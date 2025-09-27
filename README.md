@@ -23,6 +23,7 @@ A top down horror game where you are a Shepherd herding sheep across the mountai
     - [Project](#project)
     - [Rules](#rules)
     - [Teams](#teams)
+    - [Pull Requests](#pull-requests)
 4. [Support](#support)
 
 ## Overview
@@ -88,6 +89,9 @@ Writing clean and consistent code give benefits after just a short amount of wor
 > [!TIP]
 > Assembly definitions will be used for the main branch and therefore for the final project. Teams can still create their own, as long as it doesn't interfere with each other's work.
 
+> [!CAUTION]
+> Use of Layers and Tags inside of Unity can be really dangerous because of the amount of teams working with it! If you need to use one of those please contact Integration team first.
+
 ## GitHub
 
 Here are more information about the features this template offers. Follow those guidelines if you want to understand better how the project works and how to modify it.
@@ -108,18 +112,28 @@ Those are the rules everyone must follow for this repository:
 4. Team members can make new branches from their `Team branch`
 5. Pull requests to the `main branch` are allowed only from a `Team branch`
 6. Every commit **must** have a title and an exhaustive description
+7. Don't use Layers and Tags before consulting Integration Team first
 
 > [!NOTE]
 > Contact Integration Team for further questions
 
 ### Teams
 
-We recommend Teams to create personal branches from their `Team branch` and merge their work into it before creating a pull request. \
+We recommend Teams to create personal branches from their `Team branch` and merge their work into it before creating a pull request.
+
 It is also up to each team to make sure they are up to date with `main` and notify other teams when their pull request gets accepted and merged into the main project.
+
+### Pull Requests
+
+As per [Rules](#rules), pull requests to the `main` branch are accepted only from the `Team branch`. If any error occur the Integration team can start a discussion inside the pull request, highliting the problem and clarify what needs to be changed. Discussions may also start because of unclear requests or code. Pull requests can be declined when something doesn't follow departments guidelines or may cause issues with the whole project.
+
+Pull requests may also be redirected to another branch whenever Integration team suspects something may not work as intended when merging or for testing that all features works as intended without dirtying the `main` branch.
 
 ## Support
 
-If you have any suggestions for improving this repository or you want to report something, feel free to open an issue here on GitHub. The Integration Team will make sure to answer you within 1 business day. Eventually you can also contact the Integration Team on Discord for any more urgent issues.
+If you have any suggestions for improving this repository or you want to report something, feel free to open an issue here on GitHub or with the ticket system on Discord. The Integration Team will try to make sure to answer you within 1 business day.
+
+Eventually you can also contact the Integration Team directly on Discord for any more urgent issues.
 
 > [!NOTE]
 > This is a living document and may be updated in the future
