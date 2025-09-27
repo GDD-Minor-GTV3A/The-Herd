@@ -30,6 +30,7 @@ public class DialogueManager : MonoBehaviour
     private Story _story;
     private Animator _layoutAnimator;
     private string _pendingPortraitState;
+    private System.Action _onDialogueFinished;
     
     private static DialogueManager _instance;
 
@@ -42,7 +43,7 @@ public class DialogueManager : MonoBehaviour
     /// <summary>
     /// Gets a value indicating whether dialogue is currently playing.
     /// </summary>
-    public bool DialogueIsPlaying { get; private set; }
+    public bool IsDialoguePlaying { get; private set; } 
 
     /// <summary>
     /// Gets the singleton instance of the DialogueManager.
@@ -57,14 +58,14 @@ public class DialogueManager : MonoBehaviour
     {
         if (_instance != null)
         {
-            Debug.LogWarning("More than one DialogueManager in scene!");
+            Debug.LogWarning("More than one DialogueManager in scene! Destroying duplicate.");
             Destroy(gameObject);
             return;
         }
 
         _instance = this;
         
-        DialogueIsPlaying = false;
+        IsDialoguePlaying = false;
         _dialoguePanel.SetActive(false);
         _layoutAnimator = _dialoguePanel.GetComponent<Animator>();
 
@@ -77,7 +78,7 @@ public class DialogueManager : MonoBehaviour
 
     private void Update()
     {
-        if (!DialogueIsPlaying)
+        if (!IsDialoguePlaying)
         {
             return;
         }
@@ -89,9 +90,45 @@ public class DialogueManager : MonoBehaviour
             _pendingPortraitState = null;
         }
 
+        // Use Space for both advancing text and confirming a selection.
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            ContinueStory();
+            if (_story.currentChoices.Count == 0)
+            {
+                ContinueStory();
+            }
+            else
+            {
+                ConfirmChoiceSelection();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Handles the input logic for selecting the currently highlighted choice.
+    /// </summary>
+    private void ConfirmChoiceSelection()
+    {
+        GameObject selectedObject = EventSystem.current?.currentSelectedGameObject;
+        
+        if (selectedObject == null && _story.currentChoices.Count > 0)
+        {
+            // Fallback: If no button is selected but choices exist, force-select the first one.
+            EventSystem.current?.SetSelectedGameObject(_choices[0]);
+            selectedObject = _choices[0];
+        }
+
+        if (selectedObject != null)
+        {
+            for (int i = 0; i < _choices.Length; i++)
+            {
+                // Check if the selected object is one of our choice buttons
+                if (_choices[i] == selectedObject)
+                {
+                    MakeChoice(i);
+                    return; 
+                }
+            }
         }
     }
 
@@ -99,26 +136,31 @@ public class DialogueManager : MonoBehaviour
     /// Enters dialogue mode by loading an Ink story and displaying the first line.
     /// </summary>
     /// <param name="inkJson">The Ink JSON file containing the dialogue script.</param>
-    public void EnterDialogueMode(TextAsset inkJson)
+    /// <param name="onDialogueFinished">Optional callback action when dialogue exits.</param>
+    public void EnterDialogueMode(TextAsset inkJson, System.Action onDialogueFinished = null)
     {
-        if (DialogueIsPlaying)
+        if (IsDialoguePlaying)
         {
             return;
         }
 
         _story = new Story(inkJson.text);
-        DialogueIsPlaying = true;
+        IsDialoguePlaying = true;
         _dialoguePanel.SetActive(true);
+        _onDialogueFinished = onDialogueFinished;
         ContinueStory();
     }
 
     private void ExitDialogueMode()
     {
-        DialogueIsPlaying = false;
+        IsDialoguePlaying = false;
         _dialoguePanel.SetActive(false);
         _dialogueText.text = string.Empty;
         _pendingPortraitState = null;
         _layoutAnimator?.Play(DEFAULT_LAYOUT_STATE);
+        
+        _onDialogueFinished?.Invoke(); 
+        _onDialogueFinished = null;
     }
 
     private void ContinueStory()
@@ -157,7 +199,7 @@ public class DialogueManager : MonoBehaviour
                     speaker = value;
                     break;
                 case PORTRAIT_TAG:
-                    showPortrait = value.ToLower() == "true";
+                    showPortrait = !value.Equals("false", System.StringComparison.OrdinalIgnoreCase); 
                     break;
                 case LAYOUT_TAG:
                     _layoutAnimator?.Play(value);
@@ -170,12 +212,7 @@ public class DialogueManager : MonoBehaviour
 
     private void ApplySpeakerAndPortrait(string speaker, bool showPortrait)
     {
-        if (string.IsNullOrEmpty(speaker))
-        {
-            return;
-        }
-
-        if (speaker.Equals("Narrator", System.StringComparison.OrdinalIgnoreCase))
+        if (string.IsNullOrEmpty(speaker) || speaker.Equals("Narrator", System.StringComparison.OrdinalIgnoreCase))
         {
             _displayNameText.text = string.Empty;
             _portraitAnimator?.gameObject.SetActive(false);
@@ -203,11 +240,13 @@ public class DialogueManager : MonoBehaviour
 
     private string BuildPortraitStateName(string speaker)
     {
+        // Player has no sanityy portraits
         if (speaker.Equals("Player", System.StringComparison.OrdinalIgnoreCase))
         {
             return "Player";
         }
 
+        // Example: "Vesna_lowsanity"
         return $"{speaker}_{SanitySuffix()}";
     }
 
@@ -232,13 +271,14 @@ public class DialogueManager : MonoBehaviour
         if (_portraitAnimator.gameObject.activeInHierarchy)
         {
             int hash = Animator.StringToHash(stateName);
-            if (_portraitAnimator.HasState(0, hash))
+            // Check if the state exists to avoid warnings or hard errors
+            if (_portraitAnimator.HasState(0, hash)) 
             {
                 _portraitAnimator.Play(stateName, 0, 0f);
             }
             else
             {
-                Debug.LogWarning($"Portrait animator does NOT have a state named '{stateName}'.");
+                Debug.LogWarning($"Portrait animator does NOT have a state named '{stateName}' for character.");
             }
         }
         else
@@ -263,6 +303,7 @@ public class DialogueManager : MonoBehaviour
             _choices[i].SetActive(false);
         }
 
+        // Auto-select the first choice for controller/keyboard navigation
         if (currentChoices.Count > 0)
         {
             EventSystem.current?.SetSelectedGameObject(_choices[0]);
@@ -270,8 +311,18 @@ public class DialogueManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Makes a choice in the current dialogue story.
+    /// Makes a choice in the current dialogue story and continues the flow.
+    /// This is called by the UI Buttons' OnClick events and by the keyboard handler.
     /// </summary>
     /// <param name="index">The index of the choice to select.</param>
-    public void MakeChoice(int index) => _story.ChooseChoiceIndex(index);
+    public void MakeChoice(int index)
+    {
+        // Only allow selection if the story hasn't advanced (e.g., via quick clicks)
+        if (_story.currentChoices.Count > index)
+        {
+            _story.ChooseChoiceIndex(index);
+            // Immediately continue the story after a choice is made
+            ContinueStory(); 
+        }
+    }
 }

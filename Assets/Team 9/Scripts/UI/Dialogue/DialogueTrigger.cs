@@ -14,7 +14,7 @@ public class DialogueTrigger : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.D))
         {
             DialogueManager dialogueManager = DialogueManager.GetInstance();
-            if (dialogueManager != null && !dialogueManager.DialogueIsPlaying)
+            if (dialogueManager != null && !dialogueManager.IsDialoguePlaying)
             {
                 dialogueManager.EnterDialogueMode(_inkJson);
             }
