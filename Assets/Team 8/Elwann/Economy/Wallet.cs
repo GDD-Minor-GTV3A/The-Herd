@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Core.Economy
@@ -9,6 +10,11 @@ namespace Core.Economy
     {
         private readonly Dictionary<CurrencyData, int> _currencies = new Dictionary<CurrencyData, int>();
 
+        /// <summary>
+        /// called whenever a currency changes.
+        /// </summary>
+        public event Action<CurrencyData, int> OnCurrencyChanged;
+        
         /// <summary>
         /// gets the amount of a specific currency.
         /// </summary>
@@ -32,6 +38,8 @@ namespace Core.Economy
                 _currencies[currency] += amount;
             else
                 _currencies[currency] = amount;
+            
+            OnCurrencyChanged?.Invoke(currency, _currencies[currency]);
         }
 
         /// <summary>
@@ -49,8 +57,12 @@ namespace Core.Economy
             // clean up if empty
             if (_currencies[currency] <= 0)
                 _currencies.Remove(currency);
-
+            
+            OnCurrencyChanged?.Invoke(currency, GetAmount(currency));
             return true;
+            
+            
+
         }
     }
 }

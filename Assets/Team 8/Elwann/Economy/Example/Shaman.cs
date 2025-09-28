@@ -22,11 +22,6 @@ public class Shaman : MonoBehaviour
         {
             Trade();
         }
-
-        if (Input.GetKeyDown(KeyCode.G))
-        {
-            GiveCurrency();
-        }
     }
 
     public void Trade()
@@ -52,18 +47,6 @@ public class Shaman : MonoBehaviour
             Debug.Log($"Shaman now has: {_wallet.GetAmount(_currency)} {_currency.DisplayName}");
             Debug.Log($"Player now has: {_player.GetWallet().GetAmount(_currency)} {_currency.DisplayName}");
         }
-    }
-
-    private void GiveCurrency()
-    {
-        if (_player == null || _currency == null)
-        {
-            Debug.LogWarning("Player or Currency not assigned!");
-            return;
-        }
-
-        _player.GetWallet().Add(_currency, 50);
-        Debug.Log($"Given 50 currency to player. Player now has: {_player.GetWallet().GetAmount(_currency)} {_currency.DisplayName}");
     }
 
     private void OnGUI()
