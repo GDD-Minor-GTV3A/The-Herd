@@ -1,5 +1,8 @@
 VAR vesna_quest_accepted = false
 
+EXTERNAL StartQuest(string)
+EXTERNAL CompleteObjective(string, string)
+
 // START HERE: This line tells the Ink engine where to begin the story.
 -> vesna_quest.intro_dialogue
 
@@ -109,6 +112,7 @@ Yes, precisely.
 // Note: The choice text is separated from the outcome text.
 + [Accept quest: I will do it]
     ~ vesna_quest_accepted = true
+    ~ StartQuest("QUEST_001")
     #speaker:Vesna #layout:right
     That is very helpful of you! Thank you. You will have to head out to **[Level 2]** and look around as much as possible. I went through that area before I came here and it’s the last time I remember wearing it.
     #speaker:Player #layout:left

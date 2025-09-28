@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Core.Events;
 using Ink.Runtime;
 using TMPro;
 using UnityEngine;
@@ -50,6 +51,8 @@ public class DialogueManager : MonoBehaviour
     /// </summary>
     public static DialogueManager GetInstance() => _instance;
 
+    public Story Story => _story;
+    
     /// <summary>
     /// Initializes the DialogueManager, setting up the UI and singleton instance.
     /// This method is called from the game bootstrap.
@@ -68,13 +71,15 @@ public class DialogueManager : MonoBehaviour
         IsDialoguePlaying = false;
         _dialoguePanel.SetActive(false);
         _layoutAnimator = _dialoguePanel.GetComponent<Animator>();
-
+        
         _choicesText = new TextMeshProUGUI[_choices.Length];
         for (int i = 0; i < _choices.Length; i++)
         {
             _choicesText[i] = _choices[i].GetComponentInChildren<TextMeshProUGUI>();
         }
+        
     }
+    
 
     private void Update()
     {
@@ -145,6 +150,14 @@ public class DialogueManager : MonoBehaviour
         }
 
         _story = new Story(inkJson.text);
+        
+        _story.BindExternalFunction("StartQuest", (string questID) => {
+            StartQuest(questID);
+        });
+        
+        _story.BindExternalFunction("CompleteObjective", (string questID, string objectiveID) => {
+            CompleteObjective(questID, objectiveID);
+        });
         IsDialoguePlaying = true;
         _dialoguePanel.SetActive(true);
         _onDialogueFinished = onDialogueFinished;
@@ -324,5 +337,15 @@ public class DialogueManager : MonoBehaviour
             // Immediately continue the story after a choice is made
             ContinueStory(); 
         }
+    }
+
+    public void StartQuest(string questID)
+    {
+        EventManager.Broadcast(new StartQuestEvent(questID));
+    }
+
+    public void CompleteObjective(string questID, string objectiveID)
+    {
+        EventManager.Broadcast(new CompleteObjectiveEvent(questID, objectiveID));
     }
 }

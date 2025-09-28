@@ -1,17 +1,11 @@
 using UnityEngine;
 
-public class QuestStarter : MonoBehaviour
+public class NPCDialogTrigger : MonoBehaviour
 {
-    
-    //THIS IS JUST FOR TESTING!!!
-    
-    public Quest myQuest;
-    public QuestManager Manager;
-    
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        Manager.Initialize();
+        
     }
 
     // Update is called once per frame

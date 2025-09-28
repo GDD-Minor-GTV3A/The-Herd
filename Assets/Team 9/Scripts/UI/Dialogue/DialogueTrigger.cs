@@ -1,23 +1,68 @@
+using System;
 using UnityEngine;
+using TMPro;
+using UnityEngine.InputSystem;
 
 public class DialogueTrigger : MonoBehaviour
 {
-    [Header("Ink JSON")]
-    [SerializeField] private TextAsset _inkJson;
+    //TODO: EVERYTHING IN HERE!!!!
+    [SerializeField] private TextAsset _inkJSON;
     
-    public void Initialize()
+    //HANDLE UI SOMEWHERE ELSE!!!!
+    [SerializeField] private TextMeshProUGUI _interText;
+    
+
+    /// <summary>
+    /// Should enable the info "Press E to interact" but doesnt.....
+    /// </summary>
+    /// <param name="other"></param>
+    private void OnTriggerEnter(Collider other)
     {
+        if (other.CompareTag("Player"))
+        {
+            Debug.Log("Press E to Start Conversation");
+            if (!_interText) return;
+            _interText.enabled = true;
+        }
     }
 
-    private void Update()
+    
+    /// <summary>
+    /// Gives the player the ability to interact with NPC's
+    /// </summary>
+    /// <param name="other"></param>
+    private void OnTriggerStay(Collider other)
     {
-        if (Input.GetKeyDown(KeyCode.D))
+        if (DialogueManager.GetInstance().IsDialoguePlaying)
         {
-            DialogueManager dialogueManager = DialogueManager.GetInstance();
-            if (dialogueManager != null && !dialogueManager.IsDialoguePlaying)
-            {
-                dialogueManager.EnterDialogueMode(_inkJson);
-            }
+            if (!_interText) return;
+            _interText.enabled = false;
+            return;
+        }
+        if (_interText && !_interText.enabled)
+        {
+            _interText.enabled = true;
+        }
+        if (Input.GetKey(KeyCode.E))
+        {
+            DialogueManager.GetInstance().EnterDialogueMode(_inkJSON);
+        }
+        //INPUT
+        //FURTHER STUFF
+    }
+
+    
+    /// <summary>
+    /// Should disable the info "Press E to interact" but doesnt.....
+    /// </summary>
+    /// <param name="other"></param>
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            Debug.Log("Press E to Start Conversation");
+            if (!_interText) return;
+            _interText.enabled = false;
         }
     }
 }

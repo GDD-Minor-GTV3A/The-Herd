@@ -13,28 +13,31 @@ public class Quest : ScriptableObject
     /// <summary>
     /// Unique identifier for the quest.
     /// </summary>
-    //[SerializeField]
-    public string _questID;
+    [SerializeField]
+    private string _questID;
     
     /// <summary>
-    /// Public accessor for quest ID.
+    /// Name of the quest
     /// </summary>
-    public string QuestID => _questID;
-    
-    /// <summary>
-    /// Display name of the quest.
-    /// </summary>
-    public string QuestName;
+    [SerializeField] private string _questName;
     
     /// <summary>
     /// Quest description text.
     /// </summary>
-    public string Description;
+    [SerializeField] private string _questDescription;
     
     /// <summary>
     /// List of all quest objectives required to complete the quest.
     /// </summary>
-    public List<QuestObjective> Objectives;
+    [SerializeField] private List<QuestObjective> _objectives;
+    
+    /// <summary>
+    /// Public accessors for the questuff.
+    /// </summary>
+    public string QuestID => _questID;
+    public string QuestName => _questName;
+    public string QuestDescription => _questDescription;
+    public IReadOnlyList<QuestObjective> Objectives => _objectives;
     
 }
 
@@ -53,7 +56,7 @@ public class QuestObjective
     /// <summary>
     /// Objective description.
     /// </summary>
-    public string Description;
+    public string ObjectiveDescription;
     
     /// <summary>
     /// Type of the Objective
@@ -70,6 +73,10 @@ public class QuestObjective
     /// </summary>
     public int CurrentAmount;
 
+    /// <summary>
+    /// Gives back the active status of the objective
+    /// </summary>
+    public bool IsActive { get; private set; }
     
     /// <summary>
     /// Returns true if the current amount is equal to required amount.
@@ -78,7 +85,22 @@ public class QuestObjective
 
     public void AddProgress(int amount)
     {
-        CurrentAmount += CurrentAmount + amount;
+        CurrentAmount += amount;
+    }
+
+    public void SetIsActive(bool state)
+    {
+        IsActive = state;
+    }
+
+    public string GetProgressText()
+    {
+        return $"{CurrentAmount} / {RequiredAmount}";
+    }
+
+    public override string ToString()
+    {
+        return $"{ObjectiveDescription} - {CurrentAmount} / {RequiredAmount}";
     }
 }
 
@@ -91,6 +113,7 @@ public enum ObjectiveType{ CollectItem, DefeatEnemy, ReachLocation, TalkNPC, Cus
 
 /// <summary>
 /// Tracks the progress of a quest.
+/// Is a direct copy of Quest ScriptableObject
 /// </summary>
 [Serializable]
 public class QuestProgress
@@ -119,7 +142,7 @@ public class QuestProgress
             Objectives.Add(new QuestObjective
             {
                 ObjectiveID = obj.ObjectiveID,
-                Description = obj.Description,
+                ObjectiveDescription = obj.ObjectiveDescription,
                 Type = obj.Type,
                 RequiredAmount = obj.RequiredAmount,
                 CurrentAmount = obj.CurrentAmount

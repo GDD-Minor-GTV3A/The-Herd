@@ -1,20 +1,20 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Core.Events;
 using Unity.VisualScripting;
 
-
 /// <summary>
 /// Manager class to handle active quests and updates
 /// </summary>
 public class QuestManager : MonoBehaviour
 {
-    
     /// <summary>
-    /// Singleton instance of the QuestManager.
+    /// A list of all available Quests
     /// </summary>
-    public static QuestManager Instance { get; private set; }
+    [SerializeField]
+    private List<Quest> _allQuests = new List<Quest>();
 
     /// <summary>
     /// List of currently active quests.
@@ -25,16 +25,17 @@ public class QuestManager : MonoBehaviour
     /// List of completed quests.
     /// </summary>
     private List<QuestProgress> _completedQuests = new List<QuestProgress>();
-
+    
+    
+    /// <summary>
+    /// Singleton instance of the QuestManager.
+    /// </summary>
+    public static QuestManager Instance { get; private set; }
+    
     
     /// <summary>
     /// Initialise the singleton instance.
     /// </summary>
-    private void Awake()
-    {
-        
-    }
-
     public void Initialize()
     {
         if (Instance != null)
@@ -49,6 +50,24 @@ public class QuestManager : MonoBehaviour
 
     
     /// <summary>
+    /// Adding event listeners
+    /// </summary>
+    private void OnEnable()
+    {
+        EventManager.AddListener<StartQuestEvent>(OnStartQuestEvent);
+        EventManager.AddListener<CompleteObjectiveEvent>(OnCompleteObjectiveEvent);
+    }
+
+    /// <summary>
+    /// Removin event listeners
+    /// </summary>
+    private void OnDisable()
+    {
+        EventManager.RemoveListener<StartQuestEvent>(OnStartQuestEvent);
+        EventManager.RemoveListener<CompleteObjectiveEvent>(OnCompleteObjectiveEvent);
+    }
+
+    /// <summary>
     /// Starts a new quest and adds it to active quest list
     /// </summary>
     /// <param name="quest">Quest ScriptableObject to start</param>
@@ -56,8 +75,42 @@ public class QuestManager : MonoBehaviour
     {
         var progress = new QuestProgress(quest);
         _activeQuests.Add(progress);
-        
-        //TODO: UPDATE QUEST UI / CREATE QUEST UI
+    }
+
+    private void OnStartQuestEvent(StartQuestEvent evt)
+    {
+        Debug.Log($"Starting Quest: {evt.QuestID}");
+        bool checker = false;
+        if (CheckIfQuestRunningOrComplete(evt.QuestID))
+        {
+            Debug.Log("QUEST IS ALREADY RUNNING OR COMPLETED!!!");
+            return;
+        }
+        var quest = GetQuestByID(evt.QuestID);
+        StartQuest(quest);
+    }
+
+    /// <summary>
+    /// Gets called when the CompleteObjectiveEvent is triggered
+    /// </summary>
+    /// <param name="evt"></param>
+    private void OnCompleteObjectiveEvent(CompleteObjectiveEvent evt)
+    {
+        CompleteObjective(evt.QuestID, evt.ObjectiveID, 1);
+    }
+
+    
+    /// <summary>
+    /// Checks if a Quest is running or completed
+    /// </summary>
+    /// <param name="questID"> QuestID </param>
+    /// <returns> true = quest is running or complete/ false = quest hasn't been started yet </returns>
+    private bool CheckIfQuestRunningOrComplete(string questID)
+    {
+        bool result = _activeQuests.Exists(q => q.Quest.QuestID == questID);
+        if (!result)
+            result = _completedQuests.Exists(q => q.Quest.QuestID == questID);
+        return result;
     }
 
     
@@ -94,6 +147,18 @@ public class QuestManager : MonoBehaviour
 
     
     /// <summary>
+    /// Returns a Quest by it's ID
+    /// </summary>
+    /// <param name="questID"></param>
+    /// <returns></returns>
+    public Quest GetQuestByID(string questID)
+    {
+        var quest = _allQuests?.Find(q => q.QuestID == questID);
+        return quest;
+    }
+
+    
+    /// <summary>
     /// Retrieves a quest by its ID from active or completed quests.
     /// </summary>
     /// <param name="questID">The unique identifier of the quest.</param>
@@ -106,6 +171,28 @@ public class QuestManager : MonoBehaviour
             ?? _completedQuests.Find(q => q.Quest.QuestID == questID);
         return questProg;
     }
+
+    
+    /// <summary>
+    /// Returns a List of all Objective descriptions of a quest
+    /// </summary>
+    /// <param name="questID"></param>
+    /// <returns>List<string></returns>
+    public List<string> GetAllQuestObjectiveDescriptions(string questID)
+    {
+        var questObjectives = GetQuestProgressByID(questID)?.Objectives;
+        
+        if (questObjectives == null)
+            return new List<string>();
+
+        List<string> questObjDescriptionList = new List<string>();
+        foreach (var objective in questObjectives)
+        {
+            questObjDescriptionList.Add(objective.ObjectiveDescription);
+        }
+
+        return questObjDescriptionList;
+    }
     
     
     /// <summary>
@@ -117,7 +204,7 @@ public class QuestManager : MonoBehaviour
     {
         CompleteObjective("TESTQUEST_001", objectiveID, 1);
     }
-
+    
     
     /// <summary>
     /// Called when a quest is completed.
@@ -130,6 +217,7 @@ public class QuestManager : MonoBehaviour
         _activeQuests.Remove(quest);
         _completedQuests.Add(quest);
         
+        EventManager.Broadcast(new QuestCompletedEvent(quest.Quest.QuestID));
         Debug.Log($"Quest completed: {quest.Quest.QuestName}");
         //TODO: Get a reward????
     }
