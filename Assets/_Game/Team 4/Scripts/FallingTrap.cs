@@ -15,12 +15,6 @@ public class FallingTrap : MonoBehaviour
         this._startPosition = transform.position;
     }
 
-    // Temp method to initialize
-    /*void Start()
-    {
-        Initialize();
-    }*/
-
     /// <summary>
     /// Handles collision with trap
     /// </summary>
@@ -29,6 +23,8 @@ public class FallingTrap : MonoBehaviour
     {
         if (collision.gameObject.name == "sheep" && !_isFalling)
         {
+            // Temp method to store start position
+            this._startPosition = transform.position;
             // Start falling, delete sheep after 10 seconds, move platform back
             _isFalling = true;
             Destroy(collision.gameObject, 10f);
