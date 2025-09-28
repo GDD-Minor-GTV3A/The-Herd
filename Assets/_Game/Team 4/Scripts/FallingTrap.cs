@@ -21,13 +21,13 @@ public class FallingTrap : MonoBehaviour
     /// <param name="collision"></param>
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.name == "sheep" && !_isFalling)
+        if (collision.gameObject.name == "Sheep" && !_isFalling)
         {
             // Temp method to store start position
             this._startPosition = transform.position;
-            // Start falling, delete sheep after 10 seconds, move platform back
+            // Start falling, delete sheep after 4 seconds, move platform back
             _isFalling = true;
-            Destroy(collision.gameObject, 10f);
+            Destroy(collision.gameObject, 4f);
             StartCoroutine(ResetTrap());
         }
     }
