@@ -25,11 +25,12 @@ namespace Gameplay.Player
         /// <param name="input">Player input class.</param>
         /// <param name="movement">Player movement class.</param>
         /// <param name="playerRotation">Player rotation class.</param>
-        public void Initialize(PlayerInput input, PlayerMovement movement, PlayerRotation playerRotation)
+        public void Initialize(PlayerInput input, PlayerMovement movement, PlayerAnimator animator, PlayerRotation playerRotation)
         {
             Input = input;
             _movementController = movement;
             Rotation = playerRotation;
+            _animatorController = animator;
 
             InitializeStatesMap();
             SetState<PlayerIdle>();

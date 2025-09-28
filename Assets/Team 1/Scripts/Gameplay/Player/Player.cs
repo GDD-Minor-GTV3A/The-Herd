@@ -11,6 +11,8 @@ namespace Gameplay.Player
     {
         [Tooltip("Reference to player config.")]
         [SerializeField] private PlayerConfig _config;
+        [Tooltip("Animator of the player.")]
+        [SerializeField] private Animator _animator;
         [Tooltip("Reference to input actions map.")]
         [SerializeField] private InputActionAsset _inputActions;
 
@@ -41,7 +43,9 @@ namespace Gameplay.Player
             movementController.Initialize(characterController, _config);
             rotationController.Initialize(_config.RotationSpeed);
 
-            stateManager.Initialize(playerInput, movementController, rotationController);
+            PlayerAnimator animator = new PlayerAnimator(_animator);
+
+            stateManager.Initialize(playerInput, movementController,animator, rotationController);
         }
     }
 }

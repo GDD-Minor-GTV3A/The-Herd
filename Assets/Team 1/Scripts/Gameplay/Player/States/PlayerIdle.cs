@@ -7,13 +7,18 @@ namespace Gameplay.Player
     /// </summary>
     public class PlayerIdle : PlayerState
     {
+        private readonly PlayerAnimator _animator;
+
+
         public PlayerIdle(PlayerStateManager stateMachine) : base(stateMachine)
         {
+            _animator = _manager.AnimatorController as PlayerAnimator;
         }
 
 
         public override void OnStart()
         {
+            _animator.SetWalking(false);
         }
 
         public override void OnStop()

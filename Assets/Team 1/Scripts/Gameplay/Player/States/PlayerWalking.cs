@@ -7,13 +7,19 @@ namespace Gameplay.Player
     /// </summary>
     public class PlayerWalking : PlayerState
     {
+        private readonly PlayerAnimator _animator;
+
+
         public PlayerWalking(PlayerStateManager stateMachine) : base(stateMachine)
         {
+            _animator = _manager.AnimatorController as PlayerAnimator;
         }
 
 
         public override void OnStart()
         {
+            _animator.SetWalking(true);
+            _animator.SetWalkSpeed(false);
         }
 
         public override void OnStop()
@@ -27,10 +33,15 @@ namespace Gameplay.Player
 
             _playerMovement.ApplyGravity();
 
-            Vector3 movementTarget = _playerMovement.CalculateMovementTargetFromInput(_manager.Input.Move, _manager.Input.Run);
+            bool isSprinting = _manager.Input.Run;
+            Vector2 playerInput = _manager.Input.Move;
+
+            Vector3 movementTarget = _playerMovement.CalculateMovementTargetFromInput(playerInput, isSprinting);
 
             _playerMovement.MoveTo(movementTarget);
-            _manager.Rotation.Rotate(_manager.Input.Move);
+            _manager.Rotation.Rotate(playerInput);
+
+            _animator.SetWalkSpeed(isSprinting);
         }
     }
 }
