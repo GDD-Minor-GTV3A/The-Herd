@@ -13,7 +13,7 @@ public class DialogueTrigger : MonoBehaviour
     
 
     /// <summary>
-    /// Should enable the info "Press E to interact" but doesnt.....
+    /// When the player enters the trigger zone, a text will appear saying "Press E to interact"
     /// </summary>
     /// <param name="other"></param>
     private void OnTriggerEnter(Collider other)
@@ -22,8 +22,11 @@ public class DialogueTrigger : MonoBehaviour
         {
             Debug.Log("Press E to Start Conversation");
             if (!_interText) return;
+            
+            _interText.gameObject.SetActive(true);
             _interText.enabled = true;
         }
+        Debug.Log("weirdo detected");
     }
 
     
@@ -53,7 +56,7 @@ public class DialogueTrigger : MonoBehaviour
 
     
     /// <summary>
-    /// Should disable the info "Press E to interact" but doesnt.....
+    /// When the player exits the trigger zone, the interact text will disappear.
     /// </summary>
     /// <param name="other"></param>
     private void OnTriggerExit(Collider other)

@@ -10,9 +10,6 @@ EXTERNAL CompleteObjective(string, string)
 
 // --- First Dialogue Block and Choice ---
 = intro_dialogue
-#layout:narrator
-The player goes up to Vesna and interacts with her.
-
 #speaker:Vesna #layout:right
 Oh, hello there. You must be the newcomer to our Village? It is nice to meet you.
 
