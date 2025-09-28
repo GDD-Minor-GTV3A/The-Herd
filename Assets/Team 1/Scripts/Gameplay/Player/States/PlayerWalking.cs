@@ -30,7 +30,7 @@ namespace Gameplay.Player
             Vector3 movementTarget = _playerMovement.CalculateMovementTargetFromInput(_manager.Input.Move, _manager.Input.Run);
 
             _playerMovement.MoveTo(movementTarget);
-            _manager.Rotation.RotateToCamera();
+            _manager.Rotation.Rotate(_manager.Input.Move);
         }
     }
 }

@@ -17,34 +17,43 @@ namespace Gameplay.Player
         public void Initialize(float rotationSpeed)
         {
             _rotationSpeed = rotationSpeed;
-        }
-
-        private void Awake()
-        {
-            // Cache reference to main camera
             _mainCamera = Camera.main;
         }
 
+
         /// <summary>
-        /// Rotates the player to face the camera's forward direction.
+        /// Rotates the player to face the move forward direction.
         /// </summary>
-        public void RotateToCamera()
+        public void Rotate(Vector2 input)
         {
-            if (_mainCamera == null) return;
 
-            // Get camera forward vector ("beam" direction)
-            Vector3 camForward = _mainCamera.transform.forward;
-            camForward.y = 0f; // ignore vertical tilt
+            //// Get camera forward vector ("beam" direction)
+            //Vector3 camForward = _mainCamera.transform.forward;
+            //camForward.y = 0f; // ignore vertical tilt
 
-            if (camForward.sqrMagnitude > 0.001f)
-            {
-                Quaternion targetRotation = Quaternion.LookRotation(camForward);
-                transform.rotation = Quaternion.Slerp(
-                    transform.rotation,
-                    targetRotation,
-                    _rotationSpeed * Time.deltaTime
-                );
-            }
+            //if (camForward.sqrMagnitude > 0.001f)
+            //{
+            //    Quaternion targetRotation = Quaternion.LookRotation(camForward);
+            //    transform.rotation = Quaternion.Slerp(
+            //        transform.rotation,
+            //        targetRotation,
+            //        _rotationSpeed * Time.deltaTime
+            //    );
+            //}
+
+            Vector3 forward = _mainCamera.transform.forward;
+            Vector3 right = _mainCamera.transform.right;
+
+            forward.y = 0f;
+            right.y = 0f;
+
+            forward.Normalize();
+            right.Normalize();
+
+            Vector3 move = forward * input.y + right * input.x;
+
+            if (move.sqrMagnitude > 0.0001f)
+                transform.rotation = Quaternion.LookRotation(move);
         }
     }
 }

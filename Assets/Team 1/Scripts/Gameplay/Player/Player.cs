@@ -24,7 +24,8 @@ namespace Gameplay.Player
         /// <summary>
         /// Initialization method.
         /// </summary>
-        public void Initialize()
+        public void Initialize
+            ()
         {
             PlayerMovement movementController = GetComponent<PlayerMovement>();
             PlayerRotation rotationController = GetComponent<PlayerRotation>();

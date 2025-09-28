@@ -26,7 +26,7 @@ namespace Gameplay.Player
                 _manager.SetState<PlayerWalking>();
 
             _playerMovement.ApplyGravity();
-            _manager.Rotation.RotateToCamera();
+            //_manager.Rotation.Rotate();
         }
     }
 }
