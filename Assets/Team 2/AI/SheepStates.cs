@@ -18,6 +18,8 @@ namespace Core.AI.Sheep
         public void OnStart()
         {
             //for animations, sounds and so on
+            _stateManager.Agent.isStopped = false;
+            _stateManager.Animation?.SetState((int)SheepAnimState.Walk);
         }
 
         public void OnUpdate()
@@ -49,9 +51,10 @@ namespace Core.AI.Sheep
         public void OnStart()
         {
             ScheduleNextGraze();
-            if(_stateManager.Agent !=  null)
+            if(_stateManager.Agent !=  null && _stateManager?.Animation != null)
             {
                 _stateManager.Agent.isStopped = false;
+                _stateManager.Animation.SetState((int)SheepAnimState.Idle);
             }
         }
 
@@ -71,7 +74,7 @@ namespace Core.AI.Sheep
             _stateManager.Agent.isStopped = false;
             _currentTarget = _stateManager.GetGrazeTarget();
             _stateManager.SetDestinationWithHerding(_currentTarget);
-
+            _stateManager.Animation?.SetState((int)SheepAnimState.Walk);
             ScheduleNextGraze();
         }
 
@@ -118,9 +121,10 @@ namespace Core.AI.Sheep
 
             _currentTarget = _stateManager.GetTargetOutsideOfHerd();
 
-            if(_stateManager?.Agent != null)
+            if (_stateManager?.Agent != null && _stateManager?.Animation != null)
             {
                 _stateManager.Agent.isStopped = false;
+                _stateManager.Animation.SetState((int)SheepAnimState.Walk);
             }
         }
 

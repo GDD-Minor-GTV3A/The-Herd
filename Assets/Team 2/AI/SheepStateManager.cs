@@ -29,6 +29,9 @@ namespace Core.AI.Sheep
         [SerializeField][Tooltip("Sheep's archetype")]
         private SheepArchetype _archetype;
 
+        [SerializeField]
+        private SheepAnimationDriver _animation;
+
         [Header("Neighbours")]
         [SerializeField]
         [Tooltip("All herd members")]
@@ -48,6 +51,8 @@ namespace Core.AI.Sheep
         /// Exposed NavMeshAgent for state machine
         /// </summary>
         public NavMeshAgent Agent => _agent;
+
+        public SheepAnimationDriver Animation => _animation;
 
         /// <summary>
         /// Exposed config and archetype
@@ -69,7 +74,20 @@ namespace Core.AI.Sheep
                 _agent.speed = _config.BaseSpeed;
             }
 
+            if(_archetype?.AnimationOverrides != null)
+            {
+                _animation?.ApplyOverrideController(_archetype.AnimationOverrides);
+            }
+
             InitializeStatesMap();
+        }
+
+        private void LateUpdate()
+        {
+            if(_animation == null || _agent == null) return;
+            Vector3 v = _agent.velocity;
+            v.y = 0f;
+            _animation.SetSpeed(v.magnitude);
         }
 
         private void OnEnable()

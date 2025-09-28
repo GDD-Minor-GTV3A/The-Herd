@@ -12,6 +12,9 @@ namespace Core.AI.Sheep.Config
         [SerializeField] private float _followDistance = 1.8f;
         [SerializeField] private float _gettingLostChance = 0.005f;
 
+        [Header("Animation Overrides")]
+        [SerializeField] private AnimatorOverrideController _animationOverrides;
+        //[SerializeField] private int _idleVariantCount = 2;
 
         [Header("Grazing interval in seconds")]
         [SerializeField]
@@ -27,5 +30,8 @@ namespace Core.AI.Sheep.Config
 
         public float GrazeIntervalMin => _grazeIntervalMin;
         public float GrazeIntervalMax => _grazeIntervalMax;
+
+        public AnimatorOverrideController AnimationOverrides => _animationOverrides;
+        //public int IdleVariantCount => Mathf.Max(1, _idleVariantCount);
     }
 }
