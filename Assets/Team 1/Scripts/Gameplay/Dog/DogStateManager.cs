@@ -25,11 +25,14 @@ namespace Gameplay.Dog
         /// Initialization method.
         /// </summary>
         /// <param name="movementController">Dog movement controller.</param>
+        /// <param name="animator">Dog animator controller.</param>
         /// <param name="playerTransform">Player transform to follow.</param>
         /// <param name="config">Config of the dog.</param>
-        public void Initialize(DogMovementController movementController, Transform playerTransform, DogConfig config)
+        public void Initialize(DogMovementController movementController, DogAnimator animator, Transform playerTransform, DogConfig config)
         {
             _movementController = movementController;
+
+            _animatorController = animator;
 
             _playerTransform = playerTransform;
 

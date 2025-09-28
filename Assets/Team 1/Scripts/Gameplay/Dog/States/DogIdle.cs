@@ -13,6 +13,7 @@ namespace Gameplay.Dog
         private readonly float _distanceToStartFollow;
 
         private Coroutine _delayCoroutine;
+        private readonly DogAnimator _animator;
 
 
         /// <param name="playerTransform">Transform of player object to follow.</param>
@@ -21,12 +22,15 @@ namespace Gameplay.Dog
         {
             _player = playerTransform;
             _distanceToStartFollow = distanceToStartFollow;
+
+            _animator = manager.AnimatorController as DogAnimator;
         }
 
 
         public override void OnStart()
         {
             _manager.CurrentTarget.OnValueChanged += OnTargetChanged;
+            _animator.SetWalking(false);
         }
 
         public override void OnStop()

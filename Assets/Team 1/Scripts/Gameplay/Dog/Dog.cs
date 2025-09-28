@@ -10,6 +10,8 @@ namespace Gameplay.Dog
     {
         [Tooltip("Transform of player object to follow.")]
         [SerializeField] private Transform _playerTransform;
+        [Tooltip("Animator of the dog.")]
+        [SerializeField] private Animator _animator;
         [Tooltip("Config for the dog.")]
         [SerializeField] private DogConfig _config;
 
@@ -26,9 +28,10 @@ namespace Gameplay.Dog
             NavMeshAgent agent = GetComponent<NavMeshAgent>();
             _movementController.Initialize(agent, _config);
 
+            DogAnimator animator = new DogAnimator(_animator, _config);
 
             DogStateManager stateManager = GetComponent<DogStateManager>();
-            stateManager.Initialize(_movementController, _playerTransform, _config);
+            stateManager.Initialize(_movementController, animator, _playerTransform, _config);
         }
 
         // for test, needs to be moved to bootstrap

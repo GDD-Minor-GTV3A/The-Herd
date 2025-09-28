@@ -9,17 +9,23 @@ namespace Gameplay.Dog
     public class DogMove : DogState
     {
         private readonly DogMovementController _dogMovement;
+        private readonly DogAnimator _animator;
+
 
 
         public DogMove(DogStateManager manager) : base(manager)
         {
             _dogMovement = _manager.MovementController as DogMovementController;
+            _animator = _manager.AnimatorController as DogAnimator;
         }
 
 
         public override void OnStart()
         {
             UpdateTarget();
+
+            _animator.SetWalking(true);
+            _animator.SetWakingAnimationSpeedMulti(1f);
 
             _manager.CurrentTarget.OnValueChanged += UpdateTarget;
 

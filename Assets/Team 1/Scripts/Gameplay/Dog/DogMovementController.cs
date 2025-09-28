@@ -61,10 +61,12 @@ namespace Gameplay.Dog
         /// <summary>
         /// Changes speed of the dog depending on distance to hte player.
         /// </summary>
-        public void CalculateSpeedToPlayer()
+        public float CalculateSpeedToPlayer()
         {
             float t = Mathf.InverseLerp(_slowDistance, _maxDistance, _agent.remainingDistance);
             _agent.speed = Mathf.Lerp(_minSpeed, _maxSpeed, t);
+
+            return _agent.speed;
         }
     }
 }

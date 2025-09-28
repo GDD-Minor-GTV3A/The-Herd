@@ -13,6 +13,7 @@ namespace Gameplay.Dog
         private readonly float _distanceToStopFollow;
 
         private readonly DogMovementController _dogMovement;
+        private readonly DogAnimator _animator;
 
 
         /// <param name="playerTransform">Transform of player object to follow.</param>
@@ -23,12 +24,14 @@ namespace Gameplay.Dog
             _distanceToStopFollow = distanceToStopFollow;
 
             _dogMovement = _manager.MovementController as DogMovementController;
+            _animator = _manager.AnimatorController as DogAnimator;
         }
 
 
         public override void OnStart()
         {
             _manager.CurrentTarget.OnValueChanged += OnTargetChanged;
+            _animator.SetWalking(true);
         }
 
         public override void OnStop()
@@ -39,10 +42,11 @@ namespace Gameplay.Dog
         public override void OnUpdate()
         {
             _dogMovement.MoveTo(CalculateFollowPoint());
-            _dogMovement.CalculateSpeedToPlayer();
+            float currentSpeed = _dogMovement.CalculateSpeedToPlayer();
+            _animator.CalculateWalkingSpeedMultiplier(currentSpeed);
 
 
-            if (Vector3.Distance(_manager.MovementController.transform.position, _player.position) < _distanceToStopFollow)
+            if (!_dogMovement.IsMoving)
                 _manager.SetState<DogIdle>();
         }
 
