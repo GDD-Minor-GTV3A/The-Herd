@@ -1,0 +1,54 @@
+name: C# Format Check
+
+on:
+  push:
+    branches:
+      - main
+      - "Team#**"
+  pull_request:
+    branches:
+      - main
+      - "Team#**"
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  format:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Run dotnet format
+        id: format
+        run: |
+          dotnet format ./The-Herd.sln -v detailed
+          if git diff --quiet; then
+              echo "changes=false" >> $GITHUB_OUTPUT
+          else
+              echo "changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Fail if changes detected on main
+        if: (github.ref == 'refs/heads/main' || github.event_name == 'pull_request' && github.base_ref == 'main') && steps.format.outputs.changes == 'true'
+        run: |
+          echo "::error::Code formatting issues detected. Please run 'dotnet format' locally and commit the changes."
+          exit 1
+
+      - name: Create PR with changes for team branches
+        if: steps.format.outputs.changes == 'true' && (startsWith(github.ref, 'refs/heads/Team#') || (github.event_name == 'pull_request' && startsWith(github.head_ref, 'Team#')))
+        uses: peter-evans/create-pull-request@v5
+        with:
+          commit-message: "Apply dotnet format changes"
+          title: "🤖 Auto-format C# code"
+          body: "This PR was automatically created to apply C# code formatting standards."
+          branch: auto-format-${{ github.ref_name }}
+          base: ${{ github.ref_name }}
+          delete-branch: true
