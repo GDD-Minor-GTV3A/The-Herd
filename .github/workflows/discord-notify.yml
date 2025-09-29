@@ -2,9 +2,9 @@ name: Discord Notification
 
 on:
   push:
-    branches: [ main, Team#1, Team#2, Team#3, Team#4, Team#5, Team#6, Team#7, Team#8, Team#9, Team#10, Team#11 ]
+    branches: [main, "Team#**"]
   pull_request:
-    branches: [ main, Team#1, Team#2, Team#3, Team#4, Team#5, Team#6, Team#7, Team#8, Team#9, Team#10, Team#11 ]
+    branches: [main, "Team#**"]
 
 jobs:
   notify-main:
@@ -16,101 +16,24 @@ jobs:
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK_MAIN }}
 
-  notify-team1:
-    if: github.ref == 'refs/heads/Team#1'
+  notify-teams:
+    if: startsWith(github.ref, 'refs/heads/Team#')
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        team: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
     steps:
+      - name: Check if current branch matches team
+        id: check-team
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/Team#${{ matrix.team }}" ]; then
+            echo "should-notify=true" >> $GITHUB_OUTPUT
+          else
+            echo "should-notify=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Notify Discord
+        if: steps.check-team.outputs.should-notify == 'true'
         uses: sarisia/actions-status-discord@v1.15.4
         with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK_TEAM1 }}
-          
-  notify-team2:
-    if: github.ref == 'refs/heads/Team#2'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Notify Discord
-        uses: sarisia/actions-status-discord@v1.15.4
-        with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK_TEAM2 }}
-          
-  notify-team3:
-    if: github.ref == 'refs/heads/Team#3'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Notify Discord
-        uses: sarisia/actions-status-discord@v1.15.4
-        with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK_TEAM3 }}
-          
-  notify-team4:
-    if: github.ref == 'refs/heads/Team#4'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Notify Discord
-        uses: sarisia/actions-status-discord@v1.15.4
-        with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK_TEAM4 }}
-          
-  notify-team5:
-    if: github.ref == 'refs/heads/Team#5'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Notify Discord
-        uses: sarisia/actions-status-discord@v1.15.4
-        with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK_TEAM5 }}
-          
-  notify-team6:
-    if: github.ref == 'refs/heads/Team#6'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Notify Discord
-        uses: sarisia/actions-status-discord@v1.15.4
-        with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK_TEAM6 }}
-          
-  notify-team7:
-    if: github.ref == 'refs/heads/Team#7'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Notify Discord
-        uses: sarisia/actions-status-discord@v1.15.4
-        with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK_TEAM7 }}
-          
-  notify-team8:
-    if: github.ref == 'refs/heads/Team#8'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Notify Discord
-        uses: sarisia/actions-status-discord@v1.15.4
-        with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK_TEAM8 }}
-          
-  notify-team9:
-    if: github.ref == 'refs/heads/Team#9'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Notify Discord
-        uses: sarisia/actions-status-discord@v1.15.4
-        with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK_TEAM9 }}
-          
-  notify-team10:
-    if: github.ref == 'refs/heads/Team#10'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Notify Discord
-        uses: sarisia/actions-status-discord@v1.15.4
-        with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK_TEAM10 }}
-          
-  notify-team11:
-    if: github.ref == 'refs/heads/Team#11'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Notify Discord
-        uses: sarisia/actions-status-discord@v1.15.4
-        with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK_TEAM11 }}
+          webhook: ${{ secrets[format('DISCORD_WEBHOOK_TEAM{0}', matrix.team)] }}
