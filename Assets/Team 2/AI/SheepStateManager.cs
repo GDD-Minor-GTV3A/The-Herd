@@ -5,6 +5,7 @@ using System.Collections;
 using Core.Events;
 using Core.Shared.StateMachine;
 using Core.AI.Sheep.Config;
+using Core.AI.Sheep.Personality;
 using UnityEngine.AI;
 
 using Random = UnityEngine.Random;
@@ -15,7 +16,7 @@ namespace Core.AI.Sheep
     /// Sheep state manager
     /// </summary>
     [RequireComponent(typeof(NavMeshAgent))]
-    public class SheepStateManager : CharacterStateManager<IState>
+    public class SheepStateManager : StateManager<IState>
     {
         private const float DEFAULT_FOLLOW_DISTANCE = 1.8f;
         private const float DEFAULT_MAX_LOST_DISTANCE_FROM_HERD = 10f; // This is a test distance and is open to change
@@ -46,6 +47,10 @@ namespace Core.AI.Sheep
         private Vector3 _playerCenter;
         private Vector3 _playerHalfExtents;
 
+        // Personality system
+        private ISheepPersonality _personality;
+        private PersonalityBehaviorContext _behaviorContext;
+
 
         /// <summary>
         /// Exposed NavMeshAgent for state machine
@@ -59,13 +64,13 @@ namespace Core.AI.Sheep
         /// </summary>
         public SheepConfig Config => _config;
         public SheepArchetype Archetype => _archetype;
+        public ISheepPersonality Personality => _personality;
 
         /// <summary>
         /// Read-only list of neighbouring sheep
         /// </summary>
         public IReadOnlyList<Transform> Neighbours => _neighbours;
-
-
+        
         private void Awake()
         {
             _agent = GetComponent<NavMeshAgent>();
@@ -78,6 +83,9 @@ namespace Core.AI.Sheep
             {
                 _animation?.ApplyOverrideController(_archetype.AnimationOverrides);
             }
+            
+            _personality = _archetype?.CreatePersonality(this);
+            _behaviorContext = new PersonalityBehaviorContext();
 
             InitializeStatesMap();
         }
@@ -94,7 +102,7 @@ namespace Core.AI.Sheep
         {
             EventManager.AddListener<PlayerSquareChangedEvent>(OnPlayerSquareChanged);
             EventManager.AddListener<PlayerSquareTickEvent>(OnPlayerSquareTick);
-
+            
             SetState<SheepGrazeState>();
 
             float interval = _config != null ? _config.Tick : 0.15f;
@@ -140,7 +148,6 @@ namespace Core.AI.Sheep
             _playerHalfExtents = e.HalfExtents;
         }
 
-
         private void OnPlayerSquareTick(PlayerSquareTickEvent e)
         {
             _playerCenter = e.Center;
@@ -150,128 +157,125 @@ namespace Core.AI.Sheep
 
             //Decide on state
             bool outside = FlockingUtility.IsOutSquare(transform.position, _playerCenter, _playerHalfExtents);
-            var targetState = outside ? typeof(SheepFollowState) : typeof(SheepGrazeState);
-
+            
+            // Redundant check, state machine should check if switching to same state
+            Type targetState = outside ? typeof(SheepFollowState) : typeof(SheepGrazeState);
             if(_currentState.GetType() == targetState) return;
-
-            SetState(targetState);
-
+            
+            if (outside)
+                SetState<SheepFollowState>();
+            else
+                SetState<SheepGrazeState>();
         }
-
 
         private void OnSheepCallBackToPlayerEvent()
         {
             SetState<SheepFollowState>();
         }
-
-
+        
         private IEnumerator TickCoroutine(float interval)
         {
             var wait = new WaitForSeconds(interval);
 
             while(true)
             {
+                // Update behavior context for personality
+                UpdateBehaviorContext();
+
                 if (_currentState is not SheepWalkAwayFromHerdState && Time.time >= _nextWalkingAwayFromHerdAt)
                 {
                     if (Random.value <= _archetype.GettingLostChance) SetState<SheepWalkAwayFromHerdState>();
                     ScheduleNextWalkAwayFromHerd();
                 }
-                _currentState?.OnUpdate();
+
                 yield return wait;
             }
-
         }
 
         private void ScheduleNextWalkAwayFromHerd()
         {
             _nextWalkingAwayFromHerdAt = Time.time + _config?.WalkAwayFromHerdTicks ?? DEFAULT_WALK_AWAY_FROM_HERD_TICKS;
         }
+        
+        public void SetDestinationWithHerding(Vector3 destination) => _personality.SetDestinationWithHerding(destination, this, _behaviorContext);
+        public Vector3 GetTargetNearPlayer() => _personality.GetFollowTarget(this, _behaviorContext);
+        public Vector3 GetGrazeTarget() => _personality.GetGrazeTarget(this, _behaviorContext);
+        public Vector3 GetTargetOutsideOfHerd() => _personality.GetWalkAwayTarget(this, _behaviorContext);
 
 
         /// <summary>
-        /// Stops last state and starts new state.
+        /// Updates the behavior context with current state information
         /// </summary>
-        /// <param name="type">State to change to</param>
-        public virtual void SetState(Type type)
+        private void UpdateBehaviorContext()
         {
-            _currentState?.OnStop();
+            if (_behaviorContext == null) return;
 
-            _currentState = StatesMap[type];
-            _currentState.OnStart();
-        }
+            _behaviorContext.PlayerPosition = _playerCenter;
+            _behaviorContext.PlayerHalfExtents = _playerHalfExtents;
+            _behaviorContext.DistanceToPlayer = Vector3.Distance(transform.position, _playerCenter);
+            _behaviorContext.IsPlayerMoving = false; 
+            _behaviorContext.HasThreat = false; 
+            _behaviorContext.ThreatPosition = Vector3.zero;
+            _behaviorContext.TimeSinceLastAction = Time.time;
+            _behaviorContext.NeighborCount = _neighbours.Count;
+            _behaviorContext.CurrentVelocity = _agent?.velocity ?? Vector3.zero;
+            _behaviorContext.CurrentSpeed = _agent?.speed ?? 0f;
+            _behaviorContext.IsInHerd = !FlockingUtility.IsOutSquare(transform.position, _playerCenter, _playerHalfExtents);
 
-
-        #region ======== Helpers for states ========
-
-        /// <summary>
-        /// Set destination with herding nudge
-        /// </summary>
-        public void SetDestinationWithHerding(Vector3 destination)
-        {
-            Vector3 desired = destination - transform.position;
-            desired.y = 0f;
-
-            float sepDist = _config?.SeparationDistance ?? 0.8f;
-            float sepW = _config?.SeparationWeight ?? 1.2f;
-            float alignW = _config?.AlignmentWeight ?? 0.6f;
-            float clamp = _config?.SteerClamp ?? 2.5f;
-
-            Vector3 steer = FlockingUtility.Steering(
-                transform,
-                _neighbours,
-                sepDist,
-                sepW,
-                alignW,
-                clamp
-            );
-
-            Vector3 final = transform.position + desired + steer;
-            _agent?.SetDestination( final );
+            // Calculate average neighbor distance
+            if (_neighbours.Count > 0)
+            {
+                float totalDistance = 0f;
+                foreach (var neighbor in _neighbours)
+                {
+                    if (neighbor != null)
+                    {
+                        totalDistance += Vector3.Distance(transform.position, neighbor.position);
+                    }
+                }
+                _behaviorContext.AverageNeighborDistance = totalDistance / _neighbours.Count;
+            }
+            else
+            {
+                _behaviorContext.AverageNeighborDistance = float.MaxValue;
+            }
         }
 
         /// <summary>
-        /// Makes a destination near the player
+        /// Called when player performs an action (whistle, etc.)
+        /// Can be called from external systems
         /// </summary>
-        public Vector3 GetTargetNearPlayer()
+        public void OnPlayerAction(string actionType)
         {
-            float want = Mathf.Min(0.5f, _archetype?.FollowDistance ?? DEFAULT_FOLLOW_DISTANCE);
-            Vector3 dir = (_playerCenter - transform.position);
-            dir.y = 0f;
-            dir = dir.sqrMagnitude > 0.001f ? dir.normalized : Vector3.forward;
-
-            Vector3 target = _playerCenter - dir * want;
-
-            //Reduce stacking
-            target += Quaternion.Euler(0f, Random.Range(-35f, 35f), 0f) * (Vector3.right * (want * 0.5f));
-            return target;
+            _personality.OnPlayerAction(actionType, this, _behaviorContext);
         }
 
         /// <summary>
-        /// Pick a point to go to when grazing
+        /// Called when a threat is detected
+        /// Can be called from external systems
         /// </summary>
-        public Vector3 GetGrazeTarget()
+        public void OnThreatDetected(Vector3 threatPosition)
         {
-            float step = Mathf.Max(0.2f, _archetype?.IdleWanderRadius ?? 1.0f);
-            Vector2 rand = Random.insideUnitCircle * step;
-            return transform.position + new Vector3(rand.x, 0f, rand.y);
+            _behaviorContext.HasThreat = true;
+            _behaviorContext.ThreatPosition = threatPosition;
+            _personality.OnThreatDetected(threatPosition, this, _behaviorContext);
         }
 
         /// <summary>
-        /// Picks a point to go to when leaving the herd.
+        /// Called when sheep gets separated from herd
         /// </summary>
-        /// <returns></returns>
-        public Vector3 GetTargetOutsideOfHerd()
+        public void OnSeparatedFromHerd()
         {
-            float maxLostDistanceFromHerd = _config?.MaxLostDistanceFromHerd ?? DEFAULT_MAX_LOST_DISTANCE_FROM_HERD;
-            Vector2 rand = Random.insideUnitCircle * maxLostDistanceFromHerd;
-            Vector3 playerHalf = new (rand.x < 0 ? _playerHalfExtents.x * -1 : _playerHalfExtents.x, 0f, rand.y < 0 ? _playerHalfExtents.z * -1 : _playerHalfExtents.z);
-            return transform.position  + playerHalf +  new Vector3(rand.x, 0f, rand.y);
+            _personality.OnSeparatedFromHerd(this, _behaviorContext);
         }
 
-        #endregion
-
-
+        /// <summary>
+        /// Called when sheep rejoins herd
+        /// </summary>
+        public void OnRejoinedHerd()
+        {
+            _personality.OnRejoinedHerd(this, _behaviorContext);
+        }
 
     }
-
 }

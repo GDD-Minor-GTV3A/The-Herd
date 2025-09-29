@@ -90,7 +90,9 @@ namespace Core.AI.Sheep
         {
             float min = Mathf.Max(0.1f, _stateManager.Archetype?.GrazeIntervalMin ?? 3f);
             float max = Mathf.Max(min, _stateManager.Archetype?.GrazeIntervalMax ?? 5f);
-            _nextGrazeAt = Time.time + Random.Range(min, max);
+            float baseInterval = Random.Range(min, max);
+
+            _nextGrazeAt = Time.time + baseInterval;
         }
 
         private bool HasArrived()

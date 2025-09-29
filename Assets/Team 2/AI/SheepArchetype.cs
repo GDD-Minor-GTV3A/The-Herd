@@ -1,4 +1,7 @@
 using UnityEngine;
+using Core.AI.Sheep.Personality;
+using Core.AI.Sheep.Personality.Types;
+
 namespace Core.AI.Sheep.Config
 {
     /// <summary>
@@ -22,6 +25,10 @@ namespace Core.AI.Sheep.Config
         [SerializeField]
         private float _grazeIntervalMax = 5.0f;
 
+        [Header("Personality")]
+        [SerializeField]
+        private PersonalityType _personalityType = PersonalityType.Normal;
+
         //Getters
         public float Skittishness => _skittishness;
         public float IdleWanderRadius => _idleWanderRadius;
@@ -32,6 +39,33 @@ namespace Core.AI.Sheep.Config
         public float GrazeIntervalMax => _grazeIntervalMax;
 
         public AnimatorOverrideController AnimationOverrides => _animationOverrides;
+        
         //public int IdleVariantCount => Mathf.Max(1, _idleVariantCount);
+        public PersonalityType PersonalityType => _personalityType;
+        
+        public ISheepPersonality CreatePersonality(SheepStateManager sheep)
+        {
+            return _personalityType switch
+            {
+                PersonalityType.Normal => new NormalPersonality(sheep),
+                PersonalityType.Lazy => new LazyPersonality(sheep),
+                PersonalityType.Energetic => new EnergeticPersonality(sheep),
+                PersonalityType.Nervous => new NervousPersonality(sheep),
+                PersonalityType.Stubborn => new StubbornPersonality(sheep),
+                _ => new NormalPersonality(sheep)
+            };
+        }
+    }
+
+    /// <summary>
+    /// Available personality types for sheep
+    /// </summary>
+    public enum PersonalityType
+    {
+        Normal,
+        Lazy,
+        Energetic,
+        Nervous,
+        Stubborn
     }
 }
