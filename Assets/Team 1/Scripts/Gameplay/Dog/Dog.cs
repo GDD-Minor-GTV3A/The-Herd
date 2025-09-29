@@ -6,10 +6,13 @@ namespace Gameplay.Dog
     /// <summary>
     /// Main script for the dog.
     /// </summary>
+    [RequireComponent(typeof(DogMovementController), typeof(NavMeshAgent), typeof(DogStateManager))]
     public class Dog : MonoBehaviour
     {
         [Tooltip("Transform of player object to follow.")]
         [SerializeField] private Transform _playerTransform;
+        [Tooltip("Manager of step sounds.")]
+        [SerializeField] private StepsSoundManager _stepsSoundManager;
         [Tooltip("Animator of the dog.")]
         [SerializeField] private Animator _animator;
         [Tooltip("Config for the dog.")]
@@ -28,6 +31,8 @@ namespace Gameplay.Dog
             NavMeshAgent agent = GetComponent<NavMeshAgent>();
             _movementController.Initialize(agent, _config);
 
+            _stepsSoundManager.Initialize();
+
             DogAnimator animator = new DogAnimator(_animator, _config);
 
             DogStateManager stateManager = GetComponent<DogStateManager>();
@@ -40,5 +45,4 @@ namespace Gameplay.Dog
             Initialize();
         }
     }
-
 }
