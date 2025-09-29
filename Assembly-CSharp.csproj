@@ -61,7 +61,17 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.0.58f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scriptsd\AI\Monster Model\Export to Main Project\SheepSanity.cs" />
+    <Compile Include="Assets\Scriptsd\AI\Monster Model\Export to Main Project\DetectSheep.cs" />
+    <Compile Include="Assets\Scriptsd\AI\Monster Model\Export to Main Project\Monster1AI.cs" />
+    <Compile Include="Assets\Scriptsd\AI\Monster Model\Export to Main Project\LookAtPlayer.cs" />
+    <Compile Include="Assets\Scriptsd\AI\Monster Model\Export to Main Project\FieldOfView.cs" />
+    <Compile Include="Assets\Scriptsd\AI\Monster Model\Export to Main Project\NEWInCameraDetector.cs" />
+    <Compile Include="Assets\Scriptsd\AI\Monster Model\Export to Main Project\SheepAI.cs" />
+    <Compile Include="Assets\Scriptsd\AI\Monster Model\Export to Main Project\SanityController.cs" />
     <Compile Include="Assets\_Game\Scripts\Core\GameBootstrap.cs" />
+    <Compile Include="Assets\Scriptsd\System\ReadOnlyAttribute.cs" />
+    <Compile Include="Assets\Scriptsd\AI\Monster Model\Export to Main Project\Node.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Team 1\README.txt" />
@@ -563,6 +573,14 @@
     </Reference>
     <Reference Include="Mono.Cecil">
       <HintPath>Library\PackageCache\com.unity.nuget.mono-cecil@d6f9955a5d5f\Mono.Cecil.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Android.Types">
+      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.0.58f1\Editor\Data\PlaybackEngines\AndroidPlayer\Unity.Android.Types.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Android.Gradle">
+      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.0.58f1\Editor\Data\PlaybackEngines\AndroidPlayer\Unity.Android.Gradle.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="netstandard">
