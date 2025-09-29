@@ -1,3 +1,5 @@
+using System;
+
 using Gameplay.ToolsSystem;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -21,6 +23,10 @@ namespace Gameplay.Player
         [SerializeField] private PlayerConfig _config;
 
 
+        private PlayerMovement _movementController;
+        private PlayerRotation _rotationController;
+
+
         // for test, needs to be moved to bootstrap
         private void Start()
         {
@@ -32,8 +38,8 @@ namespace Gameplay.Player
         /// </summary>
         public void Initialize()
         {
-            PlayerMovement movementController = GetComponent<PlayerMovement>();
-            PlayerRotation rotationController = GetComponent<PlayerRotation>();
+            _movementController = GetComponent<PlayerMovement>();
+            _rotationController = GetComponent<PlayerRotation>();
             PlayerStateManager stateManager = GetComponent<PlayerStateManager>();
             PlayerInput playerInput = GetComponent<PlayerInput>();
             ToolSlotsController slotsController = GetComponent<ToolSlotsController>();
@@ -43,13 +49,32 @@ namespace Gameplay.Player
             slotsController.Initialize(playerInput, 3);
 
             CharacterController characterController = GetComponent<CharacterController>();
-            movementController.Initialize(characterController, _config);
-            rotationController.Initialize(_config.RotationSpeed);
+            _movementController.Initialize(characterController, _config);
+
+            _rotationController.Initialize(_config.RotationSpeed);
 
             _stepsSoundManager.Initialize();
             PlayerAnimator animator = new PlayerAnimator(_animator);
+            stateManager.Initialize(playerInput, _movementController, animator, _rotationController);
 
-            stateManager.Initialize(playerInput, movementController,animator, rotationController);
+            _config.OnValueChanged += UpdateConfigValues;
+        }
+
+
+        /// <summary>
+        /// Update values according to config.
+        /// </summary>
+        /// <param name="config">Config of the player.</param>
+        private void UpdateConfigValues(PlayerConfig config)
+        {
+            _movementController.UpdateValues(config);
+            _rotationController.UpdateRotationSpeed(config.RotationSpeed);
+        }
+
+
+        private void OnDestroy()
+        {
+            _config.OnValueChanged -= UpdateConfigValues;
         }
     }
 }

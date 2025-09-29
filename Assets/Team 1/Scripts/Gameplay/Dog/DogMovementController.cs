@@ -1,6 +1,12 @@
-using Core.Shared;
 using System;
 using System.Collections;
+
+using Core.Shared;
+
+using Gameplay.Player;
+
+using Unity.Android.Gradle.Manifest;
+
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -36,16 +42,7 @@ namespace Gameplay.Dog
         {
             _agent = agent;
 
-            _minSpeed = config.MinSpeed;
-            _maxSpeed = config.MaxSpeed;
-            _baseSpeed = config.BaseSpeed;
-
-            _slowDistance = config.SlowDistance;
-            _maxDistance = config.MaxDistance;
-
-            _agent.speed = _baseSpeed;
-
-            _agent.angularSpeed = config.RotationSpeed;
+            UpdateValues(config);
         }
 
 
@@ -67,6 +64,25 @@ namespace Gameplay.Dog
             _agent.speed = Mathf.Lerp(_minSpeed, _maxSpeed, t);
 
             return _agent.speed;
+        }
+
+
+        /// <summary>
+        /// Update values according to config.
+        /// </summary>
+        /// <param name="config">Config of the dog.</param>
+        public void UpdateValues(DogConfig config)
+        {
+            _minSpeed = config.MinSpeed;
+            _maxSpeed = config.MaxSpeed;
+            _baseSpeed = config.BaseSpeed;
+
+            _slowDistance = config.SlowDistance;
+            _maxDistance = config.MaxDistance;
+
+            _agent.speed = _baseSpeed;
+
+            _agent.angularSpeed = config.RotationSpeed;
         }
     }
 }

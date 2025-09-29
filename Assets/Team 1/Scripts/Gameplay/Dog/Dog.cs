@@ -20,6 +20,7 @@ namespace Gameplay.Dog
 
 
         private DogMovementController _movementController;
+        private DogAnimator _dogAnimator;
 
 
         /// <summary>
@@ -33,16 +34,31 @@ namespace Gameplay.Dog
 
             _stepsSoundManager.Initialize();
 
-            DogAnimator animator = new DogAnimator(_animator, _config);
+            _dogAnimator = new DogAnimator(_animator, _config);
 
             DogStateManager stateManager = GetComponent<DogStateManager>();
-            stateManager.Initialize(_movementController, animator, _playerTransform, _config);
+            stateManager.Initialize(_movementController, _dogAnimator, _playerTransform, _config);
+
+            _config.OnValueChanged += UpdateValues;
+        }
+
+        private void UpdateValues(DogConfig config)
+        {
+            _movementController.UpdateValues(config);
+            _dogAnimator.UpdateAnimationValues(config);
+
         }
 
         // for test, needs to be moved to bootstrap
         void Start()
         {
             Initialize();
+        }
+
+
+        private void OnDestroy()
+        {
+            _config.OnValueChanged -= UpdateValues;
         }
     }
 }

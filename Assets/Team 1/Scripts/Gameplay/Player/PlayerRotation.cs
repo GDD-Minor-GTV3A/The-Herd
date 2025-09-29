@@ -16,7 +16,7 @@ namespace Gameplay.Player
         /// <param name="rotationSpeed">How quickly the player rotates towards the camera's direction.</param>
         public void Initialize(float rotationSpeed)
         {
-            _rotationSpeed = rotationSpeed;
+            UpdateRotationSpeed(rotationSpeed);
             _mainCamera = Camera.main;
         }
 
@@ -54,6 +54,12 @@ namespace Gameplay.Player
 
             if (move.sqrMagnitude > 0.0001f)
                 transform.rotation = Quaternion.LookRotation(move);
+        }
+
+
+        public void UpdateRotationSpeed(float rotationSpeed)
+        {
+            _rotationSpeed = rotationSpeed;
         }
     }
 }

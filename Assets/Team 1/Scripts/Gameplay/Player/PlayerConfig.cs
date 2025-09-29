@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events;
 namespace Gameplay.Player
 {
     /// <summary>
@@ -20,6 +21,9 @@ namespace Gameplay.Player
         [SerializeField] private float _gravity;
 
 
+        public event UnityAction<PlayerConfig> OnValueChanged;
+
+
         /// <summary>
         /// General speed of the player.
         /// </summary>
@@ -37,6 +41,12 @@ namespace Gameplay.Player
         /// Gravity applied to the player.
         /// </summary>
         public float Gravity => _gravity;
+
+
+        private void OnValidate()
+        {
+            OnValueChanged?.Invoke(this);
+        }
     }
 }
 

@@ -1,5 +1,7 @@
 using Codice.Client.Common.GameUI;
+
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Gameplay.Dog 
 {
@@ -27,6 +29,9 @@ namespace Gameplay.Dog
         [SerializeField] private float _slowDistance;
         [Tooltip("Distance between player and dog, when dog's speed is max.")]
         [SerializeField] private float _maxDistance;
+
+
+        public event UnityAction<DogConfig> OnValueChanged;
 
 
         /// <summary>
@@ -58,5 +63,11 @@ namespace Gameplay.Dog
         /// Distance between player and dog, when dog's speed is max.
         /// </summary>
         public float MaxDistance => _maxDistance;
+
+
+        private void OnValidate()
+        {
+            OnValueChanged?.Invoke(this);
+        }
     }
 }

@@ -1,4 +1,7 @@
 using Core.Shared;
+
+using Gameplay.Dog;
+
 using UnityEngine;
 
 namespace Gameplay.Player
@@ -28,9 +31,7 @@ namespace Gameplay.Player
             _camera = Camera.main;
             _controller = characterController;
 
-            _walkSpeed = config.WalkSpeed;
-            _runSpeed = config.RunSpeed;
-            _gravity = config.Gravity;
+            UpdateValues(config);
         }
 
 
@@ -86,6 +87,18 @@ namespace Gameplay.Player
 
 
             return move * speed * Time.deltaTime;
+        }
+
+
+        /// <summary>
+        /// Update values according to config.
+        /// </summary>
+        /// <param name="config">Config of the player.</param>
+        public void UpdateValues(PlayerConfig config)
+        {
+            _walkSpeed = config.WalkSpeed;
+            _runSpeed = config.RunSpeed;
+            _gravity = config.Gravity;
         }
     }
 }

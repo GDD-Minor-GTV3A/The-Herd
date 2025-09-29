@@ -11,8 +11,8 @@ namespace Gameplay.Dog
         private const string  WalkingParam = "Walk";
         private const string WalkSpeedParam = "WalkSpeed";
 
-        private readonly float _minSpeed;
-        private readonly float _maxSpeed;
+        private float _minSpeed;
+        private float _maxSpeed;
 
         private readonly float _minAnimationSpeed = .5f;
         private readonly float _maxAnimationSpeed = 2f;
@@ -22,8 +22,7 @@ namespace Gameplay.Dog
         /// <param name="config">config of the dog.</param>
         public DogAnimator(Animator animator, DogConfig config) : base(animator)
         {
-            _minSpeed = config.MinSpeed;
-            _maxSpeed = config.MaxSpeed;
+            UpdateAnimationValues(config);
         }
 
 
@@ -54,6 +53,17 @@ namespace Gameplay.Dog
         public void SetWakingAnimationSpeedMulti(float multiplier)
         {
             _animator.SetFloat(WalkSpeedParam, multiplier);
+        }
+
+
+        /// <summary>
+        /// Update values according to config.
+        /// </summary>
+        /// <param name="config">Config of the dog.</param>
+        public void UpdateAnimationValues(DogConfig config)
+        {
+            _minSpeed = config.MinSpeed;
+            _maxSpeed = config.MaxSpeed;
         }
     }
 }
