@@ -19,21 +19,15 @@ jobs:
   notify-teams:
     if: startsWith(github.ref, 'refs/heads/Team#')
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        team: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
     steps:
-      - name: Check if current branch matches team
-        id: check-team
+      - name: Extract team number from branch
+        id: get-team
         run: |
-          if [ "${{ github.ref }}" = "refs/heads/Team#${{ matrix.team }}" ]; then
-            echo "should-notify=true" >> $GITHUB_OUTPUT
-          else
-            echo "should-notify=false" >> $GITHUB_OUTPUT
-          fi
+          BRANCH_NAME="${{ github.ref }}"
+          TEAM_NUMBER=${BRANCH_NAME#refs/heads/Team#}
+          echo "team=$TEAM_NUMBER" >> $GITHUB_OUTPUT
 
       - name: Notify Discord
-        if: steps.check-team.outputs.should-notify == 'true'
         uses: sarisia/actions-status-discord@v1.15.4
         with:
-          webhook: ${{ secrets[format('DISCORD_WEBHOOK_TEAM{0}', matrix.team)] }}
+          webhook: ${{ secrets[format('DISCORD_WEBHOOK_TEAM{0}', steps.get-team.outputs.team)] }}
