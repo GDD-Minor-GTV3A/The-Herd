@@ -1,12 +1,4 @@
-using System;
-using System.Collections;
-
 using Core.Shared;
-
-using Gameplay.Player;
-
-using Unity.Android.Gradle.Manifest;
-
 using UnityEngine;
 using UnityEngine.AI;
 
