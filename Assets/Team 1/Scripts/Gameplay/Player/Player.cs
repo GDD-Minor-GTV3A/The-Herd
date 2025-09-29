@@ -46,7 +46,7 @@ namespace Gameplay.Player
 
             playerInput.Initialize(_inputActions);
 
-            slotsController.Initialize(playerInput, 3);
+            slotsController.Initialize(playerInput, 1);
 
             CharacterController characterController = GetComponent<CharacterController>();
             _movementController.Initialize(characterController, _config);
