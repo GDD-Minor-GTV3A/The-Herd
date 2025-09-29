@@ -1,11 +1,11 @@
-Hello integration team , please read READ1 before this.
+Hello integration team , please read README1 before this.
 
 ## User story
 " To be introduced to the shaman and realize everything comes with cost"
 
 ## What have we done
- full economy system where you trade/ purchase items from the shaman.
-
+ - full economy system where you trade/ purchase items from the shaman.
+ - Shaman 3D model introudcing it
  ## Classes
  - `CurrencyData`: Generic type representing any tradable object  
  - `Wallet`: Container that holds different currencies  
