@@ -1,29 +1,16 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Core.Events;
-using Unity.VisualScripting;
 
 /// <summary>
 /// Manager class to handle active quests and updates
 /// </summary>
 public class QuestManager : MonoBehaviour
 {
-    /// <summary>
-    /// A list of all available Quests
-    /// </summary>
-    [SerializeField]
-    private List<Quest> _allQuests = new List<Quest>();
-
-    /// <summary>
-    /// List of currently active quests.
-    /// </summary>
+    [SerializeField] private List<Quest> _allQuests = new List<Quest>();
+    
     private List<QuestProgress> _activeQuests = new List<QuestProgress>();
-
-    /// <summary>
-    /// List of completed quests.
-    /// </summary>
     private List<QuestProgress> _completedQuests = new List<QuestProgress>();
     
     
@@ -120,7 +107,7 @@ public class QuestManager : MonoBehaviour
     /// <param name="questID">The ID of the quest to update.</param>
     /// <param name="objectiveID">The ID of the objective to complete.</param>
     /// <param name="amount">The amount to increment the objective's progress (default 1).</param>
-    public void CompleteObjective(string questID, string objectiveID, int amount = 1)
+    private void CompleteObjective(string questID, string objectiveID, int amount = 1)
     {
         foreach (var quest in _activeQuests)
         {

@@ -339,12 +339,12 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    public void StartQuest(string questID)
+    private void StartQuest(string questID)
     {
         EventManager.Broadcast(new StartQuestEvent(questID));
     }
 
-    public void CompleteObjective(string questID, string objectiveID)
+    private void CompleteObjective(string questID, string objectiveID)
     {
         EventManager.Broadcast(new CompleteObjectiveEvent(questID, objectiveID));
     }

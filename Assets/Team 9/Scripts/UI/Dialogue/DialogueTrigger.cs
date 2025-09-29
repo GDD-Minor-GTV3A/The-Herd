@@ -1,7 +1,5 @@
-using System;
 using UnityEngine;
 using TMPro;
-using UnityEngine.InputSystem;
 
 public class DialogueTrigger : MonoBehaviour
 {
@@ -11,14 +9,15 @@ public class DialogueTrigger : MonoBehaviour
     //HANDLE UI SOMEWHERE ELSE!!!!
     [SerializeField] private TextMeshProUGUI _interText;
     
-
+    private const string PLAYER_TAG = "Player";
+    
     /// <summary>
     /// When the player enters the trigger zone, a text will appear saying "Press E to interact"
     /// </summary>
     /// <param name="other"></param>
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag(PLAYER_TAG))
         {
             Debug.Log("Press E to Start Conversation");
             if (!_interText) return;
@@ -61,7 +60,7 @@ public class DialogueTrigger : MonoBehaviour
     /// <param name="other"></param>
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag(PLAYER_TAG))
         {
             Debug.Log("Press E to Start Conversation");
             if (!_interText) return;

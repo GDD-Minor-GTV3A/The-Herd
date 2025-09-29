@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 
 /// <summary>
@@ -10,25 +9,9 @@ using System.Collections.Generic;
 [CreateAssetMenu(menuName = "Quest/Quests")]
 public class Quest : ScriptableObject
 {
-    /// <summary>
-    /// Unique identifier for the quest.
-    /// </summary>
-    [SerializeField]
-    private string _questID;
-    
-    /// <summary>
-    /// Name of the quest
-    /// </summary>
+    [SerializeField] private string _questID;
     [SerializeField] private string _questName;
-    
-    /// <summary>
-    /// Quest description text.
-    /// </summary>
     [SerializeField] private string _questDescription;
-    
-    /// <summary>
-    /// List of all quest objectives required to complete the quest.
-    /// </summary>
     [SerializeField] private List<QuestObjective> _objectives;
     
     /// <summary>
