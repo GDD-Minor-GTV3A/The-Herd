@@ -1,0 +1,39 @@
+name: Discord Notification
+
+on:
+  push:
+    branches: [main, "Team#**"]
+  pull_request:
+    branches: [main, "Team#**"]
+
+jobs:
+  notify-main:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Discord
+        uses: sarisia/actions-status-discord@v1.15.4
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_MAIN }}
+
+  notify-teams:
+    if: startsWith(github.ref, 'refs/heads/Team#')
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        team: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+    steps:
+      - name: Check if current branch matches team
+        id: check-team
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/Team#${{ matrix.team }}" ]; then
+            echo "should-notify=true" >> $GITHUB_OUTPUT
+          else
+            echo "should-notify=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Notify Discord
+        if: steps.check-team.outputs.should-notify == 'true'
+        uses: sarisia/actions-status-discord@v1.15.4
+        with:
+          webhook: ${{ secrets[format('DISCORD_WEBHOOK_TEAM{0}', matrix.team)] }}
