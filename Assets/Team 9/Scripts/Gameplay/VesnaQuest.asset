@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20940cab3fddea7469f199b18cd4bb6f, type: 3}
+  m_Name: VesnaQuest
+  m_EditorClassIdentifier: 
+  _questID: QUEST_001
+  _questName: Vesna's Quest
+  _questDescription: Find Something in Level 2
+  _objectives:
+  - ObjectiveID: LOCATION_001
+    ObjectiveDescription: DESCRIPTION_001
+    Type: 2
+    RequiredAmount: 1
+    CurrentAmount: 0
+  - ObjectiveID: ITEM_001
+    ObjectiveDescription: GET ITEM ...
+    Type: 0
+    RequiredAmount: 1
+    CurrentAmount: 0
+  - ObjectiveID: NPC_VESNA
+    ObjectiveDescription: Talk to Vesna
+    Type: 3
+    RequiredAmount: 1
+    CurrentAmount: 0
