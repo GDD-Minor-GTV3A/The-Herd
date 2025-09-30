@@ -33,6 +33,35 @@ namespace Core.Events
         }
     }
 
+    /// <summary>
+    /// Broadcast when player's square center and size changes.
+    /// </summary>
+    public sealed class PlayerSquareChangedEvent : GameEvent
+    {
+        public Vector3 Center { get; }
+        public Vector2 HalfExtents { get; }
+
+        public PlayerSquareChangedEvent(Vector3 center, Vector2 halfExtents)
+        {
+            Center = center;
+            HalfExtents = halfExtents;
+        }
+    }
+
+    ///<summary>
+    /// Broadcast on timer to optimize sheep logic to not rely on Update ticks
+    ///</summary>
+    public sealed class PlayerSquareTickEvent : GameEvent
+    {
+        public Vector3 Center { get; }
+        public Vector2 HalfExtents { get; }
+
+        public PlayerSquareTickEvent(Vector3 center, Vector2 halfExtents)
+        {
+            Center = center;
+            HalfExtents = halfExtents;
+        }
+    }
     #endregion EVENTS
 
     #region DOG_EVENTS
