@@ -66,14 +66,12 @@
     <Compile Include="Assets\Team 2\AI\Personality\Types\EnergeticPersonality.cs" />
     <Compile Include="Assets\Team 2\AI\SheepAnimState.cs" />
     <Compile Include="Assets\Team 2\AI\Personality\ISheepPersonality.cs" />
-    <Compile Include="Assets\Team 1\InputSystem_Actions.cs" />
     <Compile Include="Assets\Team 2\AI\Personality\Types\StubbornPersonality.cs" />
     <Compile Include="Assets\Team 2\AI\Personality\Types\NormalPersonality.cs" />
     <Compile Include="Assets\Team 2\AI\GizmoPlayerSquare.cs" />
     <Compile Include="Assets\Team 2\AI\Personality\PersonalityBehaviorContext.cs" />
     <Compile Include="Assets\Team 2\AI\Personality\Types\NervousPersonality.cs" />
     <Compile Include="Assets\Team 2\AI\SheepAnimationDriver.cs" />
-    <Compile Include="Assets\_Game\Scripts\Core\GameBootstrap.cs" />
     <Compile Include="Assets\Team 2\AI\SheepArchetype.cs" />
     <Compile Include="Assets\Team 2\AI\SheepHerdController.cs" />
     <Compile Include="Assets\Team 2\AI\FlockingUtility.cs" />
@@ -83,7 +81,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Team 1\README.txt" />
-    <None Include="Assets\Team 11\Chris (1,2)\README.txt" />
     <None Include="Assets\Team 5\README.txt" />
     <None Include="Assets\Team 3\README.txt" />
     <None Include="Assets\Team 9\README.txt" />
@@ -577,7 +574,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.VisualScripting.Antlr3.Runtime">
-      <HintPath>Library\PackageCache\com.unity.visualscripting@b4d700247d4b\Runtime\VisualScripting.Flow\Dependencies\NCalc\Unity.VisualScripting.Antlr3.Runtime.dll</HintPath>
+      <HintPath>Library\PackageCache\com.unity.visualscripting@6279e2b7c485\Runtime\VisualScripting.Flow\Dependencies\NCalc\Unity.VisualScripting.Antlr3.Runtime.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Mono.Cecil">
@@ -1100,10 +1097,6 @@
       <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Universal.Shaders.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Unity.Cinemachine.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.Cinemachine.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Unity.RenderPipelines.Core.Runtime.Shared">
       <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Core.Runtime.Shared.dll</HintPath>
       <Private>False</Private>
@@ -1140,20 +1133,12 @@
       <HintPath>Library\ScriptAssemblies\Unity.Multiplayer.Center.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Unity.Splines">
-      <HintPath>Library\ScriptAssemblies\Unity.Splines.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Unity.Mathematics.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Mathematics.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.RenderPipelines.GPUDriven.Runtime">
       <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.GPUDriven.Runtime.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Cinemachine">
-      <HintPath>Library\ScriptAssemblies\Unity.Cinemachine.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Collections">
@@ -1174,10 +1159,6 @@
     </Reference>
     <Reference Include="Unity.RenderPipelines.Universal.Config.Runtime">
       <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Universal.Config.Runtime.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Splines.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.Splines.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.RenderPipelines.Universal.Editor">
@@ -1236,10 +1217,6 @@
       <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Core.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Unity.Settings.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.Settings.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Unity.RenderPipelines.Universal.Runtime">
       <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Universal.Runtime.dll</HintPath>
       <Private>False</Private>
@@ -1293,10 +1270,6 @@
     <ProjectReference Include="Shared.csproj">
       <Project>{5B60FE28-0D6B-EC65-2187-5CE328B0D114}</Project>
       <Name>Shared</Name>
-    </ProjectReference>
-    <ProjectReference Include="Team1.csproj">
-      <Project>{BC34C984-9886-2822-5D0D-5BB1AE478F6F}</Project>
-      <Name>Team1</Name>
     </ProjectReference>
     <ProjectReference Include="Events.csproj">
       <Project>{E65029FA-14DF-2913-D2FD-13670D85E867}</Project>

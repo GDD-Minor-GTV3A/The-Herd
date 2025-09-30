@@ -1,5 +1,6 @@
 using UnityEngine;
 using Core.Shared.StateMachine;
+using UnityEngine.AI;
 
 namespace Core.AI.Sheep
 {
@@ -18,6 +19,10 @@ namespace Core.AI.Sheep
         public void OnStart()
         {
             //for animations, sounds and so on
+            if (_stateManager.CanControlAgent())
+            {
+                _stateManager.Agent.isStopped = false;
+            }
             _stateManager.Agent.isStopped = false;
             _stateManager.Animation?.SetState((int)SheepAnimState.Walk);
         }
@@ -51,7 +56,7 @@ namespace Core.AI.Sheep
         public void OnStart()
         {
             ScheduleNextGraze();
-            if(_stateManager.Agent !=  null && _stateManager?.Animation != null)
+            if(_stateManager.Agent !=  null && _stateManager?.Animation != null && _stateManager.CanControlAgent())
             {
                 _stateManager.Agent.isStopped = false;
                 _stateManager.Animation.SetState((int)SheepAnimState.Idle);
@@ -64,7 +69,7 @@ namespace Core.AI.Sheep
 
             if(Time.time < _nextGrazeAt)
             {
-                if (HasArrived())
+                if (HasArrived() && _stateManager.CanControlAgent())
                 {
                     _stateManager.Agent.isStopped = true;
                 }
@@ -80,7 +85,8 @@ namespace Core.AI.Sheep
 
         public void OnStop()
         {
-            if(_stateManager?.Agent != null)
+            var agent = _stateManager.Agent;
+            if (_stateManager.CanControlAgent())
             {
                 _stateManager.Agent.isStopped = false;
             }
@@ -123,7 +129,7 @@ namespace Core.AI.Sheep
 
             _currentTarget = _stateManager.GetTargetOutsideOfHerd();
 
-            if (_stateManager?.Agent != null && _stateManager?.Animation != null)
+            if (_stateManager?.Agent != null && _stateManager?.Animation != null && _stateManager.CanControlAgent())
             {
                 _stateManager.Agent.isStopped = false;
                 _stateManager.Animation.SetState((int)SheepAnimState.Walk);
@@ -133,14 +139,17 @@ namespace Core.AI.Sheep
         public void OnUpdate()
         {
             if (_stateManager == null || _stateManager.Agent == null) return;
-            _stateManager.Agent.isStopped = false;
+            if (_stateManager.CanControlAgent())
+            {
+                _stateManager.Agent.isStopped = false;
+            }
             _stateManager.Agent.SetDestination(_currentTarget);
 
         }
 
         public void OnStop()
         {
-            if(_stateManager?.Agent != null)
+            if(_stateManager?.Agent != null && _stateManager.CanControlAgent())
             {
                 _stateManager.Agent.isStopped = true;
             }
