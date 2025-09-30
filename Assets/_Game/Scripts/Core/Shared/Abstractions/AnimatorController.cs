@@ -7,7 +7,7 @@ namespace Core.Shared
     /// </summary>
     public abstract class AnimatorController
     {
-        private Animator _animator;
+        protected Animator _animator;
 
 
         public AnimatorController(Animator animator)
