@@ -1,6 +1,6 @@
 using UnityEngine;
 using Core.Shared.StateMachine;
-using UnityEngine.AI;
+using Core.Shared;
 
 namespace Core.AI.Sheep
 {
