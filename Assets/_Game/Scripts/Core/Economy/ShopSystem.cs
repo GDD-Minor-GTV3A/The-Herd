@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using UI.Currency;
 
 namespace Core.Economy
 {

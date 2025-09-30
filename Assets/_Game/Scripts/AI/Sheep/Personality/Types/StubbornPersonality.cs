@@ -4,7 +4,7 @@ using Core.Shared.StateMachine;
 
 using Random = UnityEngine.Random;
 
-namespace Core.AI.Sheep.Personality.Types
+namespace AI.Sheep.Personality.Types
 {
     /// <summary>
     /// Stubborn sheep: Resists player commands, chooses own path, hard to control

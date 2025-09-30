@@ -1,10 +1,12 @@
 using System;
 
+using Core.Economy;
+
 using Gameplay.ToolsSystem;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace Gameplay.Player 
+namespace Gameplay.Player
 {
     /// <summary>
     /// Base player script.
@@ -25,6 +27,7 @@ namespace Gameplay.Player
 
         private PlayerMovement _movementController;
         private PlayerRotation _rotationController;
+        private Wallet _wallet = new Wallet();
 
 
         // for test, needs to be moved to bootstrap
@@ -70,6 +73,9 @@ namespace Gameplay.Player
             _movementController.UpdateValues(config);
             _rotationController.UpdateRotationSpeed(config.RotationSpeed);
         }
+
+
+        public Wallet GetWallet() => _wallet;
 
 
         private void OnDestroy()

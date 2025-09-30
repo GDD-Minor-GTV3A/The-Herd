@@ -1,11 +1,9 @@
 using UnityEngine;
 using System;
-using System.Collections.Generic;
-using Core.Shared.StateMachine;
 
 using Random = UnityEngine.Random;
 
-namespace Core.AI.Sheep.Personality
+namespace AI.Sheep.Personality
 {
     /// <summary>
     /// Base implementation of ISheepPersonality that provides default behavior

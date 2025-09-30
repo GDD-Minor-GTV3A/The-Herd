@@ -1,7 +1,6 @@
 using UnityEngine;
-using System;
 
-namespace Core.AI.Sheep.Personality.Types
+namespace AI.Sheep.Personality.Types
 {
     /// <summary>
     /// Lazy sheep: Moves slowly, prefers to stay still, reluctant to follow player

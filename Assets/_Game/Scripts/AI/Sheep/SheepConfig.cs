@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Core.AI.Sheep.Config
+namespace AI.Sheep
 {
     /// <summary>
     /// Tune for movement and flocking for sheeps

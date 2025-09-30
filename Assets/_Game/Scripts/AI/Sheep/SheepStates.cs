@@ -1,8 +1,8 @@
 using UnityEngine;
-using Core.Shared.StateMachine;
 using Core.Shared;
+using Core.Shared.StateMachine;
 
-namespace Core.AI.Sheep
+namespace AI.Sheep
 {
     /// <summary>
     /// Following player if outside of the square

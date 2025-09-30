@@ -1,7 +1,7 @@
 #if UNITY_EDITOR
 using UnityEngine;
 
-namespace Core.AI.Sheep
+namespace AI.Sheep
 {
     public partial class SheepHerdController
     {

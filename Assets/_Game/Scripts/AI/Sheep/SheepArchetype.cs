@@ -1,8 +1,8 @@
 using UnityEngine;
-using Core.AI.Sheep.Personality;
-using Core.AI.Sheep.Personality.Types;
+using AI.Sheep.Personality;
+using AI.Sheep.Personality.Types;
 
-namespace Core.AI.Sheep.Config
+namespace AI.Sheep.Config
 {
     /// <summary>
     /// Character/temperament of the sheep

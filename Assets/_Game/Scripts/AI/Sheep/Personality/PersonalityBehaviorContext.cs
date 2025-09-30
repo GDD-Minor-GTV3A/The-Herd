@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Core.AI.Sheep.Personality
+namespace AI.Sheep.Personality
 {
     /// <summary>
     /// Context data passed to personality behaviors for decision making

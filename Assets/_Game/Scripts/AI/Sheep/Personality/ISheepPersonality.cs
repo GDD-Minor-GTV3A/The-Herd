@@ -1,9 +1,7 @@
 using UnityEngine;
 using System;
-using System.Collections.Generic;
-using Core.Shared.StateMachine;
 
-namespace Core.AI.Sheep.Personality
+namespace AI.Sheep.Personality
 {
     /// <summary>
     /// Comprehensive interface for sheep personalities with pure delegation

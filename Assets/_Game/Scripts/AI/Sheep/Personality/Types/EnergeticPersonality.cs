@@ -5,7 +5,7 @@ using Core.Shared.StateMachine;
 
 using Random = UnityEngine.Random;
 
-namespace Core.AI.Sheep.Personality.Types
+namespace AI.Sheep.Personality.Types
 {
     /// <summary>
     /// Energetic sheep: Moves fast, bursts away from player, hyperactive behavior

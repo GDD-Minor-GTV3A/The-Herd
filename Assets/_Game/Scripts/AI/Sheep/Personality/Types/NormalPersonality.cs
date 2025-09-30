@@ -5,7 +5,7 @@ using Core.Shared.StateMachine;
 
 using Random = UnityEngine.Random;
 
-namespace Core.AI.Sheep.Personality.Types
+namespace AI.Sheep.Personality.Types
 {
     /// <summary>
     /// Normal personality - implements the default sheep behavior

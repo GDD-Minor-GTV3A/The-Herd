@@ -1,7 +1,6 @@
-using Core.Shared;
-
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Core.Shared;
 
 namespace Gameplay.Player
 {

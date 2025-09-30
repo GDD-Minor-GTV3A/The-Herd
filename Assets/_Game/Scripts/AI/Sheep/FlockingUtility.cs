@@ -1,8 +1,7 @@
 using System.Collections.Generic;
-
 using UnityEngine;
 
-namespace Core.AI.Sheep
+namespace AI.Sheep
 {
     /// <summary>
     /// Sheep separation and alignment for herds

@@ -2,7 +2,7 @@ using UnityEngine;
 using Core.Events;
 using System.Collections;
 
-namespace Core.AI.Sheep
+namespace AI.Sheep
 {
     /// <summary>
     /// Tracking player's square and raising event from manager

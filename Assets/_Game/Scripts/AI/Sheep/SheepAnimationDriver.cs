@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Core.AI.Sheep
+namespace AI.Sheep
 {
     [RequireComponent(typeof(Animator))]
     public sealed class SheepAnimationDriver : MonoBehaviour

@@ -1,7 +1,8 @@
 using UnityEngine;
 using TMPro;
+using Core.Economy;
 
-namespace Core.Economy
+namespace UI.Currency
 {
     [System.Serializable]
     public class CurrencyUI

@@ -14,7 +14,7 @@ namespace Gameplay.ToolsSystem
         private int _currentToolIndex;
         private int _slotsAmount;
 
-        private Gameplay.Player.PlayerInput _input;
+        private Player.PlayerInput _input;
 
 
         /// <summary>
@@ -22,7 +22,7 @@ namespace Gameplay.ToolsSystem
         /// </summary>
         /// <param name="input">Player input class.</param>
         /// <param name="slotsAmount">Max amount of available slots.</param>
-        public void Initialize(Gameplay.Player.PlayerInput input, int slotsAmount)
+        public void Initialize(Player.PlayerInput input, int slotsAmount)
         {
             _input = input;
             _slotsAmount = slotsAmount;

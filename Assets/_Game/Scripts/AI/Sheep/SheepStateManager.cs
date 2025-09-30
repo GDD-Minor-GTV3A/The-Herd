@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using System.Collections;
 using Core.Events;
 using Core.Shared.StateMachine;
-using Core.AI.Sheep.Config;
-using Core.AI.Sheep.Personality;
 using UnityEngine.AI;
+using AI.Sheep.Config;
+using AI.Sheep.Personality;
 
 using Random = UnityEngine.Random;
 
-namespace Core.AI.Sheep
+namespace AI.Sheep
 {
     /// <summary>
     /// Sheep state manager
