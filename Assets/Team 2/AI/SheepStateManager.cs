@@ -277,5 +277,16 @@ namespace Core.AI.Sheep
             _personality.OnRejoinedHerd(this, _behaviorContext);
         }
 
+        /// <summary>
+        /// Check for disabling the agent
+        /// </summary>
+        public bool CanControlAgent()
+        {
+            return Agent != null
+                   && Agent.enabled
+                   && Agent.isOnNavMesh
+                   && gameObject.activeInHierarchy;
+        }
     }
 }
+
