@@ -1,3 +1,7 @@
+using Core.AI.Sheep;
+
+using Unity.VisualScripting;
+
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -125,7 +129,7 @@ public class DrekavacAI : MonoBehaviour
         // Despawn only if dragging a sheep and too far from player
         if (grabbedSheep != null && Vector3.Distance(transform.position, player.position) > despawnDistance)
         {
-            //IMP01 CODE FOR KILLING SHEEP HERE
+            Destroy(grabbedSheep); // <-- Added by Chris from Implementation Team
             ReleaseGrabbedSheep();
             Destroy(gameObject);
             return;
@@ -172,6 +176,13 @@ public class DrekavacAI : MonoBehaviour
 
         if (!isSettled)
         {
+            // Always recalc nearest point dynamically in case sheep have moved
+            Vector3 toEnemy = (transform.position - circleCenter).normalized;
+            Vector3 nearestPoint = circleCenter + toEnemy * circleRadius;
+
+            if (NavMesh.SamplePosition(nearestPoint, out NavMeshHit hit, 2f, NavMesh.AllAreas))
+                agent.SetDestination(hit.position);
+
             float distToCenter = Vector3.Distance(transform.position, circleCenter);
             if (Mathf.Abs(distToCenter - circleRadius) < 0.5f)
             {
@@ -202,8 +213,8 @@ public class DrekavacAI : MonoBehaviour
         Vector3 offset = new Vector3(Mathf.Cos(radians), 0f, Mathf.Sin(radians)) * circleRadius;
         Vector3 targetPos = circleCenter + offset;
 
-        if (NavMesh.SamplePosition(targetPos, out NavMeshHit hit, 2f, NavMesh.AllAreas))
-            agent.SetDestination(hit.position);
+        if (NavMesh.SamplePosition(targetPos, out NavMeshHit hit2, 2f, NavMesh.AllAreas))
+            agent.SetDestination(hit2.position);
 
         // Face the herd center while circling
         LookAt(circleCenter);
@@ -250,7 +261,11 @@ public class DrekavacAI : MonoBehaviour
     private void GrabSheep(GameObject sheep)
     {
         if (sheep == null) return;
+
         //IMP02 CODE FOR DISABELING SHEEP AI WHEN GRABBED
+
+        // 
+
         agent.isStopped = true;
         agent.velocity = Vector3.zero;
         agent.ResetPath();
