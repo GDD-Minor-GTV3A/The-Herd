@@ -34,4 +34,35 @@ namespace Core.Events
     }
 
     #endregion EVENTS
+
+    #region DOG_EVENTS
+    /// <summary>
+    /// When player wants to move dog to specific area.
+    /// </summary>
+    public class DogMoveCommandEvent : GameEvent
+    {
+        private Vector3 _moveTarget;
+
+
+        /// <summary>
+        /// Where dog should go.
+        /// </summary>
+        public Vector3 MoveTarget => _moveTarget;
+
+
+        /// <param name="moveTarget">Where dog should go.</param>
+        public DogMoveCommandEvent(Vector3 moveTarget)
+        {
+            _moveTarget = moveTarget;
+        }
+    }
+
+
+    /// <summary>
+    /// When player wants dog to follow him.
+    /// </summary>
+    public class DogFollowCommandEvent : GameEvent
+    {
+    }
+    #endregion DOG_EVENTS
 }
