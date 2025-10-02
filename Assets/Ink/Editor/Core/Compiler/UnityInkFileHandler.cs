@@ -1,15 +1,17 @@
-﻿using Ink;
-using System.IO;
+﻿using System.IO;
+
+using Ink;
 
 // Utility class for the ink compiler, used to work out how to find include files and their contents
-public class UnityInkFileHandler : IFileHandler {
+public class UnityInkFileHandler : IFileHandler
+{
     private readonly string rootDirectory;
 
     public UnityInkFileHandler(string rootDirectory)
     {
         this.rootDirectory = rootDirectory;
     }
-    
+
     public string ResolveInkFilename(string includeName)
     {
         // Convert to Unix style, and then use FileInfo.FullName to parse any ..\
