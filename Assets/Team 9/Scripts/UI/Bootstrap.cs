@@ -11,13 +11,13 @@ public class Bootstrap : MonoBehaviour
             dialogueManager.Initialize();
         }
 
-        
+
         //Not needed anymore
         // Find and initialize the DialogueTrigger
         //DialogueTrigger dialogueTrigger = FindFirstObjectByType<DialogueTrigger>();
         //if (dialogueTrigger != null)
-       // {
-       //     dialogueTrigger.Initialize();
+        // {
+        //     dialogueTrigger.Initialize();
         //}
 
         // Add more managers and initializers here as your game grows
