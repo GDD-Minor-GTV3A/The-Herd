@@ -61,7 +61,7 @@ namespace Gameplay.ToolsSystem
 
         private void SetCurrentSlotByIndex(int index)
         {
-            index = Mathf.Clamp(index, 0, _slotsAmount);
+            index = Mathf.Clamp(index, 0, _slotsAmount-1);
             _currentToolIndex = index;
         }
 
