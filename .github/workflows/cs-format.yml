@@ -44,7 +44,7 @@ jobs:
 
       - name: Create PR with changes for team branches
         if: steps.format.outputs.changes == 'true' && (startsWith(github.ref, 'refs/heads/Team#') || (github.event_name == 'pull_request' && startsWith(github.head_ref, 'Team#')))
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v7.0.8
         with:
           commit-message: "Apply dotnet format changes"
           title: "🤖 Auto-format C# code"
