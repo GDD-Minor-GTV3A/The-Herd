@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <!-- Generated file, do not modify, your changes will be overwritten (use AssetPostprocessor.OnGeneratedCSProject) -->
   <PropertyGroup>
@@ -55,6 +55,7 @@
     <UnityVersion>6000.0.58f1</UnityVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.0.58f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.SourceGenerators.dll" />
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.0.58f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.0.58f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
@@ -65,6 +66,7 @@
     <Compile Include="Assets\_Game\Team 3\Final Export\CollisionHandlerWithHook.cs" />
     <Compile Include="Assets\Team 8\Sprint 1\Economy\Scripts\CurrencyData.cs" />
     <Compile Include="Assets\Team 2\AI\SheepConfig.cs" />
+    <Compile Include="Assets\Team 5\Scripts\PeakScare.cs" />
     <Compile Include="Assets\Scriptsd\AI\Monster Model\Export to Main Project\DetectSheep.cs" />
     <Compile Include="Assets\Team 2\AI\Personality\BaseSheepPersonality.cs" />
     <Compile Include="Assets\Scriptsd\AI\Monster Model\Export to Main Project\Monster1AI.cs" />
@@ -108,14 +110,12 @@
     <Compile Include="Assets\Team 2\AI\SheepHerdController.cs" />
     <Compile Include="Assets\_Game\Team 3\Mirco\MircoScripts\ViewClearing.cs" />
     <Compile Include="Assets\Team 2\AI\FlockingUtility.cs" />
+    <Compile Include="Assets\Team 5\Scripts\LevelManager.cs" />
     <Compile Include="Assets\Scriptsd\AI\Monster Model\Export to Main Project\Node.cs" />
     <Compile Include="Assets\Team 2\AI\SheepStates.cs" />
     <Compile Include="Assets\_Game\Team 4\Scripts\Destroy.cs" />
     <Compile Include="Assets\Team 2\AI\Personality\Types\LazyPersonality.cs" />
     <Compile Include="Assets\Team 2\AI\SheepStateManager.cs" />
-    <Compile Include="Assets\Team 5\Scripts\PeakScare.cs" />
-    <Compile Include="Assets\_Game\Scripts\Core\GameBootstrap.cs" />
-    <Compile Include="Assets\Team 5\Scripts\LevelManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Team 8\TextMesh Pro\Shaders\TMP_SDF.shader" />
@@ -135,7 +135,6 @@
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface-Mobile.shader" />
     <None Include="Assets\Team 8\TextMesh Pro\Shaders\TMP_SDF Overlay.shader" />
     <None Include="Assets\Team 8\TextMesh Pro\Shaders\TMP_Bitmap-Custom-Atlas.shader" />
-    <None Include="Assets\Team 5\README.txt" />
     <None Include="Assets\Team 8\TextMesh Pro\Sprites\EmojiOne Attribution.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\SDFFunctions.hlsl" />
     <None Include="Assets\Team 8\TextMesh Pro\Shaders\TMP_SDF-Mobile Masking.shader" />
@@ -150,7 +149,6 @@
     <None Include="Assets\TextMesh Pro\Sprites\EmojiOne Attribution.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap-Custom-Atlas.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF.shader" />
-    <None Include="Assets\Team 3\README.txt" />
     <None Include="Assets\Team 9\README.txt" />
     <None Include="Assets\Team 8\TextMesh Pro\Shaders\TMP_SDF-Mobile.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile SSD.shader" />
@@ -1333,12 +1331,12 @@
       <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.State.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Unity.2D.Sprite.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.2D.Sprite.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Unity.AI.Navigation.Editor.ConversionSystem">
       <HintPath>Library\ScriptAssemblies\Unity.AI.Navigation.Editor.ConversionSystem.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.2D.Sprite.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.2D.Sprite.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.TextMeshPro.Editor">
