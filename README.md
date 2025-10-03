@@ -68,6 +68,8 @@ Keep your folder organized! Create folders by type, so it's easy to find any fil
 > [!WARNING]
 > Files placed outside your team's designated folder structure may be removed without notice. Always ensure your work is contained within your `Asset/*your-team*/` folder. The Integration Team will not be responsible for lost work due to improper file organization.
 
+This is a template. May vary depending on the team
+
 ```tree
 └───Assets/Team *team-number*
     ├───Audio
