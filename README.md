@@ -73,7 +73,7 @@ Keep your folder organized! Create folders by type, so it's easy to find any fil
     ├───Audio
     ├───Data
     ├───Materials
-    ├───Misc
+    ├───Miscellaneous
     ├───Models
     ├───Prefabs
     ├───Scenes
