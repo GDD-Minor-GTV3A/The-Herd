@@ -15,7 +15,7 @@ repos:
     rev: v1.36.2
     hooks:
       - id: typos
-        exclude: "^(Assets/_Game/|Assets/Scenes/SampleScene|Library/|Temp/|obj/|Logs/|\\.gitignore$)"
+        exclude: "^.*(.unity|.shadergraph|.fbx|.meta|.gitignore)$"
 
   # Forbid binary files in the repository
   - repo: https://github.com/jumanjihouse/pre-commit-hooks
