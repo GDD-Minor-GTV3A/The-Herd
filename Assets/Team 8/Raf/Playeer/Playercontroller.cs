@@ -1,30 +1,14 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody))]
-public class PlayerController : MonoBehaviour
+public class PlayerMovement : MonoBehaviour
 {
-    public float moveSpeed = 5f;      // movement speed
-    private Rigidbody rb;
-    private Vector3 moveInput;
+    public float moveSpeed = 10f;
 
-    void Awake()
+    private void Update()
     {
-        rb = GetComponent<Rigidbody>();
-    }
-
-    void Update()
-    {
-        // Get WASD / Arrow input
-        float moveX = Input.GetAxisRaw("Horizontal"); // A/D
-        float moveZ = Input.GetAxisRaw("Vertical");   // W/S
-
-        // movement direction on XZ plane
-        moveInput = new Vector3(moveX, 0f, moveZ).normalized;
-    }
-
-    void FixedUpdate()
-    {
-        // Move using Rigidbody physics
-        rb.MovePosition(rb.position + moveInput * moveSpeed * Time.fixedDeltaTime);
+        float horizontal = Input.GetAxis("Horizontal");
+        float vertical = Input.GetAxis("Vertical");
+        Vector3 movement = new Vector3(horizontal, 0f, vertical) * moveSpeed * Time.deltaTime;
+        transform.Translate(movement);
     }
 }

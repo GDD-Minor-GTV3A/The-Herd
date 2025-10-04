@@ -1,50 +1,63 @@
-using System.Diagnostics;
 using UnityEngine;
 
-[RequireComponent(typeof(AudioSource))]
-public class NPCRaycaster : MonoBehaviour
+public class ProjectileSpawner : MonoBehaviour
 {
-    public Transform player;             // assign the Player in inspector
-    public float sightRange = 20f;       // how far NPC can see
-    public float minVolumeDistance = 2f; // distance where bell is loudest
-    public float maxVolumeDistance = 15f; // distance where bell is quietest
+    public GameObject projectilePrefab; // Assign in Inspector
+    public Transform playerTarget;      // Assign player in Inspector
+    public float spawnInterval = 2f;    // Time between spawns
+    public float spawnOffset = 1f;      // Offset from spawner position
+    public bool lockPosition = true;    // Lock spawner position to prevent movement
 
-    private AudioSource bell;
+    private float timer;
+    private Vector3 initialPosition;
 
-    void Awake()
+    private void Start()
     {
-        bell = GetComponent<AudioSource>();
-        bell.loop = true;
-        bell.playOnAwake = false;
+        // Store initial position for locking
+        initialPosition = transform.position;
+        Debug.Log($"[ProjectileSpawner] Initialized at position {initialPosition}");
     }
 
-    void Update()
+    private void Update()
     {
-        if (player == null) return;
-
-        Vector3 direction = (player.position - transform.position).normalized;
-        float distance = Vector3.Distance(transform.position, player.position);
-
-        // Raycast toward the player
-        if (Physics.Raycast(transform.position, direction, out RaycastHit hit, sightRange))
+        // Lock spawner position if enabled
+        if (lockPosition && transform.position != initialPosition)
         {
-            if (hit.collider.CompareTag("Player"))
-            {
-                if (!bell.isPlaying)
-                    bell.Play();
+            Debug.LogWarning($"[ProjectileSpawner] Position changed to {transform.position}. Forcing back to {initialPosition}.");
+            transform.position = initialPosition;
+        }
 
-                // Volume based on distance (closer = louder)
-                float t = Mathf.InverseLerp(maxVolumeDistance, minVolumeDistance, distance);
-                bell.volume = Mathf.Clamp01(t);
-            }
-            else
-            {
-                if (bell.isPlaying)
-                    bell.Stop();
-            }
+        timer += Time.deltaTime;
+        if (timer >= spawnInterval)
+        {
+            SpawnProjectile();
+            timer = 0f;
+        }
+    }
 
-            // Debug line in Scene view
-            Debug.DrawRay(transform.position, direction * sightRange, Color.red);
+    private void SpawnProjectile()
+    {
+        if (playerTarget == null)
+        {
+            Debug.LogWarning("[ProjectileSpawner] No player target assigned. Skipping spawn.");
+            return;
+        }
+
+        // Calculate direction to player
+        Vector3 direction = (playerTarget.position - transform.position).normalized;
+        Vector3 spawnPos = transform.position + direction * spawnOffset;
+
+        // Instantiate and set rotation
+        GameObject proj = Instantiate(projectilePrefab, spawnPos, Quaternion.LookRotation(direction));
+        HomingProjectile homing = proj.GetComponent<HomingProjectile>();
+        if (homing != null)
+        {
+            homing.SetTarget(playerTarget, transform.position);
+            Debug.Log($"[ProjectileSpawner] Spawned projectile at {spawnPos} targeting player at {playerTarget.position}");
+        }
+        else
+        {
+            Debug.LogError("[ProjectileSpawner] HomingProjectile component missing on projectile prefab!");
         }
     }
 }
