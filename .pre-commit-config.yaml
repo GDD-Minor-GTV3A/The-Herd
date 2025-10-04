@@ -16,9 +16,3 @@ repos:
     hooks:
       - id: typos
         exclude: "^.*(.unity|.shadergraph|.fbx|.meta|.gitignore)$"
-
-  # Forbid binary files in the repository
-  - repo: https://github.com/jumanjihouse/pre-commit-hooks
-    rev: 3.0.0
-    hooks:
-      - id: forbid-binary
