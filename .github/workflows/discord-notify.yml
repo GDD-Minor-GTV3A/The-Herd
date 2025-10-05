@@ -1,0 +1,33 @@
+name: Discord Notification
+
+on:
+  push:
+    branches: [main, "Team#**"]
+  pull_request:
+    branches: [main, "Team#**"]
+
+jobs:
+  notify-main:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Discord
+        uses: sarisia/actions-status-discord@v1.15.4
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_MAIN }}
+
+  notify-teams:
+    if: startsWith(github.ref, 'refs/heads/Team#')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract team number from branch
+        id: get-team
+        run: |
+          BRANCH_NAME="${{ github.ref }}"
+          TEAM_NUMBER=${BRANCH_NAME#refs/heads/Team#}
+          echo "team=$TEAM_NUMBER" >> $GITHUB_OUTPUT
+
+      - name: Notify Discord
+        uses: sarisia/actions-status-discord@v1.15.4
+        with:
+          webhook: ${{ secrets[format('DISCORD_WEBHOOK_TEAM{0}', steps.get-team.outputs.team)] }}
