@@ -205,6 +205,10 @@ public class QuestManager : MonoBehaviour
         _completedQuests.Add(quest);
         
         EventManager.Broadcast(new QuestCompletedEvent(quest.Quest.QuestID));
+        
+        // Notify DialogueManager to update Ink variables
+        DialogueManager.GetInstance()?.OnQuestCompleted(quest.Quest.QuestID);
+        
         Debug.Log($"Quest completed: {quest.Quest.QuestName}");
         //TODO: Get a reward????
     }
