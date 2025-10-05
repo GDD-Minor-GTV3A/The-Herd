@@ -11,7 +11,7 @@ namespace Core.Events
     {
     }
 
-    
+
     /// <summary>
     /// Use this manager to subscribe and broadcast events.
     /// </summary>

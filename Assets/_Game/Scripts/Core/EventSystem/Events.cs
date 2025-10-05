@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+
 using UnityEngine;
 // The Game Events used across the Game.
 // Anytime there is a need for a new event, it should be added here.
@@ -18,7 +19,7 @@ namespace Core.Events
     /// <summary>
     /// To be removed later.
     /// </summary>
-    public class ExampleEvent : GameEvent 
+    public class ExampleEvent : GameEvent
     {
         private string _exampleField;
 
@@ -26,13 +27,73 @@ namespace Core.Events
         public string ExampleField => _exampleField;
 
 
-        public ExampleEvent(string exampleField) 
+        public ExampleEvent(string exampleField)
         {
             _exampleField = exampleField;
         }
     }
 
+    /// <summary>
+    /// Broadcast when player's square center and size changes.
+    /// </summary>
+    public sealed class PlayerSquareChangedEvent : GameEvent
+    {
+        public Vector3 Center { get; }
+        public Vector2 HalfExtents { get; }
+
+        public PlayerSquareChangedEvent(Vector3 center, Vector2 halfExtents)
+        {
+            Center = center;
+            HalfExtents = halfExtents;
+        }
+    }
+
+    ///<summary>
+    /// Broadcast on timer to optimize sheep logic to not rely on Update ticks
+    ///</summary>
+    public sealed class PlayerSquareTickEvent : GameEvent
+    {
+        public Vector3 Center { get; }
+        public Vector2 HalfExtents { get; }
+
+        public PlayerSquareTickEvent(Vector3 center, Vector2 halfExtents)
+        {
+            Center = center;
+            HalfExtents = halfExtents;
+        }
+    }
     #endregion EVENTS
+
+    #region DOG_EVENTS
+    /// <summary>
+    /// When player wants to move dog to specific area.
+    /// </summary>
+    public class DogMoveCommandEvent : GameEvent
+    {
+        private Vector3 _moveTarget;
+
+
+        /// <summary>
+        /// Where dog should go.
+        /// </summary>
+        public Vector3 MoveTarget => _moveTarget;
+
+
+        /// <param name="moveTarget">Where dog should go.</param>
+        public DogMoveCommandEvent(Vector3 moveTarget)
+        {
+            _moveTarget = moveTarget;
+        }
+    }
+
+
+    /// <summary>
+    /// When player wants dog to follow him.
+    /// </summary>
+    public class DogFollowCommandEvent : GameEvent
+    {
+    }
+    #endregion DOG_EVENTS
     
     
     

@@ -8,16 +8,16 @@
         /// <summary>
         /// This method is called on start of the state.
         /// </summary>
-        public void OnStart();
+        public abstract void OnStart();
 
         /// <summary>
         /// This method is called on each frame of the state.
         /// </summary>
-        public void OnUpdate();
+        public abstract void OnUpdate();
       
         /// <summary>
         /// This method is called on stop of the state.
         /// </summary>
-        public void OnStop();
+        public abstract void OnStop();
     }
 }
