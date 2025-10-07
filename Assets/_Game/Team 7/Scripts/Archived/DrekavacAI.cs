@@ -4,36 +4,55 @@ using Unity.VisualScripting;
 
 using UnityEngine;
 using UnityEngine.AI;
+using Core.Events;
 
 public class DrekavacAI : MonoBehaviour
 {
     [Header("Movement Settings")]
-    public float circleRadius = 8f;       // Distance to keep while circling the player
-    public float moveSpeed = 3.5f;        // Normal movement speed
-    public float sprintSpeed = 7f;        // Speed when chasing a sheep
-    public float dragSpeed = 1.2f;        // Speed when dragging a sheep
-    public float circleSpeed = 2f;        // Speed of circling rotation
+    [SerializeField]
+    float circleRadius = 8f;       // Distance to keep while circling the player
+    [SerializeField]
+    float moveSpeed = 3.5f;        // Normal movement speed
+    [SerializeField]
+    float sprintSpeed = 7f;        // Speed when chasing a sheep
+    [SerializeField]
+    float dragSpeed = 1.2f;        // Speed when dragging a sheep
+    [SerializeField]
+    float circleSpeed = 2f;        // Speed of circling rotation
 
     [Header("Behavior Settings")]
-    public float directionSwitchInterval = 5f;         // Time between direction switches while circling
-    public Vector2 stalkDurationRange = new Vector2(10f, 20f); // Randomized stalking duration
-    public Transform grabPoint;                        // Point on enemy where sheep is held
-
+    [Header("Behavior Settings")]
+    [SerializeField]
+    float directionSwitchInterval = 5f;         // Time between direction switches while circling
+    [SerializeField]
+    Vector2 stalkDurationRange = new Vector2(10f, 20f); // Randomized stalking duration
+    [SerializeField]
+    Transform grabPoint;                        // Point on enemy where sheep is held
     [Header("Grab Settings")]
-    public float dragAwayDistance = 20f;               // Distance to retreat while dragging
-    public float despawnDistance = 30f;                // Distance from player to despawn enemy while dragging
+    [SerializeField]
+    float dragAwayDistance = 20f;               // Distance to retreat while dragging
+    [SerializeField]
+    float despawnDistance = 30f;                // Distance from player to despawn enemy while dragging
 
     [Header("Abort Settings")]
-    public float abortDistance = 40f;                  // How far to run before despawning
-    public float abortSpeed = 8f;                      // Speed while aborting
-    public float playerCloseAbortDistance = 5f;        // Distance that triggers abort if player gets too close
+    [SerializeField]
+    float abortDistance = 40f;                  // How far to run before despawning
+    [SerializeField]
+    float abortSpeed = 8f;                      // Speed while aborting
+    [SerializeField]
+    float playerCloseAbortDistance = 5f;        // Distance that triggers abort if player gets too close
 
     [Header("Animation")]
-    public Animator animator;                          // Animator for controlling animations
-    public AudioSource audioSource;                    // The AudioSource component
-    public AudioClip Screech;
-    public AudioClip Chomp;
-    public AudioClip Snarl;
+    [SerializeField]
+    Animator animator;                          // Animator for controlling animations
+    [SerializeField]
+    AudioSource audioSource;                    // The AudioSource component
+    [SerializeField]
+    AudioClip Screech;
+    [SerializeField]
+    AudioClip Chomp;
+    [SerializeField]
+    AudioClip Snarl;
 
     private NavMeshAgent agent;                        // Reference to NavMeshAgent component
     private Transform player;                          // Reference to player transform
@@ -53,6 +72,11 @@ public class DrekavacAI : MonoBehaviour
     private Rigidbody grabbedSheepRb;                  // Rigidbody of grabbed sheep
     private bool grabbedSheepOriginalKinematic;        // Original kinematic state to restore
 
+    public void Initialize()
+    {
+        
+    }
+    
     void Start()
     {
         // Play spawn screech
@@ -196,6 +220,7 @@ public class DrekavacAI : MonoBehaviour
                 LookAt(circleCenter);
                 return;
             }
+            
         }
 
         // Switch circling direction at intervals
@@ -216,6 +241,8 @@ public class DrekavacAI : MonoBehaviour
         if (NavMesh.SamplePosition(targetPos, out NavMeshHit hit2, 2f, NavMesh.AllAreas))
             agent.SetDestination(hit2.position);
 
+        Debug.Log($"[GOD] Pos: {transform.position:F2}, Target: {targetPos:F2}, Dist: {Vector3.Distance(transform.position, targetPos):F3}");
+        
         // Face the herd center while circling
         LookAt(circleCenter);
 
@@ -357,7 +384,7 @@ public class DrekavacAI : MonoBehaviour
     private void Abort()
     {
         // Drop sheep if dragging
-        if (grabbedSheep != null)
+        if (grabbedSheep is not null)
         {
             ReleaseGrabbedSheep();
         }
@@ -400,11 +427,7 @@ public class DrekavacAI : MonoBehaviour
             Destroy(gameObject);
         }
     }
-
-
-
-
-
+    
     public void ReleaseGrabbedSheep()
     {
         if (grabbedSheep == null) return;
