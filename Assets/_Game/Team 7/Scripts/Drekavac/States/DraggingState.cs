@@ -25,8 +25,13 @@ namespace _Game.Team_7.Scripts.Drekavac.States
                 return;
             }
 
-            if (Vector3.Distance(_manager.transform.position, _manager.GetPlayerLocation()) > _manager.GetStats().despawnDistance)
+            if (Vector3.Distance(_manager.transform.position, _manager.GetPlayerLocation()) >
+                _manager.GetStats().despawnDistance)
+            {
                 _manager.Despawn();
+                return;
+            }
+
 
             // Compute average position of remaining sheep (excluding grabbed sheep)
             Vector3 sheepCenter = Vector3.zero;
