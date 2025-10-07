@@ -1,41 +1,44 @@
 using UnityEngine;
 
-public class DrekavacAudioController
+namespace _Game.Team_7.Scripts.Drekavac
 {
-    private readonly AudioSource _audioSource;
-    
-    private readonly AudioClip _screech;
-    private readonly AudioClip _chomp;
-    private readonly AudioClip _snarl;
-
-    public DrekavacAudioController(AudioSource audioSource, AudioClip screech, AudioClip chomp, AudioClip snarl)
+    /// <summary>
+    ///     Handles playing audio for an enemy.
+    /// </summary>
+    public class DrekavacAudioController
     {
-        _audioSource = audioSource;
-        _screech = screech;
-        _chomp = chomp;
-        _snarl = snarl;
-    }
+        private readonly AudioSource _audioSource;
+        private readonly AudioClip _screech;
+        private readonly AudioClip _chomp;
+        private readonly AudioClip _snarl;
 
-    public void PlayScreech()
-    {
-        PlayClip(_screech);
-    }
+        public DrekavacAudioController(AudioSource audioSource, AudioClip screech, AudioClip chomp, AudioClip snarl)
+        {
+            _audioSource = audioSource;
+            _screech = screech;
+            _chomp = chomp;
+            _snarl = snarl;
+        }
 
-    public void PlayChomp()
-    {
-        PlayClip(_chomp);
-    }
+        public void PlayScreech()
+        {
+            PlayClip(_screech);
+        }
 
-    public void PlaySnarl()
-    {
-        PlayClip(_snarl);
-    }
+        public void PlayChomp()
+        {
+            PlayClip(_chomp);
+        }
 
-    private void PlayClip(AudioClip clip)
-    {
-        if (_audioSource is null || clip is null) return;
+        public void PlaySnarl()
+        {
+            PlayClip(_snarl);
+        }
 
-        _audioSource.clip = clip;
-        _audioSource.Play();
+        private void PlayClip(AudioClip clip)
+        {
+            _audioSource.clip = clip;
+            _audioSource.Play();
+        }
     }
 }

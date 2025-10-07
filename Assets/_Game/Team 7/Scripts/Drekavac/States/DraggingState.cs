@@ -1,77 +1,62 @@
-using System;
-
-using Core.Shared;
-using Core.Shared.StateMachine;
-
 using UnityEngine;
 using UnityEngine.AI;
 
-public class DraggingState : IState
+namespace _Game.Team_7.Scripts.Drekavac.States
 {
-    private DrekavacStateManager _manager;
-    private DrekavacAnimatorController _animator;
-    private EnemyMovementController _movement;
-    private float _draggingSpeed = 1.2f;
-    private float _dragAwayDistance = 20f;
-    float _despawnDistance = 30f; 
-    
-    public DraggingState(DrekavacStateManager manager, EnemyMovementController movement)
+    /// <summary>
+    ///     Handles the behavior of an enemy while it's dragging an object.
+    /// </summary>
+    public class DraggingState : GenericEnemyState
     {
-        _manager = manager;
-        _movement = movement;
-        _animator = _manager.drekavacAnimatorController ?? throw new ArgumentNullException(nameof(manager.drekavacAnimatorController));
-    }
-    
-    public void OnStart()
-    {
-        _movement.ToggleAgent(true);
-        _animator.SetDragging(true);
-        _movement.SetMovementSpeed(_draggingSpeed);
-        _manager.AudioController.PlayChomp();
-    }
+        public DraggingState(DrekavacStateManager manager, EnemyMovementController movement, DrekavacStats stats, DrekavacAnimatorController animator, DrekavacAudioController audio) : base(manager, movement, stats, animator, audio) { }
 
-    public void OnUpdate()
-    {
-        if (_manager.grabbedObject is null)
+        public override void OnStart()
         {
-            _manager.SetState<HuntingState>();
-            return;
+            _animator.SetDragging(true);
+            _movement.SetMovementSpeed(_manager.GetStats().dragSpeed);
+            _audio.PlayChomp();
         }
 
-        if (Vector3.Distance(_manager.transform.position, _manager.playerLocation.position) > _despawnDistance)
+        public override void OnUpdate()
         {
-            _manager.Despawn();
-        }
-
-        // Compute average position of remaining sheep (excluding grabbed sheep)
-        GameObject[] sheepObjects = GameObject.FindGameObjectsWithTag("Sheep");
-        Vector3 sheepCenter = Vector3.zero;
-        int count = 0;
-        foreach (GameObject sheep in sheepObjects)
-        {
-            if (sheep != _manager.grabbedObject)
+            if (_manager.GetGrabbedObject() is null)
             {
+                _manager.SetState<HuntingState>();
+                return;
+            }
+
+            if (Vector3.Distance(_manager.transform.position, _manager.GetPlayerLocation()) > _manager.GetStats().despawnDistance)
+                _manager.Despawn();
+
+            // Compute average position of remaining sheep (excluding grabbed sheep)
+            Vector3 sheepCenter = Vector3.zero;
+            int count = 0;
+            foreach (GameObject sheep in _manager.GetSheep())
+            {
+                if (sheep == _manager.GetGrabbedObject())
+                    continue;
+
                 sheepCenter += sheep.transform.position;
                 count++;
             }
-        }
-        sheepCenter = count > 0 ? sheepCenter / count : _manager.playerLocation.position;
+            sheepCenter = count > 0 ? sheepCenter / count : _manager.GetPlayerLocation();
 
-        var position = _manager.transform.position;
+            var position = _manager.transform.position;
         
-        // Run in opposite direction of sheep herd
-        Vector3 awayDir = (position - sheepCenter).normalized;
-        Vector3 escapeTarget = position + awayDir * _dragAwayDistance;
+            // Run in opposite direction of sheep herd
+            Vector3 awayDir = (position - sheepCenter).normalized;
+            Vector3 escapeTarget = position + awayDir * _stats.dragAwayDistance;
 
-        if (NavMesh.SamplePosition(escapeTarget, out NavMeshHit hit, 5f, NavMesh.AllAreas))
-            _movement.MoveTo(hit.position);
+            if (NavMesh.SamplePosition(escapeTarget, out NavMeshHit hit, 5f, NavMesh.AllAreas)) //TODO replace hardcoded value with variable
+                _movement.MoveTo(hit.position);
 
-        // Face backwards toward the herd (look at herd, move away)
-        _movement.LookAt(sheepCenter);
-    }
+            // Face backwards toward the herd (look at herd, move away)
+            _movement.LookAt(sheepCenter);
+        }
 
-    public void OnStop()
-    {
-        _animator.SetDragging(false);
+        public override void OnStop()
+        {
+            _animator.SetDragging(false);
+        }
     }
 }

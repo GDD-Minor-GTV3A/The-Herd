@@ -1,10 +1,5 @@
-using Core.AI.Sheep;
-
-using Unity.VisualScripting;
-
 using UnityEngine;
 using UnityEngine.AI;
-using Core.Events;
 
 public class DrekavacAI : MonoBehaviour
 {
@@ -19,8 +14,7 @@ public class DrekavacAI : MonoBehaviour
     float dragSpeed = 1.2f;        // Speed when dragging a sheep
     [SerializeField]
     float circleSpeed = 2f;        // Speed of circling rotation
-
-    [Header("Behavior Settings")]
+    
     [Header("Behavior Settings")]
     [SerializeField]
     float directionSwitchInterval = 5f;         // Time between direction switches while circling

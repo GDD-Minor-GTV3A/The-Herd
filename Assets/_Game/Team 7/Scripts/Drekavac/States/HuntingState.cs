@@ -1,57 +1,45 @@
-using Core.Shared;
-using Core.Shared.StateMachine;
-
 using UnityEngine;
 
-public class HuntingState : IState
+namespace _Game.Team_7.Scripts.Drekavac.States
 {
-    private DrekavacStateManager _manager;
-    private EnemyMovementController _movement;
-    private float _huntingSpeed = 15f;
-    
-    public HuntingState(DrekavacStateManager manager, EnemyMovementController movement)
+    /// <summary>
+    ///     Handles the behavior of an enemy while it's trying to home in on a target.
+    /// </summary>
+    public class HuntingState : GenericEnemyState
     {
-        _manager = manager;
-        _movement = movement;
-    }
+        public HuntingState(DrekavacStateManager manager, EnemyMovementController movement, DrekavacStats stats, DrekavacAnimatorController animator, DrekavacAudioController audio) : base(manager, movement, stats, animator, audio) { }
 
-    public void OnStart()
-    {
-        _movement.ToggleAgent(true);
-        _movement.SetMovementSpeed(_huntingSpeed);
-    }
-
-    public void OnUpdate()
-    {
-        if (_manager.grabbedObject is not null)
-            return;
-
-        GameObject[] sheepObjects = GameObject.FindGameObjectsWithTag("Sheep");
-        if (sheepObjects.Length == 0) return;
-
-        GameObject closestSheep = null;
-        float closestDist = Mathf.Infinity;
-
-        foreach (GameObject sheep in sheepObjects)
+        public override void OnStart()
         {
-            float dist = Vector3.Distance(_manager.transform.position, sheep.transform.position);
-            if (dist < closestDist)
+            _movement.ToggleAgent(true);
+            _movement.SetMovementSpeed(_stats.sprintSpeed);
+        }
+
+        public override void OnUpdate()
+        {
+            var sheepObjects = _manager.GetSheep();
+            if (sheepObjects.Length == 0) 
+                return;
+
+            GameObject? closestSheep = null;
+            float closestDist = Mathf.Infinity;
+
+            foreach (GameObject sheep in sheepObjects)
             {
+                float dist = Vector3.Distance(_manager.transform.position, sheep.transform.position);
+                if (!(dist < closestDist))
+                    continue;
+
                 closestDist = dist;
                 closestSheep = sheep;
             }
-        }
 
-        if (closestSheep is not null)
-        {
+            if (closestSheep is null)
+                return;
+
             var closestPosition = closestSheep.transform.position;
             _movement.MoveTo(closestPosition);
             _movement.LookAt(closestPosition);
         }
-    }
-
-    public void OnStop()
-    {
-        //throw new System.NotImplementedException();
     }
 }
