@@ -49,6 +49,9 @@ namespace Gameplay.ToolsSystem
             // test
             Whistle whistle = GetComponent<Whistle>();
             SetNewToolToSlotByIndex(whistle, 0);
+
+            Rifle rifle = GetComponent<Rifle>();
+            SetNewToolToSlotByIndex(rifle, 1);
         }
 
 
