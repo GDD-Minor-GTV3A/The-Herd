@@ -1,8 +1,10 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
+﻿using TMPro;
 
-public class ChatController : MonoBehaviour {
+using UnityEngine;
+using UnityEngine.UI;
+
+public class ChatController : MonoBehaviour
+{
 
 
     public TMP_InputField ChatInputField;

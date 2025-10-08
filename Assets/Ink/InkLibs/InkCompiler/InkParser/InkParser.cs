@@ -8,12 +8,13 @@ namespace Ink
     {
         public InkParser(string str, string filenameForMetadata = null, Ink.ErrorHandler externalErrorHandler = null, IFileHandler fileHandler = null)
             : this(str, filenameForMetadata, externalErrorHandler, null, fileHandler)
-        {  }
+        { }
 
-        InkParser(string str, string inkFilename = null, Ink.ErrorHandler externalErrorHandler = null, InkParser rootParser = null, IFileHandler fileHandler = null) : base(str) {
+        InkParser(string str, string inkFilename = null, Ink.ErrorHandler externalErrorHandler = null, InkParser rootParser = null, IFileHandler fileHandler = null) : base(str)
+        {
             _filename = inkFilename;
-            RegisterExpressionOperators ();
-            GenerateStatementLevelRules ();
+            RegisterExpressionOperators();
+            GenerateStatementLevelRules();
 
             // Built in handler for all standard parse errors and warnings
             this.errorHandler = OnStringParserError;
@@ -24,17 +25,21 @@ namespace Ink
 
             _fileHandler = fileHandler ?? new DefaultFileHandler();
 
-            if (rootParser == null) {
+            if (rootParser == null)
+            {
                 _rootParser = this;
 
-                _openFilenames = new HashSet<string> ();
+                _openFilenames = new HashSet<string>();
 
-                if (inkFilename != null) {
-                    var fullRootInkPath = _fileHandler.ResolveInkFilename (inkFilename);
-                    _openFilenames.Add (fullRootInkPath);
+                if (inkFilename != null)
+                {
+                    var fullRootInkPath = _fileHandler.ResolveInkFilename(inkFilename);
+                    _openFilenames.Add(fullRootInkPath);
                 }
 
-            } else {
+            }
+            else
+            {
                 _rootParser = rootParser;
             }
 
@@ -43,43 +48,46 @@ namespace Ink
         // Main entry point
         public Parsed.Story Parse()
         {
-            List<Parsed.Object> topLevelContent = StatementsAtLevel (StatementLevel.Top);
+            List<Parsed.Object> topLevelContent = StatementsAtLevel(StatementLevel.Top);
 
             // Note we used to return null if there were any errors, but this would mean
             // that include files would return completely empty rather than attempting to
             // continue with errors. Returning an empty include files meant that anything
             // that *did* compile successfully would otherwise be ignored, generating way
             // more errors than necessary.
-            return new Parsed.Story (topLevelContent, isInclude:_rootParser != this);
+            return new Parsed.Story(topLevelContent, isInclude: _rootParser != this);
         }
 
-        protected List<T> SeparatedList<T> (SpecificParseRule<T> mainRule, ParseRule separatorRule) where T : class
+        protected List<T> SeparatedList<T>(SpecificParseRule<T> mainRule, ParseRule separatorRule) where T : class
         {
-            T firstElement = Parse (mainRule);
+            T firstElement = Parse(mainRule);
             if (firstElement == null) return null;
 
-            var allElements = new List<T> ();
-            allElements.Add (firstElement);
+            var allElements = new List<T>();
+            allElements.Add(firstElement);
 
-            do {
+            do
+            {
 
-                int nextElementRuleId = BeginRule ();
+                int nextElementRuleId = BeginRule();
 
-                var sep = separatorRule ();
-                if (sep == null) {
-                    FailRule (nextElementRuleId);
+                var sep = separatorRule();
+                if (sep == null)
+                {
+                    FailRule(nextElementRuleId);
                     break;
                 }
 
-                var nextElement = Parse (mainRule);
-                if (nextElement == null) {
-                    FailRule (nextElementRuleId);
+                var nextElement = Parse(mainRule);
+                if (nextElement == null)
+                {
+                    FailRule(nextElementRuleId);
                     break;
                 }
 
-                SucceedRule (nextElementRuleId);
+                SucceedRule(nextElementRuleId);
 
-                allElements.Add (nextElement);
+                allElements.Add(nextElement);
 
             } while (true);
 
@@ -88,13 +96,13 @@ namespace Ink
 
         protected override string PreProcessInputString(string str)
         {
-            var inputWithCommentsRemoved = (new CommentEliminator (str)).Process();
+            var inputWithCommentsRemoved = (new CommentEliminator(str)).Process();
             return inputWithCommentsRemoved;
         }
 
         protected Runtime.DebugMetadata CreateDebugMetadata(StringParserState.Element stateAtStart, StringParserState.Element stateAtEnd)
         {
-            var md = new Runtime.DebugMetadata ();
+            var md = new Runtime.DebugMetadata();
             md.startLineNumber = stateAtStart.lineIndex + 1;
             md.endLineNumber = stateAtEnd.lineIndex + 1;
             md.startCharacterNumber = stateAtStart.characterInLineIndex + 1;
@@ -108,48 +116,58 @@ namespace Ink
             // Apply DebugMetadata based on the state at the start of the rule
             // (i.e. use line number as it was at the start of the rule)
             var parsedObj = result as Parsed.Object;
-            if ( parsedObj) {
+            if (parsedObj)
+            {
                 parsedObj.debugMetadata = CreateDebugMetadata(stateAtStart, stateAtEnd);
                 return;
             }
 
             // A list of objects that doesn't already have metadata?
             var parsedListObjs = result as List<Parsed.Object>;
-            if (parsedListObjs != null) {
-                foreach (var parsedListObj in parsedListObjs) {
-                    if (!parsedListObj.hasOwnDebugMetadata) {
+            if (parsedListObjs != null)
+            {
+                foreach (var parsedListObj in parsedListObjs)
+                {
+                    if (!parsedListObj.hasOwnDebugMetadata)
+                    {
                         parsedListObj.debugMetadata = CreateDebugMetadata(stateAtStart, stateAtEnd);
                     }
                 }
             }
 
             var id = result as Parsed.Identifier;
-            if (id != null) {
+            if (id != null)
+            {
                 id.debugMetadata = CreateDebugMetadata(stateAtStart, stateAtEnd);
             }
         }
 
         protected bool parsingStringExpression
         {
-            get {
-                return GetFlag ((uint)CustomFlags.ParsingString);
+            get
+            {
+                return GetFlag((uint)CustomFlags.ParsingString);
             }
-            set {
-                SetFlag ((uint)CustomFlags.ParsingString, value);
+            set
+            {
+                SetFlag((uint)CustomFlags.ParsingString, value);
             }
         }
 
         protected bool tagActive
         {
-            get {
-                return GetFlag ((uint)CustomFlags.TagActive);
+            get
+            {
+                return GetFlag((uint)CustomFlags.TagActive);
             }
-            set {
-                SetFlag ((uint)CustomFlags.TagActive, value);
+            set
+            {
+                SetFlag((uint)CustomFlags.TagActive, value);
             }
         }
 
-        protected enum CustomFlags {
+        protected enum CustomFlags
+        {
             ParsingString = 0x1,
             TagActive = 0x2
         }
@@ -159,16 +177,22 @@ namespace Ink
             var warningType = isWarning ? "WARNING:" : "ERROR:";
             string fullMessage;
 
-            if (_filename != null) {
-                fullMessage = string.Format(warningType+" '{0}' line {1}: {2}",  _filename, (lineIndex+1), message);
-            } else {
-                fullMessage = string.Format(warningType+" line {0}: {1}", (lineIndex+1), message);
+            if (_filename != null)
+            {
+                fullMessage = string.Format(warningType + " '{0}' line {1}: {2}", _filename, (lineIndex + 1), message);
+            }
+            else
+            {
+                fullMessage = string.Format(warningType + " line {0}: {1}", (lineIndex + 1), message);
             }
 
-            if (_externalErrorHandler != null) {
-                _externalErrorHandler (fullMessage, isWarning ? ErrorType.Warning : ErrorType.Error);
-            } else {
-                throw new System.Exception (fullMessage);
+            if (_externalErrorHandler != null)
+            {
+                _externalErrorHandler(fullMessage, isWarning ? ErrorType.Warning : ErrorType.Error);
+            }
+            else
+            {
+                throw new System.Exception(fullMessage);
             }
         }
 
@@ -179,4 +203,3 @@ namespace Ink
         string _filename;
     }
 }
-
