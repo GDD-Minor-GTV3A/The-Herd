@@ -55,6 +55,7 @@
     <UnityVersion>6000.0.58f1</UnityVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.0.58f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.SourceGenerators.dll" />
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.0.58f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.0.58f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
@@ -64,6 +65,8 @@
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\States\DogFollowPlayer.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\Dog.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\States\PlayerWalking.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\ToolsSystem\Tools\Bullet.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\ToolsSystem\Tools\Rifle.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\PlayerRotation.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\States\DogState.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\States\DogMove.cs" />
@@ -73,8 +76,10 @@
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\States\PlayerIdle.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\PlayerMovement.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\Player.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\HealthSystem\HealthTester.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\PlayerStateManager.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\DogAnimator.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\HealthSystem\Health.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\DogMovementController.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\PlayerInput.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\DogConfig.cs" />
@@ -569,6 +574,14 @@
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.0.58f1\Editor\Data\PlaybackEngines\WindowsStandaloneSupport\UnityEditor.WindowsStandalone.Extensions.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEditor.UWP.Extensions">
+      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.0.58f1\Editor\Data\PlaybackEngines\MetroSupport\UnityEditor.UWP.Extensions.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEditor.Android.Extensions">
+      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.0.58f1\Editor\Data\PlaybackEngines\AndroidPlayer\UnityEditor.Android.Extensions.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.VisualScripting.YamlDotNet">
       <HintPath>Library\PackageCache\com.unity.visualscripting@b4d700247d4b\Editor\VisualScripting.Core\Dependencies\YamlDotNet\Unity.VisualScripting.YamlDotNet.dll</HintPath>
       <Private>False</Private>
@@ -611,6 +624,14 @@
     </Reference>
     <Reference Include="Mono.Cecil">
       <HintPath>Library\PackageCache\com.unity.nuget.mono-cecil@d6f9955a5d5f\Mono.Cecil.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Android.Types">
+      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.0.58f1\Editor\Data\PlaybackEngines\AndroidPlayer\Unity.Android.Types.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Android.Gradle">
+      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.0.58f1\Editor\Data\PlaybackEngines\AndroidPlayer\Unity.Android.Gradle.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="netstandard">
