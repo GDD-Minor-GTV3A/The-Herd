@@ -1,6 +1,9 @@
-using Core.Shared;
-using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+
+using Core.Shared;
+
+using UnityEngine;
 
 public class Rifle : MonoBehaviour, IPlayerTool
 {
@@ -15,10 +18,20 @@ public class Rifle : MonoBehaviour, IPlayerTool
     private bool canFire = true;
     private bool isCycling = false;
 
+    private Queue<Bullet> bulletPool = new Queue<Bullet>();
+    [SerializeField] private int poolSize = 5;
+
     private void Start()
     {
         currentAmmo = maxAmmo;
-        Debug.Log("Rifle created and ready");
+
+        // Initialize pool
+        for (int i = 0; i < poolSize; i++)
+        {
+            GameObject b = Instantiate(bulletPrefab);
+            b.SetActive(false);
+            bulletPool.Enqueue(b.GetComponent<Bullet>());
+        }
     }
 
     public void MainUsageStarted(Observable<Vector3> cursorWorldPosition)
@@ -57,9 +70,9 @@ public class Rifle : MonoBehaviour, IPlayerTool
 
     private void Fire()
     {
-        if (bulletPrefab == null)
+        if (bulletPool.Count == 0)
         {
-            Debug.LogWarning("Bullet prefab not set!");
+            Debug.Log("No bullets available in pool!");
             return;
         }
 
@@ -67,19 +80,25 @@ public class Rifle : MonoBehaviour, IPlayerTool
         currentAmmo--;
         canFire = false;
 
-        // Spawn bullet at player position (or slightly in front)
-        Vector3 spawnPosition = transform.position + transform.forward * 1.5f + Vector3.up * 1.2f; // adjust as needed
-        GameObject bulletObj = Instantiate(bulletPrefab, spawnPosition, Quaternion.identity);
+        // Get bullet from pool
+        Bullet bullet = bulletPool.Dequeue();
+        bullet.transform.position = transform.position + transform.forward * 1.5f + Vector3.up * 1.2f;
+        bullet.transform.rotation = Quaternion.identity;
+        bullet.gameObject.SetActive(true);
+        bullet.Shoot(transform.forward);
 
-        // Shoot in player's forward direction
-        Bullet bullet = bulletObj.GetComponent<Bullet>();
-        if (bullet != null)
-        {
-            bullet.Shoot(transform.forward);
-        }
+        // Return bullet to pool after its lifetime
+        StartCoroutine(ReturnBulletToPool(bullet, 5f));
 
-        // Start bolt cycle
+        // Start the automatic bolt cycle
         StartCoroutine(AutoBoltCycle());
+    }
+
+    private IEnumerator ReturnBulletToPool(Bullet bullet, float time)
+    {
+        yield return new WaitForSeconds(time);
+        bullet.gameObject.SetActive(false);
+        bulletPool.Enqueue(bullet);
     }
 
     private IEnumerator AutoBoltCycle()

@@ -15,7 +15,6 @@ public class Bullet : MonoBehaviour
     public void Shoot(Vector3 direction)
     {
         rb.linearVelocity = direction * speed;
-        Destroy(gameObject, lifeTime); // auto-destroy after lifetime
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -24,7 +23,5 @@ public class Bullet : MonoBehaviour
         // Optionally apply damage:
         // var health = collision.gameObject.GetComponent<Health>();
         // if(health != null) health.TakeDamage(damage);
-
-        Destroy(gameObject); // destroy bullet on hit
     }
 }
