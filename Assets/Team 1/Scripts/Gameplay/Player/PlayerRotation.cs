@@ -7,55 +7,49 @@ namespace Gameplay.Player
     /// </summary>
     public class PlayerRotation : MonoBehaviour
     {
-        private float _rotationSpeed;
+        [SerializeField] private float _rotationSpeed;
         private Camera _mainCamera;
+        [SerializeField] private LayerMask _groundMask = ~0; // Default: everything
 
         /// <summary>
         /// Sets the rotation speed for smoothing the player's turn.
         /// </summary>
-        /// <param name="rotationSpeed">How quickly the player rotates towards the camera's direction.</param>
         public void Initialize(float rotationSpeed)
         {
             UpdateRotationSpeed(rotationSpeed);
             _mainCamera = Camera.main;
         }
 
-
         /// <summary>
-        /// Rotates the player to face the move forward direction.
+        /// Rotates the player toward the direction where the camera center hits the ground.
         /// </summary>
         public void Rotate(Vector2 input)
         {
+            if (_mainCamera == null)
+                return;
 
-            //// Get camera forward vector ("beam" direction)
-            //Vector3 camForward = _mainCamera.transform.forward;
-            //camForward.y = 0f; // ignore vertical tilt
+            // Step 1: Cast a ray from camera center
+            Ray ray = _mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.8f, 0));
+            if (Physics.Raycast(ray, out RaycastHit hit, 200f, _groundMask))
+            {
+                Vector3 lookPoint = hit.point;
 
-            //if (camForward.sqrMagnitude > 0.001f)
-            //{
-            //    Quaternion targetRotation = Quaternion.LookRotation(camForward);
-            //    transform.rotation = Quaternion.Slerp(
-            //        transform.rotation,
-            //        targetRotation,
-            //        _rotationSpeed * Time.deltaTime
-            //    );
-            //}
+                // Step 2: Find direction from player to that point (ignore height)
+                Vector3 lookDir = lookPoint - transform.position;
+                lookDir.y = 0f;
 
-            Vector3 forward = _mainCamera.transform.forward;
-            Vector3 right = _mainCamera.transform.right;
-
-            forward.y = 0f;
-            right.y = 0f;
-
-            forward.Normalize();
-            right.Normalize();
-
-            Vector3 move = forward * input.y + right * input.x;
-
-            if (move.sqrMagnitude > 0.0001f)
-                transform.rotation = Quaternion.LookRotation(move);
+                if (lookDir.sqrMagnitude > 0.001f)
+                {
+                    // Step 3: Smoothly rotate toward it
+                    Quaternion targetRotation = Quaternion.LookRotation(lookDir);
+                    transform.rotation = Quaternion.Slerp(
+                        transform.rotation,
+                        targetRotation,
+                        _rotationSpeed * Time.deltaTime
+                    );
+                }
+            }
         }
-
 
         public void UpdateRotationSpeed(float rotationSpeed)
         {
