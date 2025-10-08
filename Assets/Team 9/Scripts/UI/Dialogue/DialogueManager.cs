@@ -354,4 +354,31 @@ public class DialogueManager : MonoBehaviour
     {
         EventManager.Broadcast(new CompleteObjectiveEvent(questID, objectiveID));
     }
+    /// <summary>
+    /// Called by QuestManager when a quest is completed.
+    /// Updates Ink variables or performs dialogue logic if needed.
+    /// Added by Yeremey
+    /// </summary>
+    public void OnQuestCompleted(string questID)
+    {
+        Debug.Log($"DialogueManager: Quest '{questID}' completed.");
+
+        if (_story != null)
+        {
+            string variableName = "quest_" + questID + "_completed";
+
+            try
+            {
+                // Try to access the variable; if it exists, update it
+                var currentValue = _story.variablesState[variableName];
+                _story.variablesState[variableName] = true;
+                Debug.Log($"DialogueManager: Set Ink variable '{variableName}' to true.");
+            }
+            catch (System.Exception)
+            {
+                // If variable doesn't exist, Ink throws an error — we catch and log it
+                Debug.LogWarning($"DialogueManager: Ink variable '{variableName}' not found in story.");
+            }
+        }
+    }
 }
