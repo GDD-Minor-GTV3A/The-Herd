@@ -3,9 +3,18 @@
 public class ApplyForceBrick : MonoBehaviour
 {
     Rigidbody rb;
+    public bool isLeft = false;
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        rb.AddForce(Vector3.right * 15, ForceMode.Impulse);
+        if (isLeft)
+        {
+            rb.AddForce(Vector3.left * 20, ForceMode.Impulse);
+            return;
+        }
+        else
+        {
+            rb.AddForce(Vector3.right * 20, ForceMode.Impulse);
+        }
     }
 }
