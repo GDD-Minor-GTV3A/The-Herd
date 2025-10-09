@@ -1,5 +1,5 @@
 VAR vesna_quest_accepted = false
-VAR vesna_quest_completed = false
+VAR QUEST_001_completed = false
 VAR vesna_quest_declined = false
 
 EXTERNAL StartQuest(string)
@@ -10,7 +10,7 @@ EXTERNAL CompleteObjective(string, string)
 
 === vesna_quest_router ===
 // Check quest state and route to appropriate dialogue
-{ vesna_quest_completed:
+{ QUEST_001_completed:
     -> vesna_quest.quest_completed_dialogue
 - else:
     { vesna_quest_accepted:
@@ -190,7 +190,7 @@ I'll keep looking.
 
 // --- Quest Completed Dialogue ---
 = quest_completed_dialogue
-~ vesna_quest_completed = true
+~ QUEST_001_completed = true
 #speaker:Vesna #layout:right
 Welcome back! I can see by the look in your eyes that you have good news for me.
 
