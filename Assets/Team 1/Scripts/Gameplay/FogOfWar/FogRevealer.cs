@@ -8,147 +8,165 @@ namespace Gameplay.FogOfWar
 {
     public class FogRevealer : MonoBehaviour
     {
-        [SerializeField] private List<Revealer> _revealers;
+        [Serializable]
+        private class Revealer
+        {
+            public FogRevealerConfig Config;
 
-        private List<GameObject> _fovMeshObjects;
-        private List<Mesh> _fovMeshes;
-        private List<float> _startingAngles;
-        private LayerMask _obstaclesLayers;
+            [HideInInspector] public MeshRenderer Renderer;
+            [HideInInspector] public float StartingAngle = 0;
+            [HideInInspector] public Mesh Mesh;
+        }
 
 
+        [SerializeField, Tooltip("Data for every revealer for this object.")] private List<Revealer> revealers;
+        [SerializeField, Tooltip("Origin point of revealer. If not assigned transform of object will be taken.")] private Transform origin;
+
+
+        private LayerMask obstaclesLayers;
+
+
+        /// <summary>
+        /// Initializes the mesh for revealer.
+        /// </summary>
+        /// <param name="fogPlane">Transform of projection plan of the fog.</param>
+        /// <param name="meshMaterial">Material for revealers.</param>
+        /// <param name="obstaclesLayers">Layer mask of objects, which blocks the view.</param>
         public void CreateFovMeshes(Transform fogPlane, Material meshMaterial, LayerMask obstaclesLayers)
         {
-            _fovMeshObjects = new List<GameObject>();
-            _fovMeshes = new List<Mesh>();
-            _startingAngles = new List<float>();
+            UpdateObstaclesMask(obstaclesLayers);
 
-            int i = 0;
-            foreach (Revealer revealer in _revealers)
+            for (int i = 0; i < revealers.Count; i++)
             {
                 Mesh newMesh = new Mesh();
 
                 GameObject newFovMeshObject = new GameObject();
                 newFovMeshObject.name = "FovMesh";
-                newFovMeshObject.transform.position = new Vector3(revealer.Origin.position.x, fogPlane.transform.position.y + 1, revealer.Origin.position.z);
+                newFovMeshObject.transform.position = new Vector3(origin.position.x, fogPlane.transform.position.y + 1, origin.position.z);
                 newFovMeshObject.transform.parent = fogPlane.transform.parent;
                 newFovMeshObject.layer = LayerMask.NameToLayer("FogOfWarProjection");
                 newFovMeshObject.AddComponent<MeshFilter>().mesh = newMesh;
-                newFovMeshObject.AddComponent<MeshRenderer>();
 
-                _fovMeshObjects.Add(newFovMeshObject);
-                _fovMeshes.Add(newMesh);
-                _startingAngles.Add(0);
+
+
+                revealers[i].Renderer = newFovMeshObject.AddComponent<MeshRenderer>();
+                revealers[i].Mesh = newMesh;
                 UpdateMesh(i);
-                StartCoroutine(UpdateMeshCor(revealer.Config.UpdateRate, i));
-                i++;
+                UpdateRevealerMaterial(i, meshMaterial);
+                StartCoroutine(UpdateMeshCor(revealers[i].Config.UpdateRate, i));
             }
-
-            
-            UpdateRevealerMaterial(meshMaterial);
-
-            UpdateObstaclesMask(obstaclesLayers);
-
         }
 
 
         private void Update()
         {
-            if (_fovMeshes == null) return;
-            for (int i = 0; i < _fovMeshObjects.Count; i++)
+            for (int i = 0; i < revealers.Count; i++)
             {
-                Transform origin = _revealers[i].Origin;
+                if (revealers[i].Renderer == null) continue;
 
-                _fovMeshObjects[i].transform.position = new Vector3(origin.position.x, _fovMeshObjects[i].transform.position.y, origin.position.z);
+                revealers[i].Renderer.transform.position = new Vector3(origin.position.x, revealers[i].Renderer.transform.position.y, origin.position.z);
 
-                Vector3 direction = origin.forward;
-                direction = direction.normalized;
-                float result = Mathf.Atan2(direction.z, direction.x) * Mathf.Rad2Deg;
-                result += 150f;
+                Vector3 _forward = origin.forward;
+                _forward = _forward.normalized;
+                float _startAngle = Mathf.Atan2(_forward.z, _forward.x) * Mathf.Rad2Deg;
+                _startAngle += 150f;
 
-                if (result < 0) result += 360;
+                if (_startAngle < 0) _startAngle += 360;
 
-                _startingAngles[i] = result - _revealers[i].Config.FOV / 2f;
+                revealers[i].StartingAngle = _startAngle - revealers[i].Config.FOV / 2f;
 
-                _fovMeshObjects[i].GetComponent<MeshRenderer>().material.SetVector("_RevealerCenter", _fovMeshObjects[i].transform.position);
-                _fovMeshObjects[i].GetComponent<MeshRenderer>().material.SetVector("_RevealerForward", _revealers[i].Origin.forward);
-                _fovMeshObjects[i].GetComponent<MeshRenderer>().material.SetFloat("_ViewDistance", _revealers[i].Config.ViewDistance);
-                _fovMeshObjects[i].GetComponent<MeshRenderer>().material.SetFloat("_FOVAngle", _revealers[i].Config.FOV * 0.5f * Mathf.Deg2Rad);
+                revealers[i].Renderer.material.SetVector("_RevealerCenter", revealers[i].Renderer.transform.position);
+                revealers[i].Renderer.material.SetVector("_RevealerForward", origin.forward);
             }
-
         }
 
 
         private void UpdateMesh(int meshIndex)
         {
-            float fov = _revealers[meshIndex].Config.FOV;
-            float viewDistance = _revealers[meshIndex].Config.ViewDistance;
-            int rayCount = (int)_revealers[meshIndex].Config.RayCount;
-            Transform origin = _revealers[meshIndex].Origin;
+            float _fov = revealers[meshIndex].Config.FOV;
+            float _viewDistance = revealers[meshIndex].Config.ViewDistance;
+            int _rayCount = (int)revealers[meshIndex].Config.RayCount;
 
-            float angle = _startingAngles[meshIndex];
-            float angleIncrease = fov / rayCount;
-            Vector3 meshOrigin = Vector3.zero;
+            float _angle = revealers[meshIndex].StartingAngle;
+            float _angleIncrease = _fov / _rayCount;
+            Vector3 _meshOrigin = Vector3.zero;
 
-            Vector3[] vertices = new Vector3[rayCount + 1 + 1];
-            int[] triangles = new int[rayCount * 3];
+            Vector3[] _vertices = new Vector3[_rayCount + 1 + 1];
+            int[] _triangles = new int[_rayCount * 3];
 
-            vertices[0] = meshOrigin;
+            _vertices[0] = _meshOrigin;
 
-            int vertexIndex = 1;
-            int triangleIndex = 0;
+            int _vertexIndex = 1;
+            int _triangleIndex = 0;
 
-            for (int v = 0; v <= rayCount; v++)
+            for (int _v = 0; _v <= _rayCount; _v++)
             {
-                float angleRad = angle * (Mathf.PI / 180f);
-                Vector3 result = new Vector3(Mathf.Cos(angleRad), 0, Mathf.Sin(angleRad));
-                Vector3 vertex;
-                if (Physics.SphereCast(origin.position, .1f, result, out RaycastHit hit, viewDistance, _obstaclesLayers))
+                float _angleRad = _angle * (Mathf.PI / 180f);
+                Vector3 _rayDirection = new Vector3(Mathf.Cos(_angleRad), 0, Mathf.Sin(_angleRad));
+                Vector3 _vertex;
+                if (Physics.Raycast(origin.position, _rayDirection, out RaycastHit hit, _viewDistance, obstaclesLayers))
                 {
-                    Vector3 localHitPoint = _fovMeshObjects[meshIndex].transform.InverseTransformPoint(hit.point + result * .5f);
-                    vertex = new Vector3(localHitPoint.x, meshOrigin.y, localHitPoint.z);
+                    Vector3 _localHitPoint = revealers[meshIndex].Renderer.transform.InverseTransformPoint(hit.point);
+                    _vertex = new Vector3(_localHitPoint.x, _meshOrigin.y, _localHitPoint.z);
                 }
                 else
                 {
-                    vertex = meshOrigin + result * viewDistance;
+                    _vertex = _meshOrigin + _rayDirection * _viewDistance;
                 }
 
-                vertices[vertexIndex] = vertex;
+                _vertices[_vertexIndex] = _vertex;
 
-                if (v > 0)
+                if (_v > 0)
                 {
-                    triangles[triangleIndex] = 0;
-                    triangles[triangleIndex + 1] = vertexIndex - 1;
-                    triangles[triangleIndex + 2] = vertexIndex;
-                    triangleIndex += 3;
+                    _triangles[_triangleIndex] = 0;
+                    _triangles[_triangleIndex + 1] = _vertexIndex - 1;
+                    _triangles[_triangleIndex + 2] = _vertexIndex;
+                    _triangleIndex += 3;
                 }
 
-                angle -= angleIncrease;
-                vertexIndex++;
+                _angle -= _angleIncrease;
+                _vertexIndex++;
             }
 
-            _fovMeshes[meshIndex].vertices = vertices;
-            _fovMeshes[meshIndex].triangles = triangles;
+            revealers[meshIndex].Mesh.vertices = _vertices;
+            revealers[meshIndex].Mesh.triangles = _triangles;
         }
 
 
+        /// <summary>
+        /// Updates obstacles layer mask for revealers.
+        /// </summary>
+        /// <param name="obstaclesLayers">New obstacle layer mask.</param>
         public void UpdateObstaclesMask(LayerMask obstaclesLayers)
         {
-            _obstaclesLayers = obstaclesLayers;
-        }
-
-        public void UpdateRevealerMaterial(Material revealerMaterial)
-        {
-            if (_fovMeshObjects != null)
-                foreach (GameObject fovObject in _fovMeshObjects)
-                    fovObject.GetComponent<MeshRenderer>().material = revealerMaterial;
+            this.obstaclesLayers = obstaclesLayers;
         }
 
 
-        [Serializable]
-        private struct Revealer
+        private void UpdateRevealerMaterial(int index, Material revealerMaterial)
         {
-            public FogRevealerConfig Config;
-            public Transform Origin;
+            if (revealers[index].Renderer == null) return;
+
+
+            revealers[index].Renderer.material = revealerMaterial;
+
+            revealers[index].Renderer.material.SetFloat("_FOVAngle", revealers[index].Config.FOV * 0.5f * Mathf.Deg2Rad);
+            revealers[index].Renderer.material.SetFloat("_ViewDistance", revealers[index].Config.ViewDistance);
+            revealers[index].Renderer.material.SetFloat("_FadeWidth", 10f);
+            revealers[index].Renderer.material.SetFloat("_EdgeFadeWidth", (revealers[index].Config.FOV == 360f) ? 0f : .5f);
+        }
+
+
+        /// <summary>
+        /// Updates material on all meshes.
+        /// </summary>
+        /// <param name="revealerMaterial">New material.</param>
+        public void UpdateAllMaterials(Material revealerMaterial)
+        {
+            for(int _i = 0; _i< revealers.Count; _i++)
+            {
+                UpdateRevealerMaterial(_i, revealerMaterial);
+            }
         }
 
 

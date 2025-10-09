@@ -6,39 +6,52 @@ using UnityEngine.Rendering.Universal;
 
 namespace Gameplay.FogOfWar 
 {
+    /// <summary>
+    /// Main Fog Of War script. Creates all required objects, initialize revealers and update objects which are hidden if the fog.
+    /// </summary>
     public class FogOfWarManager : MonoBehaviour
     {
-        [SerializeField, Required, Tooltip("")] private Transform _playerTransform;
+        [SerializeField, Required, Tooltip("Player root object. Required for proper planes positioning.")] private Transform playerTransform;
 
         [Space]
         [Header("Configs")]
-        [SerializeField, Required, Tooltip("")] private FogOfWarConfig _fogOfWarConfig;
-        [SerializeField, Required, Tooltip("")] private LevelData _levelData;
+        [SerializeField, Required, Tooltip("General Fog Of War config.")] private FogOfWarConfig fogOfWarConfig;
+        [SerializeField, Required, Tooltip("Data of level.")] private LevelData levelData;
 
         [Space]
         [Header("Debug")]
-        [SerializeField, Tooltip("")] private bool _drawFogAreaGizmos = false;
-        [SerializeField, Tooltip("")] private bool _drawLevelBordersGizmos = false;
-        [SerializeField, Tooltip("")] private float _levelBordersGizmosSize = 1000f;
+        [SerializeField, Tooltip("Shows the area where Fog Of War will be visible.")] private bool drawFogAreaGizmos = false;
+        [SerializeField, Tooltip("Shows highest and lowest points of the map.")] private bool drawLevelBordersGizmos = false;
+        [SerializeField, Tooltip("Size of planes that show highest and lowest points. Does NOT affect actual Fog Of War.")] private float levelBordersGizmosSize = 1000f;
 
 
-        private float _fogPlaneSize = 1f;
-        private uint _textureResolution = 100;
-        private LayerMask _obstaclesLayers;
+        private float fogPlaneSize = 1f;
+        private uint textureResolution = 100;
+        private LayerMask obstaclesLayers;
 
-        private Material _fogProjectionMaterial;
-        private Material _revealerMaterial;
-        private Material _decalMaterial;
-        private Material _fogMaterial;
+        private Material fogProjectionMaterial;
+        private Material revealerMaterial;
+        private Material fogMaterial;
 
-        private float _mapHighestPoint = 0f;
-        private float _mapLowestPoint = 0f;
+        private float mapHighestPoint = 0f;
+        private float mapLowestPoint = 0f;
 
-        private List<FogRevealer> _revealers;
-        private RenderTexture _fogTexture;
-        private GameObject _fogProjPlane;
-        private DecalProjector _decal;
-        private Camera _renderCamera;
+        private List<FogRevealer> revealers;
+        private List<HiddenInFog> hiddenObjects;
+
+        private ComputeShader hiddenComputeShader;
+        private ComputeBuffer positionsBuffer;
+        private ComputeBuffer visibilityBuffer;
+        private Vector3[] positionsData;
+        private uint[] visibilityData;
+
+        private int shaderKernel;
+        private uint threadsAmount;
+
+        private RenderTexture fogTexture;
+        private MeshRenderer fogProjectionPlane;
+        private Camera renderCamera;
+        private MeshRenderer fogEffectPlane;
 
 
         private void Start()
@@ -56,18 +69,43 @@ namespace Gameplay.FogOfWar
             CreateFogProjectionPlane();
             CreateTexture();
             CreateRenderCamera();
-            //CreateDecalProjector();
             SetUpFogOverlayEffect();
 
             FindAllRevealers();
+            FindAllHidden();
 
-            foreach (FogRevealer revealer in _revealers)
+            CreateBuffers();
+            SetUpComputeShader();
+
+            foreach (FogRevealer _revealer in revealers)
             {
-                revealer.CreateFovMeshes(_fogProjPlane.transform, _revealerMaterial, _obstaclesLayers);
+                _revealer.CreateFovMeshes(fogProjectionPlane.transform, revealerMaterial, obstaclesLayers);
             }
 
-            _fogOfWarConfig.OnValueChanged += UpdateValuesFromFogConfig;
-            _levelData.OnValueChanged += UpdateValuesFromLevelData;
+            fogOfWarConfig.OnValueChanged += UpdateValuesFromFogConfig;
+            levelData.OnValueChanged += UpdateValuesFromLevelData;
+        }
+
+
+        private void CreateBuffers()
+        {
+            positionsBuffer = new ComputeBuffer(hiddenObjects.Count, sizeof(float) * 3);
+            visibilityBuffer = new ComputeBuffer(hiddenObjects.Count, sizeof(uint));
+
+            positionsData = new Vector3[hiddenObjects.Count];
+            visibilityData = new uint[hiddenObjects.Count];
+        }
+
+
+        private void SetUpComputeShader()
+        {
+            shaderKernel = hiddenComputeShader.FindKernel("CSMain");
+            hiddenComputeShader.GetKernelThreadGroupSizes(shaderKernel, out threadsAmount, out _, out _);
+
+            hiddenComputeShader.SetBuffer(shaderKernel, "_ObjectPositions", positionsBuffer);
+            hiddenComputeShader.SetBuffer(shaderKernel, "_ObjectVisibilities", visibilityBuffer);
+            hiddenComputeShader.SetTexture(shaderKernel, "_FogTexture", fogTexture);
+            hiddenComputeShader.SetFloat("_FogSize", fogPlaneSize);
         }
 
 
@@ -79,237 +117,250 @@ namespace Gameplay.FogOfWar
 
         private static void CreateFogEffectOverlayCamera()
         {
-            Camera mainCamera = Camera.main;
+            Camera _mainCamera = Camera.main;
 
-            Camera newCamera = new GameObject("FogTextureRenderCamera").AddComponent<Camera>();
+            Camera _newCamera = new GameObject("FogTextureRenderCamera").AddComponent<Camera>();
 
-            newCamera.transform.parent = mainCamera.transform;
-            newCamera.transform.localPosition = Vector3.zero;
-            newCamera.transform.localRotation = Quaternion.identity;
+            _newCamera.transform.parent = _mainCamera.transform;
+            _newCamera.transform.localPosition = Vector3.zero;
+            _newCamera.transform.localRotation = Quaternion.identity;
 
-            newCamera.orthographic = mainCamera.orthographic;
-            newCamera.orthographicSize = mainCamera.orthographicSize;
-            newCamera.fieldOfView = mainCamera.fieldOfView;
-            newCamera.nearClipPlane = mainCamera.nearClipPlane;
-            newCamera.farClipPlane = mainCamera.farClipPlane;
+            _newCamera.orthographic = _mainCamera.orthographic;
+            _newCamera.orthographicSize = _mainCamera.orthographicSize;
+            _newCamera.fieldOfView = _mainCamera.fieldOfView;
+            _newCamera.nearClipPlane = _mainCamera.nearClipPlane;
+            _newCamera.farClipPlane = _mainCamera.farClipPlane;
 
-            newCamera.cullingMask = LayerMask.GetMask("FoWEffect");
-            newCamera.clearFlags = CameraClearFlags.SolidColor;
-            newCamera.backgroundColor = Color.black;
+            _newCamera.cullingMask = LayerMask.GetMask("FogOfWarEffect");
+            _newCamera.clearFlags = CameraClearFlags.SolidColor;
+            _newCamera.backgroundColor = Color.black;
 
-            newCamera.GetUniversalAdditionalCameraData().renderType = CameraRenderType.Overlay;
-            mainCamera.GetUniversalAdditionalCameraData().cameraStack.Add(newCamera);
+            _newCamera.GetUniversalAdditionalCameraData().renderType = CameraRenderType.Overlay;
+            _mainCamera.GetUniversalAdditionalCameraData().cameraStack.Add(_newCamera);
         }
 
         private void CreateFogEffectPlane()
         {
-            GameObject _fogPlaneeffcet = GameObject.CreatePrimitive(PrimitiveType.Quad);
-            Destroy(_fogPlaneeffcet.GetComponent<Collider>());
-            _fogPlaneeffcet.transform.parent = _fogProjPlane.transform;
-            _fogPlaneeffcet.transform.localPosition = Vector3.zero + Vector3.forward * _mapHighestPoint;
-            _fogPlaneeffcet.transform.localRotation = Quaternion.identity;
-            _fogPlaneeffcet.transform.localScale = Vector3.one;
-            _fogPlaneeffcet.name = "FogPlaneEffect";
-            _fogPlaneeffcet.layer = LayerMask.NameToLayer("FoWEffect");
-            _fogPlaneeffcet.GetComponent<MeshRenderer>().material = _fogMaterial;
-        }
-
-        private void CreateDecalProjector()
-        {
-            _decal = new GameObject("DecalProjector").AddComponent<DecalProjector>();
-            _decal.transform.parent = _fogProjPlane.transform;
-            _decal.transform.localPosition = Vector3.zero;
-            _decal.transform.localRotation = Quaternion.Euler(90, 0, 0);
-            _decal.material = _decalMaterial;
-            _decal.pivot = new Vector3(0, 0, ((_mapHighestPoint - _mapLowestPoint) / 2));
-            _decal.size = new Vector3(_fogPlaneSize, _fogPlaneSize, _mapHighestPoint - _mapLowestPoint);
-            _decal.fadeFactor = .85f;
-            _decalMaterial.SetTexture("_MainTex", _fogTexture);
+            fogEffectPlane = GameObject.CreatePrimitive(PrimitiveType.Plane).GetComponent<MeshRenderer>();
+            Destroy(fogEffectPlane.GetComponent<Collider>());
+            fogEffectPlane.transform.parent = fogProjectionPlane.transform;
+            fogEffectPlane.transform.localPosition = Vector3.zero;
+            fogEffectPlane.transform.position = new Vector3(fogEffectPlane.transform.position.x,playerTransform.position.y, fogEffectPlane.transform.position.z);
+            fogEffectPlane.transform.localRotation = Quaternion.Euler(0, 180, 0);
+            fogEffectPlane.transform.localScale = Vector3.one;
+            fogEffectPlane.gameObject.name = "FogPlaneEffect";
+            fogEffectPlane.gameObject.layer = LayerMask.NameToLayer("FogOfWarEffect");
+            fogEffectPlane.material = fogMaterial;
+            fogMaterial.SetTexture("_MainTex", fogTexture);
         }
 
         private void CreateRenderCamera()
         {
-            _renderCamera = new GameObject("FogTextureRenderCamera").AddComponent<Camera>();
-            _renderCamera.transform.rotation = Quaternion.Euler(90, 0, 0);
-            _renderCamera.transform.parent = _fogProjPlane.transform;
-            _renderCamera.transform.localPosition = new Vector3(0, 5, 0);
+            renderCamera = new GameObject("FogTextureRenderCamera").AddComponent<Camera>();
+            renderCamera.transform.rotation = Quaternion.Euler(90, 0, 0);
+            renderCamera.transform.parent = fogProjectionPlane.transform;
+            renderCamera.transform.localPosition = new Vector3(0, 5, 0);
 
-            _renderCamera.orthographic = true;
-            _renderCamera.orthographicSize = _fogPlaneSize / 2;
-            _renderCamera.cullingMask = LayerMask.GetMask("FogOfWarProjection");
-            _renderCamera.clearFlags = CameraClearFlags.SolidColor;
-            _renderCamera.backgroundColor = Color.black;
-            _renderCamera.farClipPlane = 10;
-            _renderCamera.targetTexture = _fogTexture;
+            renderCamera.orthographic = true;
+            renderCamera.orthographicSize = fogPlaneSize / 2;
+            renderCamera.cullingMask = LayerMask.GetMask("FogOfWarProjection");
+            renderCamera.clearFlags = CameraClearFlags.SolidColor;
+            renderCamera.backgroundColor = Color.black;
+            renderCamera.farClipPlane = 10;
+            renderCamera.targetTexture = fogTexture;
         }
 
         private void CreateFogProjectionPlane()
         {
-            _fogProjPlane = GameObject.CreatePrimitive(PrimitiveType.Plane);
-            Destroy(_fogProjPlane.GetComponent<Collider>());
-            _fogProjPlane.transform.parent = transform;
-            _fogProjPlane.transform.localRotation = Quaternion.Euler(0, 0, 0);
-            _fogProjPlane.transform.localPosition = new Vector3(0, _mapHighestPoint + 1, 0);
-            _fogProjPlane.transform.localScale = new Vector3(_fogPlaneSize / 10f, 1, _fogPlaneSize / 10f);
-            _fogProjPlane.name = "FogProjectionPlane";
-            _fogProjPlane.layer = LayerMask.NameToLayer("FogOfWarProjection");
-            _fogProjPlane.GetComponent<MeshRenderer>().material = _fogProjectionMaterial;
+            fogProjectionPlane = GameObject.CreatePrimitive(PrimitiveType.Plane).GetComponent<MeshRenderer>();
+            Destroy(fogProjectionPlane.GetComponent<Collider>());
+            fogProjectionPlane.transform.parent = transform;
+            fogProjectionPlane.transform.localRotation = Quaternion.Euler(0, 0, 0);
+            fogProjectionPlane.transform.localPosition = new Vector3(0, mapHighestPoint + 1, 0);
+            fogProjectionPlane.transform.localScale = new Vector3(fogPlaneSize / 10f, 1, fogPlaneSize / 10f);
+            fogProjectionPlane.gameObject.name = "FogProjectionPlane";
+            fogProjectionPlane.gameObject.layer = LayerMask.NameToLayer("FogOfWarProjection");
+            fogProjectionPlane.material = fogProjectionMaterial;
         }
 
         private void CreateTexture()
         {
-            _fogTexture = new RenderTexture((int)_textureResolution, (int)_textureResolution, 0, RenderTextureFormat.ARGB32)
+            fogTexture = new RenderTexture((int)textureResolution, (int)textureResolution, 0, RenderTextureFormat.ARGB32)
             {
                 depthStencilFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.D32_SFloat_S8_UInt,
                 filterMode = FilterMode.Bilinear,
                 wrapMode = TextureWrapMode.Clamp
             };
-            _fogTexture.Create();
+            fogTexture.Create();
         }
 
 
         private void FindAllRevealers()
         {
-            _revealers = FindObjectsByType<FogRevealer>(FindObjectsInactive.Include, FindObjectsSortMode.None).ToList();
+            revealers = FindObjectsByType<FogRevealer>(FindObjectsInactive.Include, FindObjectsSortMode.None).ToList();
+        }
+
+        private void FindAllHidden()
+        {
+            hiddenObjects = FindObjectsByType<HiddenInFog>(FindObjectsInactive.Include, FindObjectsSortMode.None).ToList();
         }
 
 
         private void SetValuesFromConfigs()
         {
-            _fogPlaneSize = _fogOfWarConfig.FogPlaneSize;
-            _textureResolution = _fogOfWarConfig.TextureResolution;
-            _obstaclesLayers = _fogOfWarConfig.ObstaclesLayerMask;
+            fogPlaneSize = fogOfWarConfig.FogPlaneSize;
+            textureResolution = fogOfWarConfig.TextureResolution;
+            hiddenComputeShader = fogOfWarConfig.ComputeShader;
+            obstaclesLayers = fogOfWarConfig.ObstaclesLayerMask;
 
-            _fogProjectionMaterial = _fogOfWarConfig.FogProjectionMaterial;
-            _revealerMaterial = _fogOfWarConfig.RevealerMaterial;
-            _decalMaterial = _fogOfWarConfig.DecalMaterial;
-            _fogMaterial = _fogOfWarConfig.FogMaterial;
+            fogProjectionMaterial = fogOfWarConfig.FogProjectionMaterial;
+            revealerMaterial = fogOfWarConfig.RevealerMaterial;
+            fogMaterial = fogOfWarConfig.FogMaterial;
 
-            _mapHighestPoint = _levelData.MapHighestPoint;
-            _mapLowestPoint = _levelData.MapLowestPoint;
+            mapHighestPoint = levelData.MapHighestPoint;
+            mapLowestPoint = levelData.MapLowestPoint;
         }
 
 
         private void UpdateValuesFromFogConfig(FogOfWarConfig newConfig)
         {
-            if (_fogPlaneSize != _fogOfWarConfig.FogPlaneSize)
+            if (fogPlaneSize != fogOfWarConfig.FogPlaneSize)
             {
-                _fogPlaneSize = _fogOfWarConfig.FogPlaneSize;
-                _fogProjPlane.transform.localScale = new Vector3(_fogPlaneSize, _fogPlaneSize, 1);
+                fogPlaneSize = fogOfWarConfig.FogPlaneSize;
+                fogProjectionPlane.transform.localScale = new Vector3(fogPlaneSize / 10f, 1, fogPlaneSize / 10f);
 
-                _renderCamera.orthographicSize = _fogPlaneSize / 2;
-
-                if (_decal != null)
-                {
-                    _decal.pivot = new Vector3(0, 0, (_fogProjPlane.transform.localPosition.y / 2));
-                    _decal.size = new Vector3(_fogPlaneSize, _fogPlaneSize, _mapHighestPoint - _mapLowestPoint);
-                }
+                renderCamera.orthographicSize = fogPlaneSize / 2;
             }
 
-            if (_textureResolution != _fogOfWarConfig.TextureResolution)
+            if (textureResolution != fogOfWarConfig.TextureResolution)
             {
-                _textureResolution = _fogOfWarConfig.TextureResolution;
+                textureResolution = fogOfWarConfig.TextureResolution;
 
-                _fogTexture.Release();
+                fogTexture.Release();
                 CreateTexture();
 
-                _renderCamera.targetTexture = _fogTexture;
-                _decalMaterial.SetTexture("_MainTex", _fogTexture);
+                renderCamera.targetTexture = fogTexture;
+                fogMaterial.SetTexture("_MainTex", fogTexture);
             }
 
-            if (_obstaclesLayers != _fogOfWarConfig.ObstaclesLayerMask)
+            if (obstaclesLayers != fogOfWarConfig.ObstaclesLayerMask)
             {
-                _obstaclesLayers = _fogOfWarConfig.ObstaclesLayerMask;
+                obstaclesLayers = fogOfWarConfig.ObstaclesLayerMask;
 
-                foreach (FogRevealer revealer in _revealers)
+                foreach (FogRevealer _revealer in revealers)
                 {
-                    revealer.UpdateObstaclesMask(_obstaclesLayers);
+                    _revealer.UpdateObstaclesMask(obstaclesLayers);
                 }
             }
             
-            if (_fogProjectionMaterial != _fogOfWarConfig.FogProjectionMaterial)
+            if (fogProjectionMaterial != fogOfWarConfig.FogProjectionMaterial)
             {
-                _fogProjectionMaterial = _fogOfWarConfig.FogProjectionMaterial;
+                fogProjectionMaterial = fogOfWarConfig.FogProjectionMaterial;
 
-                _fogProjPlane.GetComponent<MeshRenderer>().material = _fogProjectionMaterial;
+                fogProjectionPlane.material = fogProjectionMaterial;
             }
 
-            if (_revealerMaterial != _fogOfWarConfig.RevealerMaterial)
+            if (revealerMaterial != fogOfWarConfig.RevealerMaterial)
             {
-                _revealerMaterial = _fogOfWarConfig.RevealerMaterial;
+                revealerMaterial = fogOfWarConfig.RevealerMaterial;
 
-                foreach (FogRevealer revealer in _revealers)
+                foreach (FogRevealer _revealer in revealers)
                 {
-                    revealer.UpdateRevealerMaterial(_revealerMaterial);
+                    _revealer.UpdateAllMaterials(revealerMaterial);
                 }
             }
 
-            if (_decalMaterial != _fogOfWarConfig.DecalMaterial)
+            if (fogMaterial != fogOfWarConfig.FogMaterial)
             {
-                _decalMaterial = _fogOfWarConfig.DecalMaterial;
-
-                if (_decal != null)
-                    _decal.material = _decalMaterial;
+                fogMaterial = fogOfWarConfig.FogMaterial;
+                fogEffectPlane.material = fogMaterial;
+                fogMaterial.SetTexture("_MainTex", fogTexture);
             }
-            
-            //_fogMaterial = _fogOfWarConfig.FogMaterial;
+
+            if (hiddenComputeShader != fogOfWarConfig.ComputeShader)
+            {
+                hiddenComputeShader = fogOfWarConfig.ComputeShader;
+                SetUpComputeShader();
+            }
         }
 
         private void UpdateValuesFromLevelData(LevelData newData)
         {
-            if (_mapHighestPoint != _levelData.MapHighestPoint)
+            if (mapHighestPoint != levelData.MapHighestPoint)
             {
-                _mapHighestPoint = _levelData.MapHighestPoint;
+                mapHighestPoint = levelData.MapHighestPoint;
 
-                _fogProjPlane.transform.localPosition = new Vector3(0, _mapHighestPoint + 1, 0);
+                fogProjectionPlane.transform.localPosition = new Vector3(0, mapHighestPoint + 1, 0);
 
-                if (_decal != null)
-                    _decal.size = new Vector3(_fogPlaneSize, _fogPlaneSize, _mapHighestPoint - _mapLowestPoint);
             }
 
-            if (_mapLowestPoint != _levelData.MapLowestPoint)
+            if (mapLowestPoint != levelData.MapLowestPoint)
             {
-                _mapLowestPoint = _levelData.MapLowestPoint;
+                mapLowestPoint = levelData.MapLowestPoint;
+            }
+        }
 
-                if (_decal != null)
-                    _decal.size = new Vector3(_fogPlaneSize, _fogPlaneSize, _mapHighestPoint - _mapLowestPoint);
+
+        private void UpdateHiddenObjectsVisibility()
+        {
+            for (int i = 0; i < positionsData.Length; i++)
+            {
+                positionsData[i] = hiddenObjects[i].GetPosition();
+            }
+
+            positionsBuffer.SetData(positionsData);
+
+            hiddenComputeShader.SetVector("_PlayerPosition", playerTransform.position);
+
+            int _threadsToStart = Mathf.CeilToInt((float)hiddenObjects.Count / threadsAmount);
+
+            hiddenComputeShader.Dispatch(shaderKernel, _threadsToStart, 1, 1);
+
+            visibilityBuffer.GetData(visibilityData);
+
+            for (int i = 0; i < hiddenObjects.Count; i++)
+            {
+                hiddenObjects[i].SetVisible(visibilityData[i] == 1);
             }
         }
 
 
         private void Update()
         {
-            _fogProjPlane.transform.position = new Vector3(_playerTransform.position.x, _fogProjPlane.transform.position.y, _playerTransform.position.z);
+            fogProjectionPlane.transform.position = new Vector3(playerTransform.position.x, fogProjectionPlane.transform.position.y, playerTransform.position.z);
+            fogEffectPlane.transform.position = new Vector3(fogEffectPlane.transform.position.x, playerTransform.position.y, fogEffectPlane.transform.position.z);
+
+            UpdateHiddenObjectsVisibility();
         }
 
 
         private void OnDrawGizmos()
         {
-            if (_drawFogAreaGizmos)
+            if (drawFogAreaGizmos)
             {
-                if (_fogOfWarConfig == null ||  _playerTransform == null) return;
+                if (fogOfWarConfig == null ||  playerTransform == null) return;
 
                 Gizmos.color = new Color(0f, 0f, .7f, .5f);
 
-                Gizmos.DrawCube(_playerTransform.position + Vector3.up, new Vector3(_fogOfWarConfig.FogPlaneSize, .001f, _fogOfWarConfig.FogPlaneSize));
+                Gizmos.DrawCube(playerTransform.position + Vector3.up, new Vector3(fogOfWarConfig.FogPlaneSize, .001f, fogOfWarConfig.FogPlaneSize));
             }
 
-            if (_drawLevelBordersGizmos)
+            if (drawLevelBordersGizmos)
             {
-                if (_levelData == null) return;
+                if (levelData == null) return;
 
                 Gizmos.color = new Color(0f, .7f, 0f, .5f);
 
-                Gizmos.DrawCube(transform.position + Vector3.up * _levelData.MapHighestPoint, new Vector3(_levelBordersGizmosSize, .001f, _levelBordersGizmosSize));
-                Gizmos.DrawCube(transform.position + Vector3.up * _levelData.MapLowestPoint, new Vector3(_levelBordersGizmosSize, .001f, _levelBordersGizmosSize));
+                Gizmos.DrawCube(transform.position + Vector3.up * levelData.MapHighestPoint, new Vector3(levelBordersGizmosSize, .001f, levelBordersGizmosSize));
+                Gizmos.DrawCube(transform.position + Vector3.up * levelData.MapLowestPoint, new Vector3(levelBordersGizmosSize, .001f, levelBordersGizmosSize));
             }
         }
 
 
         private void OnDestroy()
         {
-            _fogOfWarConfig.OnValueChanged -= UpdateValuesFromFogConfig;
-            _levelData.OnValueChanged -= UpdateValuesFromLevelData;
+            fogOfWarConfig.OnValueChanged -= UpdateValuesFromFogConfig;
+            levelData.OnValueChanged -= UpdateValuesFromLevelData;
         }
     }
 }

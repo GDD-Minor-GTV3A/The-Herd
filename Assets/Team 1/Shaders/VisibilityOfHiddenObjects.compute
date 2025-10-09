@@ -1,0 +1,32 @@
+#pragma kernel CSMain
+
+StructuredBuffer<float3> _ObjectPositions;
+RWStructuredBuffer<uint> _ObjectVisibilities;
+
+Texture2D<float4> _FogTexture;
+SamplerState samplerLinear;
+
+float3 _PlayerPosition;
+float _FogSize;
+
+[numthreads(64,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    uint index = id.x;
+    float3 pos = _ObjectPositions[index];
+
+    float2 uv = (pos.xz - _PlayerPosition.xz) / _FogSize + float2(0.5f, 0.5f);
+
+    if (uv.x < 0 || uv.x > 1 || uv.y < 0 || uv.y > 1)
+    {
+        _ObjectVisibilities[index] = 0;
+        return;
+    }
+
+    uint2 texSize;
+    _FogTexture.GetDimensions(texSize.x, texSize.y);
+    uint2 pixel = uint2(uv * texSize);
+    float4 fogVal = _FogTexture.Load(int3(pixel, 0));
+
+    _ObjectVisibilities[index] = (fogVal.r > 0.5f) ? 1 : 0;
+}
