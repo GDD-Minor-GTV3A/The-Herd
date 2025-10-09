@@ -94,9 +94,9 @@ namespace Core.Events
     {
     }
     #endregion DOG_EVENTS
-
-
-
+    
+    
+    
     #region QUEST_EVENTS
 
     public class StartQuestEvent : GameEvent
@@ -106,6 +106,18 @@ namespace Core.Events
         public string QuestID => _questID;
 
         public StartQuestEvent(string questID)
+        {
+            _questID = questID;
+        }
+    }
+    
+    public class QuestStartedEvent : GameEvent
+    {
+        private string _questID;
+
+        public string QuestID => _questID;
+
+        public QuestStartedEvent(string questID)
         {
             _questID = questID;
         }
@@ -126,6 +138,18 @@ namespace Core.Events
         }
     }
 
+    public class QuestUpdateEvent : GameEvent
+    {
+        private string _questID;
+
+        public string QuestID => _questID;
+
+        public QuestUpdateEvent(string questID)
+        {
+            _questID = questID;
+        }
+    }
+    
     public class QuestCompletedEvent : GameEvent
     {
         private string _questID;
@@ -137,6 +161,6 @@ namespace Core.Events
             _questID = questID;
         }
     }
-
+    
     #endregion QUEST_EVENTS
 }
