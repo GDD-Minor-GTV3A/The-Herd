@@ -100,16 +100,34 @@ namespace Core.AI.Sheep
 
         private void OnEnable()
         {
-            EventManager.AddListener<PlayerSquareChangedEvent>(OnPlayerSquareChanged);
-            EventManager.AddListener<PlayerSquareTickEvent>(OnPlayerSquareTick);
-            
+            EnableBehavior();
             SetState<SheepGrazeState>();
-
-            float interval = _config != null ? _config.Tick : 0.15f;
-            _tickCoroutine = StartCoroutine(TickCoroutine(interval));
         }
 
         private void OnDisable()
+        {
+            DisableBehavior();
+        }
+
+        /// <summary>
+        /// Enable event listeners and tick coroutine
+        /// </summary>
+        public void EnableBehavior()
+        {
+            EventManager.AddListener<PlayerSquareChangedEvent>(OnPlayerSquareChanged);
+            EventManager.AddListener<PlayerSquareTickEvent>(OnPlayerSquareTick);
+
+            if (_tickCoroutine == null)
+            {
+                float interval = _config != null ? _config.Tick : 0.15f;
+                _tickCoroutine = StartCoroutine(TickCoroutine(interval));
+            }
+        }
+
+        /// <summary>
+        /// Disable event listeners and tick coroutine
+        /// </summary>
+        public void DisableBehavior()
         {
             EventManager.RemoveListener<PlayerSquareChangedEvent>(OnPlayerSquareChanged);
             EventManager.RemoveListener<PlayerSquareTickEvent>(OnPlayerSquareTick);
@@ -119,8 +137,6 @@ namespace Core.AI.Sheep
                 StopCoroutine(_tickCoroutine);
                 _tickCoroutine = null;
             }
-
-            _currentState?.OnStop();
         }
 
         protected override void InitializeStatesMap()
@@ -130,6 +146,7 @@ namespace Core.AI.Sheep
                 {typeof(SheepFollowState), new SheepFollowState(this)},
                 {typeof(SheepGrazeState), new SheepGrazeState(this)},
                 {typeof(SheepWalkAwayFromHerdState), new SheepWalkAwayFromHerdState(this)},
+                {typeof(SheepFreezeState), new SheepFreezeState(this)},
             };
         }
 
@@ -275,6 +292,11 @@ namespace Core.AI.Sheep
         public void OnRejoinedHerd()
         {
             _personality.OnRejoinedHerd(this, _behaviorContext);
+        }
+
+        public void OnSheepFreeze()
+        {
+            SetState<SheepFreezeState>();
         }
 
         /// <summary>
