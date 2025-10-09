@@ -2,8 +2,7 @@ using Core.Economy;
 
 using UnityEngine;
 
-public class Player : MonoBehaviour;
-public class Wallet : MonoBehaviour;
+public class PlayerWallet : MonoBehaviour
 {
     [Header("Player Currencies")]
     [SerializeField] private CurrencyData _currency1;

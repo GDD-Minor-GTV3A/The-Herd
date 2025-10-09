@@ -13,7 +13,7 @@ namespace Core.Economy
     public class ShopSystem : MonoBehaviour
     {
         [Header("References")]
-        [SerializeField] private Player _player;
+        //[SerializeField] private Player _player;
         [SerializeField] private PlayerWallet _player; 
 
         [Header("UI Output")]
