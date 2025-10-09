@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using System.Collections;
+using Gameplay.Player;
 
 public class LevelManager : MonoBehaviour
 {
@@ -12,7 +13,7 @@ public class LevelManager : MonoBehaviour
     /// <summary>
     /// Initialization method for the dynamic parts of the level.
     /// </summary>
-    void Initialize()
+    void Initialise()
     {
         /* Places the playerprefab at position 0, 0, 0. Position will require changes later.
         *  Also, it currently uses the playerprefab, but the player will probably have a bunch of data attached to it, so it would need to have that data as well.
@@ -24,6 +25,11 @@ public class LevelManager : MonoBehaviour
         for (int i = 0; i < sheepCount; i++)
         {
             Instantiate(sheepPrefab, new Vector3(21.6790237f, 0.261999995f, 20.3814964f), Quaternion.identity, sheepParent);
+        }
+
+        for (int i = 0; i < 4; i++)
+        {
+            Instantiate(enemy2Prefab, new Vector3(71.9899979f, 24.6000004f, 275.230011f), Quaternion.identity, enemiesParent);
         }
     }
 }
