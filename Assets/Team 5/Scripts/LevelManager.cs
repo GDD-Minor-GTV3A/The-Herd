@@ -32,4 +32,9 @@ public class LevelManager : MonoBehaviour
             Instantiate(enemy2Prefab, new Vector3(71.9899979f, 24.6000004f, 275.230011f), Quaternion.identity, enemiesParent);
         }
     }
+
+    public void test()
+    {
+        Debug.Log("trigger event!");
+    }
 }
