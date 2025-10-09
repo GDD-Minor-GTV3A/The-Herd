@@ -33,6 +33,15 @@ public class LevelManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Gets the prefab of enemy 2
+    /// </summary>
+    /// <returns>GameObject of the enemy 2 prefab.</returns>
+    public GameObject GetEnemy2Prefab()
+    {
+        return enemy2Prefab;
+    }
+
     public void test()
     {
         Debug.Log("trigger event!");

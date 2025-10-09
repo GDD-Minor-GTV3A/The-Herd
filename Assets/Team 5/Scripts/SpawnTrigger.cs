@@ -5,24 +5,19 @@ public class SpawnTrigger : MonoBehaviour
 {
     //private bool triggered = false;
 
-    public UnityEvent onTriggered;
+    // [SerializeField] private UnityEvent onTriggered;
+    [SerializeField] private Transform enemySpawnpoint;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    [SerializeField] private LevelManager manager;
 
     private void OnTriggerEnter(Collider other)
     {
-       // if (triggered) return;
-        //triggered = true;
-        onTriggered.Invoke();
+        if (other.tag == "Player")
+        {
+            // if (triggered) return;
+            // triggered = true;
+            // onTriggered.Invoke();   
+            Instantiate(manager.GetEnemy2Prefab(), enemySpawnpoint.position, Quaternion.identity, enemySpawnpoint);
+        }
     }
 }
