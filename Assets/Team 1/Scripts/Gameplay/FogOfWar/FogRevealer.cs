@@ -37,6 +37,9 @@ namespace Gameplay.FogOfWar
         /// <param name="obstaclesLayers">Layer mask of objects, which blocks the view.</param>
         public void CreateFovMeshes(Transform fogPlane, Material meshMaterial, LayerMask obstaclesLayers)
         {
+            if (origin == null)
+                origin = transform;
+
             UpdateObstaclesMask(obstaclesLayers);
 
             for (int i = 0; i < revealers.Count; i++)
