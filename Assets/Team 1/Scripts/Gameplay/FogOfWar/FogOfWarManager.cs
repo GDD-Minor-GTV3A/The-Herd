@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-
 using Core.Events;
 using Core.Shared;
 using Core.Shared.Utilities;
