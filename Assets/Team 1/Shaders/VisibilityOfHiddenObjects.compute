@@ -28,5 +28,5 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     uint2 pixel = uint2(uv * texSize);
     float4 fogVal = _FogTexture.Load(int3(pixel, 0));
 
-    _ObjectVisibilities[index] = (fogVal.r > 0.5f) ? 1 : 0;
+    _ObjectVisibilities[index] = (fogVal.r > 0.2f) ? 1 : 0;
 }
