@@ -1,6 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
+
+using Core.Events;
+using Core.Shared;
 using Core.Shared.Utilities;
+using CustomEditor.Attributes;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
@@ -22,7 +26,7 @@ namespace Gameplay.FogOfWar
         [Header("Debug")]
         [SerializeField, Tooltip("Shows the area where Fog Of War will be visible.")] private bool drawFogAreaGizmos = false;
         [SerializeField, Tooltip("Shows highest and lowest points of the map.")] private bool drawLevelBordersGizmos = false;
-        [SerializeField, Tooltip("Size of planes that show highest and lowest points. Does NOT affect actual Fog Of War.")] private float levelBordersGizmosSize = 1000f;
+        [SerializeField, ShowIf("drawLevelBordersGizmos"), Tooltip("Size of planes that show highest and lowest points. Does NOT affect actual Fog Of War.")] private float levelBordersGizmosSize = 1000f;
 
 
         private float fogPlaneSize = 1f;
@@ -37,7 +41,7 @@ namespace Gameplay.FogOfWar
         private float mapLowestPoint = 0f;
 
         private List<FogRevealer> revealers;
-        private List<HiddenInFog> hiddenObjects;
+        private List<IHiddenObject> hiddenObjects;
 
         private ComputeShader hiddenComputeShader;
         private ComputeBuffer positionsBuffer;
@@ -54,6 +58,7 @@ namespace Gameplay.FogOfWar
         private MeshRenderer fogEffectPlane;
 
 
+        // for test, needs to be moved to bootstrap
         private void Start()
         {
             Initialize();
@@ -74,7 +79,7 @@ namespace Gameplay.FogOfWar
             FindAllRevealers();
             FindAllHidden();
 
-            CreateBuffers();
+            UpdateBuffers();
             SetUpComputeShader();
 
             foreach (FogRevealer _revealer in revealers)
@@ -84,11 +89,37 @@ namespace Gameplay.FogOfWar
 
             fogOfWarConfig.OnValueChanged += UpdateValuesFromFogConfig;
             levelData.OnValueChanged += UpdateValuesFromLevelData;
+
+            EventManager.AddListener<AddHiddenObjectEvent>(AddNewHiddenObject);
+            EventManager.AddListener<RemoveHiddenObjectEvent>(RemoveHiddenObject);
         }
 
 
-        private void CreateBuffers()
+        private void AddNewHiddenObject(AddHiddenObjectEvent evt)
         {
+            hiddenObjects.Add(evt.ObjectToAdd);
+            UpdateBuffers();
+            UpdateShaderValues();
+        }
+
+        private void RemoveHiddenObject(RemoveHiddenObjectEvent evt)
+        {
+            hiddenObjects.Remove(evt.ObjectToRemove);
+            UpdateBuffers();
+            UpdateShaderValues();
+        }
+
+
+        private void UpdateBuffers()
+        {
+            if (positionsBuffer != null)
+                positionsBuffer?.Release();
+
+            if (visibilityBuffer != null)
+                visibilityBuffer?.Release();
+
+            if (hiddenObjects.Count == 0) return;
+
             positionsBuffer = new ComputeBuffer(hiddenObjects.Count, sizeof(float) * 3);
             visibilityBuffer = new ComputeBuffer(hiddenObjects.Count, sizeof(uint));
 
@@ -102,12 +133,17 @@ namespace Gameplay.FogOfWar
             shaderKernel = hiddenComputeShader.FindKernel("CSMain");
             hiddenComputeShader.GetKernelThreadGroupSizes(shaderKernel, out threadsAmount, out _, out _);
 
+            UpdateShaderValues();
+        }
+
+        private void UpdateShaderValues()
+        {
+            if (hiddenObjects.Count == 0) return;
             hiddenComputeShader.SetBuffer(shaderKernel, "_ObjectPositions", positionsBuffer);
             hiddenComputeShader.SetBuffer(shaderKernel, "_ObjectVisibilities", visibilityBuffer);
             hiddenComputeShader.SetTexture(shaderKernel, "_FogTexture", fogTexture);
             hiddenComputeShader.SetFloat("_FogSize", fogPlaneSize);
         }
-
 
         private void SetUpFogOverlayEffect()
         {
@@ -198,11 +234,14 @@ namespace Gameplay.FogOfWar
         private void FindAllRevealers()
         {
             revealers = FindObjectsByType<FogRevealer>(FindObjectsInactive.Include, FindObjectsSortMode.None).ToList();
+
+            if (revealers.Count == 0)
+                Debug.LogWarning("Fog Of War didn't find any revealers on the scene.");
         }
 
         private void FindAllHidden()
         {
-            hiddenObjects = FindObjectsByType<HiddenInFog>(FindObjectsInactive.Include, FindObjectsSortMode.None).ToList();
+            hiddenObjects = FindObjectsByType<HiddenInFog>(FindObjectsInactive.Include, FindObjectsSortMode.None).ToList<IHiddenObject>();
         }
 
 
@@ -230,6 +269,7 @@ namespace Gameplay.FogOfWar
                 fogProjectionPlane.transform.localScale = new Vector3(fogPlaneSize / 10f, 1, fogPlaneSize / 10f);
 
                 renderCamera.orthographicSize = fogPlaneSize / 2;
+                hiddenComputeShader.SetFloat("_FogSize", fogPlaneSize);
             }
 
             if (textureResolution != fogOfWarConfig.TextureResolution)
@@ -241,6 +281,7 @@ namespace Gameplay.FogOfWar
 
                 renderCamera.targetTexture = fogTexture;
                 fogMaterial.SetTexture("_MainTex", fogTexture);
+                hiddenComputeShader.SetTexture(shaderKernel, "_FogTexture", fogTexture);
             }
 
             if (obstaclesLayers != fogOfWarConfig.ObstaclesLayerMask)
@@ -303,6 +344,8 @@ namespace Gameplay.FogOfWar
 
         private void UpdateHiddenObjectsVisibility()
         {
+            if (hiddenObjects.Count == 0 || hiddenObjects == null) return; 
+
             for (int i = 0; i < positionsData.Length; i++)
             {
                 positionsData[i] = hiddenObjects[i].GetPosition();
@@ -361,6 +404,9 @@ namespace Gameplay.FogOfWar
         {
             fogOfWarConfig.OnValueChanged -= UpdateValuesFromFogConfig;
             levelData.OnValueChanged -= UpdateValuesFromLevelData;
+
+            EventManager.RemoveListener<AddHiddenObjectEvent>(AddNewHiddenObject);
+            EventManager.RemoveListener<RemoveHiddenObjectEvent>(RemoveHiddenObject);
         }
     }
 }

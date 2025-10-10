@@ -1,3 +1,4 @@
+using CustomEditor.Attributes;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -11,8 +12,9 @@ namespace Gameplay.FogOfWar
     {
         [SerializeField, Range(10f, 360f), Tooltip("Angle of view in degrees.")] private float fov = 90f;
         [SerializeField, Tooltip("Distance of view.")] private float viewDistance = 10f;
-        [SerializeField, Tooltip("How often filed of view updates. Less value - more frequent updates. 0 - updates every frame.")] private float updateRate = 10f;
         [SerializeField, Tooltip("Quality of field of view shape. Affects performance!")] private uint rayCount = 50;
+        [SerializeField, Tooltip("True if you want to update this revealer regularly, false if you don't want this revealer to be updated.")] private bool isStatic = true;
+        [SerializeField, ShowIf("isStatic", true), Tooltip("How often filed of view updates. Less value - more frequent updates. 0 - updates every frame.")] private float updateRate = 10f;
 
 
         /// <summary>
@@ -24,13 +26,17 @@ namespace Gameplay.FogOfWar
         /// </summary>
         public float ViewDistance => viewDistance;
         /// <summary>
-        /// How often filed of view updates. Less value - more frequent updates. 0 - updates every frame.
-        /// </summary>
-        public float UpdateRate => updateRate;
-        /// <summary>
         /// Quality of field of view shape. Affects performance!
         /// </summary>
         public uint RayCount => rayCount;
+        /// <summary>
+        /// True if you want to update this revealer regularly, false if you don't want this revealer to be updated.
+        /// </summary>
+        public bool IsStatic => isStatic;
+        /// <summary>
+        /// How often filed of view updates. Less value - more frequent updates. 0 - updates every frame.
+        /// </summary>
+        public float UpdateRate => updateRate;
 
 
         /// <summary>

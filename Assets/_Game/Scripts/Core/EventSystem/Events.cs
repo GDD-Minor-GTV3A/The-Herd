@@ -1,5 +1,4 @@
-using System.Collections.Generic;
-
+using Core.Shared;
 using UnityEngine;
 // The Game Events used across the Game.
 // Anytime there is a need for a new event, it should be added here.
@@ -70,19 +69,19 @@ namespace Core.Events
     /// </summary>
     public class DogMoveCommandEvent : GameEvent
     {
-        private Vector3 _moveTarget;
+        private Vector3 moveTarget;
 
 
         /// <summary>
         /// Where dog should go.
         /// </summary>
-        public Vector3 MoveTarget => _moveTarget;
+        public Vector3 MoveTarget => moveTarget;
 
 
         /// <param name="moveTarget">Where dog should go.</param>
         public DogMoveCommandEvent(Vector3 moveTarget)
         {
-            _moveTarget = moveTarget;
+            this.moveTarget = moveTarget;
         }
     }
 
@@ -94,9 +93,55 @@ namespace Core.Events
     {
     }
     #endregion DOG_EVENTS
-    
-    
-    
+
+
+    #region FOW_EVENTS
+    /// <summary>
+    /// When object needs to be added dynamically to the fog of war manager.
+    /// </summary>
+    public class AddHiddenObjectEvent : GameEvent
+    {
+        private readonly IHiddenObject objectToAdd;
+
+
+        /// <summary>
+        /// Where dog should go.
+        /// </summary>
+        public IHiddenObject ObjectToAdd => objectToAdd;
+
+
+        /// <param name="moveTarget">Object which has to be added.</param>
+        public AddHiddenObjectEvent(IHiddenObject objectToAdd)
+        {
+            this.objectToAdd = objectToAdd;
+        }
+    }
+
+
+    /// <summary>
+    /// When object needs to be removed dynamically from the fog of war manager.
+    /// </summary>
+    public class RemoveHiddenObjectEvent : GameEvent
+    {
+        private readonly IHiddenObject objectToRemove;
+
+
+        /// <summary>
+        /// Where dog should go.
+        /// </summary>
+        public IHiddenObject ObjectToRemove => objectToRemove;
+
+
+        /// <param name="moveTarget">Object which has to be added.</param>
+        public RemoveHiddenObjectEvent(IHiddenObject objectToRemove)
+        {
+            this.objectToRemove = objectToRemove;
+        }
+    }
+
+    #endregion FOW_EVENTS
+
+
     #region QUEST_EVENTS
 
     public class StartQuestEvent : GameEvent

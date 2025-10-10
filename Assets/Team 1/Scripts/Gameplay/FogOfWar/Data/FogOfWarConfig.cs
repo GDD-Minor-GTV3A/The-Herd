@@ -20,7 +20,7 @@ namespace Gameplay.FogOfWar
         [Header("Materials")]
         [SerializeField, Required, Tooltip("Material for Fog Of War projection plane.")] private Material fogProjectionMaterial;
         [SerializeField, Required, Tooltip("Material for revealers meshes.")] private Material revealerMaterial;
-        [SerializeField, Required, Tooltip("Material for Fog Of War material effect.")] private Material fogMaterial;
+        [SerializeField, Required, Tooltip("Material for Fog Of War material effect.")] private Material fogEffectMaterial;
 
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace Gameplay.FogOfWar
         /// <summary>
         /// Material for Fog Of War material effect.
         /// </summary>
-        public Material FogMaterial => fogMaterial;
+        public Material FogMaterial => fogEffectMaterial;
 
 
         /// <summary>

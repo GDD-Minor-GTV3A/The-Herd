@@ -1,48 +1,53 @@
-using System.Collections.Generic;
 using System.Reflection;
-
 using UnityEngine;
 
 namespace Gameplay.FogOfWar 
 {
+    /// <summary>
+    /// Creates additional collider of the object on a different layer, which is used during raycasts of revealers.
+    /// </summary>
     public class ViewObstacle : MonoBehaviour
     {
+        // for test, needs to be moved to bootstrap
         private void Start()
         {
             Initialize();
         }
 
 
+        /// <summary>
+        /// Initialization method
+        /// </summary>
         public void Initialize()
         {
-            Collider[] objectColliders = GetComponentsInChildren<Collider>();
+            Collider[] _objectColliders = GetComponentsInChildren<Collider>();
 
-            if (objectColliders.Length == 0)
+            if (_objectColliders.Length == 0)
             {
                 Debug.LogError($"{name} does NOT contain colliders to make it a view obstacle!!!");
                 return;
             }
 
-            GameObject obstacleObject = new GameObject("ViewObstacle");
-            obstacleObject.transform.parent = transform;
-            obstacleObject.layer = LayerMask.NameToLayer("ViewObstacles");
-            obstacleObject.transform.localPosition = Vector3.zero;
-            obstacleObject.transform.localScale = Vector3.one;
-            obstacleObject.transform.localRotation = Quaternion.identity;
+            GameObject _obstacleObject = new GameObject("ViewObstacle");
+            _obstacleObject.transform.parent = transform;
+            _obstacleObject.layer = LayerMask.NameToLayer("ViewObstacles");
+            _obstacleObject.transform.localPosition = Vector3.zero;
+            _obstacleObject.transform.localScale = Vector3.one;
+            _obstacleObject.transform.localRotation = Quaternion.identity;
 
-            foreach (Collider collider in objectColliders)
+            foreach (Collider _collider in _objectColliders)
             {
-                System.Type type = collider.GetType();
-                Collider newCollider = obstacleObject.AddComponent(type) as Collider;
+                System.Type _type = _collider.GetType();
+                Collider _newCollider = _obstacleObject.AddComponent(_type) as Collider;
 
-                BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public;
+                BindingFlags _flags = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public;
 
-                foreach (FieldInfo field in type.GetFields(flags))
+                foreach (FieldInfo _field in _type.GetFields(_flags))
                 {
-                    field.SetValue(newCollider, field.GetValue(collider));
+                    _field.SetValue(_newCollider, _field.GetValue(_collider));
                 }
 
-                collider.isTrigger = true;
+                _collider.isTrigger = true;
             }
         }
     }

@@ -1,23 +1,52 @@
-using System.Collections;
+using Core.Events;
+using Core.Shared;
 using Core.Shared.Utilities;
 using UnityEngine;
 
 namespace Gameplay.FogOfWar 
 {
-    public class HiddenInFog : MonoBehaviour
+    /// <summary>
+    /// Contains position of renderer object and changes it's visibility.
+    /// </summary>
+    public class HiddenInFog : MonoBehaviour, IHiddenObject
     {
-        [SerializeField, Required, Tooltip("")] private MeshRenderer renderer;
+        [SerializeField, Required, Tooltip("MeshRenderer of this object, which has to be enabled or disabled.")] private MeshRenderer targetRenderer;
+
+
+        private bool removed = false;
 
 
         public Vector3 GetPosition()
         {
-            return renderer.transform.position;
+            return targetRenderer.transform.position;
         }
 
 
         public void SetVisible(bool visible)
         {
-            renderer.enabled = visible;
+            targetRenderer.enabled = visible;
+        }
+
+
+        public void DynamicallyAddHiddenObject()
+        {
+            EventManager.Broadcast(new AddHiddenObjectEvent(this));
+            removed = false;
+        }
+
+
+        public void DynamicallyRemoveHiddenObject()
+        {
+            if (removed) return;
+            EventManager.Broadcast(new RemoveHiddenObjectEvent(this));
+            removed = true;
+        }
+
+
+        private void OnDestroy()
+        {
+            if (!removed)
+                DynamicallyRemoveHiddenObject();
         }
     }
 }

@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace Gameplay.FogOfWar
 {
+    /// <summary>
+    /// Handles logic of creating and updating revealing mesh of the object for Fog Of War.
+    /// </summary>
     public class FogRevealer : MonoBehaviour
     {
         [Serializable]
@@ -38,22 +41,24 @@ namespace Gameplay.FogOfWar
 
             for (int i = 0; i < revealers.Count; i++)
             {
-                Mesh newMesh = new Mesh();
+                Mesh _newMesh = new Mesh();
 
-                GameObject newFovMeshObject = new GameObject();
-                newFovMeshObject.name = "FovMesh";
-                newFovMeshObject.transform.position = new Vector3(origin.position.x, fogPlane.transform.position.y + 1, origin.position.z);
-                newFovMeshObject.transform.parent = fogPlane.transform.parent;
-                newFovMeshObject.layer = LayerMask.NameToLayer("FogOfWarProjection");
-                newFovMeshObject.AddComponent<MeshFilter>().mesh = newMesh;
+                GameObject _newFovMeshObject = new GameObject();
+                _newFovMeshObject.name = "FovMesh";
+                _newFovMeshObject.transform.position = new Vector3(origin.position.x, fogPlane.transform.position.y + 1, origin.position.z);
+                _newFovMeshObject.transform.parent = fogPlane.transform.parent;
+                _newFovMeshObject.layer = LayerMask.NameToLayer("FogOfWarProjection");
+                _newFovMeshObject.AddComponent<MeshFilter>().mesh = _newMesh;
 
 
 
-                revealers[i].Renderer = newFovMeshObject.AddComponent<MeshRenderer>();
-                revealers[i].Mesh = newMesh;
+                revealers[i].Renderer = _newFovMeshObject.AddComponent<MeshRenderer>();
+                revealers[i].Mesh = _newMesh;
                 UpdateMesh(i);
                 UpdateRevealerMaterial(i, meshMaterial);
-                StartCoroutine(UpdateMeshCor(revealers[i].Config.UpdateRate, i));
+
+                if (!revealers[i].Config.IsStatic)
+                    StartCoroutine(UpdateMeshCor(revealers[i].Config.UpdateRate, i));
             }
         }
 
@@ -69,7 +74,7 @@ namespace Gameplay.FogOfWar
                 Vector3 _forward = origin.forward;
                 _forward = _forward.normalized;
                 float _startAngle = Mathf.Atan2(_forward.z, _forward.x) * Mathf.Rad2Deg;
-                _startAngle += 150f;
+                _startAngle += revealers[i].Config.FOV;
 
                 if (_startAngle < 0) _startAngle += 360;
 
