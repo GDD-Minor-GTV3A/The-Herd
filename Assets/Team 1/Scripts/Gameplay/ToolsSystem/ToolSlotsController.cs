@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+
 using Core.Shared;
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -61,7 +63,7 @@ namespace Gameplay.ToolsSystem
 
         private void SetCurrentSlotByIndex(int index)
         {
-            index = Mathf.Clamp(index, 0, _slotsAmount-1);
+            index = Mathf.Clamp(index, 0, _slotsAmount - 1);
             _currentToolIndex = index;
         }
 

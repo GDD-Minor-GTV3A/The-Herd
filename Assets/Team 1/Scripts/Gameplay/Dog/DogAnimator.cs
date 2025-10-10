@@ -1,14 +1,15 @@
 using Core.Shared;
+
 using UnityEngine;
 
-namespace Gameplay.Dog 
+namespace Gameplay.Dog
 {
     /// <summary>
     /// Handles animations logic for the dog.
     /// </summary>
     public class DogAnimator : AnimatorController
     {
-        private const string  WalkingParam = "Walk";
+        private const string WalkingParam = "Walk";
         private const string WalkSpeedParam = "WalkSpeed";
 
         private float _minSpeed;
@@ -41,7 +42,7 @@ namespace Gameplay.Dog
         /// <param name="currentSpeed">Current walking speed of the dog.</param>
         public void CalculateWalkingSpeedMultiplier(float currentSpeed)
         {
-            float animSpeed = Mathf.Lerp(_minAnimationSpeed,_maxAnimationSpeed,Mathf.InverseLerp(_minSpeed, _maxSpeed, currentSpeed));
+            float animSpeed = Mathf.Lerp(_minAnimationSpeed, _maxAnimationSpeed, Mathf.InverseLerp(_minSpeed, _maxSpeed, currentSpeed));
             SetWakingAnimationSpeedMulti(animSpeed);
         }
 

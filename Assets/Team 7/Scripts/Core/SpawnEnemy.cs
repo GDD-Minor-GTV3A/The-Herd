@@ -1,47 +1,52 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-public class SpawnEnemy : MonoBehaviour
+namespace _Game.Team_7.Scripts
 {
-    public GameObject Drekavac;
-    public float maxDistance;
-    public float minDistance;
-    public NavMeshAgent agent;
-
-    void Update()
+    /// <summary>
+    ///     Handles the logic for spawning enemies.
+    /// </summary>
+    public class SpawnEnemy : MonoBehaviour
     {
-        // TEMPORARY press E to spawn the enemy
-        if (Input.GetKeyDown("e"))
+        public GameObject Drekavac;
+        public float maxDistance;
+        public float minDistance;
+
+        void Update()
         {
-            Spawn();
-        }
-    }
-
-    private void Spawn()
-    {
-        int maxAttempts = 50;      // safety cap
-
-        for (int i = 0; i < maxAttempts; i++)
-        {
-            // Pick a random direction on the unit sphere
-            Vector3 randomDirection = Random.onUnitSphere;
-
-            // Pick a random distance between min and max
-            float randomDistance = Random.Range(minDistance, maxDistance);
-
-            // Compute spawn candidate
-            Vector3 spawnPosition = transform.position + randomDirection * randomDistance;
-
-            // Try to find a valid NavMesh position nearby
-            NavMeshHit hit;
-            if (NavMesh.SamplePosition(spawnPosition, out hit, 5.0f, NavMesh.AllAreas))
+            // TEMPORARY press E to spawn the enemy
+            if (Input.GetKeyDown("e"))
             {
-                Instantiate(Drekavac, hit.position, Quaternion.identity);
-                return; // success, stop the loop
+                Spawn();
             }
         }
 
-        // If we got here, all attempts failed
-        Debug.LogWarning("Failed to find NavMesh position for enemy spawn after multiple attempts.");
+        private void Spawn()
+        {
+            int maxAttempts = 50;      // safety cap
+
+            for (int i = 0; i < maxAttempts; i++)
+            {
+                // Pick a random direction on the unit sphere
+                Vector3 randomDirection = Random.onUnitSphere;
+
+                // Pick a random distance between min and max
+                float randomDistance = Random.Range(minDistance, maxDistance);
+
+                // Compute spawn candidate
+                Vector3 spawnPosition = transform.position + randomDirection * randomDistance;
+
+                // Try to find a valid NavMesh position nearby
+                NavMeshHit hit;
+                if (NavMesh.SamplePosition(spawnPosition, out hit, 5.0f, NavMesh.AllAreas))
+                {
+                    Instantiate(Drekavac, hit.position, Quaternion.identity);
+                    return; // success, stop the loop
+                }
+            }
+
+            // If we got here, all attempts failed
+            Debug.LogWarning("Failed to find NavMesh position for enemy spawn after multiple attempts.");
+        }
     }
 }
