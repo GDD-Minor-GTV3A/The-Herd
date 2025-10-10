@@ -1,3 +1,6 @@
+using Ink.Parsed;
+
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Core.AI.Sheep.Personality
@@ -21,5 +24,7 @@ namespace Core.AI.Sheep.Personality
         public float CurrentSpeed { get; set; }
         public float Energy { get; set; } // Could represent sheep's current energy level
         public float Stress { get; set; } // Could represent accumulated stress
+        public List<Transform> Threats { get; } = new();
+        public Dictionary<Transform, float> ThreatRadius { get; } = new();
     }
 }
