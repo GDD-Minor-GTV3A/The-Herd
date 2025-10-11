@@ -1,20 +1,12 @@
+using Gameplay.Dog;
 using UnityEngine;
 
 namespace Core
 {
-  ///<summary>
-  /// Entry point for initialization
-  ///</summary>
-  public class GameBootstrap : MonoBehaviour
-  {
-    [SerializeField] private Dog _dog;
-
     ///<summary>
-    /// Initialize everything inside this Start() function
+    /// Entry point for initialization
     ///</summary>
-    void Start()
+    public class GameBootstrap : MonoBehaviour
     {
-      _dog.Initialize();
     }
-  }
 }
