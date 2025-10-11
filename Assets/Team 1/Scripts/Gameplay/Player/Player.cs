@@ -1,6 +1,8 @@
 using System;
 
+using Gameplay.HealthSystem;
 using Gameplay.ToolsSystem;
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -25,7 +27,8 @@ namespace Gameplay.Player
 
         private PlayerMovement _movementController;
         private PlayerRotation _rotationController;
-        private Health _health;
+        private IHealth _health;
+
 
 
 
@@ -89,6 +92,7 @@ namespace Gameplay.Player
         // Gameplay entry points
         public void TakeDamage(float amount) => _health.TakeDamage(amount);
         public void Heal(float amount) => _health.Heal(amount);
+
 
 
         /// <summary>
