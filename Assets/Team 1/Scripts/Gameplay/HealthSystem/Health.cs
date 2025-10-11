@@ -1,18 +1,19 @@
 using System;
+using UnityEngine;
 
-namespace Gameplay.HealthSystem
+namespace Gameplay
 {
     /// <summary>
     /// A universal health system for any entity.
-    /// No longer a MonoBehaviour — just a pure class.
+    /// No longer a MonoBehaviour ï¿½ just a pure class.
     /// </summary>
     public class Health
     {
-        private float maxHealth;
-        private float currentHealth;
-        private bool canTakeDamage;
-        private bool canBeHealed;
-        private bool canDie;
+        private float _maxHealth;
+        private float _currentHealth;
+        private bool _canTakeDamage;
+        private bool _canBeHealed;
+        private bool _canDie;
 
         // Events (replace UnityEvent with C# events)
         public event Action<float, float> OnHealthChanged; // (current, max)
@@ -20,54 +21,53 @@ namespace Gameplay.HealthSystem
         public event Action OnDamageTaken;
         public event Action OnHealed;
 
-        public float CurrentHealth => currentHealth;
-        public float MaxHealth => maxHealth;
+        public float CurrentHealth => _currentHealth;
+        public float MaxHealth => _maxHealth;
 
-        public bool CanTakeDamage { get => canTakeDamage; set => canTakeDamage = value; }
-        public bool CanBeHealed { get => canBeHealed; set => canBeHealed = value; }
-        public bool CanDie { get => canDie; set => canDie = value; }
+        public bool CanTakeDamage { get => _canTakeDamage; set => _canTakeDamage = value; }
+        public bool CanBeHealed { get => _canBeHealed; set => _canBeHealed = value; }
+        public bool CanDie { get => _canDie; set => _canDie = value; }
 
         public Health(float maxHealth = 100f, float currentHealth = 100f, bool canTakeDamage = true, bool canBeHealed = true, bool canDie = true)
         {
-            this.maxHealth = maxHealth;
-            this.currentHealth = this.maxHealth;
-            this.canTakeDamage = canTakeDamage;
-            this.canBeHealed = canBeHealed;
-            this.canDie = canDie;
+            _maxHealth = maxHealth;
+            _currentHealth = _maxHealth;
+            _canTakeDamage = canTakeDamage;
+            _canBeHealed = canBeHealed;
+            _canDie = canDie;
         }
 
         public void TakeDamage(float amount)
         {
-            if (!canTakeDamage || amount <= 0) return;
+            Debug.Log("Dealing 20 damage");
+            if (!_canTakeDamage || amount <= 0) return;
 
-            currentHealth -= amount;
-            currentHealth = Math.Clamp(currentHealth, 0, maxHealth);
+            _currentHealth -= amount;
+            _currentHealth = Math.Clamp(_currentHealth, 0, _maxHealth);
 
             OnDamageTaken?.Invoke();
-            OnHealthChanged?.Invoke(currentHealth, maxHealth);
+            OnHealthChanged?.Invoke(_currentHealth, _maxHealth);
 
-            if (currentHealth <= 0 && canDie)
+            if (_currentHealth <= 0 && _canDie)
                 Die();
         }
 
         public void Heal(float amount)
         {
-            if (!canBeHealed || amount <= 0) return;
+            Debug.Log("Healing 10");
+            if (!_canBeHealed || amount <= 0) return;
 
-            currentHealth += amount;
-            currentHealth = Math.Clamp(currentHealth, 0, maxHealth);
+            _currentHealth += amount;
+            _currentHealth = Math.Clamp(_currentHealth, 0, _maxHealth);
 
             OnHealed?.Invoke();
-            OnHealthChanged?.Invoke(currentHealth, maxHealth);
+            OnHealthChanged?.Invoke(_currentHealth, _maxHealth);
         }
 
-        /// <summary>
-        /// Set current hp to max hp.
-        /// </summary>
         public void ResetHealth()
         {
-            currentHealth = maxHealth;
-            OnHealthChanged?.Invoke(currentHealth, maxHealth);
+            _currentHealth = _maxHealth;
+            OnHealthChanged?.Invoke(_currentHealth, _maxHealth);
         }
 
         private void Die()
@@ -75,18 +75,13 @@ namespace Gameplay.HealthSystem
             OnDeath?.Invoke();
         }
 
-        /// <summary>
-        /// Changes max hp.
-        /// </summary>
-        /// <param name="newMax">New value of max hp.</param>
-        /// <param name="resetToFull">If needed to reset to current hp to max.</param>
         public void SetMaxHealth(float newMax, bool resetToFull = true)
         {
-            maxHealth = Math.Max(1f, newMax);
+            _maxHealth = Math.Max(1f, newMax);
             if (resetToFull)
-                currentHealth = maxHealth;
+                _currentHealth = _maxHealth;
 
-            OnHealthChanged?.Invoke(currentHealth, maxHealth);
+            OnHealthChanged?.Invoke(_currentHealth, _maxHealth);
         }
 
     }
