@@ -158,7 +158,6 @@ namespace Core.AI.Sheep
             _neighbours = neighbours ?? new List<Transform>();
         }
 
-
         private void OnPlayerSquareChanged(PlayerSquareChangedEvent e)
         {
             _playerCenter = e.Center;
@@ -299,6 +298,11 @@ namespace Core.AI.Sheep
             SetState<SheepFreezeState>();
         }
 
+        public void OnSheepUnfreeze()
+        {
+            SetState<SheepGrazeState>();
+        }
+
         /// <summary>
         /// Check for disabling the agent
         /// </summary>
@@ -309,6 +313,8 @@ namespace Core.AI.Sheep
                    && Agent.isOnNavMesh
                    && gameObject.activeInHierarchy;
         }
+
+        public IState GetState() => _currentState;
     }
 }
 
