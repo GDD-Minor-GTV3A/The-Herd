@@ -51,14 +51,35 @@ public class LevelManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Handles onSpawnTriggered Event. Spawns enemy2 at all te spawnpoints.
+    /// Handles onSpawnTriggered Event. Spawns an enemy2 at a random spawnpoint every 2 seconds until a condition is met.
     /// </summary>
     /// <param name="spawnPoints"></param>
     public void OnSpawnTriggered(Transform[] spawnPoints)
     {
-        foreach (Transform spawnPoint in spawnPoints)
+        StartCoroutine(SpawnEnemies(spawnPoints));
+    }
+
+    private IEnumerator SpawnEnemies(Transform[] spawnPoints)
+    {
+        bool spawnOpportunity = true;
+
+        while (spawnOpportunity && enemiesParent.childCount <= 10)
         {
-            Instantiate(enemy2Prefab, spawnPoint.position, Quaternion.identity, enemiesParent);
+            // Spawn one enemy
+            Instantiate(enemy2Prefab, spawnPoints[UnityEngine.Random.Range(0, spawnPoints.Length)].position, Quaternion.identity, enemiesParent);
+
+            // Roll to decide whether to stop
+            int roll = UnityEngine.Random.Range(0, 20);
+
+            if (roll < 2)
+            {
+                spawnOpportunity = false;
+            }
+            else
+            {
+                // Wait 10 seconds before next roll
+                yield return new WaitForSeconds(20.0f);
+            }
         }
     }
 }

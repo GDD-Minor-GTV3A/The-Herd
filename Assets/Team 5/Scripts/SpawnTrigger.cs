@@ -6,7 +6,7 @@ public class SpawnTrigger : MonoBehaviour
 {
     [SerializeField] private Transform[] spawnPoints;
 
-    [SerializeField] private SpawnTriggerEvent onSpawnTriggerd;
+    [SerializeField] private SpawnTriggerEvent onSpawnTriggered;
 
     /// <summary>
     /// Callback for box collider. Gets triggered when player enters, and invokes the onSpawnTriggered Event passing it all its spawnPoints
@@ -16,7 +16,7 @@ public class SpawnTrigger : MonoBehaviour
     {
         if (other.tag == "Player")
         {
-            onSpawnTriggerd.Invoke(spawnPoints);
+            onSpawnTriggered.Invoke(spawnPoints);
         }
     }
 }
