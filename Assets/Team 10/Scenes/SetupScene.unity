@@ -1082,7 +1082,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &197139581
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1095,7 +1095,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91465b5e7c80b794c8350b222b279c77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  penTarget: {fileID: 1533829084}
+  decoyTransform: {fileID: 1533829084}
+  playerTransform: {fileID: 1210569689}
 --- !u!135 &197139582
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -10693,7 +10694,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b06847e149b594747bf0f4daf19ee3c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _player: {fileID: 1533829084}
+  _player: {fileID: 1210569689}
   _halfExtents: {x: 8, y: 8}
   _interval: 0.2
 --- !u!1001 &1717780641
