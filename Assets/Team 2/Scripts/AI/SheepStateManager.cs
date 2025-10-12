@@ -64,6 +64,9 @@ namespace Core.AI.Sheep
         private ISheepPersonality _personality;
         private PersonalityBehaviorContext _behaviorContext;
 
+        [SerializeField] private bool _startAsStraggler;
+        [SerializeField] private float _joinGrace = 3f;
+        private float _walkAwayReenableAt;
 
         /// <summary>
         /// Exposed NavMeshAgent for state machine
@@ -83,7 +86,9 @@ namespace Core.AI.Sheep
         /// Read-only list of neighbouring sheep
         /// </summary>
         public IReadOnlyList<Transform> Neighbours => _neighbours;
-        
+
+        public void MarkAsStraggler() => _startAsStraggler = true;
+
         private void Awake()
         {
             _agent = GetComponent<NavMeshAgent>();
@@ -182,6 +187,8 @@ namespace Core.AI.Sheep
             _playerCenter = e.Center;
             _playerHalfExtents = e.HalfExtents;
 
+            if (_startAsStraggler) return;
+
             if (_currentState is SheepWalkAwayFromHerdState) return;
 
             //Decide on state
@@ -211,9 +218,14 @@ namespace Core.AI.Sheep
                 // Update behavior context for personality
                 UpdateBehaviorContext();
 
-                if (_currentState is not SheepWalkAwayFromHerdState && Time.time >= _nextWalkingAwayFromHerdAt)
+                if (_currentState is not SheepWalkAwayFromHerdState
+                    && Time.time >= _nextWalkingAwayFromHerdAt
+                    && Time.time >= _walkAwayReenableAt
+                    && !_startAsStraggler)
                 {
-                    if (Random.value <= _archetype.GettingLostChance) SetState<SheepWalkAwayFromHerdState>();
+                    if (Random.value <= _archetype.GettingLostChance)
+                        SetState<SheepWalkAwayFromHerdState>();
+
                     ScheduleNextWalkAwayFromHerd();
                 }
 
@@ -308,7 +320,37 @@ namespace Core.AI.Sheep
         {
             _nextWalkingAwayFromHerdAt = Time.time + _config?.WalkAwayFromHerdTicks ?? DEFAULT_WALK_AWAY_FROM_HERD_TICKS;
         }
-        
+
+        public bool IsCurrentlyOutsideHerd()
+        {
+            return FlockingUtility.IsOutSquare(transform.position, _playerCenter, _playerHalfExtents);
+        }
+
+        public void SummonToHerd(float? graceSeconds = null, bool clearThreats = true)
+        {
+            _startAsStraggler = false;
+
+            // apply grace so it doesn't immediately get lost again
+            float grace = graceSeconds ?? _joinGrace;
+            _walkAwayReenableAt = Time.time + grace;
+            ScheduleNextWalkAwayFromHerd();
+
+            if (clearThreats)
+            {
+                StopPanicLoop();
+                _threats.Clear();
+                _threatRadius.Clear();
+                _behaviorContext.HasThreat = false;
+                _behaviorContext.Threats.Clear();
+                _behaviorContext.ThreatRadius.Clear();
+                _behaviorContext.ThreatPosition = Vector3.zero;
+            }
+
+            // force follow NOW, overriding WalkAway or anything else
+            SetState<SheepFollowState>();
+            OnRejoinedHerd();
+        }
+
         public void SetDestinationWithHerding(Vector3 destination) => _personality.SetDestinationWithHerding(destination, this, _behaviorContext);
         public Vector3 GetTargetNearPlayer() => _personality.GetFollowTarget(this, _behaviorContext);
         public Vector3 GetGrazeTarget() => _personality.GetGrazeTarget(this, _behaviorContext);
