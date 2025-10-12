@@ -1,8 +1,8 @@
-// Replace: NPC_NAME, [QUEST_ID]
+// Replace: NPC_NAME, QUEST_ID
 
-VAR NPC_NAME_quest_accepted = false
-VAR NPC_NAME_quest_completed = false
-VAR NPC_NAME_quest_declined = false
+VAR quest_accepted = false
+VAR QUEST_ID_quest_completed = false
+VAR quest_declined = false
 
 EXTERNAL StartQuest(string)
 EXTERNAL CompleteObjective(string, string)
@@ -10,13 +10,13 @@ EXTERNAL CompleteObjective(string, string)
 -> NPC_NAME_router
 
 === NPC_NAME_router ===
-{ NPC_NAME_quest_completed:
+{ QUEST_ID_quest_completed:
     -> NPC_NAME.quest_completed
 - else:
-    { NPC_NAME_quest_accepted:
+    { quest_accepted:
         -> NPC_NAME.quest_in_progress
     - else:
-        { NPC_NAME_quest_declined:
+        { quest_declined:
             -> NPC_NAME.quest_declined_followup
         - else:
             -> NPC_NAME.intro
@@ -37,13 +37,13 @@ EXTERNAL CompleteObjective(string, string)
 [Quest pitch]
 
 + [Accept: Yes]
-    ~ NPC_NAME_quest_accepted = true
-    ~ NPC_NAME_quest_declined = false
-    ~ StartQuest("[QUEST_ID]")
+    ~ quest_accepted = true
+    ~ quest_declined = false
+    ~ StartQuest("QUEST_ID")
     [Thank you, quest details]
     -> END
 + [Decline: No]
-    ~ NPC_NAME_quest_declined = true
+    ~ quest_declined = true
     [Understands]
     -> END
 
@@ -63,16 +63,20 @@ What request?
 I see.
 
 + [Accept quest: Alright, I'll help you]
-    ~ NPC_NAME_quest_accepted = true
-    ~ NPC_NAME_quest_declined = false
+    ~ quest_accepted = true
+    ~ quest_declined = false
     ~ StartQuest("[QUEST_ID]")
+    
     #speaker:NPC_NAME #layout:right
     [Wonderful! Quest details/location]
+    
     #speaker:Player #layout:left
     [Acknowledgment]
     -> END
+
 + [Decline quest: No, I still have other priorities]
-    ~ NPC_NAME_quest_declined = true
+    ~ quest_declined = true
+    
     #speaker:NPC_NAME #layout:right
     I understand. The offer remains open whenever you're ready.
     -> END
@@ -89,7 +93,8 @@ Not yet.
 -> END
 
 = quest_completed
-~ NPC_NAME_quest_completed = true
+~ QUEST_ID_quest_completed = true
+
 #speaker:NPC_NAME #layout:right
 [Thank you! Reward/promise]
 

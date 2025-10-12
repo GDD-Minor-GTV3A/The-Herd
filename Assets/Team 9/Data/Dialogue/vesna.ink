@@ -1,6 +1,6 @@
-VAR vesna_quest_accepted = false
+VAR quest_accepted = false
 VAR QUEST_001_completed = false
-VAR vesna_quest_declined = false
+VAR quest_declined = false
 
 EXTERNAL StartQuest(string)
 EXTERNAL CompleteObjective(string, string)
@@ -13,10 +13,10 @@ EXTERNAL CompleteObjective(string, string)
 { QUEST_001_completed:
     -> vesna_quest.quest_completed_dialogue
 - else:
-    { vesna_quest_accepted:
+    { quest_accepted:
         -> vesna_quest.quest_in_progress_dialogue
     - else:
-        { vesna_quest_declined:
+        { quest_declined:
             -> vesna_quest.quest_declined_followup
         - else:
             -> vesna_quest.intro_dialogue
@@ -129,8 +129,8 @@ If I do this for you, you are in my debt, correct?
 Yes, precisely.
 
 + [Accept quest: I will do it]
-    ~ vesna_quest_accepted = true
-    ~ vesna_quest_declined = false
+    ~ quest_accepted = true
+    ~ quest_declined = false
     ~ StartQuest("QUEST_001")
     #speaker:Vesna
     That is very helpful of you! Thank you. You will have to head out to **[Level 2]** and look around as much as possible. I went through that area before I came here and it's the last time I remember wearing it.
@@ -138,8 +138,8 @@ Yes, precisely.
     I will have a look. I hope this will be worth my efforts.
     -> END
 + [Decline quest: I have more important matters to attend to than this]
-    ~ vesna_quest_accepted = false
-    ~ vesna_quest_declined = true
+    ~ quest_accepted = false
+    ~ quest_declined = true
     #speaker:Vesna
     That is no problem. I will be here if you decide otherwise.
     -> END
@@ -162,8 +162,8 @@ As I mentioned, I would be in your debt. My connection to nature and animals cou
 I see.
 
 + [Accept quest: Alright, I'll help you find it]
-    ~ vesna_quest_accepted = true
-    ~ vesna_quest_declined = false
+    ~ quest_accepted = true
+    ~ quest_declined = false
     ~ StartQuest("QUEST_001")
     #speaker:Vesna
     Wonderful! I truly appreciate this. Please search **[Level 2]** thoroughly. I'm certain it must be there somewhere.
@@ -171,7 +171,7 @@ I see.
     I'll see what I can find.
     -> END
 + [Decline quest: No, I still have other priorities]
-    ~ vesna_quest_declined = true
+    ~ quest_accepted = true
     #speaker:Vesna
     I understand. The offer remains open whenever you're ready.
     -> END
