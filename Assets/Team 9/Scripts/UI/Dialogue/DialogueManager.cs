@@ -1,11 +1,7 @@
 using System.Collections.Generic;
-
 using Core.Events;
-
 using Ink.Runtime;
-
 using TMPro;
-
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -22,11 +18,11 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _dialogueText;
     [SerializeField] private TextMeshProUGUI _displayNameText;
     [SerializeField] private Animator _portraitAnimator;
-
+    
     [Header("Choices UI")]
     [SerializeField] private GameObject[] _choices;
     private TextMeshProUGUI[] _choicesText;
-
+    
     [Header("Sanity")]
     [Range(1, 3)]
     [SerializeField] private int _sanity = 2; // 1=low, 2=medium, 3=high
@@ -36,7 +32,10 @@ public class DialogueManager : MonoBehaviour
     private Animator _layoutAnimator;
     private string _pendingPortraitState;
     private System.Action _onDialogueFinished;
-
+    
+    // Variable persistence storage
+    private Dictionary<string, object> _inkVariableState = new Dictionary<string, object>();
+    
     private static DialogueManager _instance;
 
     // Constants
@@ -48,7 +47,7 @@ public class DialogueManager : MonoBehaviour
     /// <summary>
     /// Gets a value indicating whether dialogue is currently playing.
     /// </summary>
-    public bool IsDialoguePlaying { get; private set; }
+    public bool IsDialoguePlaying { get; private set; } 
 
     /// <summary>
     /// Gets the singleton instance of the DialogueManager.
@@ -56,7 +55,7 @@ public class DialogueManager : MonoBehaviour
     public static DialogueManager GetInstance() => _instance;
 
     public Story Story => _story;
-
+    
     /// <summary>
     /// Initializes the DialogueManager, setting up the UI and singleton instance.
     /// This method is called from the game bootstrap.
@@ -71,19 +70,18 @@ public class DialogueManager : MonoBehaviour
         }
 
         _instance = this;
-
+        
         IsDialoguePlaying = false;
         _dialoguePanel.SetActive(false);
         _layoutAnimator = _dialoguePanel.GetComponent<Animator>();
-
+        
         _choicesText = new TextMeshProUGUI[_choices.Length];
         for (int i = 0; i < _choices.Length; i++)
         {
             _choicesText[i] = _choices[i].GetComponentInChildren<TextMeshProUGUI>();
         }
-
     }
-
+    
 
     private void Update()
     {
@@ -119,7 +117,7 @@ public class DialogueManager : MonoBehaviour
     private void ConfirmChoiceSelection()
     {
         GameObject selectedObject = EventSystem.current?.currentSelectedGameObject;
-
+        
         if (selectedObject == null && _story.currentChoices.Count > 0)
         {
             // Fallback: If no button is selected but choices exist, force-select the first one.
@@ -135,7 +133,7 @@ public class DialogueManager : MonoBehaviour
                 if (_choices[i] == selectedObject)
                 {
                     MakeChoice(i);
-                    return;
+                    return; 
                 }
             }
         }
@@ -154,16 +152,18 @@ public class DialogueManager : MonoBehaviour
         }
 
         _story = new Story(inkJson.text);
-
-        _story.BindExternalFunction("StartQuest", (string questID) =>
-        {
+        
+        // Restore previously saved Ink variables
+        RestoreInkVariables();
+        
+        _story.BindExternalFunction("StartQuest", (string questID) => {
             StartQuest(questID);
         });
-
-        _story.BindExternalFunction("CompleteObjective", (string questID, string objectiveID) =>
-        {
+        
+        _story.BindExternalFunction("CompleteObjective", (string questID, string objectiveID) => {
             CompleteObjective(questID, objectiveID);
         });
+        
         IsDialoguePlaying = true;
         _dialoguePanel.SetActive(true);
         _onDialogueFinished = onDialogueFinished;
@@ -172,14 +172,89 @@ public class DialogueManager : MonoBehaviour
 
     private void ExitDialogueMode()
     {
+        // Save Ink variables before exiting
+        SaveInkVariables();
+        
         IsDialoguePlaying = false;
         _dialoguePanel.SetActive(false);
         _dialogueText.text = string.Empty;
         _pendingPortraitState = null;
         _layoutAnimator?.Play(DEFAULT_LAYOUT_STATE);
-
-        _onDialogueFinished?.Invoke();
+        
+        _onDialogueFinished?.Invoke(); 
         _onDialogueFinished = null;
+    }
+
+    /// <summary>
+    /// Saves all Ink variables to persistent storage
+    /// </summary>
+    private void SaveInkVariables()
+    {
+        if (_story == null) return;
+        
+        foreach (string varName in _story.variablesState)
+        {
+            _inkVariableState[varName] = _story.variablesState[varName];
+        }
+        
+        Debug.Log($"Saved {_inkVariableState.Count} Ink variables");
+    }
+
+    /// <summary>
+    /// Restores previously saved Ink variables to the current story
+    /// </summary>
+    private void RestoreInkVariables()
+    {
+        if (_story == null || _inkVariableState.Count == 0) return;
+        
+        foreach (var kvp in _inkVariableState)
+        {
+            try
+            {
+                _story.variablesState[kvp.Key] = kvp.Value;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning($"Could not restore variable '{kvp.Key}': {e.Message}");
+            }
+        }
+        
+        Debug.Log($"Restored {_inkVariableState.Count} Ink variables");
+    }
+
+    /// <summary>
+    /// Manually set an Ink variable (useful for quest completion triggers)
+    /// </summary>
+    /// <param name="variableName">Name of the Ink variable</param>
+    /// <param name="value">Value to set</param>
+    public void SetInkVariable(string variableName, object value)
+    {
+        _inkVariableState[variableName] = value;
+        
+        // If a story is currently active, also update it directly
+        if (_story != null)
+        {
+            try
+            {
+                _story.variablesState[variableName] = value;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning($"Could not set variable '{variableName}': {e.Message}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Get the current value of an Ink variable
+    /// </summary>
+    public object GetInkVariable(string variableName)
+    {
+        if (_inkVariableState.ContainsKey(variableName))
+        {
+            return _inkVariableState[variableName];
+        }
+        return null;
     }
 
     private void ContinueStory()
@@ -218,7 +293,7 @@ public class DialogueManager : MonoBehaviour
                     speaker = value;
                     break;
                 case PORTRAIT_TAG:
-                    showPortrait = !value.Equals("false", System.StringComparison.OrdinalIgnoreCase);
+                    showPortrait = !value.Equals("false", System.StringComparison.OrdinalIgnoreCase); 
                     break;
                 case LAYOUT_TAG:
                     _layoutAnimator?.Play(value);
@@ -259,7 +334,7 @@ public class DialogueManager : MonoBehaviour
 
     private string BuildPortraitStateName(string speaker)
     {
-        // Player has no sanityy portraits
+        // Player has no sanity portraits
         if (speaker.Equals("Player", System.StringComparison.OrdinalIgnoreCase))
         {
             return "Player";
@@ -291,7 +366,7 @@ public class DialogueManager : MonoBehaviour
         {
             int hash = Animator.StringToHash(stateName);
             // Check if the state exists to avoid warnings or hard errors
-            if (_portraitAnimator.HasState(0, hash))
+            if (_portraitAnimator.HasState(0, hash)) 
             {
                 _portraitAnimator.Play(stateName, 0, 0f);
             }
@@ -354,31 +429,19 @@ public class DialogueManager : MonoBehaviour
     {
         EventManager.Broadcast(new CompleteObjectiveEvent(questID, objectiveID));
     }
+    
     /// <summary>
-    /// Called by QuestManager when a quest is completed.
-    /// Updates Ink variables or performs dialogue logic if needed.
-    /// Added by Yeremey
+    /// Called by QuestManager when a quest is completed to update dialogue state
     /// </summary>
     public void OnQuestCompleted(string questID)
     {
-        Debug.Log($"DialogueManager: Quest '{questID}' completed.");
-
-        if (_story != null)
+        // Map quest IDs to their corresponding Ink variables
+        // Example: "QUEST_001" -> "vesna_quest_completed"
+        string inkVariableName = questID + "_completed";
+        if (!string.IsNullOrEmpty(inkVariableName))
         {
-            string variableName = "quest_" + questID + "_completed";
-
-            try
-            {
-                // Try to access the variable; if it exists, update it
-                var currentValue = _story.variablesState[variableName];
-                _story.variablesState[variableName] = true;
-                Debug.Log($"DialogueManager: Set Ink variable '{variableName}' to true.");
-            }
-            catch (System.Exception)
-            {
-                // If variable doesn't exist, Ink throws an error — we catch and log it
-                Debug.LogWarning($"DialogueManager: Ink variable '{variableName}' not found in story.");
-            }
+            SetInkVariable(inkVariableName, true);
+            Debug.Log($"Set Ink variable '{inkVariableName}' to true for completed quest {questID}");
         }
     }
 }
