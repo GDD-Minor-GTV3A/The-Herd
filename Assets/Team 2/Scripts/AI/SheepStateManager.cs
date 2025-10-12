@@ -36,6 +36,10 @@ namespace Core.AI.Sheep
         [SerializeField]
         private SheepAnimationDriver _animation;
 
+        [Header("Sounds")]
+        [SerializeField][Tooltip("Sheep sound driver")]
+        private SheepSoundDriver _sheepSoundDriver;
+
         [Header("Neighbours")]
         [SerializeField]
         [Tooltip("All herd members")]
@@ -211,6 +215,14 @@ namespace Core.AI.Sheep
                 {
                     if (Random.value <= _archetype.GettingLostChance) SetState<SheepWalkAwayFromHerdState>();
                     ScheduleNextWalkAwayFromHerd();
+                }
+
+                if (_sheepSoundDriver != null)
+                {
+                    if (_behaviorContext.CurrentVelocity != Vector3.zero)
+                        _sheepSoundDriver.TryPlayWalkSound(transform);
+
+                    _sheepSoundDriver.TryPlayBleatSound(transform, _archetype);
                 }
 
                 yield return wait;
