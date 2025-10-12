@@ -16,6 +16,7 @@ public class Monster1AI : MonoBehaviour
     public float stalkCooldown = 2f;
     public float timeToVanish = 3f;
     public float playerTooFarDistance = 20f;
+    private EnemyState previousState;
 
     private FieldOfView fieldOfView;
     private NEWInCameraDetector cameraDetector;
@@ -27,8 +28,14 @@ public class Monster1AI : MonoBehaviour
     private Node currentNode;
     private float stalkTimer = 0f;
     private float visibleTimer = 0f;
+    [Header("Audio")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip idleSound;
+    [SerializeField] private AudioClip stalkingSound;
+    [SerializeField] private AudioClip teleportSound;
+    [SerializeField] private AudioClip reappearSound;
+    [Range(0f, 1f)][SerializeField] private float sfxVolume = 0.8f;
 
-   
     private Node nextTeleportTarget;
 
     void Start()
@@ -37,12 +44,25 @@ public class Monster1AI : MonoBehaviour
         fieldOfView = GetComponent<FieldOfView>();
         cameraDetector = GetComponent<NEWInCameraDetector>();
 
+        if (audioSource == null)
+            audioSource = GetComponent<AudioSource>();
+
         allNodes = FindObjectsOfType<Node>();
         currentNode = GetClosestNode(transform.position);
+
+        PlayStateSound(idleSound, loop: true);
+        previousState = currentState;
+
     }
 
     void Update()
     {
+        if (previousState != currentState)
+        {
+            OnStateChanged(previousState, currentState);
+            previousState = currentState;
+        }
+
         switch (currentState)
         {
             case EnemyState.Idle:
@@ -112,7 +132,8 @@ public class Monster1AI : MonoBehaviour
 
         // play vanish animation
         animator.SetTrigger("Teleport");
-
+        audioSource.Stop();
+        PlayOneShot(teleportSound);
         // wait until the animation finishes 
         yield return new WaitForSeconds(0.13f);
 
@@ -120,7 +141,7 @@ public class Monster1AI : MonoBehaviour
         isTeleporting = false;
     }
 
-   // Brute force anim with event
+    // Brute force anim with event
     public void OnTeleportMoment()
     {
         Debug.Log($"Teleport event fired at {Time.time}");
@@ -137,6 +158,43 @@ public class Monster1AI : MonoBehaviour
             Debug.LogWarning("TeleportMoment called but no target set!");
         }
     }
+
+
+    private void OnStateChanged(EnemyState oldState, EnemyState newState)
+    {
+        switch (newState)
+        {
+            case EnemyState.Idle:
+                PlayStateSound(idleSound, loop: true);
+                break;
+
+            case EnemyState.Stalking:
+                PlayStateSound(stalkingSound, loop: true);
+                break;
+        }
+    }
+
+    // ===SoundHandlers===
+
+    private void PlayStateSound(AudioClip clip, bool loop)
+    {
+        if (audioSource == null || clip == null) return;
+
+        audioSource.Stop();
+        audioSource.clip = clip;
+        audioSource.loop = loop;
+        audioSource.volume = sfxVolume;
+        audioSource.Play();
+    }
+
+    private void PlayOneShot(AudioClip clip)
+    {
+        if (audioSource != null && clip != null)
+            audioSource.PlayOneShot(clip, sfxVolume);
+        Debug.Log($"[Monster1AI] Playing one-shot: {clip.name}");
+    }
+
+    //===NodeHandlers===
     Node GetClosestNode(Vector3 pos)
     {
         Node closest = null;

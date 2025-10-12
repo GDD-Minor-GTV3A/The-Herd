@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+
 using UnityEngine;
 
 public class SanityController : MonoBehaviour
@@ -8,9 +9,13 @@ public class SanityController : MonoBehaviour
     public int maxSheepToAffect = 3;
     public int sanityGainPerTick = 1;
     public float tickInterval = 1f;
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip confuseRiser;
+    [Range(0f, 1f)][SerializeField] private float effectVolume = 0.8f;
+
 
     private DetectSheep detector;
-
+    private bool soundPlaying = false;
     private void Start()
     {
         detector = GetComponent<DetectSheep>();
@@ -20,6 +25,8 @@ public class SanityController : MonoBehaviour
             enabled = false;
             return;
         }
+        if (audioSource == null)
+            audioSource = GetComponent<AudioSource>();
 
         StartCoroutine(SanityGainRoutine());
     }
@@ -61,5 +68,33 @@ public class SanityController : MonoBehaviour
         {
             sanity.GainSanity(sanityGainPerTick);
         }
+        if (confuseRiser != null && audioSource != null)
+        {
+            audioSource.pitch = Random.Range(0.95f, 1.05f);
+            audioSource.PlayOneShot(confuseRiser, effectVolume);
+        }
     }
+
+    private void HandleAffectSound(bool hasSheep)
+    {
+        if (confuseRiser == null || audioSource == null)
+            return;
+
+
+        if (hasSheep && !soundPlaying)
+        {
+            audioSource.clip = confuseRiser;
+            audioSource.PlayOneShot(confuseRiser, effectVolume);
+
+            audioSource.Play();
+            soundPlaying = true;
+        }
+
+        else if (!hasSheep && soundPlaying)
+        {
+            audioSource.Stop();
+            soundPlaying = false;
+        }
+    }
+
 }
