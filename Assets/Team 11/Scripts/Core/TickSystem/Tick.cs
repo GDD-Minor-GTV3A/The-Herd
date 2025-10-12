@@ -5,14 +5,15 @@ namespace Core.TickSystem
 {
     public class Tick : MonoBehaviour
     {
+        [Tooltip("Interval in seconds between each tick.")]
         [SerializeField] private float tickInterval = 0.2f;
 
         private float tickTimer = 0f;
 
-        public float TickDeltaTime => tickTimer;
-
-        // Events
-        public static UnityAction OnTickEvent;
+        /// <summary>
+        /// Event triggered on each tick interval. Subscribers can listen to this event to perform actions at regular intervals.
+        /// </summary>
+        public static UnityAction OnTickAction;
 
         void Update()
         {
@@ -21,7 +22,7 @@ namespace Core.TickSystem
             if (tickTimer >= tickInterval)
             {
                 tickTimer = 0f;
-                OnTickEvent?.Invoke();
+                OnTickAction?.Invoke();
             }
         }
     }
