@@ -65,20 +65,16 @@ public class LevelManager : MonoBehaviour
 
         while (spawnOpportunity && enemiesParent.childCount <= 10)
         {
-            // Spawn one enemy
             Instantiate(enemy2Prefab, spawnPoints[UnityEngine.Random.Range(0, spawnPoints.Length)].position, Quaternion.identity, enemiesParent);
 
-            // Roll to decide whether to stop
             int roll = UnityEngine.Random.Range(0, 20);
-
-            if (roll < 2)
+            if (roll < 2) // 2 is currently a random value, if this is too difficult it can be increased, or decreased if it's too easy.
             {
                 spawnOpportunity = false;
             }
             else
             {
-                // Wait 10 seconds before next roll
-                yield return new WaitForSeconds(20.0f);
+                yield return new WaitForSeconds(20.0f); // The value is the amount of seconds between each roll.
             }
         }
     }
