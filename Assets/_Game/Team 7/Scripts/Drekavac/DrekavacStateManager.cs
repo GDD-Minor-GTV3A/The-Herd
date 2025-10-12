@@ -15,7 +15,7 @@ namespace _Game.Team_7.Scripts.Drekavac
     public class DrekavacStateManager : CharacterStateManager<IState>
     {
         [SerializeField] private DrekavacStats _drekavacStats = null!;
-        private DrekavacAudioController _audioController = null!;
+        private AudioController _audioController = null!;
         private EnemyMovementController _enemyMovementController = null!;
         private DrekavacAnimatorController _drekavacAnimatorController = null!;
         private Vector3 _playerLocation;
@@ -29,24 +29,34 @@ namespace _Game.Team_7.Scripts.Drekavac
         {
             _enemyMovementController = GetComponent<EnemyMovementController>();
             if (_enemyMovementController is null)
-                Debug.LogError("A Drekavac enemy is missing it's EnemyMovementController component");
+            {
+                Debug.LogWarning("A Drekavac enemy is missing it's EnemyMovementController component, a new EnemyMovementController has been created");
+                _enemyMovementController = gameObject.AddComponent<EnemyMovementController>();
+            }
             _movementController = _enemyMovementController;
         
             var animatorControllerComponent = GetComponentInChildren<Animator>();
-            _drekavacAnimatorController = new DrekavacAnimatorController(GetComponentInChildren<Animator>());
+            Animator animator = GetComponentInChildren<Animator>();
             if (animatorControllerComponent is null)
-                Debug.LogWarning("A Drekavac enemy is missing it's Animator component");
+            {
+                Debug.LogWarning("A Drekavac enemy is missing it's Animator component, a new Animator has been created");
+                animator = gameObject.AddComponent<Animator>();
+            }
+            _drekavacAnimatorController = new DrekavacAnimatorController(animator);
             _animatorController = _drekavacAnimatorController;
         
-            if (_drekavacStats.screech is null || _drekavacStats.chomp is null || _drekavacStats.snarl is null)
+            if (_drekavacStats.screechSound is null || _drekavacStats.chompSound is null || _drekavacStats.snarlSound is null)
                 Debug.LogWarning("A Drekavac enemy is missing one or more audio files.");
             else
             {
                 var audioSource = GetComponent<AudioSource>();
                 if (audioSource is null)
-                    Debug.LogWarning("A Drekavac enemy is missing it's AudioSource component");
-                _audioController = new DrekavacAudioController(GetComponent<AudioSource>(), _drekavacStats.screech, _drekavacStats.chomp, _drekavacStats.snarl);
-                _audioController.PlayScreech();
+                {
+                    Debug.LogWarning("A Drekavac enemy is missing it's AudioSource component, a new AudioSource has been created");
+                    audioSource = gameObject.AddComponent<AudioSource>();
+                }
+                _audioController = new AudioController(audioSource);
+                _audioController.PlayClip(_drekavacStats.screechSound);
             }
         
             InitializeStatesMap();

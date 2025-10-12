@@ -7,7 +7,7 @@ namespace _Game.Team_7.Scripts.Drekavac.States
     /// </summary>
     public class HuntingState : GenericEnemyState
     {
-        public HuntingState(DrekavacStateManager manager, EnemyMovementController movement, DrekavacStats stats, DrekavacAnimatorController animator, DrekavacAudioController audio) : base(manager, movement, stats, animator, audio) { }
+        public HuntingState(DrekavacStateManager manager, EnemyMovementController movement, DrekavacStats stats, DrekavacAnimatorController animator, AudioController audio) : base(manager, movement, stats, animator, audio) { }
 
         public override void OnStart()
         {

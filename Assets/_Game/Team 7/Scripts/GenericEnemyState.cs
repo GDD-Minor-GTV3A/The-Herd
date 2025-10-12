@@ -10,12 +10,12 @@ namespace _Game.Team_7.Scripts
     {
         //TODO make it accept more generic controllers/managers so it can be reused across enemies.
         protected readonly DrekavacAnimatorController _animator;
-        protected readonly DrekavacAudioController _audio;
+        protected readonly AudioController _audio;
         protected readonly DrekavacStateManager _manager;
         protected readonly EnemyMovementController _movement;
         protected readonly DrekavacStats _stats;
 
-        protected GenericEnemyState(DrekavacStateManager manager, EnemyMovementController movement, DrekavacStats stats, DrekavacAnimatorController animator, DrekavacAudioController audio)
+        protected GenericEnemyState(DrekavacStateManager manager, EnemyMovementController movement, DrekavacStats stats, DrekavacAnimatorController animator, AudioController audio)
         {
             _manager = manager;
             _movement = movement;

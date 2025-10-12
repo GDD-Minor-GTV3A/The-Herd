@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace _Game.Team_7.Scripts.Drekavac
 {
@@ -29,8 +30,8 @@ namespace _Game.Team_7.Scripts.Drekavac
         public float fleeTriggerDistance = 3f;
     
         [Header("Audio Settings")]
-        public AudioClip? screech;
-        public AudioClip? chomp;
-        public AudioClip? snarl;
+        public AudioClip? screechSound;
+        public AudioClip? chompSound;
+        public AudioClip? snarlSound;
     }
 }

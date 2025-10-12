@@ -8,13 +8,13 @@ namespace _Game.Team_7.Scripts.Drekavac.States
     /// </summary>
     public class DraggingState : GenericEnemyState
     {
-        public DraggingState(DrekavacStateManager manager, EnemyMovementController movement, DrekavacStats stats, DrekavacAnimatorController animator, DrekavacAudioController audio) : base(manager, movement, stats, animator, audio) { }
+        public DraggingState(DrekavacStateManager manager, EnemyMovementController movement, DrekavacStats stats, DrekavacAnimatorController animator, AudioController audio) : base(manager, movement, stats, animator, audio) { }
 
         public override void OnStart()
         {
             _animator.SetDragging(true);
             _movement.SetMovementSpeed(_manager.GetStats().dragSpeed);
-            _audio.PlayChomp();
+            _audio.PlayClip(_manager.GetStats().chompSound);
         }
 
         public override void OnUpdate()
