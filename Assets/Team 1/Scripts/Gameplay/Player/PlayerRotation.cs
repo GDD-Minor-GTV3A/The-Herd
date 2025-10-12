@@ -8,7 +8,7 @@ namespace Gameplay.Player
     public class PlayerRotation : MonoBehaviour
     {
         [Header("Settings")]
-        //SerializeField] private float _rotationSpeed = 10f;
+        [SerializeField] private float _rotationSpeed = 10f;
 
         [Tooltip("Select which rotation mode the player starts in.")]
         [SerializeField] private PlayerRotationMode _startingRotationMode = PlayerRotationMode.MovementDirection;
