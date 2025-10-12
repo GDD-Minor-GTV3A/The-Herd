@@ -51,8 +51,17 @@ public class LevelManager : MonoBehaviour
         return enemy2Prefab;
     }
 
-    public void test()
+    /// <summary>
+    /// Callback for SpawnTrigger. Spawns enemy2 at all te spawnpoints.
+    /// </summary>
+    /// <param name="spawnPoints"></param>
+    public void OnSpawnTriggered(Transform[] spawnPoints)
     {
-        Debug.Log("trigger event!");
+        foreach (Transform spawnPoint in spawnPoints)
+        {
+            Instantiate(enemy2Prefab, spawnPoint.position, Quaternion.identity, enemiesParent);
+        }
     }
+
+
 }

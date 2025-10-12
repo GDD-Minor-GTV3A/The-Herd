@@ -4,24 +4,18 @@ using UnityEngine.Events;
 
 public class SpawnTrigger : MonoBehaviour
 {
-    //private bool triggered = false;
+    [SerializeField] private LevelManager levelManager;
+    [SerializeField] private Transform[] spawnPoints;
 
-    // [SerializeField] private UnityEvent onTriggered;
-    [SerializeField] private Transform enemySpawnpoint;
-    [SerializeField] private List<Transform> possibleSpawnpoints;
-
-    [SerializeField] private LevelManager manager;
-
+    /// <summary>
+    /// Callback for box collider. Gets triggered when player enters, and calls OnSpawnTriggered function giving it the spawn points
+    /// </summary>
+    /// <param name="other"></param>
     private void OnTriggerEnter(Collider other)
     {
         if (other.tag == "Player")
         {
-            // if (triggered) return;
-            // triggered = true;
-            // onTriggered.Invoke();   
-            Instantiate(manager.GetEnemy2Prefab(), enemySpawnpoint.position, Quaternion.identity, enemySpawnpoint);
-
-            Instantiate(manager.GetEnemy2Prefab(), possibleSpawnpoints[Random.Range(0, possibleSpawnpoints.Count)].position, Quaternion.identity, enemySpawnpoint);
+            levelManager.OnSpawnTriggered(spawnPoints);
         }
     }
 }
