@@ -64,6 +64,7 @@
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\States\PlayerState.cs" />
     <Compile Include="Assets\Team 1\Scripts\Editor\ShowIfDrawer.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\States\DogFollowPlayer.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\HeardZone.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\FogRevealer.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\Dog.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\FogOfWarManager.cs" />
@@ -75,7 +76,6 @@
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\PlayerRotation.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\States\DogState.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\ViewObstacle.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\DogHerdZone.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\States\DogMove.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\StepsSoundManager.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\PlayerAnimator.cs" />
@@ -103,6 +103,7 @@
     <Compile Include="Assets\Team 1\Scripts\Gameplay\HealthSystem\IHealable.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\ToolsSystem\Tools\Whistle.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\PlayerConfig.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\States\DogMoveToSheep.cs" />
     <Compile Include="Assets\Team 1\Scripts\Core\Shared\Abstractions\IPlayerTool.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -593,6 +594,10 @@
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.0.58f1\Editor\Data\PlaybackEngines\MetroSupport\UnityEditor.UWP.Extensions.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEditor.Android.Extensions">
+      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.0.58f1\Editor\Data\PlaybackEngines\AndroidPlayer\UnityEditor.Android.Extensions.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.VisualScripting.YamlDotNet">
       <HintPath>Library\PackageCache\com.unity.visualscripting@b4d700247d4b\Editor\VisualScripting.Core\Dependencies\YamlDotNet\Unity.VisualScripting.YamlDotNet.dll</HintPath>
       <Private>False</Private>
@@ -635,6 +640,14 @@
     </Reference>
     <Reference Include="Mono.Cecil">
       <HintPath>Library\PackageCache\com.unity.nuget.mono-cecil@d6f9955a5d5f\Mono.Cecil.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Android.Types">
+      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.0.58f1\Editor\Data\PlaybackEngines\AndroidPlayer\Unity.Android.Types.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Android.Gradle">
+      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.0.58f1\Editor\Data\PlaybackEngines\AndroidPlayer\Unity.Android.Gradle.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="netstandard">
@@ -1154,6 +1167,10 @@
     <ProjectReference Include="Events.csproj">
       <Project>{E65029FA-14DF-2913-D2FD-13670D85E867}</Project>
       <Name>Events</Name>
+    </ProjectReference>
+    <ProjectReference Include="Team2.csproj">
+      <Project>{6A9BB6DD-77E8-903B-6BCE-96FC8F8B7AB1}</Project>
+      <Name>Team2</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

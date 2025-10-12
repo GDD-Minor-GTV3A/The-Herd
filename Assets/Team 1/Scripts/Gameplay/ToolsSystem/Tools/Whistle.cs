@@ -11,8 +11,6 @@ namespace Gameplay.ToolsSystem
     {
         private Observable<Vector3> _cursorWorldPosition;
 
-        // Track herd mode state
-        private bool _isHerdModeActive = false;
 
         public void MainUsageFinished()
         {
@@ -39,13 +37,7 @@ namespace Gameplay.ToolsSystem
 
         public void SecondaryUsageStarted(Observable<Vector3> cursorWorldPosition)
         {
-            // Toggle herd mode
-            _isHerdModeActive = !_isHerdModeActive;
-
-            // Broadcast event with the new herd state
-            EventManager.Broadcast(new DogHerdModeToggleEvent(_isHerdModeActive));
-            
-            Debug.Log($"Dog herd mode is now {(_isHerdModeActive ? "ON" : "OFF")}");
+            EventManager.Broadcast(new DogFollowCommandEvent());
         }
 
         private void SendDogMoveCommand()
