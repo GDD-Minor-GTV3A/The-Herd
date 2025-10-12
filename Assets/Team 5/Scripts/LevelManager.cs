@@ -13,7 +13,8 @@ public class LevelManager : MonoBehaviour
     private Player player;
     private Dog dog;
 
-
+    private bool playerEnteredQuestArea = false;
+    private bool spawnedScare = false;
     /// <summary>
     /// Initialization method for the dynamic parts of the level.
     /// </summary>
@@ -32,7 +33,7 @@ public class LevelManager : MonoBehaviour
         // Places all the sheep at position 0, 0, 0. Positions will require changes later.
         for (int i = 0; i < sheepCount; i++)
         {
-            Instantiate(sheepPrefab, new Vector3(21.6790237f, 0.261999995f, 20.3814964f), Quaternion.identity, sheepParent);
+            Instantiate(sheepPrefab, new Vector3(71.9899979f, 24.6000004f, 275.230011f), Quaternion.identity, sheepParent);
         }
 
         // for (int i = 0; i < 4; i++)
@@ -51,12 +52,41 @@ public class LevelManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Handles onSpawnTriggered Event. Spawns an enemy2 at a random spawnpoint every 2 seconds until a condition is met.
+    /// Handles OnQuestAreaEntered Event. sets playerEnteredQuestArea to true.
     /// </summary>
     /// <param name="spawnPoints"></param>
-    public void OnSpawnTriggered(Transform[] spawnPoints)
+    public void OnQuestAreaEntered(Transform[] _spawnPoints)
     {
-        StartCoroutine(SpawnEnemies(spawnPoints));
+        playerEnteredQuestArea = true;
+    }
+
+    /// <summary>
+    /// Handles OnQuestAreaExit Event. triggers the scare (currently 4 enemies spawn around the player)
+    /// </summary>
+    /// <param name="spawnPoints"></param>
+    public void OnQuestAreaExit(Transform[] spawnPoints)
+    {
+        if (!playerEnteredQuestArea || spawnedScare) return;
+        spawnedScare = true;
+
+        foreach (Transform spawnPoint in spawnPoints)
+        {
+            Instantiate(enemy2Prefab, spawnPoint.position, Quaternion.identity, enemiesParent);
+        }
+    }
+
+    /// <summary>
+    /// Handles OnChaseTrigger Event. Only spawnes enemies when the scare has already happend.
+    /// </summary>
+    /// <param name="spawnPoints"></param>
+    public void OnChaseTrigger(Transform[] spawnPoints)
+    {
+        if (!spawnedScare) return;
+
+        foreach (Transform spawnPoint in spawnPoints)
+        {
+            Instantiate(enemy2Prefab, spawnPoint.position, Quaternion.identity, enemiesParent);
+        }
     }
 
     private IEnumerator SpawnEnemies(Transform[] spawnPoints)
@@ -66,7 +96,7 @@ public class LevelManager : MonoBehaviour
         while (spawnOpportunity && enemiesParent.childCount <= 10)
         {
             Instantiate(enemy2Prefab, spawnPoints[UnityEngine.Random.Range(0, spawnPoints.Length)].position, Quaternion.identity, enemiesParent);
-
+            
             int roll = UnityEngine.Random.Range(0, 20);
             if (roll < 2) // 2 is currently a random value, if this is too difficult it can be increased, or decreased if it's too easy.
             {

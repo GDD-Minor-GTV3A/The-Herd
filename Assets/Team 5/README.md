@@ -23,8 +23,9 @@ The hierarchy consists of every 3D model used in the scene, as well as some empt
 ### Gameplay
 The level is currently playable. The CameraFollowing script is temporary to make the level function, and the positioning of this camera will be adjusted in the future once everything is properly integrated.
 
-The "peak scare" can be triggered by heading to the end of the level, where the trigger is located. This will cause enemies to spawn, creating a chase back towards the village. (Enemy AI isn't implemented in this scene yet, so they don't actually move.) The most efficient route can be seen in the image below.
+The "peak scare" is located at the end of the level (top right). To trigger the scare, you must first enter the circular area and then exit it the same way. When exiting, enemies will spawn around you and the "chase" will begin. During the chase, enemies will block certain paths and force the player down a specific route. Currently, the chase doesn’t lead anywhere meaningfully, as this is just a proof of concept.
 
+The most efficient route to the end of the level can be seen in the image below.
 ![Route through the level](images/levelroute.png)
 
 Here the green dot is the player spawn, the blue line the trigger and the red line the route.
@@ -35,13 +36,13 @@ Here the green dot is the player spawn, the blue line the trigger and the red li
 
 ![Setup for the level manager object](images/LevelManagerSetup.png)
 
-- The SpawnTrigger object in the hierarchy needs to contain a list of all the spawnpoints, as well as the "OnSpawnTriggered" event. This should already be in place, but it's put here in case it isn't.
+- The SpawnTrigger objects in the hierarchy need to contain a list of all the spawnpoints. The "OnSpawnTriggered" event should also be linked to a function. This should already be in place, but it's put here in case it isn't.
 
 ![Setup for the spawn trigger object](images/SpawnTriggerSetup.png)
 
-- If possible: provide the enemies (enemy2) with AI. If something from us is needed for this, just let us know.
+- If possible: Correct the scales of the Drekavac and the sheep. They seem way smaller then intended.
+- If possible: Correct the Drekavac behaviar, they spawn and recognize the navmesh correctly but don't seem to recognize the player in our level. If something from us is needed for this, just let us know.
 - Aside from this, if it's already in that state, the level could be connected to the village.
 
 ### Other things
-- There seems to be some offset in the sheep-prefab. They do spawn, but not on the assigned position. This will be fixed in the future; don't worry about this for now.
 - The dog doesn't actually follow the player yet, this too will be fixed in the future.
