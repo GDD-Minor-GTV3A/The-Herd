@@ -62,26 +62,44 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\States\PlayerState.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Editor\ShowIfDrawer.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\States\DogFollowPlayer.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\FogRevealer.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\Dog.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\FogOfWarManager.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\Camera\CameraManager.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\States\PlayerWalking.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\ToolsSystem\Tools\Bullet.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\ToolsSystem\Tools\Rifle.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\HealthSystem\IDamagable.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\PlayerRotation.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\States\DogState.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\ViewObstacle.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\States\DogMove.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\StepsSoundManager.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\PlayerAnimator.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\Data\LevelData.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\Data\FogRevealerConfig.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\HealthSystem\IKillable.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Input System\InputSystem_Actions.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\States\PlayerIdle.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\PlayerMovement.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\Player.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\HealthSystem\HealthTester.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\PlayerStateManager.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\Camera\CameraConfig.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\Data\FogOfWarConfig.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Editor\ShowIfAttribute.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\DogAnimator.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\HiddenInFog.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\HealthSystem\Health.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\DogMovementController.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\PlayerInput.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\DogConfig.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\ToolsSystem\ToolSlotsController.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\DogStateManager.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\States\DogIdle.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\HealthSystem\IHealable.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\ToolsSystem\Tools\Whistle.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\PlayerConfig.cs" />
     <Compile Include="Assets\Team 1\Scripts\Core\Shared\Abstractions\IPlayerTool.cs" />
@@ -574,6 +592,10 @@
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.0.58f1\Editor\Data\PlaybackEngines\MetroSupport\UnityEditor.UWP.Extensions.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEditor.Android.Extensions">
+      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.0.58f1\Editor\Data\PlaybackEngines\AndroidPlayer\UnityEditor.Android.Extensions.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.VisualScripting.YamlDotNet">
       <HintPath>Library\PackageCache\com.unity.visualscripting@b4d700247d4b\Editor\VisualScripting.Core\Dependencies\YamlDotNet\Unity.VisualScripting.YamlDotNet.dll</HintPath>
       <Private>False</Private>
@@ -616,6 +638,14 @@
     </Reference>
     <Reference Include="Mono.Cecil">
       <HintPath>Library\PackageCache\com.unity.nuget.mono-cecil@d6f9955a5d5f\Mono.Cecil.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Android.Types">
+      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.0.58f1\Editor\Data\PlaybackEngines\AndroidPlayer\Unity.Android.Types.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Android.Gradle">
+      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.0.58f1\Editor\Data\PlaybackEngines\AndroidPlayer\Unity.Android.Gradle.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="netstandard">
@@ -1108,6 +1138,14 @@
     </Reference>
     <Reference Include="Unity.InputSystem">
       <HintPath>Library\ScriptAssemblies\Unity.InputSystem.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.Universal.Runtime">
+      <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Universal.Runtime.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Cinemachine">
+      <HintPath>Library\ScriptAssemblies\Unity.Cinemachine.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEditor.UI">
