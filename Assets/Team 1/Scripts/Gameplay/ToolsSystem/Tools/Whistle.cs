@@ -5,12 +5,14 @@ using UnityEngine;
 namespace Gameplay.ToolsSystem
 {
     /// <summary>
-    /// Tool for dogs controlls.
+    /// Tool for controlling dogs.
     /// </summary>
     public class Whistle : MonoBehaviour, IPlayerTool
     {
         private Observable<Vector3> _cursorWorldPosition;
 
+        // Track herd mode state
+        private bool _isHerdModeActive = false;
 
         public void MainUsageFinished()
         {
@@ -27,19 +29,24 @@ namespace Gameplay.ToolsSystem
 
         public void Reload()
         {
-            return;
+            Debug.Log("Testing secondary functionality.");
         }
 
         public void SecondaryUsageFinished()
         {
-            return;
+            // Not needed
         }
 
         public void SecondaryUsageStarted(Observable<Vector3> cursorWorldPosition)
         {
-            EventManager.Broadcast(new DogFollowCommandEvent());
-        }
+            // Toggle herd mode
+            _isHerdModeActive = !_isHerdModeActive;
 
+            // Broadcast event with the new herd state
+            EventManager.Broadcast(new DogHerdModeToggleEvent(_isHerdModeActive));
+            
+            Debug.Log($"Dog herd mode is now {(_isHerdModeActive ? "ON" : "OFF")}");
+        }
 
         private void SendDogMoveCommand()
         {
