@@ -9,7 +9,6 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private GameObject playerPrefab, dogPrefab, sheepPrefab, enemy1Prefab, enemy2Prefab;
     [SerializeField] private Transform playerParent, sheepParent, enemiesParent;
     [SerializeField] private int sheepCount; // Might become a field in the Player class, in which case it wouldn't be needed here.
-    [SerializeField] private SpawnTrigger spawnTrigger;
 
     private Player player;
     private Dog dog;
@@ -52,7 +51,7 @@ public class LevelManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Callback for SpawnTrigger. Spawns enemy2 at all te spawnpoints.
+    /// Handles onSpawnTriggered Event. Spawns enemy2 at all te spawnpoints.
     /// </summary>
     /// <param name="spawnPoints"></param>
     public void OnSpawnTriggered(Transform[] spawnPoints)
@@ -62,6 +61,4 @@ public class LevelManager : MonoBehaviour
             Instantiate(enemy2Prefab, spawnPoint.position, Quaternion.identity, enemiesParent);
         }
     }
-
-
 }
