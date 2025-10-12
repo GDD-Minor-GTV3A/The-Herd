@@ -31,7 +31,7 @@ namespace Core.InputSystem
         public UnityAction OnResumeEvent;
         #endregion UI Events
 
-        private void OnEnable()
+        void OnEnable()
         {
             if (gameInputs == null)
             {
@@ -44,6 +44,11 @@ namespace Core.InputSystem
             }
 
             EnableGameplayInput();
+        }
+
+        void OnDisable()
+        {
+            DisableInputs();
         }
 
         #region Gameplay Inputs
