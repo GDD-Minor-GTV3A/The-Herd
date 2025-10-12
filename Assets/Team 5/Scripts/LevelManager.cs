@@ -2,14 +2,17 @@ using UnityEngine;
 using System;
 using System.Collections;
 using Gameplay.Player;
+using Gameplay.Dog;
 
 public class LevelManager : MonoBehaviour
 {
     [SerializeField] private GameObject playerPrefab, dogPrefab, sheepPrefab, enemy1Prefab, enemy2Prefab;
     [SerializeField] private Transform playerParent, sheepParent, enemiesParent;
     [SerializeField] private int sheepCount; // Might become a field in the Player class, in which case it wouldn't be needed here.
+    [SerializeField] private SpawnTrigger spawnTrigger;
 
     private Player player;
+    private Dog dog;
 
 
     /// <summary>
@@ -23,7 +26,9 @@ public class LevelManager : MonoBehaviour
         GameObject playerObject = Instantiate(playerPrefab, new Vector3(71.9899979f, 24.6000004f, 275.230011f), Quaternion.identity, playerParent);
         player = playerObject.GetComponent<Player>();
         player.Initialize();
-        Instantiate(dogPrefab, new Vector3(71.9899979f, 24.6000004f, 275.230011f), Quaternion.identity, playerParent);
+        GameObject dogObject = Instantiate(dogPrefab, new Vector3(71.9899979f, 24.6000004f, 275.230011f), Quaternion.identity, playerParent);
+        dog = dogObject.GetComponent<Dog>();
+        dog.Initialize();
 
         // Places all the sheep at position 0, 0, 0. Positions will require changes later.
         for (int i = 0; i < sheepCount; i++)
@@ -31,10 +36,10 @@ public class LevelManager : MonoBehaviour
             Instantiate(sheepPrefab, new Vector3(21.6790237f, 0.261999995f, 20.3814964f), Quaternion.identity, sheepParent);
         }
 
-        for (int i = 0; i < 4; i++)
-        {
-            Instantiate(enemy2Prefab, new Vector3(71.9899979f, 24.6000004f, 275.230011f), Quaternion.identity, enemiesParent);
-        }
+        // for (int i = 0; i < 4; i++)
+        // {
+        //     Instantiate(enemy2Prefab, new Vector3(71.9899979f, 24.6000004f, 275.230011f), Quaternion.identity, enemiesParent);
+        // }
     }
 
     /// <summary>

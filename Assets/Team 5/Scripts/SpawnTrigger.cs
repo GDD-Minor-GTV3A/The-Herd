@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -7,6 +8,7 @@ public class SpawnTrigger : MonoBehaviour
 
     // [SerializeField] private UnityEvent onTriggered;
     [SerializeField] private Transform enemySpawnpoint;
+    [SerializeField] private List<Transform> possibleSpawnpoints;
 
     [SerializeField] private LevelManager manager;
 
@@ -18,6 +20,8 @@ public class SpawnTrigger : MonoBehaviour
             // triggered = true;
             // onTriggered.Invoke();   
             Instantiate(manager.GetEnemy2Prefab(), enemySpawnpoint.position, Quaternion.identity, enemySpawnpoint);
+
+            Instantiate(manager.GetEnemy2Prefab(), possibleSpawnpoints[Random.Range(0, possibleSpawnpoints.Count)].position, Quaternion.identity, enemySpawnpoint);
         }
     }
 }
