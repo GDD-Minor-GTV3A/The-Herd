@@ -548,11 +548,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d33b6693d5f62de48852a78411bf22ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _joinIfOutside: 1
-  _oneJoiningPerSheep: 1
-  _graceAfterJoin: 3
-  _sheepTag: Sheep
-  _freeSheep: []
+  joinIfOutside: 1
+  graceAfterJoin: 3
+  sheepTag: Sheep
 --- !u!135 &951822396
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -1111,6 +1109,23 @@ MonoBehaviour:
     StartingAngle: 0
     Mesh: {fileID: 0}
   origin: {fileID: 1370579413}
+--- !u!114 &1813006636
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 65095863}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e425490b7dd14c41ae7453691823ddd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxAmmo: 5
+  fireCooldown: 1
+  boltCycleTime: 1.5
+  bulletPrefab: {fileID: 9139095716783313779, guid: 93f5674f1ddbf184ebe9fafbcbe29b3a, type: 3}
+  damage: 0
 --- !u!1001 &1785960595897861831
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1364,6 +1379,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6065300022185603627, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1813006625}
+    - targetCorrespondingSourceObject: {fileID: 6065300022185603627, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1813006636}
   m_SourcePrefab: {fileID: 100100000, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
 --- !u!1001 &6156032451368726267
 PrefabInstance:
