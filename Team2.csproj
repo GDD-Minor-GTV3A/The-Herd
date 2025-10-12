@@ -10,10 +10,10 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{22ABDBB0-7571-F5D4-56A0-118D2A39EE38}</ProjectGuid>
+    <ProjectGuid>{6A9BB6DD-77E8-903B-6BCE-96FC8F8B7AB1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <AssemblyName>Ink-Libraries</AssemblyName>
+    <AssemblyName>Team2</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <BaseDirectory>.</BaseDirectory>
@@ -61,107 +61,31 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.0.58f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Ink\InkLibs\InkRuntime\InkList.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\InkStringConversionExtensions.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\InkParser\InkParser_Choices.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\Stitch.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkRuntime\Tag.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\InkParser\InkParser_Knot.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\Conditional.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\InkParser\InkParser_Tags.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\ConstantDeclaration.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkRuntime\Pointer.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\Tag.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\InkParser\InkParser_Expressions.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkRuntime\DebugMetadata.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkRuntime\Divert.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\InkParser\InkParser_Sequences.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\Object.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\StringParser\StringParser.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\InkParser\InkParser_CommandLineInput.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\InkParser\InkParser_Whitespace.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkRuntime\ControlCommand.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\AuthorWarning.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkRuntime\Void.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\InkParser\InkParser_Statements.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\Return.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkRuntime\ChoicePoint.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkRuntime\SimpleJson.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\Number.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\Compiler.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\ExternalDeclaration.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkRuntime\ListDefinitionsOrigin.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\Sequence.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\List.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkRuntime\StatePatch.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkRuntime\INamedContent.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\Plugins\Plugin.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\ContentList.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\Identifier.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkRuntime\VariablesState.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\Story.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkRuntime\PushPop.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkRuntime\CallStack.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\Expression.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\InkParser\InkParser_Include.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkRuntime\Value.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\InkParser\CommentEliminator.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\ConditionalSingleBranch.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\InkParser\InkParser_Conditional.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkRuntime\Object.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\INamedContent.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkRuntime\NativeFunctionCall.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\Gather.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkRuntime\VariableAssignment.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\Path.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\Choice.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\VariableAssignment.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkRuntime\Story.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\CommandLineInput.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkRuntime\Error.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\InkParser\InkParser_Content.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkRuntime\SearchResult.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkRuntime\Choice.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\InkParser\InkParser_CharacterRanges.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkRuntime\Flow.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\Stats.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\InkParser\InkParser_Logic.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\DivertTarget.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\StringParser\StringParserState.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkRuntime\VariableReference.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\FlowBase.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkRuntime\StoryException.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkRuntime\Container.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\FunctionCall.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkRuntime\Profiler.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\IncludedFile.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkRuntime\StoryState.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\Weave.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\CharacterRange.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\InkParser\InkParser_Divert.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkRuntime\JsonSerialisation.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\InkParser\InkParser_AuthorWarning.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\FlowLevel.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\TunnelOnwards.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\InkParser\InkParser.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\FileHandler.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\Wrap.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkRuntime\Glue.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\Divert.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\Knot.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\Text.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkRuntime\ListDefinition.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\ListDefinition.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\Plugins\PluginManager.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\VariableReference.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkRuntime\StringJoinExtension.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\IWeavePoint.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\ParsedHierarchy\StringExpression.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkCompiler\CharacterSet.cs" />
-    <Compile Include="Assets\Ink\InkLibs\InkRuntime\Path.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\Personality\Types\EnergeticPersonality.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\Personality\PersonalityBehaviorContext.cs" />
+    <Compile Include="Assets\Team 2\Scripts\Sound\SheepSoundManager.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\Personality\Types\LazyPersonality.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\Personality\Types\NormalPersonality.cs" />
+    <Compile Include="Assets\Team 2\Scripts\Sound\SheepSoundDriver.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\SheepStates.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\FlockingUtility.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\ThreatSensor.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\Personality\Types\NervousPersonality.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\Personality\BaseSheepPersonality.cs" />
+    <Compile Include="Assets\Team 2\Scripts\EventDemoSimulator.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\SheepArchetype.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\GizmoPlayerSquare.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\Personality\ISheepPersonality.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\SheepStateManager.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\SheepRejoinTester.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\SheepAnimationDriver.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\SheepAnimState.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\Personality\Types\StubbornPersonality.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\SheepConfig.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\SheepHerdController.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Ink\InkLibs\Ink-Libraries.asmdef" />
+    <None Include="Assets\Team 2\Scripts\Team2.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -1180,6 +1104,14 @@
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.0.58f1\Editor\Data\NetStandard\compat\2.1.0\shims\netfx\System.Xml.Serialization.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.InputSystem">
+      <HintPath>Library\ScriptAssemblies\Unity.InputSystem.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEditor.UI">
       <HintPath>Library\ScriptAssemblies\UnityEditor.UI.dll</HintPath>
       <Private>False</Private>
@@ -1190,6 +1122,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="Shared.csproj">
+      <Project>{5B60FE28-0D6B-EC65-2187-5CE328B0D114}</Project>
+      <Name>Shared</Name>
+    </ProjectReference>
+    <ProjectReference Include="Events.csproj">
+      <Project>{E65029FA-14DF-2913-D2FD-13670D85E867}</Project>
+      <Name>Events</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />
