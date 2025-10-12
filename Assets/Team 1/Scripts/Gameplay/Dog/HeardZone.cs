@@ -10,13 +10,12 @@ namespace Gameplay.Dog
     public class HeardZone : MonoBehaviour
     {
         [Header("Herding Settings")]
-        [SerializeField] private bool _joinIfOutside = true;
-        [SerializeField] private bool _oneJoiningPerSheep = true;
-        [SerializeField] private float _graceAfterJoin = 3f;
-        [SerializeField] private string _sheepTag = "Sheep";
+        [SerializeField] private bool joinIfOutside = true;
+        [SerializeField] private float graceAfterJoin = 3f;
+        [SerializeField] private string sheepTag = "Sheep";
 
 
-        [SerializeField] private List<SheepStateManager> _freeSheep = new();
+        private List<SheepStateManager> freeSheep = new();
 
 
         public void Initialize()
@@ -27,37 +26,37 @@ namespace Gameplay.Dog
 
         private void Reset()
         {
-            var collider = GetComponent<Collider>();
-            collider.isTrigger = true;
+            var _collider = GetComponent<Collider>();
+            _collider.isTrigger = true;
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            var sheep = FindSheep(other);
-            if (sheep == null)
+            var _sheep = FindSheep(other);
+            if (_sheep == null)
                 return;
 
-            if (!_joinIfOutside || sheep.IsCurrentlyOutsideHerd())
+            if (!joinIfOutside || _sheep.IsCurrentlyOutsideHerd())
             {
-                _freeSheep.Add(sheep);
+                freeSheep.Add(_sheep);
             }
         }
 
 
         private void OnTriggerExit(Collider other)
         {
-            var sheep = FindSheep(other);
-            if (sheep == null)
+            var _sheep = FindSheep(other);
+            if (_sheep == null)
                 return;
 
-            if (!_joinIfOutside || sheep.IsCurrentlyOutsideHerd())
-                _freeSheep.Remove(sheep);
+            if (!joinIfOutside || _sheep.IsCurrentlyOutsideHerd())
+                freeSheep.Remove(_sheep);
         }
 
 
         private SheepStateManager FindSheep(Collider col)
         {
-            if (!col.CompareTag(_sheepTag))
+            if (!col.CompareTag(sheepTag))
                 return null;
 
             return col.GetComponent<SheepStateManager>();
@@ -66,28 +65,28 @@ namespace Gameplay.Dog
 
         public SheepStateManager GetFreeSheep()
         {
-            if (_freeSheep.Count == 0)
+            if (freeSheep.Count == 0)
                 return null;
 
-            return _freeSheep[0];
+            return freeSheep[0];
         }
 
 
         public void HeardSheep(SheepStateManager sheepToHeard)
         {
-            if (_freeSheep.Contains(sheepToHeard))
+            if (freeSheep.Contains(sheepToHeard))
             {
-                sheepToHeard.SummonToHerd();
+                sheepToHeard.SummonToHerd(graceAfterJoin, clearThreats : true);
                 sheepToHeard.SetDestinationWithHerding(transform.position);
 
-                _freeSheep.Remove(sheepToHeard);
+                freeSheep.Remove(sheepToHeard);
             }
         }
 
 
         public bool IsFreeSheepToHeard()
         {
-            return _freeSheep.Count != 0;
+            return freeSheep.Count != 0;
         }
     }
 }

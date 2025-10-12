@@ -53,6 +53,7 @@ namespace Gameplay.ToolsSystem
             SetNewToolToSlotByIndex(whistle, 0);
 
             Rifle rifle = GetComponent<Rifle>();
+            rifle.Initialize();
             SetNewToolToSlotByIndex(rifle, 1);
         }
 

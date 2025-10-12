@@ -27,12 +27,11 @@ namespace Gameplay.ToolsSystem
 
         public void Reload()
         {
-            Debug.Log("Testing secondary functionality.");
+            Debug.Log("Bark!!!");
         }
 
         public void SecondaryUsageFinished()
         {
-            // Not needed
         }
 
         public void SecondaryUsageStarted(Observable<Vector3> cursorWorldPosition)
