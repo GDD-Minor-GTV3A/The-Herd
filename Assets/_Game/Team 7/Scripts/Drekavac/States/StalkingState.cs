@@ -16,7 +16,7 @@ namespace _Game.Team_7.Scripts.Drekavac.States
         private float _stalkEndTime;                        // When to stop stalking and start hunting
         private GameObject[] _sheep = { };
         
-        public StalkingState(DrekavacStateManager manager, EnemyMovementController movement, DrekavacStats stats, DrekavacAnimatorController animator, DrekavacAudioController audio) : base(manager, movement, stats, animator, audio) { }
+        public StalkingState(DrekavacStateManager manager, EnemyMovementController movement, DrekavacStats stats, DrekavacAnimatorController animator, AudioController audio) : base(manager, movement, stats, animator, audio) { }
 
         public override void OnStart()
         {
@@ -78,7 +78,7 @@ namespace _Game.Team_7.Scripts.Drekavac.States
                 if (Mathf.Abs(distToCenter - _manager.GetStats().circleRadius) < 0.5f)
                 {
                     _isSettled = true; // Enemy reached the circle radius
-                    _audio.PlaySnarl();
+                    _audio.PlayClip(_manager.GetStats().snarlSound);
                 }
                 else
                 {
