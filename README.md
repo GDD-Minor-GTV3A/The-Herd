@@ -61,9 +61,38 @@ Contains the following:
 
 The project is structured and organized to be beneficial and readable for you and your team.
 
-Everything is organized inside the `Asset/*your-team*/` folder, keeping your files well organized. Each team will have its personal folder. This is mainly done to prevent confusion between folders when importing a package and avoid conflicts between teams' assets and scripts.
+Everything is organized inside the `Asset/*your-team*/` folder, keeping your files well organized. Each team will have its designated folder. This is mainly done to prevent confusion between folders when importing a package and avoid conflicts between teams' assets and scripts.
 
 Keep your folder organized! Create folders by type, so it's easy to find any file needed.
+
+> [!WARNING]
+> Files placed outside your team's designated folder structure may be removed without notice. Always ensure your work is contained within your `Asset/*your-team*/` folder. The Integration Team will not be responsible for lost work due to improper file organization.
+
+> [!WARNING]
+> Branches containing compilation errors are not eligable for integration.
+
+This is a template. May vary depending on the team
+
+```tree
+└───Assets/Team *team-number*
+    ├───Audio
+    ├───Data
+    ├───Materials
+    ├───Miscellaneous
+    ├───Models
+    ├───Prefabs
+    ├───Scenes
+    ├───Scripts
+    │   ├───AI
+    │   ├───Core
+    │   ├───Editor
+    │   ├───Gameplay
+    │   └───UI
+    └───Textures
+        ├───Images
+        ├───Sprites
+        └───Texture
+```
 
 **Benefits:**
 
