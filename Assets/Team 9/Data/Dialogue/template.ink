@@ -1,7 +1,11 @@
+// SEE DOCUMENTATION AT 
+// https://docs.google.com/document/d/17rfnE03GXNniznrM8fdLGHhFy1wNvdZoMoxpZ7nJq5U/edit?usp=sharing
+
 // Replace: NPC_NAME, QUEST_ID
 
 VAR quest_accepted = false
-VAR QUEST_ID_quest_completed = false
+VAR QUEST_ID_completed = false
+VAR after_quest_completed = false
 VAR quest_declined = false
 
 EXTERNAL StartQuest(string)
@@ -10,23 +14,26 @@ EXTERNAL CompleteObjective(string, string)
 -> NPC_NAME_router
 
 === NPC_NAME_router ===
-{ QUEST_ID_quest_completed:
-    -> NPC_NAME.quest_completed
+{ after_quest_completed:
+    ->NPC_NAME.after_quest_completed_dialogue
 - else:
-    { quest_accepted:
-        -> NPC_NAME.quest_in_progress
+    { QUEST_ID_completed:
+        -> NPC_NAME.quest_completed_dialogue
     - else:
-        { quest_declined:
-            -> NPC_NAME.quest_declined_followup
+        { quest_accepted:
+            -> NPC_NAME.quest_in_progress_dialogue
         - else:
-            -> NPC_NAME.intro
+            { quest_declined:
+                -> NPC_NAME.quest_declined_followup_dialogue
+            - else:
+                -> NPC_NAME.intro_dialogue
+            }
         }
     }
 }
-
 === NPC_NAME ===
 
-= intro
+= intro_dialogue
 #speaker:NPC_NAME #layout:right
 [Greeting and introduction]
 
@@ -47,7 +54,7 @@ EXTERNAL CompleteObjective(string, string)
     [Understands]
     -> END
 
-= quest_declined_followup
+= quest_declined_followup_dialogue
 #speaker:NPC_NAME #layout:right
 Oh, hello again. Have you reconsidered my request?
 
@@ -81,7 +88,7 @@ I see.
     I understand. The offer remains open whenever you're ready.
     -> END
 
-= quest_in_progress
+= quest_in_progress_dialogue
 #speaker:NPC_NAME #layout:right
 Have you found [the item/completed task]?
 
@@ -92,12 +99,21 @@ Not yet.
 [Reminder/encouragement]
 -> END
 
-= quest_completed
-~ QUEST_ID_quest_completed = true
+= quest_completed_dialogue
+~ QUEST_ID_completed = true
 
 #speaker:NPC_NAME #layout:right
 [Thank you! Reward/promise]
 
 #speaker:Player #layout:left
 [Response]
+~ after_quest_completed = true
+-> END
+
+= after_quest_completed_dialogue
+~ after_quest_completed = true
+
+#speaker:Vesna
+Thanks but now go away please
+
 -> END
