@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+
 using Core.Shared;
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -36,6 +38,8 @@ namespace Gameplay.ToolsSystem
             _input.MainUsage.started += OnCurrentToolMainUseStarted;
             _input.MainUsage.canceled += OnCurrentToolMainUseFinished;
 
+            _input.Reload.canceled += OnCurrentToolReload;
+
             _input.SecondaryUsage.started += OnCurrentToolSecondaryUseStarted;
             _input.SecondaryUsage.canceled += OnCurrentToolSecondaryUseFinished;
 
@@ -49,6 +53,9 @@ namespace Gameplay.ToolsSystem
             // test
             Whistle whistle = GetComponent<Whistle>();
             SetNewToolToSlotByIndex(whistle, 0);
+
+            Rifle rifle = GetComponent<Rifle>();
+            SetNewToolToSlotByIndex(rifle, 1);
         }
 
 
@@ -61,8 +68,15 @@ namespace Gameplay.ToolsSystem
 
         private void SetCurrentSlotByIndex(int index)
         {
-            index = Mathf.Clamp(index, 0, _slotsAmount-1);
+            index = Mathf.Clamp(index, 0, _slotsAmount - 1);
             _currentToolIndex = index;
+        }
+
+
+        private void OnCurrentToolReload(InputAction.CallbackContext obj)
+        {
+            if (_toolSlots[_currentToolIndex] != null)
+                _toolSlots[_currentToolIndex].Reload();
         }
 
 
@@ -107,6 +121,8 @@ namespace Gameplay.ToolsSystem
         {
             _input.MainUsage.started -= OnCurrentToolMainUseStarted;
             _input.MainUsage.canceled -= OnCurrentToolMainUseFinished;
+
+            _input.Reload.canceled -= OnCurrentToolReload;
 
             _input.SecondaryUsage.started -= OnCurrentToolSecondaryUseStarted;
             _input.SecondaryUsage.canceled -= OnCurrentToolSecondaryUseFinished;

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+
 using UnityEngine;
 
 public class DetectSheep : MonoBehaviour
@@ -8,8 +9,8 @@ public class DetectSheep : MonoBehaviour
     [Range(0, 360)]
     public float angle;
 
-    public LayerMask targetMask;  
-    public LayerMask obstructionMask;  
+    public LayerMask targetMask;
+    public LayerMask obstructionMask;
 
     [HideInInspector]
     public List<Transform> visibleTargets = new List<Transform>();

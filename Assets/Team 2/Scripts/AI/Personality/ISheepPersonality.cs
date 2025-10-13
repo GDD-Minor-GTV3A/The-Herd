@@ -1,7 +1,9 @@
-using UnityEngine;
 using System;
 using System.Collections.Generic;
+
 using Core.Shared.StateMachine;
+
+using UnityEngine;
 
 namespace Core.AI.Sheep.Personality
 {
@@ -37,7 +39,7 @@ namespace Core.AI.Sheep.Personality
         /// Allow personality to override state transitions
         /// </summary>
         Type GetNextState(Type currentState, Type proposedState, SheepStateManager sheep, PersonalityBehaviorContext context);
-        
+
 
         /// <summary>
         /// Called when sheep detects a threat/enemy

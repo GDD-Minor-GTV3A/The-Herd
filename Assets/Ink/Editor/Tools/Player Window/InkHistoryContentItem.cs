@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+
 using Ink.Runtime;
+
 using UnityEngine;
 
-namespace Ink.UnityIntegration.Debugging {
+namespace Ink.UnityIntegration.Debugging
+{
     [System.Serializable]
-    public class InkHistoryContentItem {
-        public enum ContentType {
+    public class InkHistoryContentItem
+    {
+        public enum ContentType
+        {
             PresentedContent,
             ChooseChoice,
             PresentedChoice,
@@ -25,65 +30,84 @@ namespace Ink.UnityIntegration.Debugging {
         [SerializeField] JsonDateTime _serializableTime;
         [NonSerialized] bool hasDeserializedTime;
         [NonSerialized] DateTime _time;
-        public DateTime time {
-            get {
-                if (!hasDeserializedTime) {
+        public DateTime time
+        {
+            get
+            {
+                if (!hasDeserializedTime)
+                {
                     _time = _serializableTime;
                     hasDeserializedTime = true;
                 }
                 return _time;
-            } private set {
+            }
+            private set
+            {
                 _time = value;
                 _serializableTime = value;
             }
         }
 
-        InkHistoryContentItem (string text, ContentType contentType) {
+        InkHistoryContentItem(string text, ContentType contentType)
+        {
             this.content = text;
             this.contentType = contentType;
             this.time = DateTime.Now;
         }
-        InkHistoryContentItem (string text, List<string> tags, ContentType contentType) {
+        InkHistoryContentItem(string text, List<string> tags, ContentType contentType)
+        {
             this.content = text;
             this.tags = tags;
             this.contentType = contentType;
             this.time = DateTime.Now;
         }
 
-        public static InkHistoryContentItem CreateForContent (string choiceText, List<string> tags) {
+        public static InkHistoryContentItem CreateForContent(string choiceText, List<string> tags)
+        {
             return new InkHistoryContentItem(choiceText, tags, InkHistoryContentItem.ContentType.PresentedContent);
         }
-        public static InkHistoryContentItem CreateForPresentChoice (Choice choice) {
+        public static InkHistoryContentItem CreateForPresentChoice(Choice choice)
+        {
             return new InkHistoryContentItem(choice.text.Trim(), choice.tags, InkHistoryContentItem.ContentType.PresentedChoice);
         }
-        public static InkHistoryContentItem CreateForMakeChoice (Choice choice) {
+        public static InkHistoryContentItem CreateForMakeChoice(Choice choice)
+        {
             return new InkHistoryContentItem(choice.text.Trim(), choice.tags, InkHistoryContentItem.ContentType.ChooseChoice);
         }
-        public static InkHistoryContentItem CreateForEvaluateFunction (string functionInfoText) {
+        public static InkHistoryContentItem CreateForEvaluateFunction(string functionInfoText)
+        {
             return new InkHistoryContentItem(functionInfoText, InkHistoryContentItem.ContentType.EvaluateFunction);
         }
-        public static InkHistoryContentItem CreateForCompleteEvaluateFunction (string functionInfoText) {
+        public static InkHistoryContentItem CreateForCompleteEvaluateFunction(string functionInfoText)
+        {
             return new InkHistoryContentItem(functionInfoText, InkHistoryContentItem.ContentType.CompleteEvaluateFunction);
         }
-        public static InkHistoryContentItem CreateForChoosePathString (string choosePathStringText) {
+        public static InkHistoryContentItem CreateForChoosePathString(string choosePathStringText)
+        {
             return new InkHistoryContentItem(choosePathStringText, InkHistoryContentItem.ContentType.ChoosePathString);
         }
-        public static InkHistoryContentItem CreateForWarning (string warningText) {
+        public static InkHistoryContentItem CreateForWarning(string warningText)
+        {
             return new InkHistoryContentItem(warningText, InkHistoryContentItem.ContentType.Warning);
         }
-        public static InkHistoryContentItem CreateForError (string errorText) {
+        public static InkHistoryContentItem CreateForError(string errorText)
+        {
             return new InkHistoryContentItem(errorText, InkHistoryContentItem.ContentType.Error);
         }
-        public static InkHistoryContentItem CreateForDebugNote (string noteText) {
+        public static InkHistoryContentItem CreateForDebugNote(string noteText)
+        {
             return new InkHistoryContentItem(noteText, InkHistoryContentItem.ContentType.DebugNote);
         }
 
-        struct JsonDateTime {
+        struct JsonDateTime
+        {
             public long value;
-            public static implicit operator DateTime(JsonDateTime jdt) {
+            public static implicit operator DateTime(JsonDateTime jdt)
+            {
                 return DateTime.FromFileTime(jdt.value);
             }
-            public static implicit operator JsonDateTime(DateTime dt) {
+            public static implicit operator JsonDateTime(DateTime dt)
+            {
                 JsonDateTime jdt = new JsonDateTime();
                 jdt.value = dt.ToFileTime();
                 return jdt;
