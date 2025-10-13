@@ -21,14 +21,14 @@ namespace Team_7.Scripts.AI.Phantom.States
 
         public override void OnUpdate()
         {
-            if (_running && _movement.Agent.remainingDistance < 5)
+            if (_running && _movement.Agent.remainingDistance < 3)
             {
                 _movement.SetMovementSpeed(_stats.moveSpeed);
                 _running = false;
             }
 
             var distance = Vector3.Distance(_manager.GetPlayerTransform().position, _manager.transform.position);
-            if (distance < _stats.shootRange && !_manager.IsBeingLookedAt())
+            if (distance < _stats.shootRange && !_manager.IsBeingLookedAt() && !_running)
             {
                 _manager.SetState<ShootingState>();
                 return;
@@ -50,11 +50,16 @@ namespace Team_7.Scripts.AI.Phantom.States
             }
         }
 
+        /// <summary>
+        ///     Finds an area that is at least some distance from the player and outside the players view cone.
+        /// </summary>
+        /// <param name="result">The position to move towards</param>
+        /// <returns>True if it has found a safe spot to path to</returns>
         bool FindSafeSpot(out Vector3 result)
         {
             for (int i = 0; i < 20; i++)
             {
-                Vector3 randomDir = Random.insideUnitSphere * 45;
+                Vector3 randomDir = Random.insideUnitSphere * _stats.repositionDistance;
                 randomDir += _manager.transform.position;
 
                 NavMeshHit hit;
@@ -62,7 +67,7 @@ namespace Team_7.Scripts.AI.Phantom.States
                 {
                     // Check if new position is outside the player's vision cone and not too close.
                     if (!IsInVisionCone(_manager.GetPlayerTransform(), hit.position, _stats.DamageAngle) && 
-                        Vector3.Distance(_manager.GetPlayerTransform().position, hit.position) > _stats.damageDistance)
+                        Vector3.Distance(_manager.GetPlayerTransform().position, hit.position) > _stats.minRepositionPlayerDistance)
                     {
                         result = hit.position;
                         return true;

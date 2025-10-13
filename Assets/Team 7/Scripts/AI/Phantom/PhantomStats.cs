@@ -17,9 +17,13 @@ namespace _Game.Team_7.Scripts.Phantom
         [Tooltip("The maximum distance the enemy will respawn at.")]
         public float maxRespawnDistance = 100;
         [Tooltip("Should be the same as the angle of the player's vision cone, the enemy takes damage if it's too long inside this area.")]
-        public float DamageAngle = 50;
+        public float DamageAngle = 30;
         [Tooltip("Should be the same as the vision length of the player view cone")]
         public float damageDistance = 30;
+        [Tooltip("How far away from the player the enemy should at least be when repositioning")] 
+        public float minRepositionPlayerDistance = 35;
+        [Tooltip("How far away from It's original location the enemy can move when it's within the users cone of view")]
+        public float repositionDistance = 45;
         
         [Header("Movement Settings")]
         [Tooltip("The regular movement speed of the enemy.")]
