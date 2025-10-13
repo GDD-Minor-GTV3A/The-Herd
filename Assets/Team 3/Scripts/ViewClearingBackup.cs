@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-
 using UnityEngine;
 
 public class ViewClearingBackup : MonoBehaviour
@@ -17,7 +16,7 @@ public class ViewClearingBackup : MonoBehaviour
     void Awake()
     {
         HandledObjects = new List<Transform>();
-
+        
     }
 
 

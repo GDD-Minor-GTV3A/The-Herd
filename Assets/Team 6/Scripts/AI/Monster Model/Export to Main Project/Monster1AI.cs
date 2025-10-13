@@ -1,6 +1,5 @@
-﻿using System.Collections;
-
-using UnityEngine;
+﻿using UnityEngine;
+using System.Collections;
 
 public enum EnemyState
 {
@@ -29,7 +28,7 @@ public class Monster1AI : MonoBehaviour
     private float stalkTimer = 0f;
     private float visibleTimer = 0f;
 
-
+   
     private Node nextTeleportTarget;
 
     void Start()
@@ -121,7 +120,7 @@ public class Monster1AI : MonoBehaviour
         isTeleporting = false;
     }
 
-    // Brute force anim with event
+   // Brute force anim with event
     public void OnTeleportMoment()
     {
         Debug.Log($"Teleport event fired at {Time.time}");

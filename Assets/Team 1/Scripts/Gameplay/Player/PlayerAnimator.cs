@@ -1,8 +1,7 @@
+using UnityEngine;
 using Core.Shared;
 
-using UnityEngine;
-
-namespace Gameplay.Player
+namespace Gameplay.Player 
 {
     public class PlayerAnimator : AnimatorController
     {
@@ -55,3 +54,5 @@ namespace Gameplay.Player
 
     }
 }
+
+

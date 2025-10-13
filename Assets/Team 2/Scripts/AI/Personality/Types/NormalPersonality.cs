@@ -1,9 +1,7 @@
+using UnityEngine;
 using System;
 using System.Collections.Generic;
-
 using Core.Shared.StateMachine;
-
-using UnityEngine;
 
 using Random = UnityEngine.Random;
 

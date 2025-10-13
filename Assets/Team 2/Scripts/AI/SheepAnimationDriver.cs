@@ -35,7 +35,7 @@ namespace Core.AI.Sheep
 
         public void ApplyOverrideController(AnimatorOverrideController overrideController)
         {
-            if (_animator && overrideController)
+            if(_animator && overrideController)
             {
                 _animator.runtimeAnimatorController = overrideController;
             }

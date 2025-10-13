@@ -12,12 +12,13 @@
         /// <summary>
         /// Constructs a default instance of a StoryException without a message.
         /// </summary>
-        public StoryException() { }
+        public StoryException () { }
 
         /// <summary>
         /// Constructs an instance of a StoryException with a message.
         /// </summary>
         /// <param name="message">The error message.</param>
-        public StoryException(string message) : base(message) { }
+        public StoryException(string message) : base(message) {}
     }
 }
+
