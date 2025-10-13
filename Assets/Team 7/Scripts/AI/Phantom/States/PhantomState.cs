@@ -1,3 +1,6 @@
+using _Game.Team_7.Scripts;
+using _Game.Team_7.Scripts.Phantom;
+
 namespace Team_7.Scripts.AI.Phantom.States
 {
     public class PhantomState : GenericEnemyState

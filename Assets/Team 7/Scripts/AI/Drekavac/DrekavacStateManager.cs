@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 
+using _Game.Team_7.Scripts;
+
 using Core.Shared.StateMachine;
 
 using Team_7.Scripts.AI.Drekavac.States;

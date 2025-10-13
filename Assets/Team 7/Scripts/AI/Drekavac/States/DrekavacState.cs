@@ -1,3 +1,5 @@
+using _Game.Team_7.Scripts;
+
 namespace Team_7.Scripts.AI.Drekavac.States
 {
     public class DrekavacState : GenericEnemyState

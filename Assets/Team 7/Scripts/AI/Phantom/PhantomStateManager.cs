@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 
+using _Game.Team_7.Scripts;
+using _Game.Team_7.Scripts.Phantom;
+
 using Core.Shared.StateMachine;
 
 using Team_7.Scripts.AI.Phantom.States;

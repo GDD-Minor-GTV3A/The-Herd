@@ -1,3 +1,6 @@
+using _Game.Team_7.Scripts;
+using _Game.Team_7.Scripts.Phantom;
+
 using UnityEngine;
 
 namespace Team_7.Scripts.AI.Phantom.States
