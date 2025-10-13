@@ -99,50 +99,113 @@ namespace Core.Events
 
     #region QUEST_EVENTS
 
+    /// <summary>
+    /// Event triggered to request the start of a specific quest.
+    /// Typically dispatched by gameplay systems when a quest should begin.
+    /// </summary>
     public class StartQuestEvent : GameEvent
     {
+        /// <summary>
+        /// The unique identifier of the quest to start.
+        /// </summary>
         private string _questID;
 
+        /// <summary>
+        /// Gets the unique ID of the quest being started.
+        /// </summary>
         public string QuestID => _questID;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StartQuestEvent"/> class.
+        /// </summary>
+        /// <param name="questID">The unique ID of the quest to start.</param>
         public StartQuestEvent(string questID)
         {
             _questID = questID;
         }
     }
 
+    /// <summary>
+    /// Event broadcast when a quest has successfully started.
+    /// Typically used by the UI or other systems to display the quest entry.
+    /// </summary>
     public class QuestStartedEvent : GameEvent
     {
+        /// <summary>
+        /// The unique identifier of the started quest.
+        /// </summary>
         private string _questID;
 
+        /// <summary>
+        /// Gets the unique ID of the quest that was started.
+        /// </summary>
         public string QuestID => _questID;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="QuestStartedEvent"/> class.
+        /// </summary>
+        /// <param name="questID">The unique ID of the quest that has started.</param>
         public QuestStartedEvent(string questID)
         {
             _questID = questID;
         }
     }
 
+    /// <summary>
+    /// Event broadcast when an existing quest’s progress changes (e.g., objectives updated).
+    /// </summary>
     public class QuestUpdateEvent : GameEvent
     {
+        /// <summary>
+        /// The unique identifier of the quest being updated.
+        /// </summary>
         private string _questID;
 
+        /// <summary>
+        /// Gets the unique ID of the quest that was updated.
+        /// </summary>
         public string QuestID => _questID;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="QuestUpdateEvent"/> class.
+        /// </summary>
+        /// <param name="questID">The unique ID of the quest being updated.</param>
         public QuestUpdateEvent(string questID)
         {
             _questID = questID;
         }
     }
 
+    /// <summary>
+    /// Event triggered when a specific objective within a quest is completed.
+    /// </summary>
     public class CompleteObjectiveEvent : GameEvent
     {
+        /// <summary>
+        /// The unique identifier of the quest containing the completed objective.
+        /// </summary>
         private string _questID;
+
+        /// <summary>
+        /// The unique identifier of the completed objective.
+        /// </summary>
         private string _objectiveID;
 
+        /// <summary>
+        /// Gets the unique ID of the quest containing the completed objective.
+        /// </summary>
         public string QuestID => _questID;
+
+        /// <summary>
+        /// Gets the unique ID of the completed objective.
+        /// </summary>
         public string ObjectiveID => _objectiveID;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CompleteObjectiveEvent"/> class.
+        /// </summary>
+        /// <param name="questID">The unique ID of the quest containing the objective.</param>
+        /// <param name="objectiveID">The unique ID of the completed objective.</param>
         public CompleteObjectiveEvent(string questID, string objectiveID)
         {
             _questID = questID;
@@ -150,12 +213,25 @@ namespace Core.Events
         }
     }
 
+    /// <summary>
+    /// Event broadcast when a quest is fully completed (all objectives and stages finished).
+    /// </summary>
     public class QuestCompletedEvent : GameEvent
     {
+        /// <summary>
+        /// The unique identifier of the completed quest.
+        /// </summary>
         private string _questID;
 
+        /// <summary>
+        /// Gets the unique ID of the quest that was completed.
+        /// </summary>
         public string QuestID => _questID;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="QuestCompletedEvent"/> class.
+        /// </summary>
+        /// <param name="questID">The unique ID of the quest that was completed.</param>
         public QuestCompletedEvent(string questID)
         {
             _questID = questID;
