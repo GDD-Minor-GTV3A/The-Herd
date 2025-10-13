@@ -7,5 +7,19 @@ HEALTH SYSTEM INTEGRATION:
 
 FOG OF WAR INTEGRATION:
 1. Add fog of war prefab on scene.
-2. To make any object a fog reveler - add Fog Revelaer component. In componnet add revealer configs - ecah config represent one shape. So, if u need object to reveal circle and cone(like player) add 2 configs NOT two components.
+2. To make any object a fog reveler - add Fog Revelaer component. In componnet add revealer configs - ecah config represent one shape. So, if u need object to reveal circle and cone(like player) add 2 configs NOT two components. Player and dog already have revealers set up.
 3. To make object hidden in the fog - add Hidden In Fog component. In componnet assign MeshRenderer of the hidden object. If u want to dynamically add new hidden objects(spawn enemy or smth like that) - on spawn object has to broadcast AddHiddenObjectEvent, on despawn - RemoveHiddenObjectEvent.
+
+
+TOOL SLOTS:
+No need extra actions, all set up on prefabs.
+Slots can be changed on mouse wheel or number keys(1 and 2 for now)
+Right now, player has 2 slots:
+1. Whistle gives commands to dog
+    LMB - go to cursor position
+    RMB - set standart mode(follow the player and if there are free sheep, add them to heard)
+    R - bark(not used for now, only writes in console. Latter will be used to scare enemies)
+2. Rifle
+    LMB - fire(only one bullet per click, has delay between shots)
+    R - reload
+    RMB - not used for now(will be used for aiming)
