@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+
 using Core.Shared;
 
 using Gameplay.Player;
@@ -35,22 +36,32 @@ public class Rifle : MonoBehaviour, IPlayerTool
         currentAmmo = maxAmmo;
 
         // Initialize pool
-        for (int i = 0; i < maxAmmo; i++)
+        for (int i = 0; i < poolSize; i++)
         {
-            Bullet _bullet = Instantiate(bulletPrefab).GetComponent<Bullet>();
-            _bullet.Initialize(damage, bulletPool);
-            _bullet.gameObject.SetActive(false);
-            bulletPool.Enqueue(_bullet);
+            GameObject b = Instantiate(bulletPrefab);
+            b.SetActive(false);
+            bulletPool.Enqueue(b.GetComponent<Bullet>());
         }
 
         gameObject.SetActive(false);
     }
 
-
     public void MainUsageStarted(Observable<Vector3> cursorWorldPosition)
     {
-        if (!canFire || isCycling || !isBoltClosed || currentAmmo <= 0)
+        if (!canFire || isCycling)
             return;
+
+        if (!isBoltClosed)
+        {
+            Debug.Log("Bolt open — cannot fire");
+            return;
+        }
+
+        if (currentAmmo <= 0)
+        {
+            Debug.Log("Out of ammo — reload!");
+            return;
+        }
 
         Fire();
     }
@@ -69,12 +80,15 @@ public class Rifle : MonoBehaviour, IPlayerTool
         }
     }
 
-
     private void Fire()
     {
         if (bulletPool.Count == 0)
+        {
+            Debug.Log("No bullets available in pool!");
             return;
+        }
 
+        Debug.Log("Rifle: Bullet fired!");
         currentAmmo--;
         canFire = false;
 
@@ -89,29 +103,41 @@ public class Rifle : MonoBehaviour, IPlayerTool
         StartCoroutine(AutoBoltCycle());
     }
 
+    private IEnumerator ReturnBulletToPool(Bullet bullet, float time)
+    {
+        yield return new WaitForSeconds(time);
+        bullet.gameObject.SetActive(false);
+        bulletPool.Enqueue(bullet);
+    }
 
     private IEnumerator AutoBoltCycle()
     {
         isCycling = true;
+        Debug.Log("Cycling bolt automatically...");
 
         isBoltClosed = false;
         yield return new WaitForSeconds(boltCycleTime / 3f);
 
+        Debug.Log("Shell ejected");
         yield return new WaitForSeconds(boltCycleTime / 3f);
 
         if (currentAmmo > 0)
         {
+            Debug.Log($"Round chambered ({currentAmmo}/{maxAmmo} left)");
         }
         else
         {
+            Debug.Log("No ammo left — reload required");
             isCycling = false;
             isBoltClosed = true;
             canFire = true;
+            Debug.Log("Bolt closed, reload available");
             yield break;
         }
 
         yield return new WaitForSeconds(boltCycleTime / 3f);
         isBoltClosed = true;
+        Debug.Log("Bolt closed, ready to fire again");
 
         // Wait for small cooldown to simulate player resetting aim
         yield return new WaitForSeconds(fireCooldown);
@@ -120,16 +146,20 @@ public class Rifle : MonoBehaviour, IPlayerTool
         canFire = true;
     }
 
-
     private IEnumerator ReloadRoutine()
     {
         if (currentAmmo == maxAmmo)
+        {
+            Debug.Log("Magazine full — reload skipped");
             yield break;
+        }
 
         canFire = false;
+        Debug.Log("Reloading magazine...");
         yield return new WaitForSeconds(boltCycleTime * 2f);
         currentAmmo = maxAmmo;
         isBoltClosed = true;
+        Debug.Log("Reload complete");
         canFire = true;
     }
 

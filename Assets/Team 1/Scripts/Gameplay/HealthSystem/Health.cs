@@ -14,10 +14,11 @@ namespace Gameplay.HealthSystem
         private bool canBeHealed;
         private bool canDie;
 
-
         // Events (replace UnityEvent with C# events)
         public event Action<float, float> OnHealthChanged; // (current, max)
-
+        public event Action OnDeath;
+        public event Action OnDamageTaken;
+        public event Action OnHealed;
 
         public float CurrentHealth => currentHealth;
         public float MaxHealth => maxHealth;
@@ -25,7 +26,6 @@ namespace Gameplay.HealthSystem
         public bool CanTakeDamage { get => canTakeDamage; set => canTakeDamage = value; }
         public bool CanBeHealed { get => canBeHealed; set => canBeHealed = value; }
         public bool CanDie { get => canDie; set => canDie = value; }
-
 
         public Health(float maxHealth = 100f, float currentHealth = 100f, bool canTakeDamage = true, bool canBeHealed = true, bool canDie = true)
         {
@@ -36,6 +36,30 @@ namespace Gameplay.HealthSystem
             this.canDie = canDie;
         }
 
+        public void TakeDamage(float amount)
+        {
+            if (!canTakeDamage || amount <= 0) return;
+
+            currentHealth -= amount;
+            currentHealth = Math.Clamp(currentHealth, 0, maxHealth);
+
+            OnDamageTaken?.Invoke();
+            OnHealthChanged?.Invoke(currentHealth, maxHealth);
+
+            if (currentHealth <= 0 && canDie)
+                Die();
+        }
+
+        public void Heal(float amount)
+        {
+            if (!canBeHealed || amount <= 0) return;
+
+            currentHealth += amount;
+            currentHealth = Math.Clamp(currentHealth, 0, maxHealth);
+
+            OnHealed?.Invoke();
+            OnHealthChanged?.Invoke(currentHealth, maxHealth);
+        }
 
         /// <summary>
         /// Set current hp to max hp.
@@ -46,6 +70,10 @@ namespace Gameplay.HealthSystem
             OnHealthChanged?.Invoke(currentHealth, maxHealth);
         }
 
+        private void Die()
+        {
+            OnDeath?.Invoke();
+        }
 
         /// <summary>
         /// Changes max hp.
@@ -61,13 +89,5 @@ namespace Gameplay.HealthSystem
             OnHealthChanged?.Invoke(currentHealth, maxHealth);
         }
 
-
-        public void ChangeCurrentHealth(float value)
-        {
-            currentHealth += value;
-            currentHealth = Math.Clamp(currentHealth, 0, maxHealth);
-
-            OnHealthChanged?.Invoke(currentHealth, maxHealth);
-        }
     }
 }

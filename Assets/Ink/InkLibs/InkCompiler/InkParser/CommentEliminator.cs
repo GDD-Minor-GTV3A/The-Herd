@@ -9,34 +9,40 @@ namespace Ink
     /// </summary>
     public class CommentEliminator : StringParser
     {
-        public CommentEliminator (string input) : base(input)
+        public CommentEliminator(string input) : base(input)
         {
         }
 
         public string Process()
         {
             // Make both comments and non-comments optional to handle trivial empty file case (or *only* comments)
-            var stringList = Interleave<string>(Optional (CommentsAndNewlines), Optional(MainInk));
+            var stringList = Interleave<string>(Optional(CommentsAndNewlines), Optional(MainInk));
 
-            if (stringList != null) {
+            if (stringList != null)
+            {
                 return string.Join("", stringList.ToArray());
-            } else {
+            }
+            else
+            {
                 return null;
             }
         }
 
         string MainInk()
         {
-            return ParseUntil (CommentsAndNewlines, _commentOrNewlineStartCharacter, null);
+            return ParseUntil(CommentsAndNewlines, _commentOrNewlineStartCharacter, null);
         }
 
         string CommentsAndNewlines()
         {
-            var newlines = Interleave<string> (Optional (ParseNewline), Optional (ParseSingleComment));
+            var newlines = Interleave<string>(Optional(ParseNewline), Optional(ParseSingleComment));
 
-            if (newlines != null) {
-                return string.Join ("", newlines.ToArray());
-            } else {
+            if (newlines != null)
+            {
+                return string.Join("", newlines.ToArray());
+            }
+            else
+            {
                 return null;
             }
         }
@@ -45,49 +51,53 @@ namespace Ink
         // which we want to keep so that line numbers stay the same
         string ParseSingleComment()
         {
-            return (string) OneOf (EndOfLineComment, BlockComment);
+            return (string)OneOf(EndOfLineComment, BlockComment);
         }
 
         string EndOfLineComment()
         {
-            if (ParseString ("//") == null) {
+            if (ParseString("//") == null)
+            {
                 return null;
             }
 
-            ParseUntilCharactersFromCharSet (_newlineCharacters);
+            ParseUntilCharactersFromCharSet(_newlineCharacters);
 
             return "";
         }
 
         string BlockComment()
         {
-            if (ParseString ("/*") == null) {
+            if (ParseString("/*") == null)
+            {
                 return null;
             }
 
             int startLineIndex = lineIndex;
 
-            var commentResult = ParseUntil (String("*/"), _commentBlockEndCharacter, null);
+            var commentResult = ParseUntil(String("*/"), _commentBlockEndCharacter, null);
 
-            if (!endOfInput) {
-                ParseString ("*/");
+            if (!endOfInput)
+            {
+                ParseString("*/");
             }
 
             // Count the number of lines that were inside the block, and replicate them as newlines
             // so that the line indexing still works from the original source
-            if (commentResult != null) {
-                return new string ('\n', lineIndex - startLineIndex);
-            } 
+            if (commentResult != null)
+            {
+                return new string('\n', lineIndex - startLineIndex);
+            }
 
             // No comment at all
-            else {
+            else
+            {
                 return null;
             }
         }
-          
-        CharacterSet _commentOrNewlineStartCharacter = new CharacterSet ("/\r\n");
+
+        CharacterSet _commentOrNewlineStartCharacter = new CharacterSet("/\r\n");
         CharacterSet _commentBlockEndCharacter = new CharacterSet("*");
-        CharacterSet _newlineCharacters = new CharacterSet ("\n\r");
+        CharacterSet _newlineCharacters = new CharacterSet("\n\r");
     }
 }
-

@@ -1,8 +1,10 @@
-using Core.Shared.StateMachine;
 using System.Collections.Generic;
+
+using Core.Shared.StateMachine;
+
 using UnityEngine;
 
-namespace Gameplay.Player 
+namespace Gameplay.Player
 {
     /// <summary>
     /// Player state machine.

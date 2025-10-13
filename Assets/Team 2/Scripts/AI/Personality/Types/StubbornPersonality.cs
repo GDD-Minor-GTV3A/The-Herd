@@ -1,6 +1,8 @@
-using UnityEngine;
 using System;
+
 using Core.Shared.StateMachine;
+
+using UnityEngine;
 
 using Random = UnityEngine.Random;
 
@@ -92,7 +94,7 @@ namespace Core.AI.Sheep.Personality.Types
 
             return base.GetFollowTarget(sheep, context);
         }
-        
+
         private void SetNewPreferredLocation(Vector3 currentPosition)
         {
             // Pick a spot within reasonable distance
