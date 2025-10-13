@@ -3,43 +3,83 @@ using UnityEngine;
 namespace Gameplay.Player
 {
     /// <summary>
-    /// Handles player rotation logic.
+    /// Handles player rotation logic, supporting both movement and mouse-based rotation modes.
     /// </summary>
     public class PlayerRotation : MonoBehaviour
     {
-        private float _rotationSpeed;
+        [Header("Settings")]
+        [SerializeField] private float _rotationSpeed = 10f;
+        [SerializeField] private LayerMask _groundLayers;
+
+        [Tooltip("Select which rotation mode the player starts in.")]
+        [SerializeField] private PlayerRotationMode _startingRotationMode = PlayerRotationMode.MovementDirection;
+
+
         private Camera _mainCamera;
+        private PlayerRotationMode _rotationMode;
+
+        public PlayerRotationMode RotationMode => _rotationMode;
+
+        private void Awake()
+        {
+            _mainCamera = Camera.main;
+
+            // Set the initial rotation mode
+            SetRotationMode(_startingRotationMode);
+        }
 
         /// <summary>
         /// Sets the rotation speed for smoothing the player's turn.
         /// </summary>
-        /// <param name="rotationSpeed">How quickly the player rotates towards the camera's direction.</param>
         public void Initialize(float rotationSpeed)
         {
             UpdateRotationSpeed(rotationSpeed);
-            _mainCamera = Camera.main;
         }
 
+        public void UpdateRotationSpeed(float rotationSpeed)
+        {
+            _rotationSpeed = rotationSpeed;
+        }
 
         /// <summary>
-        /// Rotates the player to face the move forward direction.
+        /// Switches between movement-based and mouse-based rotation.
         /// </summary>
-        public void Rotate(Vector2 input)
+        public void ToggleRotationMode()
         {
+            _rotationMode = _rotationMode == PlayerRotationMode.MovementDirection
+                ? PlayerRotationMode.MouseDirection
+                : PlayerRotationMode.MovementDirection;
+        }
 
-            //// Get camera forward vector ("beam" direction)
-            //Vector3 camForward = _mainCamera.transform.forward;
-            //camForward.y = 0f; // ignore vertical tilt
+        /// <summary>
+        /// Sets rotation mode directly.
+        /// </summary>
+        public void SetRotationMode(PlayerRotationMode mode)
+        {
+            _rotationMode = mode;
+        }
 
-            //if (camForward.sqrMagnitude > 0.001f)
-            //{
-            //    Quaternion targetRotation = Quaternion.LookRotation(camForward);
-            //    transform.rotation = Quaternion.Slerp(
-            //        transform.rotation,
-            //        targetRotation,
-            //        _rotationSpeed * Time.deltaTime
-            //    );
-            //}
+        /// <summary>
+        /// Rotates the player based on the current rotation mode.
+        /// </summary>
+        public void Rotate(Vector2 moveInput, Vector3 mouseWorldPosition)
+        {
+            switch (_rotationMode)
+            {
+                case PlayerRotationMode.MovementDirection:
+                    RotateByMovement(moveInput);
+                    break;
+
+                case PlayerRotationMode.MouseDirection:
+                    RotateByMouseWorld(mouseWorldPosition);
+                    break;
+            }
+        }
+
+        private void RotateByMovement(Vector2 input)
+        {
+            if (input.sqrMagnitude < 0.0001f)
+                return;
 
             Vector3 forward = _mainCamera.transform.forward;
             Vector3 right = _mainCamera.transform.right;
@@ -52,14 +92,30 @@ namespace Gameplay.Player
 
             Vector3 move = forward * input.y + right * input.x;
 
-            if (move.sqrMagnitude > 0.0001f)
-                transform.rotation = Quaternion.LookRotation(move);
+            Quaternion targetRotation = Quaternion.LookRotation(move);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, _rotationSpeed * Time.deltaTime);
         }
 
-
-        public void UpdateRotationSpeed(float rotationSpeed)
+        private void RotateByMouseWorld(Vector3 worldPosition)
         {
-            _rotationSpeed = rotationSpeed;
+            Vector3 direction = worldPosition - transform.position;
+            direction.y = 0f;
+
+            if (direction.sqrMagnitude < 0.0001f)
+                return;
+
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, _rotationSpeed * Time.deltaTime);
+
         }
+    }
+
+    /// <summary>
+    /// The available player rotation modes.
+    /// </summary>
+    public enum PlayerRotationMode
+    {
+        MovementDirection,
+        MouseDirection
     }
 }
