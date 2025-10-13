@@ -84,10 +84,5 @@ namespace Team_7.Scripts.AI.Phantom.States
             float angle = Vector3.Angle(player.forward, dirToTarget);
             return angle < viewAngle * 0.5f;
         }
-
-        public override void OnStop()
-        {
-            
-        }
     }
 }
