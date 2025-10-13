@@ -43,12 +43,15 @@ public class ViewClearing : MonoBehaviour
             {
                 if (hit.collider.gameObject.transform != Player && hit.collider.transform.root != Player)
                 {
-                    hit.collider.transform.root.gameObject.TryGetComponent<ViewRecieve>(out ViewRecieve observed);
+                    /*hit.collider.transform.root.gameObject.TryGetComponent<ViewRecieve>(out ViewRecieve observed);
                     if (observed != false)
                     {
                         hit.collider.gameObject.GetComponent<MeshRenderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
                         HandledObjects.Add(hit.collider.gameObject.transform);
-                    }
+                    } */
+
+                    hit.collider.gameObject.GetComponent<MeshRenderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+                    HandledObjects.Add(hit.collider.gameObject.transform);
                 }
             }
         }
