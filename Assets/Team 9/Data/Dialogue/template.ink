@@ -113,7 +113,7 @@ Not yet.
 = after_quest_completed_dialogue
 ~ after_quest_completed = true
 
-#speaker:Vesna
+#speaker:NPC_NAME
 Thanks but now go away please
 
 -> END
