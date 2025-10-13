@@ -1,23 +1,48 @@
 using System;
 using System.Collections.Generic;
-
 using Core.Events;
-
 using UnityEngine;
 using TMPro;
 
+/// <summary>
+/// Handles the UI representation of a single quest entry in the quest log.
+/// Displays the quest name, description, and objective progress dynamically.
+/// </summary>
 public class QuestUIEntry : MonoBehaviour
 {
-
+    /// <summary>
+    /// Reference to the text component that displays the quest name.
+    /// </summary>
     [SerializeField] private TextMeshProUGUI questNameText;
+    /// <summary>
+    /// Reference to the text component that displays the quest description.
+    /// </summary>
     [SerializeField] private TextMeshProUGUI questDescriptionText;
+    /// <summary>
+    /// Container transform used to hold all instantiated objective entries.
+    /// </summary>
     [SerializeField] private Transform objectiveListContainer;
+    /// <summary>
+    /// Prefab used for displaying individual objective entries (TextMeshProUGUI).
+    /// </summary>
     [SerializeField] private GameObject objectiveEntryPrefab;
-
+    
+    /// <summary>
+    /// The current quest progress data being displayed by this UI entry.
+    /// </summary>
     private QuestProgress _quest;
+
+    /// <summary>
+    /// Cached dictionary mapping objective IDs to their corresponding text UI components.
+    /// </summary>
     private readonly Dictionary<string, TextMeshProUGUI> _objectiveTexts = new();
+
     
-    
+    /// <summary>
+    /// Initializes this quest UI entry using the specified quest progress data.
+    /// Creates and populates UI elements for each objective.
+    /// </summary>
+    /// <param name="quest">The quest progress data to display.</param>
     public void Setup(QuestProgress quest)
     {
         _quest = quest;
@@ -32,7 +57,7 @@ public class QuestUIEntry : MonoBehaviour
         // Iterate through all stages and objectives
         foreach (var stage in quest.StageProgresses)
         {
-            // Optional: add stage header
+            // Optional: add stage header if multiple stages exist
             if (quest.StageProgresses.Count > 1)
             {
                 var stageHeader = Instantiate(objectiveEntryPrefab, objectiveListContainer);
@@ -46,7 +71,7 @@ public class QuestUIEntry : MonoBehaviour
                 var entry = Instantiate(objectiveEntryPrefab, objectiveListContainer);
                 var text = entry.GetComponent<TextMeshProUGUI>();
                 text.text = $"{obj.ObjectiveDescription} ({obj.CurrentAmount}/{obj.RequiredAmount})";
-            
+
                 // Color logic
                 if (obj.IsCompleted)
                     text.color = Color.green;
@@ -60,7 +85,11 @@ public class QuestUIEntry : MonoBehaviour
         }
     }
     
-    
+
+    /// <summary>
+    /// Updates the UI to reflect the latest progress of the quest objectives.
+    /// Creates new UI entries for any newly activated objectives.
+    /// </summary>
     public void RefreshObjectives()
     {
         if (_quest == null)
@@ -79,7 +108,7 @@ public class QuestUIEntry : MonoBehaviour
                 }
 
                 text.text = $"{obj.ObjectiveDescription} ({obj.CurrentAmount}/{obj.RequiredAmount})";
-            
+
                 if (obj.IsCompleted)
                     text.color = Color.green;
                 else if (obj.IsActive)
@@ -90,21 +119,16 @@ public class QuestUIEntry : MonoBehaviour
         }
     }
 
+    
+    /// <summary>
+    /// Marks this quest as completed visually by changing text color and adding a completion indicator.
+    /// </summary>
     public void MarkCompleted()
     {
         questNameText.text += " X";
         questNameText.color = Color.green;
         questDescriptionText.color = Color.green;
     }
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    
+    
 }

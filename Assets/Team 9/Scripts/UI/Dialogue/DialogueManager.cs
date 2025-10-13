@@ -445,7 +445,7 @@ public class DialogueManager : MonoBehaviour
     }
     
     /// <summary>
-    /// Called by QuestManager when a quest is completed to update dialogue state
+    /// Called through the EventSystem/Manager
     /// </summary>
     public void OnQuestCompleted(QuestCompletedEvent evt)
     {
