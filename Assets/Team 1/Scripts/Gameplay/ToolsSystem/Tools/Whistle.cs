@@ -1,5 +1,8 @@
 using Core.Events;
 using Core.Shared;
+
+using Gameplay.Player;
+
 using UnityEngine;
 
 namespace Gameplay.ToolsSystem
@@ -10,6 +13,19 @@ namespace Gameplay.ToolsSystem
     public class Whistle : MonoBehaviour, IPlayerTool
     {
         private Observable<Vector3> _cursorWorldPosition;
+        private PlayerAnimator _animator;
+
+
+        public void Initialize(PlayerAnimator animator)
+        {
+            _animator = animator;
+        }
+
+
+        public void HideTool()
+        {
+            _animator.RemoveHands();
+        }
 
 
         public void MainUsageFinished()
@@ -37,6 +53,10 @@ namespace Gameplay.ToolsSystem
         public void SecondaryUsageStarted(Observable<Vector3> cursorWorldPosition)
         {
             EventManager.Broadcast(new DogFollowCommandEvent());
+        }
+
+        public void ShowTool()
+        {
         }
 
         private void SendDogMoveCommand()

@@ -1,6 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using Core.Shared;
+
+using Gameplay.Player;
+
 using UnityEngine;
 
 public class Rifle : MonoBehaviour, IPlayerTool
@@ -10,6 +13,7 @@ public class Rifle : MonoBehaviour, IPlayerTool
     [SerializeField, Tooltip("Delay between shots (simulates bolt time)")] private float fireCooldown = 1f;
     [SerializeField, Tooltip("How long the bolt cycle takes")] private float boltCycleTime = 1.5f;
     [SerializeField, Tooltip("Prefab of bullet object.")] private GameObject bulletPrefab;
+    [SerializeField, Tooltip("Prefab of bullet object.")] private Transform shotPoint;
     [SerializeField, Tooltip("Damage of rifle.")] private float damage = 0f;
 
 
@@ -19,13 +23,15 @@ public class Rifle : MonoBehaviour, IPlayerTool
     private bool isCycling = false;
 
     private Queue<Bullet> bulletPool = new Queue<Bullet>();
+    private PlayerAnimator animator;
 
 
     /// <summary>
     /// Initialization method.
     /// </summary>
-    public void Initialize()
+    public void Initialize(PlayerAnimator animator)
     {
+        this.animator = animator;
         currentAmmo = maxAmmo;
 
         // Initialize pool
@@ -36,6 +42,8 @@ public class Rifle : MonoBehaviour, IPlayerTool
             _bullet.gameObject.SetActive(false);
             bulletPool.Enqueue(_bullet);
         }
+
+        gameObject.SetActive(false);
     }
 
 
@@ -72,10 +80,10 @@ public class Rifle : MonoBehaviour, IPlayerTool
 
         // Get bullet from pool
         Bullet _bullet = bulletPool.Dequeue();
-        _bullet.transform.position = transform.position + transform.forward * 1.5f + Vector3.up * 1.2f;
-        _bullet.transform.rotation = Quaternion.identity;
+        _bullet.transform.position = shotPoint.position;
+        _bullet.transform.forward = shotPoint.forward;
         _bullet.gameObject.SetActive(true);
-        _bullet.Shoot(transform.forward);
+        _bullet.Shoot(shotPoint.forward);
 
         // Start the automatic bolt cycle
         StartCoroutine(AutoBoltCycle());
@@ -123,5 +131,17 @@ public class Rifle : MonoBehaviour, IPlayerTool
         currentAmmo = maxAmmo;
         isBoltClosed = true;
         canFire = true;
+    }
+
+    public void HideTool()
+    {
+        gameObject.SetActive(false);
+        animator.RemoveHands();
+    }
+
+    public void ShowTool()
+    {
+        gameObject.SetActive(true);
+        animator.GetRifle();
     }
 }
