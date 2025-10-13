@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Gameplay.Player
 {
@@ -31,7 +32,9 @@ namespace Gameplay.Player
                 _manager.SetState<PlayerWalking>();
 
             _playerMovement.ApplyGravity();
-            //_manager.Rotation.Rotate();
+            Vector2 playerInput = _manager.Input.Move;
+            _manager.Rotation.Rotate(playerInput, _manager.Input.Look.Value);
         }
+
     }
 }

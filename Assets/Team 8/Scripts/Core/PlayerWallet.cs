@@ -1,7 +1,5 @@
-using Core.Economy;
-
 using UnityEngine;
-
+using Core.Economy;
 public class PlayerWallet : MonoBehaviour
 {
     [Header("Player Currencies")]
