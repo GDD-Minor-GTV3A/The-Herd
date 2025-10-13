@@ -157,4 +157,41 @@ namespace Core.AI.Sheep
             }
         }
     }
+
+    /// <summary>
+    /// Freeze the sheep in place, disabling all behavior
+    /// </summary>
+    public class SheepFreezeState : IState
+    {
+        private readonly SheepStateManager _stateManager;
+
+        public SheepFreezeState(SheepStateManager context)
+        {
+            _stateManager = context;
+        }
+
+        public void OnStart()
+        {
+            if (_stateManager.CanControlAgent())
+            {
+                _stateManager.Agent.ResetPath();
+                _stateManager.Agent.isStopped = true;
+            }
+
+            _stateManager.Animation?.SetState((int)SheepAnimState.Idle);
+            _stateManager.DisableBehavior();
+        }
+
+        public void OnUpdate() {} // Sheep remains frozen, no updates needed
+
+        public void OnStop()
+        {
+            if (_stateManager.CanControlAgent())
+            {
+                _stateManager.Agent.isStopped = false;
+            }
+
+            _stateManager.EnableBehavior();
+        }
+    }
 }
