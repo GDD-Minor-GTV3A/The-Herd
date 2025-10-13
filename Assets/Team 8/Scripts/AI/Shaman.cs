@@ -24,7 +24,7 @@ namespace AI.Shaman
             Initialize();
         }
 
-        /// <summary>
+        /// <summary> 
         /// initialization method.
         /// </summary>
         public void Initialize()
