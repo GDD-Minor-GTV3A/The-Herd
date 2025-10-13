@@ -1,6 +1,6 @@
 using Core.Shared.StateMachine;
 
-namespace Gameplay.Dog 
+namespace Gameplay.Dog
 {
     /// <summary>
     /// Abstract class for all state for Dog.

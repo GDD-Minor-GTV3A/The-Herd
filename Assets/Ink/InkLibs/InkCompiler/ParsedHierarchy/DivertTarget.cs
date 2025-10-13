@@ -5,79 +5,95 @@ namespace Ink.Parsed
     {
         public Divert divert;
 
-        public DivertTarget (Divert divert)
+        public DivertTarget(Divert divert)
         {
             this.divert = AddContent(divert);
         }
 
-        public override void GenerateIntoContainer (Runtime.Container container)
+        public override void GenerateIntoContainer(Runtime.Container container)
         {
             divert.GenerateRuntimeObject();
 
-            _runtimeDivert = (Runtime.Divert) divert.runtimeDivert;
-            _runtimeDivertTargetValue = new Runtime.DivertTargetValue ();
+            _runtimeDivert = (Runtime.Divert)divert.runtimeDivert;
+            _runtimeDivertTargetValue = new Runtime.DivertTargetValue();
 
-            container.AddContent (_runtimeDivertTargetValue);
+            container.AddContent(_runtimeDivertTargetValue);
         }
 
-        public override void ResolveReferences (Story context)
+        public override void ResolveReferences(Story context)
         {
-            base.ResolveReferences (context);
+            base.ResolveReferences(context);
 
-            if( divert.isDone || divert.isEnd )
+            if (divert.isDone || divert.isEnd)
             {
                 Error("Can't Can't use -> DONE or -> END as variable divert targets", this);
                 return;
             }
 
             Parsed.Object usageContext = this;
-            while (usageContext && usageContext is Expression) {
+            while (usageContext && usageContext is Expression)
+            {
 
                 bool badUsage = false;
                 bool foundUsage = false;
 
                 var usageParent = usageContext.parent;
-                if (usageParent is BinaryExpression) {
+                if (usageParent is BinaryExpression)
+                {
 
                     // Only allowed to compare for equality
 
                     var binaryExprParent = usageParent as BinaryExpression;
-                    if (binaryExprParent.opName != "==" && binaryExprParent.opName != "!=") {
+                    if (binaryExprParent.opName != "==" && binaryExprParent.opName != "!=")
+                    {
                         badUsage = true;
-                    } else {
-                        if (!(binaryExprParent.leftExpression is DivertTarget || binaryExprParent.leftExpression is VariableReference)) {
+                    }
+                    else
+                    {
+                        if (!(binaryExprParent.leftExpression is DivertTarget || binaryExprParent.leftExpression is VariableReference))
+                        {
                             badUsage = true;
                         }
-                        if (!(binaryExprParent.rightExpression is DivertTarget || binaryExprParent.rightExpression is VariableReference)) {
+                        if (!(binaryExprParent.rightExpression is DivertTarget || binaryExprParent.rightExpression is VariableReference))
+                        {
                             badUsage = true;
                         }
                     }
                     foundUsage = true;
                 }
-                else if( usageParent is FunctionCall ) {
+                else if (usageParent is FunctionCall)
+                {
                     var funcCall = usageParent as FunctionCall;
-                    if( !funcCall.isTurnsSince && !funcCall.isReadCount ) {
+                    if (!funcCall.isTurnsSince && !funcCall.isReadCount)
+                    {
                         badUsage = true;
                     }
                     foundUsage = true;
                 }
-                else if (usageParent is Expression) {
+                else if (usageParent is Expression)
+                {
                     badUsage = true;
                     foundUsage = true;
                 }
-                else if (usageParent is MultipleConditionExpression) {
+                else if (usageParent is MultipleConditionExpression)
+                {
                     badUsage = true;
                     foundUsage = true;
-                } else if (usageParent is Choice && ((Choice)usageParent).condition == usageContext) {
+                }
+                else if (usageParent is Choice && ((Choice)usageParent).condition == usageContext)
+                {
                     badUsage = true;
                     foundUsage = true;
-                } else if (usageParent is Conditional || usageParent is ConditionalSingleBranch) {
+                }
+                else if (usageParent is Conditional || usageParent is ConditionalSingleBranch)
+                {
                     badUsage = true;
                     foundUsage = true;
                 }
 
-                if (badUsage) {
-                    Error ("Can't use a divert target like that. Did you intend to call '" + divert.target + "' as a function: likeThis(), or check the read count: likeThis, with no arrows?", this);
+                if (badUsage)
+                {
+                    Error("Can't use a divert target like that. Did you intend to call '" + divert.target + "' as a function: likeThis(), or check the read count: likeThis, with no arrows?", this);
                 }
 
                 if (foundUsage)
@@ -95,7 +111,7 @@ namespace Ink.Parsed
             // contain a divert target itself) since really we should be generating a variable reference
             // rather than a concrete DivertTarget, so we list it as an error.
             if (_runtimeDivert.hasVariableTarget)
-                Error ("Since '"+divert.target.dotSeparatedComponents+"' is a variable, it shouldn't be preceded by '->' here.");
+                Error("Since '" + divert.target.dotSeparatedComponents + "' is a variable, it shouldn't be preceded by '->' here.");
 
             // Main resolve
             _runtimeDivertTargetValue.targetPath = _runtimeDivert.targetPath;
@@ -104,18 +120,21 @@ namespace Ink.Parsed
             // TODO: Only detect DivertTargets that are values rather than being used directly for
             // read or turn counts. Should be able to detect this by looking for other uses of containerForCounting
             var targetContent = this.divert.targetContent;
-            if (targetContent != null ) {
+            if (targetContent != null)
+            {
                 var target = targetContent.containerForCounting;
                 if (target != null)
                 {
                     // Purpose is known: used directly in TURNS_SINCE(-> divTarg)
                     var parentFunc = this.parent as FunctionCall;
-                    if( parentFunc && parentFunc.isTurnsSince ) {
+                    if (parentFunc && parentFunc.isTurnsSince)
+                    {
                         target.turnIndexShouldBeCounted = true;
                     }
 
                     // Unknown purpose, count everything
-                    else {
+                    else
+                    {
                         target.visitsShouldBeCounted = true;
                         target.turnIndexShouldBeCounted = true;
                     }
@@ -137,10 +156,11 @@ namespace Ink.Parsed
                 var targetFlow = (targetContent as FlowBase);
                 if (targetFlow != null && targetFlow.arguments != null)
                 {
-                    foreach(var arg in targetFlow.arguments) {
-                        if(arg.isByReference)
+                    foreach (var arg in targetFlow.arguments)
+                    {
+                        if (arg.isByReference)
                         {
-                            Error("Can't store a divert target to a knot or function that has by-reference arguments ('"+targetFlow.identifier+"' has 'ref "+arg.identifier+"').");
+                            Error("Can't store a divert target to a knot or function that has by-reference arguments ('" + targetFlow.identifier + "' has 'ref " + arg.identifier + "').");
                         }
                     }
                 }
@@ -148,7 +168,7 @@ namespace Ink.Parsed
         }
 
         // Equals override necessary in order to check for CONST multiple definition equality
-        public override bool Equals (object obj)
+        public override bool Equals(object obj)
         {
             var otherDivTarget = obj as DivertTarget;
             if (otherDivTarget == null) return false;
@@ -156,17 +176,16 @@ namespace Ink.Parsed
             var targetStr = this.divert.target.dotSeparatedComponents;
             var otherTargetStr = otherDivTarget.divert.target.dotSeparatedComponents;
 
-            return targetStr.Equals (otherTargetStr);
+            return targetStr.Equals(otherTargetStr);
         }
 
-        public override int GetHashCode ()
+        public override int GetHashCode()
         {
             var targetStr = this.divert.target.dotSeparatedComponents;
-            return targetStr.GetHashCode ();
+            return targetStr.GetHashCode();
         }
 
         Runtime.DivertTargetValue _runtimeDivertTargetValue;
         Runtime.Divert _runtimeDivert;
     }
 }
-

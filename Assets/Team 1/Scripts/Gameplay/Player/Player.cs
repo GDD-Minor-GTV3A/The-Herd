@@ -1,10 +1,10 @@
-using System;
-
+using Gameplay.HealthSystem;
 using Gameplay.ToolsSystem;
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace Gameplay.Player 
+namespace Gameplay.Player
 {
     /// <summary>
     /// Base player script.
@@ -25,6 +25,8 @@ namespace Gameplay.Player
 
         private PlayerMovement _movementController;
         private PlayerRotation _rotationController;
+        private Health _health;
+
 
 
         // for test, needs to be moved to bootstrap
@@ -46,7 +48,7 @@ namespace Gameplay.Player
 
             playerInput.Initialize(_inputActions);
 
-            slotsController.Initialize(playerInput, 1);
+            slotsController.Initialize(playerInput, 2);
 
             CharacterController characterController = GetComponent<CharacterController>();
             _movementController.Initialize(characterController, _config);
@@ -57,8 +59,36 @@ namespace Gameplay.Player
             PlayerAnimator animator = new PlayerAnimator(_animator);
             stateManager.Initialize(playerInput, _movementController, animator, _rotationController);
 
+            // Init health
+            _health = new Health(
+                _config.MaxHealth,
+                _config.CurrentHealth,
+                _config.CanTakeDamage,
+                _config.CanBeHealed,
+                _config.CanDie
+            );
+            _health.OnHealthChanged += HandleHealthChanged;
+            _health.OnDeath += HandleDeath;
+
             _config.OnValueChanged += UpdateConfigValues;
+
         }
+        private void HandleHealthChanged(float current, float max)
+        {
+            Debug.Log($"Player health updated: {current}/{max}");
+        }
+
+        private void HandleDeath()
+        {
+            Debug.Log("Player died!");
+            _movementController.enabled = false;
+            _rotationController.enabled = false;
+            _animator.SetTrigger("Die");
+        }
+
+        // Gameplay entry points
+        public void TakeDamage(float amount) => _health.TakeDamage(amount);
+        public void Heal(float amount) => _health.Heal(amount);
 
 
         /// <summary>
