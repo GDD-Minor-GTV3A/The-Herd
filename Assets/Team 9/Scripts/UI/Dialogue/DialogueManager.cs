@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Core.Events;
 using Ink.Runtime;
@@ -82,7 +83,12 @@ public class DialogueManager : MonoBehaviour
             _choicesText[i] = _choices[i].GetComponentInChildren<TextMeshProUGUI>();
         }
     }
-    
+
+    private void OnEnable()
+    {
+        EventManager.AddListener<QuestCompletedEvent>(OnQuestCompleted);
+    }
+
 
     private void Update()
     {
@@ -441,10 +447,11 @@ public class DialogueManager : MonoBehaviour
     /// <summary>
     /// Called by QuestManager when a quest is completed to update dialogue state
     /// </summary>
-    public void OnQuestCompleted(string questID)
+    public void OnQuestCompleted(QuestCompletedEvent evt)
     {
         // Map quest IDs to their corresponding Ink variables
         // Example: "QUEST_001" -> "vesna_quest_completed"
+        string questID = evt.QuestID;
         string inkVariableName = questID + "_completed";
         if (!string.IsNullOrEmpty(inkVariableName))
         {
