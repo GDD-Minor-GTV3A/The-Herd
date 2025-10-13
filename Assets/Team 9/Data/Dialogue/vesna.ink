@@ -1,32 +1,40 @@
 VAR quest_accepted = false
+VAR all_objectives_completed = false
 VAR QUEST_001_completed = false
 VAR quest_declined = false
+VAR after_quest_completed = false
 
 EXTERNAL StartQuest(string)
 EXTERNAL CompleteObjective(string, string)
 
-// START HERE: Entry point that routes to correct dialogue based on state
--> vesna_quest_router
+// Entry point
+-> vesna_router
 
-=== vesna_quest_router ===
-// Check quest state and route to appropriate dialogue
-{ QUEST_001_completed:
-    -> vesna_quest.quest_completed_dialogue
+=== vesna_router ===
+{ after_quest_completed:
+    -> vesna.after_quest_completed_dialogue
 - else:
-    { quest_accepted:
-        -> vesna_quest.quest_in_progress_dialogue
+    { QUEST_001_completed:
+        -> vesna.quest_completed_dialogue
     - else:
-        { quest_declined:
-            -> vesna_quest.quest_declined_followup
+        { all_objectives_completed:
+            -> vesna.quest_completed_dialogue
         - else:
-            -> vesna_quest.intro_dialogue
+            { quest_accepted:
+                -> vesna.quest_in_progress_dialogue
+            - else:
+                { quest_declined:
+                    -> vesna.quest_declined_followup_dialogue
+                - else:
+                    -> vesna.intro_dialogue
+                }
+            }
         }
     }
 }
 
-=== vesna_quest ===
+=== vesna ===
 
-// --- Initial Meeting Dialogue ---
 = intro_dialogue
 #speaker:Vesna
 Oh, hello there. You must be the newcomer to our Village? It is nice to meet you.
@@ -43,18 +51,15 @@ I see. Did you come here by accident or were you running from something like mos
 + [I don't think that's any of your business.]
     #speaker:Vesna
     Forgive me, you are right. Your reasons are your reasons alone and I will respect that.
-    -> after_first_choice
 + [My past.]
     #speaker:Vesna
     Ah, this is the sad reality of so many of us. I am sorry that you've felt the need to do that.
-    -> after_first_choice
 + [Don't say anything.]
     #speaker:Vesna
     I understand your silence, forgive me for my bluntness. I hope you do not have to keep running and feel safe enough to stay in one place.
-    -> after_first_choice
 
-// --- Continuation Dialogue Block after the first choice ---
-= after_first_choice
+-
+
 #speaker:Vesna
 Is there anything I can help you with?
 
@@ -88,25 +93,17 @@ She touches the wrist of her right hand and shakes her head as if trying to shoo
 #speaker:Vesna
 I lost something very precious to me. My bracelet, gifted to me by one of the wild horses in the valley, made by their hair and the gold from the soil underneath their feet.
 
--> quest_pitch_choice
-
-// --- Second Dialogue Block and Choice ---
-= quest_pitch_choice
 + [How precious exactly was it?]
     #speaker:Vesna
     Very precious. It is one of a kind and worn by a Samodiva at that. If it has to be translated in human terms, it costs a fortune that can last you a lifetime.
-    -> after_second_choice
 + [I don't see how this is of any relevance to me.]
     #speaker:Vesna
     Perhaps it is not. But at the very least, you have your sheep with you who look just as precious to me. I wouldn't wish to lose them the way I lost my bracelet.
-    -> after_second_choice
 + [Kueze 3]
     #speaker:Vesna
     goede keuze
-    -> after_second_choice
+-
 
-// --- Final Decision Block ---
-= after_second_choice
 #speaker:Vesna
 Maybe you could help me find it?
 
@@ -132,20 +129,23 @@ Yes, precisely.
     ~ quest_accepted = true
     ~ quest_declined = false
     ~ StartQuest("QUEST_001")
+
     #speaker:Vesna
     That is very helpful of you! Thank you. You will have to head out to **[Level 2]** and look around as much as possible. I went through that area before I came here and it's the last time I remember wearing it.
+
     #speaker:Player
     I will have a look. I hope this will be worth my efforts.
     -> END
+
 + [Decline quest: I have more important matters to attend to than this]
     ~ quest_accepted = false
     ~ quest_declined = true
+
     #speaker:Vesna
     That is no problem. I will be here if you decide otherwise.
     -> END
 
-// --- Quest Declined Follow-up Dialogue ---
-= quest_declined_followup
+= quest_declined_followup_dialogue
 #speaker:Vesna
 Oh, hello again. Have you reconsidered my request?
 
@@ -158,25 +158,26 @@ My bracelet. The one I lost in **[Level 2]**. I understand you were busy before,
 #speaker:Vesna
 As I mentioned, I would be in your debt. My connection to nature and animals could be invaluable to you and your sheep.
 
-#speaker:Player
-I see.
-
 + [Accept quest: Alright, I'll help you find it]
     ~ quest_accepted = true
     ~ quest_declined = false
     ~ StartQuest("QUEST_001")
+
     #speaker:Vesna
     Wonderful! I truly appreciate this. Please search **[Level 2]** thoroughly. I'm certain it must be there somewhere.
+
     #speaker:Player
     I'll see what I can find.
     -> END
+
 + [Decline quest: No, I still have other priorities]
-    ~ quest_accepted = true
+    ~ quest_accepted = false
+    ~ quest_declined = true
+
     #speaker:Vesna
     I understand. The offer remains open whenever you're ready.
     -> END
 
-// --- Quest In Progress Dialogue ---
 = quest_in_progress_dialogue
 #speaker:Vesna
 Oh, hello again! Have you found my bracelet yet?
@@ -189,12 +190,11 @@ I understand. Please take your time. Remember, it should be somewhere in **[Leve
 
 #speaker:Player
 I'll keep looking.
-
 -> END
 
-// --- Quest Completed Dialogue ---
 = quest_completed_dialogue
 ~ QUEST_001_completed = true
+
 #speaker:Vesna
 Welcome back! I can see by the look in your eyes that you have good news for me.
 
@@ -210,4 +210,12 @@ Vesna carefully takes the bracelet and puts it on her wrist, her eyes glistening
 #speaker:Vesna
 If you ever need my help with your sheep or anything else within my power, please do not hesitate to ask.
 
+~ after_quest_completed = true
+-> END
+
+= after_quest_completed_dialogue
+~ after_quest_completed = true
+
+#speaker:Vesna
+Thanks but now go away please
 -> END

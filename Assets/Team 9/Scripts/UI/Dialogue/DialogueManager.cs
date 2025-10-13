@@ -449,8 +449,6 @@ public class DialogueManager : MonoBehaviour
     /// </summary>
     public void OnQuestCompleted(QuestCompletedEvent evt)
     {
-        // Map quest IDs to their corresponding Ink variables
-        // Example: "QUEST_001" -> "vesna_quest_completed"
         string questID = evt.QuestID;
         string inkVariableName = questID + "_completed";
         if (!string.IsNullOrEmpty(inkVariableName))
