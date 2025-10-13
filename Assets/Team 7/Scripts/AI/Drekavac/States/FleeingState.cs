@@ -1,12 +1,12 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace _Game.Team_7.Scripts.Drekavac.States
+namespace Team_7.Scripts.AI.Drekavac.States
 {
     /// <summary>
     ///     Handles the behavior of an enemy while it's trying to run away.
     /// </summary>
-    public class FleeingState : GenericEnemyState
+    public class FleeingState : DrekavacState
     {
         private Vector3 fleeTarget;                       // Escape target position
 

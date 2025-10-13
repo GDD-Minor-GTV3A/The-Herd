@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 
-using _Game.Team_7.Scripts.Drekavac.States;
-
 using Core.Shared.StateMachine;
+
+using Team_7.Scripts.AI.Drekavac.States;
 
 using UnityEngine;
 
-namespace _Game.Team_7.Scripts.Drekavac
+namespace Team_7.Scripts.AI.Drekavac
 {
     /// <summary>
     ///     Manages the behavior of a "Drekavac" type enemy, adding this component to an object makes it behave like a "Drekavac".
@@ -18,6 +18,7 @@ namespace _Game.Team_7.Scripts.Drekavac
         private AudioController _audioController = null!;
         private EnemyMovementController _enemyMovementController = null!;
         private DrekavacAnimatorController _drekavacAnimatorController = null!;
+        private GameObject _playerObject;
         private Vector3 _playerLocation;
         private Transform _grabPoint = null!;
         private GameObject? _grabbedObject;
@@ -64,7 +65,10 @@ namespace _Game.Team_7.Scripts.Drekavac
             // Find player by tag (still needed for dragging/abort) //TODO replace this
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
             if (playerObj != null)
+            {
                 _playerLocation = playerObj.transform.position;
+                _playerObject = playerObj;
+            }
             else
             {
                 Debug.LogError("EnemyAI: No object with tag 'Player' found!");
@@ -97,6 +101,7 @@ namespace _Game.Team_7.Scripts.Drekavac
         protected override void Update()
         {
             base.Update();
+            _playerLocation = _playerObject.transform.position;
             if (_currentState is not FleeingState && Vector3.Distance(transform.position, _playerLocation) <= _drekavacStats.fleeTriggerDistance)
                 Flee();
         }

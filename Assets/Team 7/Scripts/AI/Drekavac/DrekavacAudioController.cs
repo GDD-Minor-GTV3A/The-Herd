@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace _Game.Team_7.Scripts.Drekavac
+namespace Team_7.Scripts.AI.Drekavac
 {
     /// <summary>
     ///     Handles playing audio for an enemy.

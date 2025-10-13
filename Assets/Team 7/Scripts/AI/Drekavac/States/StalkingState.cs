@@ -1,13 +1,14 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace _Game.Team_7.Scripts.Drekavac.States
+namespace Team_7.Scripts.AI.Drekavac.States
 {
     /// <summary>
     ///     Handles the behavior of an enemy while it's stalking a target.
     /// </summary>
-    public class StalkingState : GenericEnemyState
+    public class StalkingState : DrekavacState
     {
+        private readonly DrekavacStateManager _manager;
         private Vector3 _circleCenter;                      // Fixed center of circling
         private float _angleOffset;                         // Angle used for circling calculations
         private int _circleDirection;                       // 1 or -1 for clockwise/counterclockwise
@@ -16,7 +17,10 @@ namespace _Game.Team_7.Scripts.Drekavac.States
         private float _stalkEndTime;                        // When to stop stalking and start hunting
         private GameObject[] _sheep = { };
         
-        public StalkingState(DrekavacStateManager manager, EnemyMovementController movement, DrekavacStats stats, DrekavacAnimatorController animator, AudioController audio) : base(manager, movement, stats, animator, audio) { }
+        public StalkingState(DrekavacStateManager manager, EnemyMovementController movement, DrekavacStats stats, DrekavacAnimatorController animator, AudioController audio) : base(manager, movement, stats, animator, audio)
+        {
+            _manager = manager;
+        }
 
         public override void OnStart()
         {

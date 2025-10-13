@@ -1,11 +1,11 @@
 using UnityEngine;
 
-namespace _Game.Team_7.Scripts.Drekavac.States
+namespace Team_7.Scripts.AI.Drekavac.States
 {
     /// <summary>
     ///     Handles the behavior of an enemy while it's trying to home in on a target.
     /// </summary>
-    public class HuntingState : GenericEnemyState
+    public class HuntingState : DrekavacState
     {
         public HuntingState(DrekavacStateManager manager, EnemyMovementController movement, DrekavacStats stats, DrekavacAnimatorController animator, AudioController audio) : base(manager, movement, stats, animator, audio) { }
 
