@@ -129,7 +129,7 @@ public class DrekavacAI : MonoBehaviour
         // Despawn only if dragging a sheep and too far from player
         if (grabbedSheep != null && Vector3.Distance(transform.position, player.position) > despawnDistance)
         {
-            Destroy(grabbedSheep); // <-- Added by Chris from Implementation Team
+            Destroy(grabbedSheep); // IMP01 - Chris
             ReleaseGrabbedSheep();
             Destroy(gameObject);
             return;
@@ -262,8 +262,9 @@ public class DrekavacAI : MonoBehaviour
     {
         if (sheep == null) return;
 
-        //IMP02 CODE FOR DISABELING SHEEP AI WHEN GRABBED
-
+        // IMP02 Disable sheep's AI - Chris
+        sheep.GetComponent <SheepStateManager>().enabled = false;
+        sheep.GetComponent<NavMeshAgent>().enabled = false;
         // 
 
         agent.isStopped = true;
@@ -413,6 +414,11 @@ public class DrekavacAI : MonoBehaviour
 
         if (grabbedSheepRb != null)
             grabbedSheepRb.isKinematic = grabbedSheepOriginalKinematic;
+
+        // IMP03 Return Sheep's AI - Chris
+        grabbedSheep.GetComponent<SheepStateManager>().enabled = true;
+        grabbedSheep.GetComponent<NavMeshAgent>().enabled = true;
+        //
 
         grabbedSheep = null;
         grabbedSheepRb = null;
