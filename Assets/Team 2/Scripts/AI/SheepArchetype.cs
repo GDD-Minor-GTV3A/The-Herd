@@ -20,12 +20,6 @@ namespace Core.AI.Sheep.Config
         [SerializeField] private AnimatorOverrideController _animationOverrides;
         //[SerializeField] private int _idleVariantCount = 2;
 
-
-        [Header("Sounds")]
-        [Tooltip("Sound clips for the bleat sound.")] [SerializeField]
-        public AudioClip[] BleatSounds;
-
-
         [Header("Grazing interval in seconds")]
         [SerializeField]
         private float _grazeIntervalMin = 3.0f;

@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Gameplay.ToolsSystem
 {
     /// <summary>
-    /// Tool for controlling dogs.
+    /// Tool for dogs controlls.
     /// </summary>
     public class Whistle : MonoBehaviour, IPlayerTool
     {
@@ -28,17 +28,19 @@ namespace Gameplay.ToolsSystem
 
         public void Reload()
         {
-            Debug.Log("Bark!!!");
+            return;
         }
 
         public void SecondaryUsageFinished()
         {
+            return;
         }
 
         public void SecondaryUsageStarted(Observable<Vector3> cursorWorldPosition)
         {
             EventManager.Broadcast(new DogFollowCommandEvent());
         }
+
 
         private void SendDogMoveCommand()
         {

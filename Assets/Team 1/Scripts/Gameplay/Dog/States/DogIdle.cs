@@ -30,7 +30,7 @@ namespace Gameplay.Dog
 
         public override void OnStart()
         {
-            _manager.CurrentCommandTarget.OnValueChanged += OnTargetChanged;
+            _manager.CurrentTarget.OnValueChanged += OnTargetChanged;
             _animator.SetWalking(false);
         }
 
@@ -42,15 +42,11 @@ namespace Gameplay.Dog
                 _delayCoroutine = null;
             }
 
-            _manager.CurrentCommandTarget.OnValueChanged -= OnTargetChanged;
+            _manager.CurrentTarget.OnValueChanged -= OnTargetChanged;
         }
 
         public override void OnUpdate()
         {
-            if (_manager.HeardZone.IsFreeSheepToHeard())
-                _manager.SetState<DogMoveToSheep>();
-
-
             if (Vector3.Distance(_manager.MovementController.transform.position, _player.position) > _distanceToStartFollow && _delayCoroutine == null)
                 _delayCoroutine = _manager.StartCoroutine(MoveDelay());
         }

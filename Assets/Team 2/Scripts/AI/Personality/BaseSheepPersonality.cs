@@ -69,9 +69,7 @@ namespace Core.AI.Sheep.Personality
 
         public virtual void SetDestinationWithHerding(Vector3 destination, SheepStateManager sheep, PersonalityBehaviorContext context)
         {
-            Vector3 goal = context.HasThreat && context.Threats.Count > 0
-                ? ComputeEscapeDestination(sheep, context) : destination;
-            Vector3 desired = goal - sheep.transform.position;
+            Vector3 desired = destination - sheep.transform.position;
             desired.y = 0f;
 
             float sepDist = sheep.Config?.SeparationDistance ?? 0.8f;
@@ -90,61 +88,12 @@ namespace Core.AI.Sheep.Personality
 
             Vector3 final = sheep.transform.position + desired + steer;
 
-            if (sheep.CanControlAgent())
+            // Apply speed and set destination
+            if (sheep.Agent != null)
             {
-                float baseSpeed = sheep.Config?.BaseSpeed ?? 2.2f;
-                bool isFLeeing = context.HasThreat;
-                
-                sheep.Agent.speed = isFLeeing ? baseSpeed * 1.5f : baseSpeed;
+                sheep.Agent.speed = sheep.Config?.BaseSpeed ?? 2.2f;
                 sheep.Agent.SetDestination(final);
-
-                if (isFLeeing)
-                {
-                    Vector3 look = final - sheep.transform.position;
-                    look.y = 0f;
-                    if (look.sqrMagnitude > 0.0001f)
-                    {
-                        var q = Quaternion.LookRotation(look);
-                        sheep.transform.rotation = Quaternion.Slerp(sheep.transform.rotation, q, Time.deltaTime * 10f);
-                    }
-                }
             }
-        }
-
-        protected virtual Vector3 ComputeEscapeDestination(SheepStateManager sheep, PersonalityBehaviorContext ctx)
-        {
-            Vector3 myPos = sheep.transform.position;
-            Vector3 flee = Vector3.zero;
-
-            foreach (var t in ctx.Threats)
-            {
-                if (!t) continue;
-                Vector3 away = myPos - t.position;
-                away.y = 0f;
-                float d = Mathf.Max(away.magnitude, 0.25f);
-
-                float w = 1f / (d * d);
-
-                if (ctx.ThreatRadius.TryGetValue(t, out float r) && r > 0.01f)
-                {
-                    float boost = Mathf.Clamp01(1f + (r - d) / r);
-                    w *= boost;
-                }
-
-                flee += away.normalized * w;
-            }
-
-            if (flee.sqrMagnitude < 0.0001f)
-            {
-                return myPos;
-            }
-
-            flee.Normalize();
-
-            float fleeSeconds = Mathf.Max(sheep.Config?.WalkAwayFromHerdTicks ?? 2f, 1.5f);
-            float fleeDist = fleeSeconds * (sheep.Config?.BaseSpeed ?? 2.2f);
-
-            return myPos + flee * fleeDist;
         }
 
         public virtual Type GetNextState(Type currentState, Type proposedState, SheepStateManager sheep, PersonalityBehaviorContext context)
