@@ -1,3 +1,3 @@
-That's your team folder! Here you can work freely with your team.
+Link to Branch Documentation:
+  https://docs.google.com/document/d/1fqqB83nMdmMMzhQbbOyj5ZIgkWfiq-FpUc6KrVoLDQI/edit?usp=sharing
 
-Enjoy!
