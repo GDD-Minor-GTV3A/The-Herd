@@ -13,7 +13,7 @@ public class DialogueTrigger : MonoBehaviour
     private const string PLAYER_TAG = "Player";
 
     /// <summary>
-    /// When the player enters the trigger zone, a text will appear saying "Press E to interact"
+    /// When the player enters the trigger zone, a text will appear saying "Press G to interact"
     /// </summary>
     /// <param name="other"></param>
     private void OnTriggerEnter(Collider other)
@@ -46,7 +46,7 @@ public class DialogueTrigger : MonoBehaviour
         {
             _interText.enabled = true;
         }
-        if (Input.GetKey(KeyCode.E))
+        if (Input.GetKey(KeyCode.G))
         {
             DialogueManager.GetInstance().EnterDialogueMode(_inkJSON);
         }
