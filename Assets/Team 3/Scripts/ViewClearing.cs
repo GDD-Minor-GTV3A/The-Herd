@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-
 using UnityEngine;
 
 public class ViewClearing : MonoBehaviour
@@ -17,7 +16,7 @@ public class ViewClearing : MonoBehaviour
     void Awake()
     {
         HandledObjects = new List<Transform>();
-
+        
     }
 
 

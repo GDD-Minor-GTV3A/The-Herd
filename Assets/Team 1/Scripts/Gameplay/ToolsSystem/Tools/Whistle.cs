@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Gameplay.ToolsSystem
 {
     /// <summary>
-    /// Tool for dogs controlls.
+    /// Tool for controlling dogs.
     /// </summary>
     public class Whistle : MonoBehaviour, IPlayerTool
     {
@@ -43,12 +43,11 @@ namespace Gameplay.ToolsSystem
 
         public void Reload()
         {
-            return;
+            Debug.Log("Bark!!!");
         }
 
         public void SecondaryUsageFinished()
         {
-            return;
         }
 
         public void SecondaryUsageStarted(Observable<Vector3> cursorWorldPosition)
