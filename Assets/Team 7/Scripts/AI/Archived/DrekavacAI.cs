@@ -284,8 +284,8 @@ public class DrekavacAI : MonoBehaviour
         if (sheep == null) return;
 
         // IMP02 Disable sheep's AI - Chris
-        sheep.GetComponent <SheepStateManager>().enabled = false;
-        sheep.GetComponent<NavMeshAgent>().enabled = false;
+        //sheep.GetComponent <SheepStateManager>().enabled = false;
+        //sheep.GetComponent<NavMeshAgent>().enabled = false;
         // 
 
         agent.isStopped = true;
@@ -433,8 +433,8 @@ public class DrekavacAI : MonoBehaviour
             grabbedSheepRb.isKinematic = grabbedSheepOriginalKinematic;
 
         // IMP03 Return Sheep's AI - Chris
-        grabbedSheep.GetComponent<SheepStateManager>().enabled = true;
-        grabbedSheep.GetComponent<NavMeshAgent>().enabled = true;
+        //grabbedSheep.GetComponent<SheepStateManager>().enabled = true;
+        //grabbedSheep.GetComponent<NavMeshAgent>().enabled = true;
         //
 
         grabbedSheep = null;
