@@ -1,6 +1,6 @@
-using _Game.Team_7.Scripts;
+using Core;
 
-namespace Team_7.Scripts.AI.Drekavac.States
+namespace AI.Drekavac.States
 {
     public class DrekavacState : GenericEnemyState
     {
@@ -8,7 +8,8 @@ namespace Team_7.Scripts.AI.Drekavac.States
         protected readonly DrekavacStateManager _manager;
         protected readonly DrekavacStats _stats;
 
-        protected DrekavacState(DrekavacStateManager manager, EnemyMovementController movement, DrekavacStats stats, DrekavacAnimatorController animator, AudioController audio) : base(movement, audio)
+        protected DrekavacState(DrekavacStateManager manager, EnemyMovementController movement, DrekavacStats stats, DrekavacAnimatorController animator, AudioController audio)
+            : base(movement, audio)
         {
             _animator = animator;
             _manager = manager;

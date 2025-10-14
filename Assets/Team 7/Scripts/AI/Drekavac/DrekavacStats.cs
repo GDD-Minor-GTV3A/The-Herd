@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Team_7.Scripts.AI.Drekavac
+namespace AI.Drekavac
 {
     /// <summary>
     ///     Holds all the parameters that a "Drekavac" type enemy will need to function.

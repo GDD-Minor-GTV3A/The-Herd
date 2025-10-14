@@ -1,6 +1,7 @@
+using Core;
 using Core.Shared.StateMachine;
 
-namespace Team_7.Scripts.AI
+namespace AI
 {
     /// <summary>
     ///     Base enemy state class

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Team_7.Scripts.AI.Phantom
+namespace AI.Phantom
 {
     public class PhantomProjectile : MonoBehaviour
     {

@@ -1,15 +1,18 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace _Game.Team_7.Scripts
+namespace Core
 {
     /// <summary>
     ///     Handles the logic for spawning enemies.
     /// </summary>
     public class SpawnEnemy : MonoBehaviour
     {
+        [Header("Enemy to spawn")]
         public GameObject Drekavac;
         public GameObject Phantom;
+
+        [Header("Spawn distance")]
         public float maxDistance;
         public float minDistance;
 

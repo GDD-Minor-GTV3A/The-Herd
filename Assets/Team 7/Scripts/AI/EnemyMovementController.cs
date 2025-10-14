@@ -3,22 +3,17 @@ using Core.Shared;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace Team_7.Scripts.AI
+namespace AI
 {
+    [RequireComponent(typeof(NavMeshAgent))]
     public class EnemyMovementController : MovementController
     {
         public NavMeshAgent Agent { get; private set; }
-        private float _moveSpeed = 3.5f;
+        [SerializeField] private float _moveSpeed = 3.5f;
     
         public void Initialize()
         {
             Agent = GetComponent<NavMeshAgent>();
-            if (Agent is null)
-            {
-                Debug.LogError("EnemyAI: No NavMeshAgent component found.");
-                enabled = false;
-                return;
-            }
             Agent.speed = _moveSpeed;
         }
 

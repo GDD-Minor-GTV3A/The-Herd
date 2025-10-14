@@ -1,9 +1,8 @@
-using _Game.Team_7.Scripts;
-
 using UnityEngine;
 using UnityEngine.AI;
+using Core;
 
-namespace Team_7.Scripts.AI.Drekavac.States
+namespace AI.Drekavac.States
 {
     /// <summary>
     ///     Handles the behavior of an enemy while it's stalking a target.
@@ -18,7 +17,8 @@ namespace Team_7.Scripts.AI.Drekavac.States
         private float _stalkEndTime;                        // When to stop stalking and start hunting
         private GameObject[] _sheep = { };
         
-        public StalkingState(DrekavacStateManager manager, EnemyMovementController movement, DrekavacStats stats, DrekavacAnimatorController animator, AudioController audio) : base(manager, movement, stats, animator, audio) { }
+        public StalkingState(DrekavacStateManager manager, EnemyMovementController movement, DrekavacStats stats, DrekavacAnimatorController animator, AudioController audio)
+            : base(manager, movement, stats, animator, audio) { }
 
         public override void OnStart()
         {

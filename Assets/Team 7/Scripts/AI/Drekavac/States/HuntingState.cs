@@ -1,15 +1,15 @@
-using _Game.Team_7.Scripts;
-
 using UnityEngine;
+using Core;
 
-namespace Team_7.Scripts.AI.Drekavac.States
+namespace AI.Drekavac.States
 {
     /// <summary>
     ///     Handles the behavior of an enemy while it's trying to home in on a target.
     /// </summary>
     public class HuntingState : DrekavacState
     {
-        public HuntingState(DrekavacStateManager manager, EnemyMovementController movement, DrekavacStats stats, DrekavacAnimatorController animator, AudioController audio) : base(manager, movement, stats, animator, audio) { }
+        public HuntingState(DrekavacStateManager manager, EnemyMovementController movement, DrekavacStats stats, DrekavacAnimatorController animator, AudioController audio)
+            : base(manager, movement, stats, animator, audio) { }
 
         public override void OnStart()
         {
@@ -20,7 +20,7 @@ namespace Team_7.Scripts.AI.Drekavac.States
         public override void OnUpdate()
         {
             var sheepObjects = _manager.GetSheep();
-            if (sheepObjects.Length == 0) 
+            if (sheepObjects.Length == 0)
                 return;
 
             GameObject? closestSheep = null;

@@ -1,16 +1,17 @@
-using _Game.Team_7.Scripts;
+using Core;
 
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace Team_7.Scripts.AI.Drekavac.States
+namespace AI.Drekavac.States
 {
     /// <summary>
     ///     Handles the behavior of an enemy while it's dragging an object.
     /// </summary>
     public class DraggingState : DrekavacState
     {
-        public DraggingState(DrekavacStateManager manager, EnemyMovementController movement, DrekavacStats stats, DrekavacAnimatorController animator, AudioController audio) : base(manager, movement, stats, animator, audio) { }
+        public DraggingState(DrekavacStateManager manager, EnemyMovementController movement, DrekavacStats stats, DrekavacAnimatorController animator, AudioController audio)
+            : base(manager, movement, stats, animator, audio) { }
 
         public override void OnStart()
         {

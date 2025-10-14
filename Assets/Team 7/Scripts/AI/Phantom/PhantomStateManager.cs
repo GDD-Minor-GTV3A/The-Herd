@@ -1,23 +1,20 @@
 using System;
 using System.Collections.Generic;
-
-using _Game.Team_7.Scripts;
-using _Game.Team_7.Scripts.Phantom;
-
-using Core.Shared.StateMachine;
-
-using Team_7.Scripts.AI.Phantom.States;
-
 using UnityEngine;
+using Core;
+using Core.Shared.StateMachine;
+using Phantom;
 
 using Random = UnityEngine.Random;
+using AI.Phantom.States;
+using Core.Shared.Utilities;
 
-namespace Team_7.Scripts.AI.Phantom
+namespace AI.Phantom
 {
     public class PhantomStateManager : CharacterStateManager<IState>
     {
-        [SerializeField]private PhantomStats stats;
-        [SerializeField]private GameObject projectileSpawn;
+        [SerializeField][Required] private PhantomStats stats;
+        [SerializeField] private GameObject projectileSpawn;
         private EnemyMovementController _enemyMovementController;
         private PhantomAnimatorController _phantomAnimatorController;
         private AudioController _audioController;
@@ -48,6 +45,10 @@ namespace Team_7.Scripts.AI.Phantom
             }
             _phantomAnimatorController = _phantomAnimatorController = new PhantomAnimatorController(animator);
             _animatorController = _phantomAnimatorController;
+
+            // IMP01 - Samuele
+            var _audioSource = GetComponent<AudioSource>();
+            _audioController = new AudioController(_audioSource);
             
             InitializeStatesMap();
             

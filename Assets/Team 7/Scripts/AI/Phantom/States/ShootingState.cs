@@ -1,9 +1,8 @@
-using _Game.Team_7.Scripts;
-using _Game.Team_7.Scripts.Phantom;
-
 using UnityEngine;
+using Phantom;
+using Core;
 
-namespace Team_7.Scripts.AI.Phantom.States
+namespace AI.Phantom.States
 {
     public class ShootingState : PhantomState
     {
@@ -11,9 +10,8 @@ namespace Team_7.Scripts.AI.Phantom.States
         private PhantomProjectile projectile;
         private float _lastShot;
 
-        public ShootingState(PhantomStateManager manager, EnemyMovementController movement, PhantomStats stats, PhantomAnimatorController animator, AudioController audio) : base(manager, movement, stats, animator, audio)
-        {
-        }
+        public ShootingState(PhantomStateManager manager, EnemyMovementController movement, PhantomStats stats, PhantomAnimatorController animator, AudioController audio)
+            : base(manager, movement, stats, animator, audio) { }
         
         public override void OnStart()
         {

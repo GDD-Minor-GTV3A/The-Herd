@@ -1,89 +1,66 @@
 using System;
 using System.Collections.Generic;
-
-using _Game.Team_7.Scripts;
-
-using Core.Shared.StateMachine;
-
-using Team_7.Scripts.AI.Drekavac.States;
-
 using UnityEngine;
+using Core;
+using Core.Shared.StateMachine;
+using AI.Drekavac.States;
+using Core.Shared.Utilities;
 
-namespace Team_7.Scripts.AI.Drekavac
+namespace AI.Drekavac
 {
     /// <summary>
     ///     Manages the behavior of a "Drekavac" type enemy, adding this component to an object makes it behave like a "Drekavac".
     /// </summary>
+    [RequireComponent(typeof(EnemyMovementController), typeof(AudioSource))]
     public class DrekavacStateManager : CharacterStateManager<IState>
     {
-        [SerializeField] private DrekavacStats _drekavacStats = null!;
-        private AudioController _audioController = null!;
-        private EnemyMovementController _enemyMovementController = null!;
-        private DrekavacAnimatorController _drekavacAnimatorController = null!;
+        [SerializeField][Required] private DrekavacStats _drekavacStats;
+        private AudioController _audioController;
+        private EnemyMovementController _enemyMovementController;
+        private DrekavacAnimatorController _drekavacAnimatorController;
         private GameObject _playerObject;
         private Vector3 _playerLocation;
         private Transform _grabPoint = null!;
-        private GameObject? _grabbedObject;
-        private Rigidbody? _grabbedObjectRb;
+        private GameObject _grabbedObject;
+        private Rigidbody _grabbedObjectRb;
         private bool _grabbedObjectOriginalKinematic;
         private GameObject[] _sheep = { }; // All the sheep in the scene
 
         public void Initialize()
         {
             _enemyMovementController = GetComponent<EnemyMovementController>();
-            if (_enemyMovementController is null)
-            {
-                Debug.LogWarning("A Drekavac enemy is missing it's EnemyMovementController component, a new EnemyMovementController has been created");
-                _enemyMovementController = gameObject.AddComponent<EnemyMovementController>();
-            }
             _movementController = _enemyMovementController;
-        
-            var animatorControllerComponent = GetComponentInChildren<Animator>();
+
             Animator animator = GetComponentInChildren<Animator>();
-            if (animatorControllerComponent is null)
+            if (animator == null)
             {
                 Debug.LogWarning("A Drekavac enemy is missing it's Animator component, a new Animator has been created");
                 animator = gameObject.AddComponent<Animator>();
             }
             _drekavacAnimatorController = new DrekavacAnimatorController(animator);
             _animatorController = _drekavacAnimatorController;
-        
-            if (_drekavacStats.screechSound is null || _drekavacStats.chompSound is null || _drekavacStats.snarlSound is null)
+
+            if (_drekavacStats.screechSound == null || _drekavacStats.chompSound == null || _drekavacStats.snarlSound == null)
                 Debug.LogWarning("A Drekavac enemy is missing one or more audio files.");
             else
             {
                 var audioSource = GetComponent<AudioSource>();
-                if (audioSource is null)
-                {
-                    Debug.LogWarning("A Drekavac enemy is missing it's AudioSource component, a new AudioSource has been created");
-                    audioSource = gameObject.AddComponent<AudioSource>();
-                }
                 _audioController = new AudioController(audioSource);
                 _audioController.PlayClip(_drekavacStats.screechSound);
             }
-        
+
             InitializeStatesMap();
 
-            // Find player by tag (still needed for dragging/abort) //TODO replace this
-            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-            if (playerObj != null)
-            {
-                _playerLocation = playerObj.transform.position;
-                _playerObject = playerObj;
-            }
-            else
-            {
-                Debug.LogError("EnemyAI: No object with tag 'Player' found!");
-                enabled = false;
-                return;
-            }
-            
+            _playerObject = GameObject.FindGameObjectWithTag("Player");
+            _playerLocation = _playerObject.transform.position;
+
             // Find sheep
             // TODO replace this
             _sheep = GameObject.FindGameObjectsWithTag("Sheep");
-        
+
             SetState<StalkingState>();
         }
+        
         protected override void InitializeStatesMap()
         {
             StatesMap = new Dictionary<Type, IState>
@@ -206,7 +183,7 @@ namespace Team_7.Scripts.AI.Drekavac
             return _drekavacStats;
         }
 
-        public GameObject? GetGrabbedObject()
+        public GameObject GetGrabbedObject()
         {
             return _grabbedObject;
         }

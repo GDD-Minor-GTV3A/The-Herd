@@ -1,18 +1,16 @@
-using _Game.Team_7.Scripts;
-using _Game.Team_7.Scripts.Phantom;
-
 using UnityEngine;
 using UnityEngine.AI;
+using Phantom;
+using Core;
 
-namespace Team_7.Scripts.AI.Phantom.States
+namespace AI.Phantom.States
 {
     public class WanderingState : PhantomState
     {
         private bool _running;
-        
-        public WanderingState(PhantomStateManager manager, EnemyMovementController movement, PhantomStats stats, PhantomAnimatorController animator, AudioController audio) : base(manager, movement, stats, animator, audio)
-        {
-        }
+
+        public WanderingState(PhantomStateManager manager, EnemyMovementController movement, PhantomStats stats, PhantomAnimatorController animator, AudioController audio)
+            : base(manager, movement, stats, animator, audio) { }
 
         public override void OnStart()
         {

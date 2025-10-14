@@ -1,9 +1,8 @@
-using _Game.Team_7.Scripts;
-
 using UnityEngine;
 using UnityEngine.AI;
+using Core;
 
-namespace Team_7.Scripts.AI.Drekavac.States
+namespace AI.Drekavac.States
 {
     /// <summary>
     ///     Handles the behavior of an enemy while it's trying to run away.
@@ -12,7 +11,8 @@ namespace Team_7.Scripts.AI.Drekavac.States
     {
         private Vector3 fleeTarget;                       // Escape target position
 
-        public FleeingState(DrekavacStateManager manager, EnemyMovementController movement, DrekavacStats stats, DrekavacAnimatorController animator, AudioController audio) : base(manager, movement, stats, animator, audio) { }
+        public FleeingState(DrekavacStateManager manager, EnemyMovementController movement, DrekavacStats stats, DrekavacAnimatorController animator, AudioController audio)
+            : base(manager, movement, stats, animator, audio) { }
 
         public override void OnStart()
         {
