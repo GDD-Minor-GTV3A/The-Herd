@@ -1,7 +1,8 @@
-﻿using Ink.Parsed;
-using System.Text;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+
+using Ink.Parsed;
 
 namespace Ink
 {
@@ -10,22 +11,25 @@ namespace Ink
         void TrimEndWhitespace(List<Parsed.Object> mixedTextAndLogicResults, bool terminateWithSpace)
         {
             // Trim whitespace from end
-            if (mixedTextAndLogicResults.Count > 0) {
+            if (mixedTextAndLogicResults.Count > 0)
+            {
                 var lastObjIdx = mixedTextAndLogicResults.Count - 1;
                 var lastObj = mixedTextAndLogicResults[lastObjIdx];
-                if (lastObj is Text) {
+                if (lastObj is Text)
+                {
                     var text = (Text)lastObj;
-                    text.text = text.text.TrimEnd (' ', '\t');
+                    text.text = text.text.TrimEnd(' ', '\t');
 
                     if (terminateWithSpace)
                         text.text += " ";
 
                     // No content left at all? trim the whole object
-                    else if( text.text.Length == 0 ) {
+                    else if (text.text.Length == 0)
+                    {
                         mixedTextAndLogicResults.RemoveAt(lastObjIdx);
 
                         // Recurse in case there's more whitespace
-                        TrimEndWhitespace(mixedTextAndLogicResults, terminateWithSpace:false);
+                        TrimEndWhitespace(mixedTextAndLogicResults, terminateWithSpace: false);
                     }
                 }
             }
@@ -35,7 +39,7 @@ namespace Ink
         {
             // Consume any whitespace at the start of the line
             // (Except for escaped whitespace)
-            Parse (Whitespace);
+            Parse(Whitespace);
 
             var result = Parse(MixedTextAndLogic);
             if (result == null || result.Count == 0)
@@ -43,17 +47,20 @@ namespace Ink
 
             // Warn about accidentally writing "return" without "~"
             var firstText = result[0] as Text;
-            if (firstText) {
-                if (firstText.text.StartsWith ("return")) {
-                    Warning ("Do you need a '~' before 'return'? If not, perhaps use a glue: <> (since it's lowercase) or rewrite somehow?");
+            if (firstText)
+            {
+                if (firstText.text.StartsWith("return"))
+                {
+                    Warning("Do you need a '~' before 'return'? If not, perhaps use a glue: <> (since it's lowercase) or rewrite somehow?");
                 }
             }
             if (result.Count == 0)
                 return null;
 
-            var lastObj = result [result.Count - 1];
-            if (!(lastObj is Divert)) {
-                TrimEndWhitespace (result, terminateWithSpace:false);
+            var lastObj = result[result.Count - 1];
+            if (!(lastObj is Divert))
+            {
+                TrimEndWhitespace(result, terminateWithSpace: false);
             }
 
             EndTagIfNecessary(result);
@@ -63,8 +70,8 @@ namespace Ink
             // a newline, since we want the tag (or tags) to be associated
             // with the line below rather than being completely independent.
             bool lineIsPureTag = result.Count > 0 && result[0] is Parsed.Tag && ((Parsed.Tag)result[0]).isStart;
-            if( !lineIsPureTag )
-                result.Add (new Text ("\n"));
+            if (!lineIsPureTag)
+                result.Add(new Text("\n"));
 
             Expect(EndOfLine, "end of line", recoveryRule: SkipToNextLine);
 
@@ -76,33 +83,35 @@ namespace Ink
             // Check for disallowed "~" within this context
             var disallowedTilda = ParseObject(Spaced(String("~")));
             if (disallowedTilda != null)
-                Error ("You shouldn't use a '~' here - tildas are for logic that's on its own line. To do inline logic, use { curly braces } instead");
+                Error("You shouldn't use a '~' here - tildas are for logic that's on its own line. To do inline logic, use { curly braces } instead");
 
             // Either, or both interleaved
-            var results = Interleave<Parsed.Object>(Optional (ContentText), Optional (InlineLogicOrGlueOrStartTag));
+            var results = Interleave<Parsed.Object>(Optional(ContentText), Optional(InlineLogicOrGlueOrStartTag));
 
             // Terminating divert?
             // (When parsing content for the text of a choice, diverts aren't allowed.
             //  The divert on the end of the body of a choice is handled specially.)
-            if (!_parsingChoice) {
+            if (!_parsingChoice)
+            {
 
-                var diverts = Parse (MultiDivert);
-                if (diverts != null) {
+                var diverts = Parse(MultiDivert);
+                if (diverts != null)
+                {
 
                     // May not have had any results at all if there's *only* a divert!
                     if (results == null)
-                        results = new List<Parsed.Object> ();
+                        results = new List<Parsed.Object>();
 
                     // End previously active tag if necessary
                     EndTagIfNecessary(results);
 
-                    TrimEndWhitespace (results, terminateWithSpace:true);
+                    TrimEndWhitespace(results, terminateWithSpace: true);
 
-                    results.AddRange (diverts);
+                    results.AddRange(diverts);
                 }
 
             }
-                
+
             if (results == null)
                 return null;
 
@@ -111,41 +120,51 @@ namespace Ink
 
         protected Parsed.Text ContentText()
         {
-            return ContentTextAllowingEcapeChar ();
+            return ContentTextAllowingEcapeChar();
         }
 
         protected Parsed.Text ContentTextAllowingEcapeChar()
         {
             StringBuilder sb = null;
 
-            do {
+            do
+            {
                 var str = Parse(ContentTextNoEscape);
                 bool gotEscapeChar = ParseString(@"\") != null;
 
-                if( gotEscapeChar || str != null ) {
-                    if( sb == null ) {
+                if (gotEscapeChar || str != null)
+                {
+                    if (sb == null)
+                    {
                         sb = new StringBuilder();
                     }
 
-                    if( str != null ) {
+                    if (str != null)
+                    {
                         sb.Append(str);
                     }
 
-                    if( gotEscapeChar ) {
+                    if (gotEscapeChar)
+                    {
                         char c = ParseSingleCharacter();
                         sb.Append(c);
                     }
 
-                } else {
+                }
+                else
+                {
                     break;
                 }
 
-            } while(true);
+            } while (true);
 
-            if (sb != null ) {
-                return new Parsed.Text (sb.ToString ());
+            if (sb != null)
+            {
+                return new Parsed.Text(sb.ToString());
 
-            } else {
+            }
+            else
+            {
                 return null;
             }
         }
@@ -159,40 +178,48 @@ namespace Ink
             // attempt to parse the nonTextRule.
             // "-": possible start of divert or start of gather
             // "<": possible start of glue
-            if (_nonTextPauseCharacters == null) {
-                _nonTextPauseCharacters = new CharacterSet ("-<");
+            if (_nonTextPauseCharacters == null)
+            {
+                _nonTextPauseCharacters = new CharacterSet("-<");
             }
 
             // If we hit any of these characters, we stop *immediately* without bothering to even check the nonTextRule
             // "{" for start of logic
             // "|" for mid logic branch
-            if (_nonTextEndCharacters == null) {
-                _nonTextEndCharacters = new CharacterSet ("{}|\n\r\\#");
-                _notTextEndCharactersChoice = new CharacterSet (_nonTextEndCharacters);
-                _notTextEndCharactersChoice.AddCharacters ("[]");
-                _notTextEndCharactersString = new CharacterSet (_nonTextEndCharacters);
-                _notTextEndCharactersString.AddCharacters ("\"");
+            if (_nonTextEndCharacters == null)
+            {
+                _nonTextEndCharacters = new CharacterSet("{}|\n\r\\#");
+                _notTextEndCharactersChoice = new CharacterSet(_nonTextEndCharacters);
+                _notTextEndCharactersChoice.AddCharacters("[]");
+                _notTextEndCharactersString = new CharacterSet(_nonTextEndCharacters);
+                _notTextEndCharactersString.AddCharacters("\"");
             }
 
             // When the ParseUntil pauses, check these rules in case they evaluate successfully
-            ParseRule nonTextRule = () => OneOf (ParseDivertArrow, ParseThreadArrow, EndOfLine, Glue);
+            ParseRule nonTextRule = () => OneOf(ParseDivertArrow, ParseThreadArrow, EndOfLine, Glue);
 
             CharacterSet endChars = null;
-            if (parsingStringExpression) {
+            if (parsingStringExpression)
+            {
                 endChars = _notTextEndCharactersString;
-            } 
-            else if (_parsingChoice) {
+            }
+            else if (_parsingChoice)
+            {
                 endChars = _notTextEndCharactersChoice;
-            } 
-            else {
+            }
+            else
+            {
                 endChars = _nonTextEndCharacters;
             }
 
-            string pureTextContent = ParseUntil (nonTextRule, _nonTextPauseCharacters, endChars);
-            if (pureTextContent != null ) {
+            string pureTextContent = ParseUntil(nonTextRule, _nonTextPauseCharacters, endChars);
+            if (pureTextContent != null)
+            {
                 return pureTextContent;
 
-            } else {
+            }
+            else
+            {
                 return null;
             }
 
@@ -207,4 +234,3 @@ namespace Ink
 
     }
 }
-
