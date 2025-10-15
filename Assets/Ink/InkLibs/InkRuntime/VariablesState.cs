@@ -15,30 +15,24 @@ namespace Ink.Runtime
 
         public StatePatch patch;
 
-        public bool batchObservingVariableChanges
-        {
-            get
-            {
+        public bool batchObservingVariableChanges 
+        { 
+            get {
                 return _batchObservingVariableChanges;
             }
-            set
-            {
+            set { 
                 _batchObservingVariableChanges = value;
-                if (value)
-                {
-                    _changedVariablesForBatchObs = new HashSet<string>();
-                }
+                if (value) {
+                    _changedVariablesForBatchObs = new HashSet<string> ();
+                } 
 
                 // Finished observing variables in a batch - now send 
                 // notifications for changed variables all in one go.
-                else
-                {
-                    if (_changedVariablesForBatchObs != null)
-                    {
-                        foreach (var variableName in _changedVariablesForBatchObs)
-                        {
-                            var currentValue = _globalVariables[variableName];
-                            variableChangedEvent(variableName, currentValue);
+                else {
+                    if (_changedVariablesForBatchObs != null) {
+                        foreach (var variableName in _changedVariablesForBatchObs) {
+                            var currentValue = _globalVariables [variableName];
+                            variableChangedEvent (variableName, currentValue);
                         }
                     }
 
@@ -50,14 +44,11 @@ namespace Ink.Runtime
 
         // Allow StoryState to change the current callstack, e.g. for
         // temporary function evaluation.
-        public CallStack callStack
-        {
-            get
-            {
+        public CallStack callStack {
+            get {
                 return _callStack;
             }
-            set
-            {
+            set {
                 _callStack = value;
             }
         }
@@ -71,8 +62,7 @@ namespace Ink.Runtime
         /// </summary>
         public object this[string variableName]
         {
-            get
-            {
+            get {
                 Runtime.Object varContents;
 
                 if (patch != null && patch.TryGetGlobal(variableName, out varContents))
@@ -82,65 +72,57 @@ namespace Ink.Runtime
                 // If it's not found, it might be because the story content has changed,
                 // and the original default value hasn't be instantiated.
                 // Should really warn somehow, but it's difficult to see how...!
-                if (_globalVariables.TryGetValue(variableName, out varContents) ||
-                     _defaultGlobalVariables.TryGetValue(variableName, out varContents))
+                if ( _globalVariables.TryGetValue (variableName, out varContents) || 
+                     _defaultGlobalVariables.TryGetValue(variableName, out varContents) )
                     return (varContents as Runtime.Value).valueObject;
-                else
-                {
+                else {
                     return null;
                 }
             }
-            set
-            {
-                if (!_defaultGlobalVariables.ContainsKey(variableName))
-                    throw new StoryException("Cannot assign to a variable (" + variableName + ") that hasn't been declared in the story");
-
+            set {
+                if (!_defaultGlobalVariables.ContainsKey (variableName))
+                    throw new StoryException ("Cannot assign to a variable ("+variableName+") that hasn't been declared in the story");
+                
                 var val = Runtime.Value.Create(value);
-                if (val == null)
-                {
-                    if (value == null)
-                    {
-                        throw new Exception("Cannot pass null to VariableState");
-                    }
-                    else
-                    {
-                        throw new Exception("Invalid value passed to VariableState: " + value.ToString());
+                if (val == null) {
+                    if (value == null) {
+                        throw new Exception ("Cannot pass null to VariableState");
+                    } else {
+                        throw new Exception ("Invalid value passed to VariableState: "+value.ToString());
                     }
                 }
 
-                SetGlobal(variableName, val);
+                SetGlobal (variableName, val);
             }
         }
 
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
 
         /// <summary>
         /// Enumerator to allow iteration over all global variables by name.
         /// </summary>
 		public IEnumerator<string> GetEnumerator()
-        {
-            return _globalVariables.Keys.GetEnumerator();
-        }
+		{
+			return _globalVariables.Keys.GetEnumerator();
+		}
 
-        public VariablesState(CallStack callStack, ListDefinitionsOrigin listDefsOrigin)
+        public VariablesState (CallStack callStack, ListDefinitionsOrigin listDefsOrigin)
         {
-            _globalVariables = new Dictionary<string, Object>();
+            _globalVariables = new Dictionary<string, Object> ();
             _callStack = callStack;
             _listDefsOrigin = listDefsOrigin;
         }
 
         public void ApplyPatch()
         {
-            foreach (var namedVar in patch.globals)
-            {
+            foreach(var namedVar in patch.globals) {
                 _globalVariables[namedVar.Key] = namedVar.Value;
             }
 
-            if (_changedVariablesForBatchObs != null)
-            {
+            if(_changedVariablesForBatchObs != null ) {
                 foreach (var name in patch.changedVariables)
                     _changedVariablesForBatchObs.Add(name);
             }
@@ -152,15 +134,11 @@ namespace Ink.Runtime
         {
             _globalVariables.Clear();
 
-            foreach (var varVal in _defaultGlobalVariables)
-            {
+            foreach (var varVal in _defaultGlobalVariables) {
                 object loadedToken;
-                if (jToken.TryGetValue(varVal.Key, out loadedToken))
-                {
+                if( jToken.TryGetValue(varVal.Key, out loadedToken) ) {
                     _globalVariables[varVal.Key] = Json.JTokenToRuntimeObject(loadedToken);
-                }
-                else
-                {
+                } else {
                     _globalVariables[varVal.Key] = varVal.Value;
                 }
             }
@@ -186,8 +164,7 @@ namespace Ink.Runtime
                 var name = keyVal.Key;
                 var val = keyVal.Value;
 
-                if (dontSaveDefaultValues)
-                {
+                if(dontSaveDefaultValues) {
                     // Don't write out values that are the same as the default global values
                     Runtime.Object defaultVal;
                     if (_defaultGlobalVariables.TryGetValue(name, out defaultVal))
@@ -211,14 +188,12 @@ namespace Ink.Runtime
 
             // Perform equality on int/float/bool manually to avoid boxing
             var boolVal = obj1 as BoolValue;
-            if (boolVal != null)
-            {
+            if( boolVal != null ) {
                 return boolVal.value == ((BoolValue)obj2).value;
             }
 
             var intVal = obj1 as IntValue;
-            if (intVal != null)
-            {
+            if( intVal != null ) {
                 return intVal.value == ((IntValue)obj2).value;
             }
 
@@ -231,40 +206,38 @@ namespace Ink.Runtime
             // Other Value type (using proper Equals: list, string, divert path)
             var val1 = obj1 as Value;
             var val2 = obj2 as Value;
-            if (val1 != null)
-            {
+            if( val1 != null ) {
                 return val1.valueObject.Equals(val2.valueObject);
             }
 
-            throw new System.Exception("FastRoughDefinitelyEquals: Unsupported runtime object type: " + obj1.GetType());
+            throw new System.Exception("FastRoughDefinitelyEquals: Unsupported runtime object type: "+obj1.GetType());
         }
 
         public Runtime.Object GetVariableWithName(string name)
         {
-            return GetVariableWithName(name, -1);
+            return GetVariableWithName (name, -1);
         }
 
-        public Runtime.Object TryGetDefaultVariableValue(string name)
+        public Runtime.Object TryGetDefaultVariableValue (string name)
         {
             Runtime.Object val = null;
-            _defaultGlobalVariables.TryGetValue(name, out val);
+            _defaultGlobalVariables.TryGetValue (name, out val);
             return val;
         }
 
-        public bool GlobalVariableExistsWithName(string name)
-        {
-            return _globalVariables.ContainsKey(name) || _defaultGlobalVariables != null && _defaultGlobalVariables.ContainsKey(name);
-        }
+		public bool GlobalVariableExistsWithName(string name)
+		{
+			return _globalVariables.ContainsKey(name) || _defaultGlobalVariables != null && _defaultGlobalVariables.ContainsKey(name);
+		}
 
         Runtime.Object GetVariableWithName(string name, int contextIndex)
         {
-            Runtime.Object varValue = GetRawVariableWithName(name, contextIndex);
+            Runtime.Object varValue = GetRawVariableWithName (name, contextIndex);
 
             // Get value from pointer?
             var varPointer = varValue as VariablePointerValue;
-            if (varPointer)
-            {
-                varValue = ValueAtVariablePointer(varPointer);
+            if (varPointer) {
+                varValue = ValueAtVariablePointer (varPointer);
             }
 
             return varValue;
@@ -275,12 +248,11 @@ namespace Ink.Runtime
             Runtime.Object varValue = null;
 
             // 0 context = global
-            if (contextIndex == 0 || contextIndex == -1)
-            {
+            if (contextIndex == 0 || contextIndex == -1) {
                 if (patch != null && patch.TryGetGlobal(name, out varValue))
                     return varValue;
 
-                if (_globalVariables.TryGetValue(name, out varValue))
+                if ( _globalVariables.TryGetValue (name, out varValue) )
                     return varValue;
 
                 // Getting variables can actually happen during globals set up since you can do
@@ -288,25 +260,24 @@ namespace Ink.Runtime
                 // So _defaultGlobalVariables may be null.
                 // We need to do this check though in case a new global is added, so we need to
                 // revert to the default globals dictionary since an initial value hasn't yet been set.
-                if (_defaultGlobalVariables != null && _defaultGlobalVariables.TryGetValue(name, out varValue))
-                {
+                if( _defaultGlobalVariables != null && _defaultGlobalVariables.TryGetValue(name, out varValue) ) {
                     return varValue;
                 }
 
-                var listItemValue = _listDefsOrigin.FindSingleItemListWithName(name);
+                var listItemValue = _listDefsOrigin.FindSingleItemListWithName (name);
                 if (listItemValue)
                     return listItemValue;
-            }
+            } 
 
             // Temporary
-            varValue = _callStack.GetTemporaryVariableWithName(name, contextIndex);
+            varValue = _callStack.GetTemporaryVariableWithName (name, contextIndex);
 
             return varValue;
         }
 
         public Runtime.Object ValueAtVariablePointer(VariablePointerValue pointer)
         {
-            return GetVariableWithName(pointer.variableName, pointer.contextIndex);
+            return GetVariableWithName (pointer.variableName, pointer.contextIndex);
         }
 
         public void Assign(VariableAssignment varAss, Runtime.Object value)
@@ -316,96 +287,81 @@ namespace Ink.Runtime
 
             // Are we assigning to a global variable?
             bool setGlobal = false;
-            if (varAss.isNewDeclaration)
-            {
+            if (varAss.isNewDeclaration) {
                 setGlobal = varAss.isGlobal;
-            }
-            else
-            {
-                setGlobal = GlobalVariableExistsWithName(name);
+            } else {
+                setGlobal = GlobalVariableExistsWithName (name);
             }
 
             // Constructing new variable pointer reference
-            if (varAss.isNewDeclaration)
-            {
+            if (varAss.isNewDeclaration) {
                 var varPointer = value as VariablePointerValue;
-                if (varPointer)
-                {
-                    var fullyResolvedVariablePointer = ResolveVariablePointer(varPointer);
+                if (varPointer) {
+                    var fullyResolvedVariablePointer = ResolveVariablePointer (varPointer);
                     value = fullyResolvedVariablePointer;
                 }
 
-            }
+            } 
 
             // Assign to existing variable pointer?
             // Then assign to the variable that the pointer is pointing to by name.
-            else
-            {
+            else {
 
                 // De-reference variable reference to point to
                 VariablePointerValue existingPointer = null;
-                do
-                {
-                    existingPointer = GetRawVariableWithName(name, contextIndex) as VariablePointerValue;
-                    if (existingPointer)
-                    {
+                do {
+                    existingPointer = GetRawVariableWithName (name, contextIndex) as VariablePointerValue;
+                    if (existingPointer) {
                         name = existingPointer.variableName;
                         contextIndex = existingPointer.contextIndex;
                         setGlobal = (contextIndex == 0);
                     }
-                } while (existingPointer);
+                } while(existingPointer);
             }
 
 
-            if (setGlobal)
-            {
-                SetGlobal(name, value);
-            }
-            else
-            {
-                _callStack.SetTemporaryVariable(name, value, varAss.isNewDeclaration, contextIndex);
+            if (setGlobal) {
+                SetGlobal (name, value);
+            } else {
+                _callStack.SetTemporaryVariable (name, value, varAss.isNewDeclaration, contextIndex);
             }
         }
 
-        public void SnapshotDefaultGlobals()
+        public void SnapshotDefaultGlobals ()
         {
-            _defaultGlobalVariables = new Dictionary<string, Object>(_globalVariables);
+            _defaultGlobalVariables = new Dictionary<string, Object> (_globalVariables);
         }
 
-        void RetainListOriginsForAssignment(Runtime.Object oldValue, Runtime.Object newValue)
+        void RetainListOriginsForAssignment (Runtime.Object oldValue, Runtime.Object newValue)
         {
             var oldList = oldValue as ListValue;
             var newList = newValue as ListValue;
             if (oldList && newList && newList.value.Count == 0)
-                newList.value.SetInitialOriginNames(oldList.value.originNames);
+                newList.value.SetInitialOriginNames (oldList.value.originNames);
         }
 
         public void SetGlobal(string variableName, Runtime.Object value)
         {
             Runtime.Object oldValue = null;
-            if (patch == null || !patch.TryGetGlobal(variableName, out oldValue))
-                _globalVariables.TryGetValue(variableName, out oldValue);
+            if( patch == null || !patch.TryGetGlobal(variableName, out oldValue) )
+                _globalVariables.TryGetValue (variableName, out oldValue);
 
-            ListValue.RetainListOriginsForAssignment(oldValue, value);
+            ListValue.RetainListOriginsForAssignment (oldValue, value);
 
             if (patch != null)
                 patch.SetGlobal(variableName, value);
             else
-                _globalVariables[variableName] = value;
+                _globalVariables [variableName] = value;
 
-            if (variableChangedEvent != null && !value.Equals(oldValue))
-            {
+            if (variableChangedEvent != null && !value.Equals (oldValue)) {
 
-                if (batchObservingVariableChanges)
-                {
+                if (batchObservingVariableChanges) {
                     if (patch != null)
                         patch.AddChangedVariable(variableName);
-                    else if (_changedVariablesForBatchObs != null)
-                        _changedVariablesForBatchObs.Add(variableName);
-                }
-                else
-                {
-                    variableChangedEvent(variableName, value);
+                    else if(_changedVariablesForBatchObs != null)
+                        _changedVariablesForBatchObs.Add (variableName);
+                } else {
+                    variableChangedEvent (variableName, value);
                 }
             }
         }
@@ -417,26 +373,24 @@ namespace Ink.Runtime
         {
             int contextIndex = varPointer.contextIndex;
 
-            if (contextIndex == -1)
-                contextIndex = GetContextIndexOfVariableNamed(varPointer.variableName);
+            if( contextIndex == -1 )
+                contextIndex = GetContextIndexOfVariableNamed (varPointer.variableName);
 
-            var valueOfVariablePointedTo = GetRawVariableWithName(varPointer.variableName, contextIndex);
+            var valueOfVariablePointedTo = GetRawVariableWithName (varPointer.variableName, contextIndex);
 
             // Extra layer of indirection:
             // When accessing a pointer to a pointer (e.g. when calling nested or 
             // recursive functions that take a variable references, ensure we don't create
             // a chain of indirection by just returning the final target.
             var doubleRedirectionPointer = valueOfVariablePointedTo as VariablePointerValue;
-            if (doubleRedirectionPointer)
-            {
+            if (doubleRedirectionPointer) {
                 return doubleRedirectionPointer;
-            }
+            } 
 
             // Make copy of the variable pointer so we're not using the value direct from
             // the runtime. Temporary must be local to the current scope.
-            else
-            {
-                return new VariablePointerValue(varPointer.variableName, contextIndex);
+            else {
+                return new VariablePointerValue (varPointer.variableName, contextIndex);
             }
         }
 
@@ -460,3 +414,4 @@ namespace Ink.Runtime
         ListDefinitionsOrigin _listDefsOrigin;
     }
 }
+

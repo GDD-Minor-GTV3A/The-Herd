@@ -1,75 +1,60 @@
+using UnityEngine;
+using UnityEditor;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-using UnityEditor;
+namespace Ink.UnityIntegration {
+	[CustomEditor(typeof(DefaultAsset), true)]
+	public class DefaultAssetEditor : Editor {
 
-using UnityEngine;
+		private DefaultAssetInspector inspector;
 
-namespace Ink.UnityIntegration
-{
-    [CustomEditor(typeof(DefaultAsset), true)]
-    public class DefaultAssetEditor : Editor
-    {
+		private void OnEnable () {
+			inspector = FindObjectInspector ();
+			if(inspector != null) {
+				inspector.editor = this;
+				inspector.serializedObject = serializedObject;
+				inspector.target = target;
+				inspector.OnEnable();
+			}
+		}
 
-        private DefaultAssetInspector inspector;
+		private void OnDisable () {
+			if(inspector != null)
+				inspector.OnDisable();
+		}
 
-        private void OnEnable()
-        {
-            inspector = FindObjectInspector();
-            if (inspector != null)
-            {
-                inspector.editor = this;
-                inspector.serializedObject = serializedObject;
-                inspector.target = target;
-                inspector.OnEnable();
-            }
-        }
+		protected override void OnHeaderGUI () {
+			if(inspector != null) {
+				inspector.OnHeaderGUI();
+			}
+			else
+				base.OnHeaderGUI();
+		}
 
-        private void OnDisable()
-        {
-            if (inspector != null)
-                inspector.OnDisable();
-        }
+		public override void OnInspectorGUI () {
+			if(inspector != null) {
+				GUI.enabled = true;
+				inspector.OnInspectorGUI();
+			}
+			else
+				base.OnInspectorGUI();
+		}
 
-        protected override void OnHeaderGUI()
-        {
-            if (inspector != null)
-            {
-                inspector.OnHeaderGUI();
-            }
-            else
-                base.OnHeaderGUI();
-        }
-
-        public override void OnInspectorGUI()
-        {
-            if (inspector != null)
-            {
-                GUI.enabled = true;
-                inspector.OnInspectorGUI();
-            }
-            else
-                base.OnInspectorGUI();
-        }
-
-        private DefaultAssetInspector FindObjectInspector()
-        {
-            var assembly = Assembly.GetExecutingAssembly();
-            var assetPath = AssetDatabase.GetAssetPath(target);
-            foreach (var type in assembly.GetTypes())
-            {
-                if (type.IsSubclassOf(typeof(DefaultAssetInspector)))
-                {
-                    DefaultAssetInspector objectInspector = (DefaultAssetInspector)Activator.CreateInstance(type);
-                    if (objectInspector.IsValid(assetPath))
-                    {
-                        objectInspector.target = target;
-                        return objectInspector;
-                    }
-                }
-            }
-            return null;
-        }
-    }
+		private DefaultAssetInspector FindObjectInspector () {
+			var assembly = Assembly.GetExecutingAssembly();
+			var assetPath = AssetDatabase.GetAssetPath(target);
+			foreach(var type in assembly.GetTypes()) {
+				if(type.IsSubclassOf(typeof(DefaultAssetInspector))) {
+					DefaultAssetInspector objectInspector = (DefaultAssetInspector)Activator.CreateInstance(type);
+					if(objectInspector.IsValid(assetPath)) {
+						objectInspector.target = target;
+						return objectInspector;
+					}
+				}
+			}
+			return null;
+		}
+	}
 }
