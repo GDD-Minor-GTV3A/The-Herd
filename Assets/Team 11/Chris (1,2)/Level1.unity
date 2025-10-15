@@ -7890,7 +7890,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 366954846902213099, guid: 949b4c49ab05bbb4abde14eee43ce17a, type: 3}
       propertyPath: orthographic size
-      value: 15
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1669028158844492960, guid: 949b4c49ab05bbb4abde14eee43ce17a, type: 3}
       propertyPath: m_Name
@@ -7898,7 +7898,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2322101386113416344, guid: 949b4c49ab05bbb4abde14eee43ce17a, type: 3}
       propertyPath: Lens.OrthographicSize
-      value: 15
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 2322101386113416344, guid: 949b4c49ab05bbb4abde14eee43ce17a, type: 3}
       propertyPath: Target.TrackingTarget
@@ -10248,11 +10248,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 964686772}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 278a2478b3a9d0399a2b959c4136ae89, type: 3}
+  m_Script: {fileID: 11500000, guid: e2866fbb3f9c2974f86237495eb0198e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _player: {fileID: 0}
-  _currency: {fileID: 0}
+  collisionResult:
+    m_PersistentCalls:
+      m_Calls: []
+  oneTimeEvent: 1
 --- !u!65 &964686775
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -13072,10 +13074,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1266794961}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3d0c00dacfee65e43b84c0f47e6635ad, type: 3}
+  m_Script: {fileID: 11500000, guid: e2866fbb3f9c2974f86237495eb0198e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Player: {fileID: 1797470908}
+  collisionResult:
+    m_PersistentCalls:
+      m_Calls: []
+  oneTimeEvent: 1
 --- !u!65 &1266794963
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -20757,6 +20762,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2866fbb3f9c2974f86237495eb0198e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  collisionResult:
+    m_PersistentCalls:
+      m_Calls: []
+  oneTimeEvent: 1
 --- !u!65 &1832504573
 BoxCollider:
   m_ObjectHideFlags: 0
