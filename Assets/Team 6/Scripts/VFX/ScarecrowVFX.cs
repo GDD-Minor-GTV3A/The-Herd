@@ -1,7 +1,6 @@
 using System.Collections;
 using UnityEngine;
 
-[RequireComponent(typeof(Renderer))]
 public class ScarecrowVFX : MonoBehaviour
 {
     [Header("Visuals")]
