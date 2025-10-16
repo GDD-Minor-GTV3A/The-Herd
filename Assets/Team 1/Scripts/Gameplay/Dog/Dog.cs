@@ -11,6 +11,8 @@ namespace Gameplay.Dog
     {
         [Tooltip("Transform of player object to follow.")]
         [SerializeField] private Transform _playerTransform;
+        [Tooltip("Heard zone reference.")]
+        [SerializeField] private HeardZone _heardZone;
         [Tooltip("Manager of step sounds.")]
         [SerializeField] private StepsSoundManager _stepsSoundManager;
         [Tooltip("Animator of the dog.")]
@@ -37,7 +39,7 @@ namespace Gameplay.Dog
             _dogAnimator = new DogAnimator(_animator, _config);
 
             DogStateManager stateManager = GetComponent<DogStateManager>();
-            stateManager.Initialize(_movementController, _dogAnimator, _playerTransform, _config);
+            stateManager.Initialize(_movementController, _dogAnimator, _heardZone, _playerTransform, _config);
 
             _config.OnValueChanged += UpdateValues;
         }
