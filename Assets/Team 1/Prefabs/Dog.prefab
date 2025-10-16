@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 505708836935536439}
   - component: {fileID: 3262632793578345549}
   - component: {fileID: 8610237918081496107}
+  - component: {fileID: 3468619060094155431}
   m_Layer: 0
   m_Name: Dog
   m_TagString: Untagged
@@ -72,6 +73,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playerTransform: {fileID: 0}
+  _heardZone: {fileID: 0}
   _stepsSoundManager: {fileID: 6384406999088229869}
   _animator: {fileID: 3171391158692443822}
   _config: {fileID: 11400000, guid: a9a53b25b4a842542b4086cfd00829cd, type: 2}
@@ -99,6 +101,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f8d33a1b914dd84a881de9cc43baec5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &3468619060094155431
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3018951382313821739}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48346d083c9583847bc56cd412890e1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  revealers:
+  - Config: {fileID: 11400000, guid: 89868ed88fa4f7146ab71fdfb0c514fa, type: 2}
+    Renderer: {fileID: 0}
+    StartingAngle: 0
+    Mesh: {fileID: 0}
+  origin: {fileID: 0}
 --- !u!1 &7967640244434156149
 GameObject:
   m_ObjectHideFlags: 0

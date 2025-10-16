@@ -9,7 +9,6 @@ namespace Gameplay.Player
     {
         [Header("Settings")]
         [SerializeField] private float _rotationSpeed = 10f;
-        [SerializeField] private LayerMask _groundLayers;
 
         [Tooltip("Select which rotation mode the player starts in.")]
         [SerializeField] private PlayerRotationMode _startingRotationMode = PlayerRotationMode.MovementDirection;
@@ -20,26 +19,25 @@ namespace Gameplay.Player
 
         public PlayerRotationMode RotationMode => _rotationMode;
 
-        private void Awake()
-        {
-            _mainCamera = Camera.main;
-
-            // Set the initial rotation mode
-            SetRotationMode(_startingRotationMode);
-        }
 
         /// <summary>
         /// Sets the rotation speed for smoothing the player's turn.
         /// </summary>
         public void Initialize(float rotationSpeed)
         {
+            _mainCamera = Camera.main;
+
+            SetRotationMode(_startingRotationMode);
+
             UpdateRotationSpeed(rotationSpeed);
         }
+
 
         public void UpdateRotationSpeed(float rotationSpeed)
         {
             _rotationSpeed = rotationSpeed;
         }
+
 
         /// <summary>
         /// Switches between movement-based and mouse-based rotation.
@@ -51,6 +49,7 @@ namespace Gameplay.Player
                 : PlayerRotationMode.MovementDirection;
         }
 
+
         /// <summary>
         /// Sets rotation mode directly.
         /// </summary>
@@ -58,6 +57,7 @@ namespace Gameplay.Player
         {
             _rotationMode = mode;
         }
+
 
         /// <summary>
         /// Rotates the player based on the current rotation mode.
@@ -75,6 +75,7 @@ namespace Gameplay.Player
                     break;
             }
         }
+
 
         private void RotateByMovement(Vector2 input)
         {
@@ -109,6 +110,7 @@ namespace Gameplay.Player
 
         }
     }
+
 
     /// <summary>
     /// The available player rotation modes.
