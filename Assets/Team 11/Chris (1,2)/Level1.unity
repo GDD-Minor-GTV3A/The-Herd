@@ -348,7 +348,7 @@ GameObject:
   - component: {fileID: 103387350}
   - component: {fileID: 103387354}
   - component: {fileID: 103387353}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Part 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5340,7 +5340,7 @@ GameObject:
   - component: {fileID: 397421675}
   - component: {fileID: 397421679}
   - component: {fileID: 397421678}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Part 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7890,7 +7890,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 366954846902213099, guid: 949b4c49ab05bbb4abde14eee43ce17a, type: 3}
       propertyPath: orthographic size
-      value: 5
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 1669028158844492960, guid: 949b4c49ab05bbb4abde14eee43ce17a, type: 3}
       propertyPath: m_Name
@@ -7898,7 +7898,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2322101386113416344, guid: 949b4c49ab05bbb4abde14eee43ce17a, type: 3}
       propertyPath: Lens.OrthographicSize
-      value: 5
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 2322101386113416344, guid: 949b4c49ab05bbb4abde14eee43ce17a, type: 3}
       propertyPath: Target.TrackingTarget
@@ -10216,7 +10216,6 @@ GameObject:
   - component: {fileID: 964686777}
   - component: {fileID: 964686776}
   - component: {fileID: 964686775}
-  - component: {fileID: 964686774}
   m_Layer: 0
   m_Name: ShamanEvent
   m_TagString: Untagged
@@ -10239,22 +10238,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 282489794}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &964686774
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 964686772}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e2866fbb3f9c2974f86237495eb0198e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  collisionResult:
-    m_PersistentCalls:
-      m_Calls: []
-  oneTimeEvent: 1
 --- !u!65 &964686775
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -13057,7 +13040,6 @@ GameObject:
   - component: {fileID: 1266794965}
   - component: {fileID: 1266794964}
   - component: {fileID: 1266794963}
-  - component: {fileID: 1266794962}
   m_Layer: 0
   m_Name: SheepEvent
   m_TagString: Untagged
@@ -13065,22 +13047,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1266794962
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1266794961}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e2866fbb3f9c2974f86237495eb0198e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  collisionResult:
-    m_PersistentCalls:
-      m_Calls: []
-  oneTimeEvent: 1
 --- !u!65 &1266794963
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -17237,7 +17203,7 @@ GameObject:
   - component: {fileID: 1641202386}
   - component: {fileID: 1641202390}
   - component: {fileID: 1641202389}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Part 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -20439,7 +20405,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2256758700414420681, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
       propertyPath: _groundLayers.m_Bits
+<<<<<<< HEAD
       value: 0
+=======
+      value: 8
+>>>>>>> parent of 74560a4 (Force pull)
       objectReference: {fileID: 0}
     - target: {fileID: 2413864504092887247, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
       propertyPath: m_Layer
@@ -20731,7 +20701,6 @@ GameObject:
   - component: {fileID: 1832504575}
   - component: {fileID: 1832504574}
   - component: {fileID: 1832504573}
-  - component: {fileID: 1832504572}
   m_Layer: 0
   m_Name: LevelExitEvent
   m_TagString: Untagged
@@ -20754,22 +20723,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 282489794}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1832504572
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1832504570}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e2866fbb3f9c2974f86237495eb0198e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  collisionResult:
-    m_PersistentCalls:
-      m_Calls: []
-  oneTimeEvent: 1
 --- !u!65 &1832504573
 BoxCollider:
   m_ObjectHideFlags: 0
