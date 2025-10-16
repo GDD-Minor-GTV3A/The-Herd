@@ -55,6 +55,7 @@
     <UnityVersion>6000.0.58f1</UnityVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.0.58f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.SourceGenerators.dll" />
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.0.58f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.0.58f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
@@ -63,7 +64,6 @@
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\States\PlayerState.cs" />
     <Compile Include="Assets\Team 1\Scripts\Editor\ShowIfDrawer.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\States\DogFollowPlayer.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\HeardZone.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\FogRevealer.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\Dog.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\FogOfWarManager.cs" />
@@ -102,7 +102,6 @@
     <Compile Include="Assets\Team 1\Scripts\Gameplay\HealthSystem\IHealable.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\ToolsSystem\Tools\Whistle.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\PlayerConfig.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\States\DogMoveToSheep.cs" />
     <Compile Include="Assets\Team 1\Scripts\Core\Shared\Abstractions\IPlayerTool.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -587,6 +586,10 @@
     </Reference>
     <Reference Include="UnityEditor.WindowsStandalone.Extensions">
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.0.58f1\Editor\Data\PlaybackEngines\WindowsStandaloneSupport\UnityEditor.WindowsStandalone.Extensions.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEditor.UWP.Extensions">
+      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.0.58f1\Editor\Data\PlaybackEngines\MetroSupport\UnityEditor.UWP.Extensions.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.VisualScripting.YamlDotNet">
@@ -1123,6 +1126,14 @@
     </Reference>
     <Reference Include="Unity.InputSystem">
       <HintPath>Library\ScriptAssemblies\Unity.InputSystem.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.Universal.Runtime">
+      <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Universal.Runtime.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Cinemachine">
+      <HintPath>Library\ScriptAssemblies\Unity.Cinemachine.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEditor.UI">

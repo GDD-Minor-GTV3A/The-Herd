@@ -3,7 +3,7 @@ using Ink.UnityIntegration;
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(BasicInkExample))]
+[UnityEditor.CustomEditor(typeof(BasicInkExample))]
 [InitializeOnLoad]
 public class BasicInkExampleEditor : Editor {
     static bool storyExpanded;
