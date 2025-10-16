@@ -1,8 +1,5 @@
 using System.Collections.Generic;
 using Core.Shared;
-
-using Gameplay.Player;
-
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -13,10 +10,6 @@ namespace Gameplay.ToolsSystem
     /// </summary>
     public class ToolSlotsController : MonoBehaviour
     {
-        [SerializeField] private Whistle whistle;
-        [SerializeField] private Rifle rifle;
-
-
         private List<IPlayerTool> _toolSlots = new List<IPlayerTool>();
         private int _currentToolIndex;
         private int _slotsAmount;
@@ -29,7 +22,7 @@ namespace Gameplay.ToolsSystem
         /// </summary>
         /// <param name="input">Player input class.</param>
         /// <param name="slotsAmount">Max amount of available slots.</param>
-        public void Initialize(Gameplay.Player.PlayerInput input, PlayerAnimator animator, int slotsAmount)
+        public void Initialize(Gameplay.Player.PlayerInput input, int slotsAmount)
         {
             _input = input;
             _slotsAmount = slotsAmount;
@@ -43,8 +36,6 @@ namespace Gameplay.ToolsSystem
             _input.MainUsage.started += OnCurrentToolMainUseStarted;
             _input.MainUsage.canceled += OnCurrentToolMainUseFinished;
 
-            _input.Reload.canceled += OnCurrentToolReload;
-
             _input.SecondaryUsage.started += OnCurrentToolSecondaryUseStarted;
             _input.SecondaryUsage.canceled += OnCurrentToolSecondaryUseFinished;
 
@@ -56,11 +47,8 @@ namespace Gameplay.ToolsSystem
 
 
             // test
-            whistle.Initialize(animator);
+            Whistle whistle = GetComponent<Whistle>();
             SetNewToolToSlotByIndex(whistle, 0);
-
-            rifle.Initialize(animator);
-            SetNewToolToSlotByIndex(rifle, 1);
         }
 
 
@@ -73,21 +61,8 @@ namespace Gameplay.ToolsSystem
 
         private void SetCurrentSlotByIndex(int index)
         {
-            if (_toolSlots[_currentToolIndex] != null)
-                _toolSlots[_currentToolIndex].HideTool();
-
             index = Mathf.Clamp(index, 0, _slotsAmount-1);
             _currentToolIndex = index;
-
-            if (_toolSlots[_currentToolIndex] != null)
-                _toolSlots[_currentToolIndex].ShowTool();
-        }
-
-
-        private void OnCurrentToolReload(InputAction.CallbackContext obj)
-        {
-            if (_toolSlots[_currentToolIndex] != null)
-                _toolSlots[_currentToolIndex].Reload();
         }
 
 
@@ -132,8 +107,6 @@ namespace Gameplay.ToolsSystem
         {
             _input.MainUsage.started -= OnCurrentToolMainUseStarted;
             _input.MainUsage.canceled -= OnCurrentToolMainUseFinished;
-
-            _input.Reload.canceled -= OnCurrentToolReload;
 
             _input.SecondaryUsage.started -= OnCurrentToolSecondaryUseStarted;
             _input.SecondaryUsage.canceled -= OnCurrentToolSecondaryUseFinished;
