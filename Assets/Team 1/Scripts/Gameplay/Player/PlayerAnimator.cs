@@ -9,11 +9,8 @@ namespace Gameplay.Player
         private const string WalkSpeedParam = "WalkSpeed";
 
 
-        private readonly int handsLayerIndex;
-
         public PlayerAnimator(Animator animator) : base(animator)
         {
-            handsLayerIndex = _animator.GetLayerIndex("Hands Layer");
         }
 
 
@@ -37,19 +34,6 @@ namespace Gameplay.Player
                 _animator.SetFloat(WalkSpeedParam, 2f);
             else
                 _animator.SetFloat(WalkSpeedParam, 1f);
-        }
-
-
-        public void GetRifle()
-        {
-            _animator.SetTrigger("GetRifle");
-            _animator.SetLayerWeight(handsLayerIndex, 1);
-        }
-
-
-        public void RemoveHands()
-        {
-            _animator.SetLayerWeight(handsLayerIndex, 0);
         }
 
     }

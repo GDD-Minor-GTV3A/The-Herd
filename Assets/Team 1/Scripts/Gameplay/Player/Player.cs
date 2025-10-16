@@ -57,6 +57,7 @@ namespace Gameplay.Player
 
             playerInput.Initialize(_inputActions);
 
+            slotsController.Initialize(playerInput, 2);
 
             CharacterController characterController = GetComponent<CharacterController>();
             _movementController.Initialize(characterController, _config);
@@ -77,7 +78,6 @@ namespace Gameplay.Player
             );
             _config.OnValueChanged += UpdateConfigValues;
 
-            slotsController.Initialize(playerInput, animator, 2);
         }
 
 
