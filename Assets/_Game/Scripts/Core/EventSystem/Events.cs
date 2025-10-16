@@ -92,17 +92,6 @@ namespace Core.Events
     public class DogFollowCommandEvent : GameEvent
     {
     }
-
-    public class DogHerdModeToggleEvent : GameEvent
-    {
-        public bool IsActive { get; }
-
-        public DogHerdModeToggleEvent(bool isActive)
-        {
-            IsActive = isActive;
-        }
-    }
-
     #endregion DOG_EVENTS
 
 
