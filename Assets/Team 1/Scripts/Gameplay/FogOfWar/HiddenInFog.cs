@@ -10,7 +10,7 @@ namespace Gameplay.FogOfWar
     /// </summary>
     public class HiddenInFog : MonoBehaviour, IHiddenObject
     {
-        [SerializeField, Required, Tooltip("MeshRenderer of this object, which has to be enabled or disabled.")] private MeshRenderer targetRenderer;
+        [SerializeField, Required, Tooltip("MeshRenderer of this object, which has to be enabled or disabled.")] private Renderer targetRenderer;
 
 
         private bool removed = false;
