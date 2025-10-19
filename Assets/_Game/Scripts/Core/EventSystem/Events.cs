@@ -1,4 +1,5 @@
-using Core.Shared;
+using System.Collections.Generic;
+
 using UnityEngine;
 // The Game Events used across the Game.
 // Anytime there is a need for a new event, it should be added here.
@@ -69,19 +70,19 @@ namespace Core.Events
     /// </summary>
     public class DogMoveCommandEvent : GameEvent
     {
-        private Vector3 moveTarget;
+        private Vector3 _moveTarget;
 
 
         /// <summary>
         /// Where dog should go.
         /// </summary>
-        public Vector3 MoveTarget => moveTarget;
+        public Vector3 MoveTarget => _moveTarget;
 
 
         /// <param name="moveTarget">Where dog should go.</param>
         public DogMoveCommandEvent(Vector3 moveTarget)
         {
-            this.moveTarget = moveTarget;
+            _moveTarget = moveTarget;
         }
     }
 
@@ -92,107 +93,150 @@ namespace Core.Events
     public class DogFollowCommandEvent : GameEvent
     {
     }
-
-    public class DogHerdModeToggleEvent : GameEvent
-    {
-        public bool IsActive { get; }
-
-        public DogHerdModeToggleEvent(bool isActive)
-        {
-            IsActive = isActive;
-        }
-    }
-
     #endregion DOG_EVENTS
 
-
-    #region FOW_EVENTS
-    /// <summary>
-    /// When object needs to be added dynamically to the fog of war manager.
-    /// </summary>
-    public class AddHiddenObjectEvent : GameEvent
-    {
-        private readonly IHiddenObject objectToAdd;
-
-
-        /// <summary>
-        /// Where dog should go.
-        /// </summary>
-        public IHiddenObject ObjectToAdd => objectToAdd;
-
-
-        /// <param name="moveTarget">Object which has to be added.</param>
-        public AddHiddenObjectEvent(IHiddenObject objectToAdd)
-        {
-            this.objectToAdd = objectToAdd;
-        }
-    }
-
-
-    /// <summary>
-    /// When object needs to be removed dynamically from the fog of war manager.
-    /// </summary>
-    public class RemoveHiddenObjectEvent : GameEvent
-    {
-        private readonly IHiddenObject objectToRemove;
-
-
-        /// <summary>
-        /// Where dog should go.
-        /// </summary>
-        public IHiddenObject ObjectToRemove => objectToRemove;
-
-
-        /// <param name="moveTarget">Object which has to be added.</param>
-        public RemoveHiddenObjectEvent(IHiddenObject objectToRemove)
-        {
-            this.objectToRemove = objectToRemove;
-        }
-    }
-
-    #endregion FOW_EVENTS
 
 
     #region QUEST_EVENTS
 
+    /// <summary>
+    /// Event triggered to request the start of a specific quest.
+    /// Typically dispatched by gameplay systems when a quest should begin.
+    /// </summary>
     public class StartQuestEvent : GameEvent
     {
+        /// <summary>
+        /// The unique identifier of the quest to start.
+        /// </summary>
         private string _questID;
 
+        /// <summary>
+        /// Gets the unique ID of the quest being started.
+        /// </summary>
         public string QuestID => _questID;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StartQuestEvent"/> class.
+        /// </summary>
+        /// <param name="questID">The unique ID of the quest to start.</param>
         public StartQuestEvent(string questID)
         {
             _questID = questID;
         }
     }
 
+    /// <summary>
+    /// Event broadcast when a quest has successfully started.
+    /// Typically used by the UI or other systems to display the quest entry.
+    /// </summary>
+    public class QuestStartedEvent : GameEvent
+    {
+        /// <summary>
+        /// The unique identifier of the started quest.
+        /// </summary>
+        private string _questID;
+
+        /// <summary>
+        /// Gets the unique ID of the quest that was started.
+        /// </summary>
+        public string QuestID => _questID;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="QuestStartedEvent"/> class.
+        /// </summary>
+        /// <param name="questID">The unique ID of the quest that has started.</param>
+        public QuestStartedEvent(string questID)
+        {
+            _questID = questID;
+        }
+    }
+
+    /// <summary>
+    /// Event broadcast when an existing quest’s progress changes (e.g., objectives updated).
+    /// </summary>
+    public class QuestUpdateEvent : GameEvent
+    {
+        /// <summary>
+        /// The unique identifier of the quest being updated.
+        /// </summary>
+        private string _questID;
+
+        /// <summary>
+        /// Gets the unique ID of the quest that was updated.
+        /// </summary>
+        public string QuestID => _questID;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="QuestUpdateEvent"/> class.
+        /// </summary>
+        /// <param name="questID">The unique ID of the quest being updated.</param>
+        public QuestUpdateEvent(string questID)
+        {
+            _questID = questID;
+        }
+    }
+
+    /// <summary>
+    /// Event triggered when a specific objective within a quest is completed.
+    /// </summary>
     public class CompleteObjectiveEvent : GameEvent
     {
+        /// <summary>
+        /// The unique identifier of the quest containing the completed objective.
+        /// </summary>
         private string _questID;
+
+        /// <summary>
+        /// The unique identifier of the completed objective.
+        /// </summary>
         private string _objectiveID;
 
+        /// <summary>
+        /// Gets the unique ID of the quest containing the completed objective.
+        /// </summary>
         public string QuestID => _questID;
+
+        /// <summary>
+        /// Gets the unique ID of the completed objective.
+        /// </summary>
         public string ObjectiveID => _objectiveID;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CompleteObjectiveEvent"/> class.
+        /// </summary>
+        /// <param name="questID">The unique ID of the quest containing the objective.</param>
+        /// <param name="objectiveID">The unique ID of the completed objective.</param>
         public CompleteObjectiveEvent(string questID, string objectiveID)
         {
             _questID = questID;
             _objectiveID = objectiveID;
         }
     }
-    
+
+    /// <summary>
+    /// Event broadcast when a quest is fully completed (all objectives and stages finished).
+    /// </summary>
     public class QuestCompletedEvent : GameEvent
     {
+        /// <summary>
+        /// The unique identifier of the completed quest.
+        /// </summary>
         private string _questID;
 
+        /// <summary>
+        /// Gets the unique ID of the quest that was completed.
+        /// </summary>
         public string QuestID => _questID;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="QuestCompletedEvent"/> class.
+        /// </summary>
+        /// <param name="questID">The unique ID of the quest that was completed.</param>
         public QuestCompletedEvent(string questID)
         {
             _questID = questID;
         }
     }
-    
+
     #endregion QUEST_EVENTS
 }

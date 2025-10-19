@@ -13,21 +13,29 @@ MonoBehaviour:
   m_Name: TestQuest
   m_EditorClassIdentifier: 
   _questID: TESTQUEST_001
-  QuestName: TESTQUEST
-  QuestDescription: 
-  Objectives:
-  - ObjectiveID: 001
-    ObjectiveDescription: 123
-    Type: 1
-    RequiredAmount: 4
-    CurrentAmount: 0
-  - ObjectiveID: 002
-    ObjectiveDescription: 123
-    Type: 3
-    RequiredAmount: 3
-    CurrentAmount: 0
-  - ObjectiveID: 003
-    ObjectiveDescription: 123
-    Type: 3
-    RequiredAmount: 2
-    CurrentAmount: 0
+  _questName: HELP
+  _questDescription: HELP SOMENONE
+  _stages:
+  - _stageID: 000
+    _stageDescription: Help With stuff
+    _objectives:
+    - objectiveID: ITEM_001
+      objectiveDescription: Collect Item
+      type: 0
+      requiredAmount: 2
+      currentAmount: 0
+    - objectiveID: ITEM_002
+      objectiveDescription: Collect Item
+      type: 0
+      requiredAmount: 2
+      currentAmount: 0
+    _isParallel: 1
+  - _stageID: 001
+    _stageDescription: Talk to Vesna
+    _objectives:
+    - objectiveID: NPC_VESNA
+      objectiveDescription: Talk To Vesna
+      type: 3
+      requiredAmount: 1
+      currentAmount: 0
+    _isParallel: 0
