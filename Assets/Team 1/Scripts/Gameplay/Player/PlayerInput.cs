@@ -47,7 +47,6 @@ namespace Gameplay.Player
         {
             get
             {
-                UpdateCursorPositionInWorld();
                 return _cursorWorldPosition;
             }
         }
@@ -122,7 +121,7 @@ namespace Gameplay.Player
         }
 
 
-        private void UpdateCursorPositionInWorld()
+        private void LateUpdate()
         {
             Ray ray = _mainCamera.ScreenPointToRay(_lookAction.ReadValue<Vector2>());
 
@@ -130,7 +129,6 @@ namespace Gameplay.Player
 
             Physics.Raycast(ray, out RaycastHit hitInfo, Mathf.Infinity, _groundLayers);
             worldCursorPosition = hitInfo.point;
-            
 
             _cursorWorldPosition.Value = worldCursorPosition;
         }

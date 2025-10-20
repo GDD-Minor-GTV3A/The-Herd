@@ -9,12 +9,16 @@ namespace Gameplay.Player
     /// <summary>
     /// Base player script.
     /// </summary>
-    [RequireComponent(typeof(PlayerMovement), typeof(PlayerRotation), typeof(PlayerStateManager))]
+    [RequireComponent(typeof(PlayerMovement), typeof(PlayerStateManager))]
     [RequireComponent(typeof(PlayerInput), typeof(ToolSlotsController), typeof(CharacterController))]
     public class Player : MonoBehaviour, IDamageable, IHealable, IKillable
     {
+        [Header("Animations")]
         [Tooltip("Animator of the player.")]
         [SerializeField] private Animator _animator;
+        [SerializeField] private PlayerAnimationConstraints animationConstrains;
+
+        [Space]
         [Tooltip("Manager of step sounds.")]
         [SerializeField] private StepsSoundManager _stepsSoundManager;
         [Tooltip("Reference to input actions map.")]
@@ -24,7 +28,6 @@ namespace Gameplay.Player
 
 
         private PlayerMovement _movementController;
-        private PlayerRotation _rotationController;
         private Health _health;
 
 
@@ -49,8 +52,15 @@ namespace Gameplay.Player
         /// </summary>
         public void Initialize()
         {
+            Vector3 forward = Camera.main.transform.forward;
+
+            forward.y = 0f;
+
+            forward.Normalize();
+
+            transform.forward = forward;
+
             _movementController = GetComponent<PlayerMovement>();
-            _rotationController = GetComponent<PlayerRotation>();
             PlayerStateManager stateManager = GetComponent<PlayerStateManager>();
             PlayerInput playerInput = GetComponent<PlayerInput>();
             ToolSlotsController slotsController = GetComponent<ToolSlotsController>();
@@ -61,11 +71,10 @@ namespace Gameplay.Player
             CharacterController characterController = GetComponent<CharacterController>();
             _movementController.Initialize(characterController, _config);
 
-            _rotationController.Initialize(_config.RotationSpeed);
 
             _stepsSoundManager.Initialize();
-            PlayerAnimator animator = new PlayerAnimator(_animator);
-            stateManager.Initialize(playerInput, _movementController, animator, _rotationController);
+            PlayerAnimator animator = new PlayerAnimator(_animator,transform, animationConstrains);
+            stateManager.Initialize(playerInput, _movementController, animator);
 
             // Init health
             _health = new Health(
@@ -88,7 +97,6 @@ namespace Gameplay.Player
         private void UpdateConfigValues(PlayerConfig config)
         {
             _movementController.UpdateValues(config);
-            _rotationController.UpdateRotationSpeed(config.RotationSpeed);
         }
 
 

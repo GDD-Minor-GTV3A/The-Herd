@@ -1,24 +1,24 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Gameplay.Player
 {
-    /// <summary>
-    /// Player is walking.
-    /// </summary>
-    public class PlayerWalking : PlayerState
+    public class PlayerRunning: PlayerState
     {
         private readonly PlayerAnimator _animator;
+        private readonly PlayerMovement _movement;
 
-        public PlayerWalking(PlayerStateManager stateMachine) : base(stateMachine)
+        public PlayerRunning(PlayerStateManager stateMachine) : base(stateMachine)
         {
             _animator = _manager.AnimatorController as PlayerAnimator;
+            _movement = _manager.MovementController as PlayerMovement;
         }
 
         public override void OnStart()
         {
             _animator.SetWalking(true);
-            _animator.SetWalkSpeed(false);
-            _animator.SetAnimationRotation(true);
+            _animator.SetWalkSpeed(true);
+
+            _animator.SetAnimationRotation(false);
         }
 
         public override void OnStop()
@@ -36,20 +36,20 @@ namespace Gameplay.Player
                 return;
             }
 
-            if (_manager.Input.Run)
+            if (!_manager.Input.Run)
             {
-                _manager.SetState<PlayerRunning>();
+                _manager.SetState<PlayerWalking>();
                 return;
             }
 
             _playerMovement.ApplyGravity();
 
-            Vector3 movementTarget = _playerMovement.CalculateMovementTargetFromInput(playerInput, false);
+
+            Vector3 movementTarget = _playerMovement.CalculateMovementTargetFromInput(playerInput, true);
             _playerMovement.MoveTo(movementTarget);
 
             // Rotate based on current rotation mode (movement or mouse)
-            //_manager.Rotation.Rotate(playerInput, _manager.Input.Look.Value);
-            _animator.RotateCharacterBody(_manager.Input.Look.Value);
+            _movement.Rotate(playerInput);
         }
     }
 }
