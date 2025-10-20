@@ -1,3 +1,5 @@
+using System;
+
 using UnityEngine;
 
 namespace Core.Shared
@@ -30,4 +32,20 @@ namespace Core.Shared
         /// </summary>
         public abstract void SecondaryUsageFinished();
     }
+}
+
+[Serializable]
+public struct ToolAnimationKeyPoints
+{
+    [Header("Right hand")]
+    public Transform RightHandTarget;
+    public Transform RightHandHint;
+
+    [Space]
+    [Header("Left hand")]
+    public Transform LeftHandTarget;
+    public Transform LeftHandHint;
+
+    [Space]
+    public Transform ShouldersTarget;
 }
