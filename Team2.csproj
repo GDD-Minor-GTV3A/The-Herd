@@ -10,10 +10,10 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{BC34C984-9886-2822-5D0D-5BB1AE478F6F}</ProjectGuid>
+    <ProjectGuid>{6A9BB6DD-77E8-903B-6BCE-96FC8F8B7AB1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <AssemblyName>Team1</AssemblyName>
+    <AssemblyName>Team2</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <BaseDirectory>.</BaseDirectory>
@@ -60,53 +60,31 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.0.58f2\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\States\PlayerState.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Editor\ShowIfDrawer.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\States\DogFollowPlayer.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\HeardZone.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\FogRevealer.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\Dog.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\FogOfWarManager.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\Camera\CameraManager.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\States\PlayerWalking.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\ToolsSystem\Tools\Bullet.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\ToolsSystem\Tools\Rifle.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\HealthSystem\IDamagable.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\PlayerRotation.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\States\DogState.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\ViewObstacle.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\States\DogMove.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\StepsSoundManager.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\PlayerAnimator.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\Data\LevelData.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\Data\FogRevealerConfig.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\HealthSystem\IKillable.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\Input System\InputSystem_Actions.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\States\PlayerIdle.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\PlayerMovement.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\Player.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\HealthSystem\HealthTester.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\PlayerStateManager.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\Camera\CameraConfig.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\Data\FogOfWarConfig.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Editor\ShowIfAttribute.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\DogAnimator.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\HiddenInFog.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\HealthSystem\Health.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\DogMovementController.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\PlayerInput.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\DogConfig.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\ToolsSystem\ToolSlotsController.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\DogStateManager.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\States\DogIdle.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\HealthSystem\IHealable.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\ToolsSystem\Tools\Whistle.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\PlayerConfig.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\States\DogMoveToSheep.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Core\Shared\Abstractions\IPlayerTool.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\Personality\Types\EnergeticPersonality.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\Personality\PersonalityBehaviorContext.cs" />
+    <Compile Include="Assets\Team 2\Scripts\Sound\SheepSoundManager.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\Personality\Types\LazyPersonality.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\Personality\Types\NormalPersonality.cs" />
+    <Compile Include="Assets\Team 2\Scripts\Sound\SheepSoundDriver.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\SheepStates.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\FlockingUtility.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\ThreatSensor.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\Personality\Types\NervousPersonality.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\Personality\BaseSheepPersonality.cs" />
+    <Compile Include="Assets\Team 2\Scripts\EventDemoSimulator.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\SheepArchetype.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\GizmoPlayerSquare.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\Personality\ISheepPersonality.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\SheepStateManager.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\SheepRejoinTester.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\SheepAnimationDriver.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\SheepAnimState.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\Personality\Types\StubbornPersonality.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\SheepConfig.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\SheepHerdController.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Team 1\Scripts\Team1.asmdef" />
+    <None Include="Assets\Team 2\Scripts\Team2.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -1133,12 +1111,8 @@
       <HintPath>Library\ScriptAssemblies\Unity.InputSystem.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Unity.RenderPipelines.Universal.Runtime">
-      <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Universal.Runtime.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Cinemachine">
-      <HintPath>Library\ScriptAssemblies\Unity.Cinemachine.dll</HintPath>
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEditor.UI">
@@ -1158,10 +1132,6 @@
     <ProjectReference Include="Events.csproj">
       <Project>{E65029FA-14DF-2913-D2FD-13670D85E867}</Project>
       <Name>Events</Name>
-    </ProjectReference>
-    <ProjectReference Include="Team2.csproj">
-      <Project>{6A9BB6DD-77E8-903B-6BCE-96FC8F8B7AB1}</Project>
-      <Name>Team2</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
