@@ -91,7 +91,8 @@ namespace Team_7.Scripts.AI.Drekavac
                 { typeof(HuntingState), new HuntingState(this, _enemyMovementController, _drekavacStats, _drekavacAnimatorController, _audioController) },
                 { typeof(StalkingState), new StalkingState(this, _enemyMovementController, _drekavacStats, _drekavacAnimatorController, _audioController) },
                 { typeof(DraggingState), new DraggingState(this, _enemyMovementController, _drekavacStats, _drekavacAnimatorController, _audioController) },
-                { typeof(FleeingState), new FleeingState(this, _enemyMovementController, _drekavacStats, _drekavacAnimatorController, _audioController) }
+                { typeof(FleeingState), new FleeingState(this, _enemyMovementController, _drekavacStats, _drekavacAnimatorController, _audioController) },
+                { typeof(BigState), new BigState(this, _enemyMovementController, _drekavacStats, _drekavacAnimatorController, _audioController) }
             };
         }
 
@@ -104,7 +105,7 @@ namespace Team_7.Scripts.AI.Drekavac
         {
             base.Update();
             _playerLocation = _playerObject.transform.position;
-            if (_currentState is not FleeingState && Vector3.Distance(transform.position, _playerLocation) <= _drekavacStats.fleeTriggerDistance)
+            if (_currentState is not FleeingState && _currentState is not BigState && Vector3.Distance(transform.position, _playerLocation) <= _drekavacStats.fleeTriggerDistance)
                 Flee();
         }
 

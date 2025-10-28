@@ -14,6 +14,7 @@ namespace Team_7.Scripts.AI.Drekavac
         public float sprintSpeed = 15f;
         public float dragSpeed = 1.2f;
         public float circleSpeed = 7f;
+        public float bigChargeSpeed = 20;
 
         [Header("Behavior Settings")]
         public float directionSwitchInterval = 5f;
