@@ -1,12 +1,17 @@
+<<<<<<< HEAD
 VAR quest_accepted = false
 VAR all_objectives_completed = false
 VAR QUEST_001_completed = false
 VAR quest_declined = false
 VAR after_quest_completed = false
+=======
+VAR vesna_quest_accepted = false
+>>>>>>> main
 
 EXTERNAL StartQuest(string)
 EXTERNAL CompleteObjective(string, string)
 
+<<<<<<< HEAD
 // Entry point
 -> vesna_router
 
@@ -32,9 +37,17 @@ EXTERNAL CompleteObjective(string, string)
         }
     }
 }
+=======
+// START HERE: This line tells the Ink engine where to begin the story.
+-> vesna_quest.intro_dialogue
+>>>>>>> main
 
 === vesna ===
 
+<<<<<<< HEAD
+=======
+// --- First Dialogue Block and Choice ---
+>>>>>>> main
 = intro_dialogue
 #speaker:Vesna
 Oh, hello there. You must be the newcomer to our Village? It is nice to meet you.
@@ -48,6 +61,7 @@ Vesna looks a bit surprised by the cold tone and short words but hides it behind
 #speaker:Vesna
 I see. Did you come here by accident or were you running from something like most of us?
 
+<<<<<<< HEAD
 + [I don't think that's any of your business.]
     #speaker:Vesna
     Forgive me, you are right. Your reasons are your reasons alone and I will respect that.
@@ -56,6 +70,18 @@ I see. Did you come here by accident or were you running from something like mos
     Ah, this is the sad reality of so many of us. I am sorry that you've felt the need to do that.
 + [Don't say anything.]
     #speaker:Vesna
+=======
+* [I don’t think that’s any of your business.]
+    #speaker:Vesna #layout:right
+    Forgive me, you are right. Your reasons are your reasons alone and I will respect that.
+    -> after_first_choice
+* [My past.]
+    #speaker:Vesna #layout:right
+    Ah, this is the sad reality of so many of us. I am sorry that you’ve felt the need to do that.
+    -> after_first_choice
+* [Don’t say anything.]
+    #speaker:Vesna #layout:right
+>>>>>>> main
     I understand your silence, forgive me for my bluntness. I hope you do not have to keep running and feel safe enough to stay in one place.
 
 -
@@ -72,12 +98,18 @@ Vesna looks unphased by the hostility of the player and keeps her warm expressio
 #speaker:Vesna
 That is understandable. I also came here to seek a new home as the war progressed and I was forced to leave that which was most precious to me.
 
+<<<<<<< HEAD
 #speaker:Vesna
 I see you have not come with much? Are your sheep all you've got?
+=======
+#speaker:Vesna #layout:right
+I see you have not come with much? Are your sheep all you’ve got?
+>>>>>>> main
 
 #speaker:Narrator
 Player visibly tenses and quickly scans the area around them as if looking for sudden danger.
 
+<<<<<<< HEAD
 #speaker:Player
 Why are you questioning me so much? You look like you don't have much either.
 
@@ -86,6 +118,16 @@ Vesna's eyes turn slightly sad and she sighs in melancholy.
 
 #speaker:Vesna
 You are right. I couldn't bring my belongings with me besides the clothes on my back and flowers on my head.
+=======
+#speaker:Player #layout:left
+Why are you questioning me so much? You look like you don’t have much either.
+
+#layout:narrator
+Vesna’s eyes turn slightly sad and she sighs in melancholy.
+
+#speaker:Vesna #layout:right
+You are right. I couldn’t bring my belongings with me besides the clothes on my back and flowers on my head.
+>>>>>>> main
 
 #speaker:Narrator
 She touches the wrist of her right hand and shakes her head as if trying to shoo away unwanted thoughts.
@@ -96,6 +138,7 @@ I lost something very precious to me. My bracelet, gifted to me by one of the wi
 + [How precious exactly was it?]
     #speaker:Vesna
     Very precious. It is one of a kind and worn by a Samodiva at that. If it has to be translated in human terms, it costs a fortune that can last you a lifetime.
+<<<<<<< HEAD
 + [I don't see how this is of any relevance to me.]
     #speaker:Vesna
     Perhaps it is not. But at the very least, you have your sheep with you who look just as precious to me. I wouldn't wish to lose them the way I lost my bracelet.
@@ -103,12 +146,24 @@ I lost something very precious to me. My bracelet, gifted to me by one of the wi
     #speaker:Vesna
     goede keuze
 -
+=======
+    -> after_second_choice
+* [I don’t see how this is of any relevance to me.]
+    #speaker:Vesna #layout:right
+    Perhaps it is not. But at the very least, you have your sheep with you who look just as precious to me. I wouldn’t wish to lose them the way I lost my bracelet.
+    -> after_second_choice
+>>>>>>> main
 
 #speaker:Vesna
 Maybe you could help me find it?
 
+<<<<<<< HEAD
 #speaker:Player
 Why would I do that? As I said, I came here to seek refuge and make sure I'm safe, not become an errand boy for random people.
+=======
+#speaker:Player #layout:left
+Why would I do that? As I said, I came here to seek refuge and make sure I’m safe, not become an errand boy for random people.
+>>>>>>> main
 
 #speaker:Vesna
 Think of it as a favour of some kind, maybe. If you bring my bracelet, I will owe you anything you ask of me, no matter what it is. I am a creature of nature, after all, and can do things no normal human being is capable of.
@@ -125,7 +180,9 @@ If I do this for you, you are in my debt, correct?
 #speaker:Vesna
 Yes, precisely.
 
+// Note: The choice text is separated from the outcome text.
 + [Accept quest: I will do it]
+<<<<<<< HEAD
     ~ quest_accepted = true
     ~ quest_declined = false
     ~ StartQuest("QUEST_001")
@@ -134,10 +191,18 @@ Yes, precisely.
     That is very helpful of you! Thank you. You will have to head out to **[Level 2]** and look around as much as possible. I went through that area before I came here and it's the last time I remember wearing it.
 
     #speaker:Player
+=======
+    ~ vesna_quest_accepted = true
+    ~ StartQuest("QUEST_001")
+    #speaker:Vesna #layout:right
+    That is very helpful of you! Thank you. You will have to head out to **[Level 2]** and look around as much as possible. I went through that area before I came here and it’s the last time I remember wearing it.
+    #speaker:Player #layout:left
+>>>>>>> main
     I will have a look. I hope this will be worth my efforts.
     -> END
 
 + [Decline quest: I have more important matters to attend to than this]
+<<<<<<< HEAD
     ~ quest_accepted = false
     ~ quest_declined = true
 
@@ -219,3 +284,9 @@ If you ever need my help with your sheep or anything else within my power, pleas
 #speaker:Vesna
 Thanks but now go away please
 -> END
+=======
+    ~ vesna_quest_accepted = false
+    #speaker:Vesna #layout:right
+    That is no problem. I will be here if you decide otherwise.
+    -> END
+>>>>>>> main
