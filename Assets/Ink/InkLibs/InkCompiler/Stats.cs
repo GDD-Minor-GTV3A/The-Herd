@@ -1,8 +1,6 @@
 
-namespace Ink
-{
-    public struct Stats
-    {
+namespace Ink {
+    public struct Stats {
 
         public int words;
         public int knots;
@@ -12,27 +10,21 @@ namespace Ink
         public int gathers;
         public int diverts;
 
-        public static Stats Generate(Ink.Parsed.Story story)
-        {
+        public static Stats Generate(Ink.Parsed.Story story) {
             var stats = new Stats();
 
             var allText = story.FindAll<Ink.Parsed.Text>();
 
             // Count all the words across all strings
             stats.words = 0;
-            foreach (var text in allText)
-            {
+            foreach(var text in allText) {
 
                 var wordsInThisStr = 0;
                 var wasWhiteSpace = true;
-                foreach (var c in text.text)
-                {
-                    if (c == ' ' || c == '\t' || c == '\n' || c == '\r')
-                    {
+                foreach(var c in text.text) {
+                    if( c == ' ' || c == '\t' || c == '\n' || c == '\r' ) {
                         wasWhiteSpace = true;
-                    }
-                    else if (wasWhiteSpace)
-                    {
+                    } else if( wasWhiteSpace ) {
                         wordsInThisStr++;
                         wasWhiteSpace = false;
                     }
@@ -45,7 +37,7 @@ namespace Ink
             stats.knots = knots.Count;
 
             stats.functions = 0;
-            foreach (var knot in knots)
+            foreach(var knot in knots)
                 if (knot.isFunction) stats.functions++;
 
             var stitches = story.FindAll<Ink.Parsed.Stitch>();
