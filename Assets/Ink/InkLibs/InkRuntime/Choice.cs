@@ -8,7 +8,7 @@ namespace Ink.Runtime
     /// separated.
     /// </summary>
 	public class Choice : Runtime.Object
-    {
+	{
         /// <summary>
         /// The main text to presented to the player for this Choice.
         /// </summary>
@@ -18,15 +18,12 @@ namespace Ink.Runtime
         /// The target path that the Story should be diverted to if
         /// this Choice is chosen.
         /// </summary>
-        public string pathStringOnChoice
-        {
-            get
-            {
-                return targetPath.ToString();
+        public string pathStringOnChoice {
+            get {
+                return targetPath.ToString ();
             }
-            set
-            {
-                targetPath = new Path(value);
+            set {
+                targetPath = new Path (value);
             }
         }
 
@@ -54,5 +51,6 @@ namespace Ink.Runtime
         public Choice()
         {
         }
-    }
+	}
 }
+

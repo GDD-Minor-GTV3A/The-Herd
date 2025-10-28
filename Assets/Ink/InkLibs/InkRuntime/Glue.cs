@@ -4,9 +4,10 @@
     {
         public Glue() { }
 
-        public override string ToString()
+        public override string ToString ()
         {
             return "Glue";
         }
     }
 }
+

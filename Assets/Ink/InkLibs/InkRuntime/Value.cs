@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
+using System.Collections.Generic;
 
 namespace Ink.Runtime
 {
@@ -13,7 +13,7 @@ namespace Ink.Runtime
         // Bool is new addition, keep enum values the same, with Int==0, Float==1 etc,
         // but for coersion rules, we want to keep bool with a lower value than Int
         // so that it converts in the right direction
-        Bool = -1,
+        Bool = -1, 
         // Used in coersion
         Int,
         Float,
@@ -37,43 +37,27 @@ namespace Ink.Runtime
         public static Value Create(object val)
         {
             // Implicitly lose precision from any doubles we get passed in
-            if (val is double)
-            {
+            if (val is double) {
                 double doub = (double)val;
                 val = (float)doub;
             }
 
-            if (val is bool)
-            {
+            if( val is bool ) {
                 return new BoolValue((bool)val);
-            }
-            else if (val is int)
-            {
-                return new IntValue((int)val);
-            }
-            else if (val is long)
-            {
-                return new IntValue((int)(long)val);
-            }
-            else if (val is float)
-            {
-                return new FloatValue((float)val);
-            }
-            else if (val is double)
-            {
-                return new FloatValue((float)(double)val);
-            }
-            else if (val is string)
-            {
-                return new StringValue((string)val);
-            }
-            else if (val is Path)
-            {
-                return new DivertTargetValue((Path)val);
-            }
-            else if (val is InkList)
-            {
-                return new ListValue((InkList)val);
+            } else if (val is int) {
+                return new IntValue ((int)val);
+            } else if (val is long) {
+                return new IntValue ((int)(long)val);
+            } else if (val is float) {
+                return new FloatValue ((float)val);
+            } else if (val is double) {
+                return new FloatValue ((float)(double)val);
+            } else if (val is string) {
+                return new StringValue ((string)val);
+            } else if (val is Path) {
+                return new DivertTargetValue ((Path)val);
+            } else if (val is InkList) {
+                return new ListValue ((InkList)val);
             }
 
             return null;
@@ -81,12 +65,12 @@ namespace Ink.Runtime
 
         public override Object Copy()
         {
-            return Create(valueObject);
+            return Create (valueObject);
         }
 
-        protected StoryException BadCastException(ValueType targetType)
+        protected StoryException BadCastException (ValueType targetType)
         {
-            return new StoryException("Can't cast " + this.valueObject + " from " + this.valueType + " to " + targetType);
+            return new StoryException ("Can't cast "+this.valueObject+" from " + this.valueType+" to "+targetType);
         }
     }
 
@@ -94,20 +78,18 @@ namespace Ink.Runtime
     {
         public T value { get; set; }
 
-        public override object valueObject
-        {
-            get
-            {
+        public override object valueObject {
+            get {
                 return (object)value;
             }
         }
 
-        public Value(T val)
+        public Value (T val)
         {
             value = val;
         }
 
-        public override string ToString()
+        public override string ToString ()
         {
             return value.ToString();
         }
@@ -122,34 +104,30 @@ namespace Ink.Runtime
         {
         }
 
-        public BoolValue() : this(false) { }
+        public BoolValue() : this(false) {}
 
         public override Value Cast(ValueType newType)
         {
-            if (newType == valueType)
-            {
+            if (newType == valueType) {
                 return this;
             }
 
-            if (newType == ValueType.Int)
-            {
-                return new IntValue(this.value ? 1 : 0);
+            if (newType == ValueType.Int) {
+                return new IntValue (this.value ? 1 : 0);
             }
 
-            if (newType == ValueType.Float)
-            {
-                return new FloatValue(this.value ? 1.0f : 0.0f);
+            if (newType == ValueType.Float) {
+                return new FloatValue (this.value ? 1.0f : 0.0f);
             }
 
-            if (newType == ValueType.String)
-            {
+            if (newType == ValueType.String) {
                 return new StringValue(this.value ? "true" : "false");
             }
 
-            throw BadCastException(newType);
+            throw BadCastException (newType);
         }
 
-        public override string ToString()
+        public override string ToString ()
         {
             // Instead of C# "True" / "False"
             return value ? "true" : "false";
@@ -165,31 +143,27 @@ namespace Ink.Runtime
         {
         }
 
-        public IntValue() : this(0) { }
+        public IntValue() : this(0) {}
 
         public override Value Cast(ValueType newType)
         {
-            if (newType == valueType)
-            {
+            if (newType == valueType) {
                 return this;
             }
 
-            if (newType == ValueType.Bool)
-            {
-                return new BoolValue(this.value == 0 ? false : true);
+            if (newType == ValueType.Bool) {
+                return new BoolValue (this.value == 0 ? false : true);
             }
 
-            if (newType == ValueType.Float)
-            {
-                return new FloatValue((float)this.value);
+            if (newType == ValueType.Float) {
+                return new FloatValue ((float)this.value);
             }
 
-            if (newType == ValueType.String)
-            {
+            if (newType == ValueType.String) {
                 return new StringValue("" + this.value);
             }
 
-            throw BadCastException(newType);
+            throw BadCastException (newType);
         }
     }
 
@@ -202,31 +176,27 @@ namespace Ink.Runtime
         {
         }
 
-        public FloatValue() : this(0.0f) { }
+        public FloatValue() : this(0.0f) {}
 
         public override Value Cast(ValueType newType)
         {
-            if (newType == valueType)
-            {
+            if (newType == valueType) {
                 return this;
             }
 
-            if (newType == ValueType.Bool)
-            {
-                return new BoolValue(this.value == 0.0f ? false : true);
+            if (newType == ValueType.Bool) {
+                return new BoolValue (this.value == 0.0f ? false : true);
             }
 
-            if (newType == ValueType.Int)
-            {
-                return new IntValue((int)this.value);
+            if (newType == ValueType.Int) {
+                return new IntValue ((int)this.value);
             }
 
-            if (newType == ValueType.String)
-            {
+            if (newType == ValueType.String) {
                 return new StringValue("" + this.value.ToString(System.Globalization.CultureInfo.InvariantCulture));
             }
 
-            throw BadCastException(newType);
+            throw BadCastException (newType);
         }
     }
 
@@ -237,10 +207,8 @@ namespace Ink.Runtime
 
         public bool isNewline { get; private set; }
         public bool isInlineWhitespace { get; private set; }
-        public bool isNonWhitespace
-        {
-            get
-            {
+        public bool isNonWhitespace {
+            get {
                 return !isNewline && !isInlineWhitespace;
             }
         }
@@ -250,53 +218,42 @@ namespace Ink.Runtime
             // Classify whitespace status
             isNewline = value == "\n";
             isInlineWhitespace = true;
-            foreach (var c in value)
-            {
-                if (c != ' ' && c != '\t')
-                {
+            foreach (var c in value) {
+                if (c != ' ' && c != '\t') {
                     isInlineWhitespace = false;
                     break;
                 }
             }
         }
 
-        public StringValue() : this("") { }
+        public StringValue() : this("") {}
 
         public override Value Cast(ValueType newType)
         {
-            if (newType == valueType)
-            {
+            if (newType == valueType) {
                 return this;
             }
 
-            if (newType == ValueType.Int)
-            {
+            if (newType == ValueType.Int) {
 
                 int parsedInt;
-                if (int.TryParse(value, out parsedInt))
-                {
-                    return new IntValue(parsedInt);
-                }
-                else
-                {
+                if (int.TryParse (value, out parsedInt)) {
+                    return new IntValue (parsedInt);
+                } else {
                     return null;
                 }
             }
 
-            if (newType == ValueType.Float)
-            {
+            if (newType == ValueType.Float) {
                 float parsedFloat;
-                if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out parsedFloat))
-                {
-                    return new FloatValue(parsedFloat);
-                }
-                else
-                {
+                if (float.TryParse (value, System.Globalization.NumberStyles.Float ,System.Globalization.CultureInfo.InvariantCulture, out parsedFloat)) {
+                    return new FloatValue (parsedFloat);
+                } else {
                     return null;
                 }
             }
 
-            throw BadCastException(newType);
+            throw BadCastException (newType);
         }
     }
 
@@ -305,23 +262,23 @@ namespace Ink.Runtime
         public Path targetPath { get { return this.value; } set { this.value = value; } }
         public override ValueType valueType { get { return ValueType.DivertTarget; } }
         public override bool isTruthy { get { throw new System.Exception("Shouldn't be checking the truthiness of a divert target"); } }
-
+            
         public DivertTargetValue(Path targetPath) : base(targetPath)
         {
         }
 
         public DivertTargetValue() : base(null)
-        { }
+        {}
 
         public override Value Cast(ValueType newType)
         {
             if (newType == valueType)
                 return this;
-
-            throw BadCastException(newType);
+            
+            throw BadCastException (newType);
         }
 
-        public override string ToString()
+        public override string ToString ()
         {
             return "DivertTargetValue(" + targetPath + ")";
         }
@@ -355,102 +312,94 @@ namespace Ink.Runtime
             if (newType == valueType)
                 return this;
 
-            throw BadCastException(newType);
+            throw BadCastException (newType);
         }
 
-        public override string ToString()
+        public override string ToString ()
         {
             return "VariablePointerValue(" + variableName + ")";
         }
 
         public override Object Copy()
         {
-            return new VariablePointerValue(variableName, contextIndex);
+            return new VariablePointerValue (variableName, contextIndex);
         }
     }
 
     public class ListValue : Value<InkList>
     {
-        public override ValueType valueType
-        {
-            get
-            {
+        public override ValueType valueType {
+            get {
                 return ValueType.List;
             }
         }
 
         // Truthy if it is non-empty
-        public override bool isTruthy
-        {
-            get
-            {
+        public override bool isTruthy {
+            get {
                 return value.Count > 0;
             }
         }
-
-        public override Value Cast(ValueType newType)
+                
+        public override Value Cast (ValueType newType)
         {
-            if (newType == ValueType.Int)
-            {
+            if (newType == ValueType.Int) {
                 var max = value.maxItem;
-                if (max.Key.isNull)
-                    return new IntValue(0);
+                if( max.Key.isNull )
+                    return new IntValue (0);
                 else
-                    return new IntValue(max.Value);
+                    return new IntValue (max.Value);
             }
 
-            else if (newType == ValueType.Float)
-            {
+            else if (newType == ValueType.Float) {
                 var max = value.maxItem;
                 if (max.Key.isNull)
-                    return new FloatValue(0.0f);
+                    return new FloatValue (0.0f);
                 else
-                    return new FloatValue((float)max.Value);
+                    return new FloatValue ((float)max.Value);
             }
 
-            else if (newType == ValueType.String)
-            {
+            else if (newType == ValueType.String) {
                 var max = value.maxItem;
                 if (max.Key.isNull)
-                    return new StringValue("");
-                else
-                {
-                    return new StringValue(max.Key.ToString());
+                    return new StringValue ("");
+                else {
+                    return new StringValue (max.Key.ToString());
                 }
             }
 
             if (newType == valueType)
                 return this;
 
-            throw BadCastException(newType);
+            throw BadCastException (newType);
         }
 
-        public ListValue() : base(null)
+        public ListValue () : base(null) {
+            value = new InkList ();
+        }
+
+        public ListValue (InkList list) : base (null)
         {
-            value = new InkList();
+            value = new InkList (list);
         }
 
-        public ListValue(InkList list) : base(null)
-        {
-            value = new InkList(list);
-        }
-
-        public ListValue(InkListItem singleItem, int singleValue) : base(null)
+        public ListValue (InkListItem singleItem, int singleValue) : base (null)
         {
             value = new InkList {
                 {singleItem, singleValue}
             };
         }
 
-        public static void RetainListOriginsForAssignment(Runtime.Object oldValue, Runtime.Object newValue)
+        public static void RetainListOriginsForAssignment (Runtime.Object oldValue, Runtime.Object newValue)
         {
             var oldList = oldValue as ListValue;
             var newList = newValue as ListValue;
 
             // When assigning the emtpy list, try to retain any initial origin names
             if (oldList && newList && newList.value.Count == 0)
-                newList.value.SetInitialOriginNames(oldList.value.originNames);
+                newList.value.SetInitialOriginNames (oldList.value.originNames);
         }
     }
-
+        
 }
+ 
