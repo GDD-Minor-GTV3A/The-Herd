@@ -3,17 +3,23 @@ using UnityEngine;
 public class FallingTree : MonoBehaviour
 {
     [SerializeField] private GameObject treeChopped;
+    private bool hasFallen = false;
 
     public void Execute()
     {
+        if (hasFallen) return;
+
+        hasFallen = true;
+
         Instantiate(treeChopped, transform.position, Quaternion.identity);
         Destroy(gameObject);
-
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private void OnTriggerEnter(Collider other)
     {
-        Execute();
+        if (other.CompareTag("Player"))
+        {
+            Execute();
+        }
     }
 }
