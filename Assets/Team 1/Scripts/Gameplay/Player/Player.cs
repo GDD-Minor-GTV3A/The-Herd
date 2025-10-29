@@ -15,20 +15,24 @@ namespace Gameplay.Player
     {
         [Header("Animations")]
         [Tooltip("Animator of the player.")]
-        [SerializeField] private Animator _animator;
+        [SerializeField] private Animator animator;
         [SerializeField] private PlayerAnimationConstraints animationConstrains;
 
         [Space]
         [Tooltip("Manager of step sounds.")]
-        [SerializeField] private StepsSoundManager _stepsSoundManager;
+        [SerializeField] private StepsSoundManager stepsSoundManager;
         [Tooltip("Reference to input actions map.")]
-        [SerializeField] private InputActionAsset _inputActions;
+        [SerializeField] private InputActionAsset inputActions;
+        [Tooltip("Reference to input actions map.")]
+        [SerializeField] private CanvasGroup vignette;
         [Tooltip("Reference to player config.")]
-        [SerializeField] private PlayerConfig _config;
+        [SerializeField] private PlayerConfig config;
 
 
         private PlayerMovement _movementController;
+        private PlayerAnimator playerAnimator;
         private Health _health;
+        private Coroutine vigneteRoutine;
 
 
         public UnityEvent OnDamageTaken;
@@ -65,28 +69,28 @@ namespace Gameplay.Player
             PlayerInput playerInput = GetComponent<PlayerInput>();
             ToolSlotsController slotsController = GetComponent<ToolSlotsController>();
 
-            playerInput.Initialize(_inputActions);
+            playerInput.Initialize(inputActions);
 
 
             CharacterController characterController = GetComponent<CharacterController>();
-            _movementController.Initialize(characterController, _config);
+            _movementController.Initialize(characterController, config);
 
 
-            _stepsSoundManager.Initialize();
-            PlayerAnimator animator = new PlayerAnimator(_animator,transform, animationConstrains);
-            stateManager.Initialize(playerInput, _movementController, animator);
+            stepsSoundManager.Initialize();
+            playerAnimator = new PlayerAnimator(animator, transform, animationConstrains, vignette);
+            stateManager.Initialize(playerInput, _movementController, playerAnimator);
 
             // Init health
             _health = new Health(
-                _config.MaxHealth,
-                _config.CurrentHealth,
-                _config.CanTakeDamage,
-                _config.CanBeHealed,
-                _config.CanDie
+                config.MaxHealth,
+                config.CurrentHealth,
+                config.CanTakeDamage,
+                config.CanBeHealed,
+                config.CanDie
             );
-            _config.OnValueChanged += UpdateConfigValues;
+            config.OnValueChanged += UpdateConfigValues;
 
-            slotsController.Initialize(playerInput, animator, 2);
+            slotsController.Initialize(playerInput, playerAnimator, 2);
         }
 
 
@@ -102,7 +106,7 @@ namespace Gameplay.Player
 
         private void OnDestroy()
         {
-            _config.OnValueChanged -= UpdateConfigValues;
+            config.OnValueChanged -= UpdateConfigValues;
         }
 
 
@@ -110,6 +114,9 @@ namespace Gameplay.Player
         {
             if (!_health.CanTakeDamage && damage <= 0) return;
             _health.ChangeCurrentHealth(-damage);
+            if (vigneteRoutine != null)
+                StopCoroutine(vigneteRoutine);
+            vigneteRoutine = StartCoroutine(playerAnimator.ShowVignetteRoutine(.7f));
             OnDamageTaken?.Invoke();
 
             if (_health.CurrentHealth == 0)

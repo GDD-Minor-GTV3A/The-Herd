@@ -1,3 +1,5 @@
+using System.Collections;
+
 using Core.Shared.Utilities;
 using Unity.Cinemachine;
 using UnityEngine;
@@ -17,6 +19,10 @@ namespace Gameplay.CameraSettings
         [Space]
         [SerializeField, Required, Tooltip("Camera config.")] private CameraConfig config;
         [SerializeField, Required, Tooltip("Player transform for camera to follow.")] private Transform playerTransform;
+
+
+        private CinemachineBasicMultiChannelPerlin cameraNoise;
+        private Coroutine shakeRoutine;
 
 
         private void UpdateCameraSettings(CameraConfig newConfig)
@@ -55,7 +61,26 @@ namespace Gameplay.CameraSettings
 
             virtualCamera.Follow = playerTransform;
             virtualCamera.transform.rotation = Quaternion.Euler(config.CameraAngles.x, config.CameraAngles.y, config.CameraAngles.z);
+
+            cameraNoise = virtualCamera.GetComponent<CinemachineBasicMultiChannelPerlin>();
         }
+
+
+        public void ShakeCamera(float time)
+        {
+            if (shakeRoutine != null)
+                StopCoroutine(shakeRoutine);
+            shakeRoutine = StartCoroutine(ShakeCameraRoutine(time));
+        }
+
+
+        private IEnumerator ShakeCameraRoutine(float time)
+        {
+            cameraNoise.AmplitudeGain = 1f;
+            yield return new WaitForSecondsRealtime(time);
+            cameraNoise.AmplitudeGain = 0;
+        }
+
 
 
         private void OnEnable()

@@ -1,10 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using Core.Shared;
+using Core.Shared.Utilities;
 
+using DG.Tweening;
+
+using Gameplay.CameraSettings;
 using Gameplay.Player;
-
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Rifle : MonoBehaviour, IPlayerTool
 {
@@ -12,9 +16,12 @@ public class Rifle : MonoBehaviour, IPlayerTool
     [SerializeField, Tooltip("Max amount of ammo in magazine.")] private int maxAmmo = 5;
     [SerializeField, Tooltip("Delay between shots (simulates bolt time)")] private float fireCooldown = 1f;
     [SerializeField, Tooltip("How long the bolt cycle takes")] private float boltCycleTime = 1.5f;
-    [SerializeField, Tooltip("Prefab of bullet object.")] private GameObject bulletPrefab;
-    [SerializeField, Tooltip("Prefab of bullet object.")] private Transform shotPoint;
+    [SerializeField, Tooltip("Prefab of bullet object."), Required] private GameObject bulletPrefab;
+    [SerializeField, Tooltip("Prefab of bullet object."), Required] private Transform shotPoint;
     [SerializeField, Tooltip("Damage of rifle.")] private float damage = 0f;
+
+    [Space]
+    [SerializeField] private UnityEvent onShot;
 
     [Space]
     [Header("Animation Points")]
@@ -27,16 +34,20 @@ public class Rifle : MonoBehaviour, IPlayerTool
     private bool isCycling = false;
 
     private Queue<Bullet> bulletPool = new Queue<Bullet>();
-    private PlayerAnimator animator;
+    private PlayerAnimator playerAnimator;
+    private Animator animator;
 
 
     /// <summary>
     /// Initialization method.
     /// </summary>
-    public void Initialize(PlayerAnimator animator)
+    public void Initialize(PlayerAnimator playerAnimator)
     {
-        this.animator = animator;
+        this.playerAnimator = playerAnimator;
         currentAmmo = maxAmmo;
+
+        animator = GetComponent<Animator>();
+
 
         // Initialize pool
         for (int i = 0; i < maxAmmo; i++)
@@ -89,7 +100,10 @@ public class Rifle : MonoBehaviour, IPlayerTool
         _bullet.gameObject.SetActive(true);
         _bullet.Shoot(shotPoint.forward);
 
+        onShot?.Invoke();
+
         // Start the automatic bolt cycle
+        animator.SetTrigger("BoltCycle");
         StartCoroutine(AutoBoltCycle());
     }
 
@@ -130,6 +144,7 @@ public class Rifle : MonoBehaviour, IPlayerTool
         if (currentAmmo == maxAmmo)
             yield break;
 
+        animator.SetTrigger("Reload");
         canFire = false;
         yield return new WaitForSeconds(boltCycleTime * 2f);
         currentAmmo = maxAmmo;
@@ -140,12 +155,14 @@ public class Rifle : MonoBehaviour, IPlayerTool
     public void HideTool()
     {
         gameObject.SetActive(false);
-        animator.RemoveHands();
+        playerAnimator.RemoveHands();
     }
 
     public void ShowTool()
     {
         gameObject.SetActive(true);
-        animator.GetTool(keyPoints);
+        playerAnimator.GetTool(keyPoints);
+        animator.SetFloat("BoltCycleSpeed", 1 / (boltCycleTime + fireCooldown));
+        animator.SetFloat("ReloadSpeed", 1 / (boltCycleTime * 2f));
     }
 }
