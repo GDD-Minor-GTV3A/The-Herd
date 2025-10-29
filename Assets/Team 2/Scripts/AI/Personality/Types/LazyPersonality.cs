@@ -1,5 +1,6 @@
-using UnityEngine;
 using System;
+
+using UnityEngine;
 
 namespace Core.AI.Sheep.Personality.Types
 {

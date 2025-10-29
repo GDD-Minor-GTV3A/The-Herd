@@ -1,17 +1,17 @@
 using Gameplay.HealthSystem;
 using Gameplay.ToolsSystem;
+
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
-namespace Gameplay.Player 
+namespace Gameplay.Player
 {
     /// <summary>
     /// Base player script.
     /// </summary>
     [RequireComponent(typeof(PlayerMovement), typeof(PlayerStateManager))]
     [RequireComponent(typeof(PlayerInput), typeof(ToolSlotsController), typeof(CharacterController))]
-    public class Player : MonoBehaviour, IDamageable, IHealable, IKillable
+    public class Player : MonoBehaviour
     {
         [Header("Animations")]
         [Tooltip("Animator of the player.")]
@@ -30,15 +30,6 @@ namespace Gameplay.Player
         private PlayerMovement _movementController;
         private Health _health;
 
-
-        public UnityEvent OnDamageTaken;
-        public UnityEvent OnHealed;
-        public UnityEvent OnDied;
-
-
-        public UnityEvent DamageEvent { get => OnDamageTaken; set => OnDamageTaken = value; }
-        public UnityEvent HealEvent { get => OnHealed; set => OnHealed = value; }
-        public UnityEvent DeathEvent { get => OnDied; set => OnDied = value; }
 
 
         // for test, needs to be moved to bootstrap
@@ -67,6 +58,7 @@ namespace Gameplay.Player
 
             playerInput.Initialize(_inputActions);
 
+            slotsController.Initialize(playerInput, 2);
 
             CharacterController characterController = GetComponent<CharacterController>();
             _movementController.Initialize(characterController, _config);
@@ -84,10 +76,28 @@ namespace Gameplay.Player
                 _config.CanBeHealed,
                 _config.CanDie
             );
+            _health.OnHealthChanged += HandleHealthChanged;
+            _health.OnDeath += HandleDeath;
+
             _config.OnValueChanged += UpdateConfigValues;
 
-            slotsController.Initialize(playerInput, animator, 2);
         }
+        private void HandleHealthChanged(float current, float max)
+        {
+            Debug.Log($"Player health updated: {current}/{max}");
+        }
+
+        private void HandleDeath()
+        {
+            Debug.Log("Player died!");
+            _movementController.enabled = false;
+            _rotationController.enabled = false;
+            _animator.SetTrigger("Die");
+        }
+
+        // Gameplay entry points
+        public void TakeDamage(float amount) => _health.TakeDamage(amount);
+        public void Heal(float amount) => _health.Heal(amount);
 
 
         /// <summary>
@@ -103,30 +113,6 @@ namespace Gameplay.Player
         private void OnDestroy()
         {
             _config.OnValueChanged -= UpdateConfigValues;
-        }
-
-
-        public void TakeDamage(float damage)
-        {
-            if (!_health.CanTakeDamage && damage <= 0) return;
-            _health.ChangeCurrentHealth(-damage);
-            OnDamageTaken?.Invoke();
-
-            if (_health.CurrentHealth == 0)
-                Die();
-        }
-
-        public void Heal(float amount)
-        {
-            if (!_health.CanBeHealed && amount <= 0) return;
-            _health.ChangeCurrentHealth(amount);
-            OnHealed?.Invoke();
-        }
-
-        public void Die()
-        {
-            OnDied?.Invoke();
-            Debug.Log("Died!");
         }
     }
 }

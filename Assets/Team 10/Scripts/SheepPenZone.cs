@@ -1,105 +1,83 @@
 ﻿using UnityEngine;
-using Core.AI.Sheep;
+using Core.AI.Sheep; // gives access to SheepStateManager
 
-namespace Gameplay.Pen
+public class SheepPenZone : MonoBehaviour
 {
-    /// <summary>
-    /// Controls the sheep pen zone behavior.
-    /// When the player enters the zone, all active sheep either
-    /// follow the decoy inside the pen or return to following the player.
-    /// </summary>
-    public class SheepPenZone : MonoBehaviour
+    [Tooltip("The decoy Transform inside the pen that sheep should follow.")]
+    public Transform decoyTransform;
+
+    [Tooltip("Reference to the player Transform.")]
+    public Transform playerTransform;
+
+    private bool sheepFollowingDecoy = false;
+    private SheepStateManager[] sheepManagers;
+
+    private void Start()
     {
-        [Header("References")]
+        sheepManagers = FindObjectsOfType<SheepStateManager>();
 
-        [SerializeField]
-        [Tooltip("The decoy Transform inside the pen that sheep should follow.")]
-        private Transform _decoyTransform;
-
-        [SerializeField]
-        [Tooltip("Reference to the player Transform.")]
-        private Transform _playerTransform;
-
-        private bool _sheepFollowingDecoy = false;
-
-        private void Start()
+        // Make sure they start active and following the player normally
+        foreach (var sheep in sheepManagers)
         {
-            // Ensure sheep begin following the player at game start
-            SheepStateManager[] sheepManagers = FindObjectsOfType<SheepStateManager>();
-
-            foreach (var sheep in sheepManagers)
-            {
-                if (sheep == null)
-                    continue;
-
-                sheep.OnRejoinedHerd();
-            }
-
-            Debug.Log("Sheep initialized to follow player normally.");
+            if (sheep == null) continue;
+            sheep.OnRejoinedHerd();
         }
 
+        Debug.Log("Sheep initialized to follow player normally.");
+    }
 
-        private void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(Collider other)
+    {
+        if (!other.CompareTag("Player")) return;
+
+        sheepFollowingDecoy = !sheepFollowingDecoy;
+
+        if (sheepFollowingDecoy)
         {
-            if (!other.CompareTag("Player"))
-                return;
-
-            _sheepFollowingDecoy = !_sheepFollowingDecoy;
-
-            if (_sheepFollowingDecoy)
-            {
-                SendSheepToDecoy();
-                Debug.Log("Sheep are now following the DECOY (pen).");
-            }
-            else
-            {
-                ReturnSheepToPlayer();
-                Debug.Log("Sheep are now following the PLAYER.");
-            }
+            SendSheepToDecoy();
+            Debug.Log("Sheep are now following the DECOY (pen).");
         }
-    
-        /// Sends all active sheep to the decoy's position inside the pen.
-   
-        private void SendSheepToDecoy()
+        else
         {
-            SheepStateManager[] sheepManagers = FindObjectsOfType<SheepStateManager>();
+            ReturnSheepToPlayer();
+            Debug.Log("Sheep are now following the PLAYER.");
+        }
+    }
 
-            foreach (var sheep in sheepManagers)
+    private void SendSheepToDecoy()
+    {
+        foreach (var sheep in sheepManagers)
+        {
+            if (sheep == null || !sheep.CanControlAgent()) continue;
+
+            // Stop their state logic so it doesn’t override movement
+            sheep.enabled = false;
+
+            Vector2 offset = Random.insideUnitCircle * 1.5f;
+            Vector3 dest = decoyTransform.position + new Vector3(offset.x, 0, offset.y);
+            sheep.Agent.SetDestination(dest);
+        }
+    }
+
+    private void ReturnSheepToPlayer()
+    {
+        foreach (var sheep in sheepManagers)
+        {
+            if (sheep == null) continue;
+
+            // Reactivate the AI logic
+            sheep.enabled = true;
+
+            // Move them toward player instantly so they resume near the player
+            if (sheep.CanControlAgent())
             {
-                if (sheep == null || !sheep.CanControlAgent())
-                    continue;
-
-                // Temporarily disable AI logic so it does not override movement
-                sheep.enabled = false;
-
                 Vector2 offset = Random.insideUnitCircle * 1.5f;
-                Vector3 destination = _decoyTransform.position + new Vector3(offset.x, 0f, offset.y);
-                sheep.Agent.SetDestination(destination);
+                Vector3 dest = playerTransform.position + new Vector3(offset.x, 0, offset.y);
+                sheep.Agent.SetDestination(dest);
             }
-        }
 
-
-        /// Reactivates sheep AI and makes them follow the player again.
-        private void ReturnSheepToPlayer()
-        {
-            SheepStateManager[] sheepManagers = FindObjectsOfType<SheepStateManager>();
-
-            foreach (var sheep in sheepManagers)
-            {
-                if (sheep == null)
-                    continue;
-
-                sheep.enabled = true;
-
-                if (sheep.CanControlAgent())
-                {
-                    Vector2 offset = Random.insideUnitCircle * 1.5f;
-                    Vector3 destination = _playerTransform.position + new Vector3(offset.x, 0f, offset.y);
-                    sheep.Agent.SetDestination(destination);
-                }
-
-                sheep.OnRejoinedHerd();
-            }
+            // Trigger the “back to herd” event
+            sheep.OnRejoinedHerd();
         }
     }
 }

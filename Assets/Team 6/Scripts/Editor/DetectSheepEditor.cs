@@ -1,7 +1,8 @@
 using UnityEditor;
+
 using UnityEngine;
 
-[UnityEditor.CustomEditor(typeof(DetectSheep))]
+[CustomEditor(typeof(DetectSheep))]
 public class DetectSheepEditor : Editor
 {
     private void OnSceneGUI()

@@ -31,10 +31,6 @@ namespace Core.Shared
         /// Called when RMB released.
         /// </summary>
         public abstract void SecondaryUsageFinished();
-
-
-        public abstract void HideTool();
-        public abstract void ShowTool();
     }
 }
 

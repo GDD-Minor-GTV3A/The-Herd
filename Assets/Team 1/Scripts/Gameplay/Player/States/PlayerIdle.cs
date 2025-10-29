@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace Gameplay.Player 
+namespace Gameplay.Player
 {
     /// <summary>
     /// Player is staying.
