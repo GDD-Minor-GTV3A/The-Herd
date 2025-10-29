@@ -1,31 +1,25 @@
 using System.Collections;
-using System.Collections.Generic;
 
 using Gameplay.HealthSystem;
 
 using UnityEngine;
+using UnityEngine.Pool;
 
 public class Bullet : MonoBehaviour
 {
     [SerializeField, Tooltip("Bullet speed.")] private float speed = 50f;
     [SerializeField, Tooltip("Time before bullet despawning.")] private float lifeTime = 5f;
 
-
     private Rigidbody rb;
     private float damage;
-    private Queue<Bullet> bulletPool;
+    private IObjectPool<Bullet> pool;
 
-
-    /// <summary>
-    /// Initialization method.
-    /// </summary>
-    public void Initialize(float damage, Queue<Bullet> bulletPool)
+    public void Initialize(float damage, IObjectPool<Bullet> pool)
     {
         rb = GetComponent<Rigidbody>();
         this.damage = damage;
-        this.bulletPool = bulletPool;
+        this.pool = pool;
     }
-
 
     public void Shoot(Vector3 direction)
     {
@@ -33,24 +27,18 @@ public class Bullet : MonoBehaviour
         StartCoroutine(DespawnCoroutine());
     }
 
-
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.TryGetComponent<IDamageable>(out IDamageable _damageable))
-        {
-            _damageable.TakeDamage(damage);
-        }
+        if (collision.gameObject.TryGetComponent<IDamageable>(out IDamageable damageable))
+            damageable.TakeDamage(damage);
 
         StopAllCoroutines();
-        gameObject.SetActive(false);
-        bulletPool.Enqueue(this);
+        pool.Release(this);
     }
-
 
     private IEnumerator DespawnCoroutine()
     {
         yield return new WaitForSeconds(lifeTime);
-        gameObject.SetActive(false);
-        bulletPool.Enqueue(this);
+        pool.Release(this);
     }
 }
