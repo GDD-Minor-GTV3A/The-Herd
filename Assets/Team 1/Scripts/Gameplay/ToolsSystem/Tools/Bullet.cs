@@ -3,7 +3,6 @@ using System.Collections;
 using Gameplay.HealthSystem;
 
 using UnityEngine;
-using UnityEngine.Pool;
 
 public class Bullet : MonoBehaviour
 {
@@ -12,13 +11,13 @@ public class Bullet : MonoBehaviour
 
     private Rigidbody rb;
     private float damage;
-    private IObjectPool<Bullet> pool;
+    private System.Action<Bullet> releaseCallback; // callback to return bullet to pool
 
-    public void Initialize(float damage, IObjectPool<Bullet> pool)
+    public void Initialize(float damage, System.Action<Bullet> releaseCallback)
     {
         rb = GetComponent<Rigidbody>();
         this.damage = damage;
-        this.pool = pool;
+        this.releaseCallback = releaseCallback;
     }
 
     public void Shoot(Vector3 direction)
@@ -33,12 +32,12 @@ public class Bullet : MonoBehaviour
             damageable.TakeDamage(damage);
 
         StopAllCoroutines();
-        pool.Release(this);
+        releaseCallback?.Invoke(this);
     }
 
     private IEnumerator DespawnCoroutine()
     {
         yield return new WaitForSeconds(lifeTime);
-        pool.Release(this);
+        releaseCallback?.Invoke(this);
     }
 }

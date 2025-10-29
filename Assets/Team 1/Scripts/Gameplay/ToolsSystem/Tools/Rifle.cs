@@ -5,19 +5,17 @@ using Core.Shared;
 using Gameplay.Player;
 
 using UnityEngine;
-using UnityEngine.Pool;
 
 public class Rifle : MonoBehaviour, IPlayerTool
 {
     [Header("Bolt-Action Settings")]
-    [SerializeField, Tooltip("Max amount of ammo in magazine.")] private int maxAmmo = 5;
-    [SerializeField, Tooltip("Amount of time it takes to reload the weapon")] private float reload = 5f;
-    [SerializeField, Tooltip("How long the bolt cycle takes")] private float boltCycleTime = 1.5f;
-    [SerializeField, Tooltip("Prefab of bullet object.")] private Bullet bulletPrefab;
-    [SerializeField, Tooltip("Spawn point for bullets.")] private Transform shotPoint;
-    [SerializeField, Tooltip("Damage of rifle.")] private float damage = 0f;
+    [SerializeField] private int maxAmmo = 5;
+    [SerializeField] private float reload = 5f;
+    [SerializeField] private float boltCycleTime = 1.5f;
+    [SerializeField] private Bullet bulletPrefab;
+    [SerializeField] private Transform shotPoint;
+    [SerializeField] private float damage = 0f;
 
-    [Space]
     [Header("Animation Points")]
     [SerializeField] private ToolAnimationKeyPoints keyPoints;
 
@@ -27,20 +25,28 @@ public class Rifle : MonoBehaviour, IPlayerTool
     private bool isCycling = false;
 
     private PlayerAnimator animator;
-    private IObjectPool<Bullet> pool;
+    private GenericPool<Bullet> bulletPool;
 
     private void Awake()
     {
-        // Initialize the pool with callbacks.
-        pool = new ObjectPool<Bullet>(
-            createFunc: CreateBullet,
-            actionOnGet: OnGetBullet,
-            actionOnRelease: OnReleaseBullet,
-            actionOnDestroy: OnDestroyBullet,
-            collectionCheck: true,
-            defaultCapacity: maxAmmo,
+        bulletPool = new GenericPool<Bullet>(
+            createFunc: () =>
+            {
+                Bullet b = Instantiate(bulletPrefab);
+                b.Initialize(damage, ReleaseBullet); // callback for returning
+                b.gameObject.SetActive(false);
+                return b;
+            },
+            onGet: b => b.gameObject.SetActive(true),
+            onRelease: b => b.gameObject.SetActive(false),
+            onDestroy: b => Destroy(b.gameObject),
+            initialCapacity: 0,  // <-- start empty, no bullets pre-created
             maxSize: 50
         );
+    }
+    private void ReleaseBullet(Bullet bullet)
+    {
+        bulletPool.Release(bullet);
     }
 
     public void Initialize(PlayerAnimator animator)
@@ -50,36 +56,9 @@ public class Rifle : MonoBehaviour, IPlayerTool
         gameObject.SetActive(false);
     }
 
-    private Bullet CreateBullet()
-    {
-
-        Bullet bullet = Instantiate(bulletPrefab);
-        bullet.Initialize(damage, pool);
-        bullet.gameObject.SetActive(false);
-        return bullet;
-    }
-
-
-    private void OnGetBullet(Bullet bullet)
-    {
-        bullet.gameObject.SetActive(true);
-    }
-
-    private void OnReleaseBullet(Bullet bullet)
-    {
-        bullet.gameObject.SetActive(false);
-    }
-
-    private void OnDestroyBullet(Bullet bullet)
-    {
-        Destroy(bullet.gameObject);
-    }
-
     public void MainUsageStarted(Observable<Vector3> cursorWorldPosition)
     {
-        if (!canFire || isCycling || !isBoltClosed || currentAmmo <= 0)
-            return;
-
+        if (!canFire || isCycling || !isBoltClosed || currentAmmo <= 0) return;
         Fire();
     }
 
@@ -89,13 +68,12 @@ public class Rifle : MonoBehaviour, IPlayerTool
 
     private void Fire()
     {
-        if (currentAmmo <= 0)
-            return;
+        if (currentAmmo <= 0) return;
 
         currentAmmo--;
         canFire = false;
 
-        Bullet bullet = pool.Get();
+        Bullet bullet = bulletPool.Get();
         bullet.transform.SetPositionAndRotation(shotPoint.position, shotPoint.rotation);
         bullet.Shoot(shotPoint.forward);
 
@@ -105,8 +83,8 @@ public class Rifle : MonoBehaviour, IPlayerTool
     private IEnumerator AutoBoltCycle()
     {
         isCycling = true;
-
         isBoltClosed = false;
+
         yield return new WaitForSeconds(boltCycleTime / 3f);
         yield return new WaitForSeconds(boltCycleTime / 3f);
 
@@ -127,17 +105,16 @@ public class Rifle : MonoBehaviour, IPlayerTool
 
     public void Reload()
     {
-        if (!isCycling)
-            StartCoroutine(ReloadRoutine());
+        if (!isCycling) StartCoroutine(ReloadRoutine());
     }
 
     private IEnumerator ReloadRoutine()
     {
-        if (currentAmmo == maxAmmo)
-            yield break;
+        if (currentAmmo == maxAmmo) yield break;
 
         canFire = false;
         yield return new WaitForSeconds(reload);
+
         currentAmmo = maxAmmo;
         isBoltClosed = true;
         canFire = true;
