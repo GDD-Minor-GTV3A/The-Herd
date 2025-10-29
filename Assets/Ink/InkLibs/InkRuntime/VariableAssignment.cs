@@ -9,18 +9,19 @@ namespace Ink.Runtime
         public bool isNewDeclaration { get; protected set; }
         public bool isGlobal { get; set; }
 
-        public VariableAssignment(string variableName, bool isNewDeclaration)
+        public VariableAssignment (string variableName, bool isNewDeclaration)
         {
             this.variableName = variableName;
             this.isNewDeclaration = isNewDeclaration;
         }
 
         // Require default constructor for serialisation
-        public VariableAssignment() : this(null, false) { }
+        public VariableAssignment() : this(null, false) {}
 
-        public override string ToString()
+        public override string ToString ()
         {
             return "VarAssign to " + variableName;
         }
     }
 }
+
