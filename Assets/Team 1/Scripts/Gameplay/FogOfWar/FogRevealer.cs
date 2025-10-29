@@ -48,7 +48,7 @@ namespace Gameplay.FogOfWar
 
                 GameObject _newFovMeshObject = new GameObject();
                 _newFovMeshObject.name = "FovMesh";
-                _newFovMeshObject.transform.position = new Vector3(origin.position.x, fogPlane.transform.position.y + 1, origin.position.z);
+                _newFovMeshObject.transform.position = new Vector3(origin.position.x, fogPlane.transform.position.y + 2, origin.position.z);
                 _newFovMeshObject.transform.parent = fogPlane.transform.parent;
                 _newFovMeshObject.layer = LayerMask.NameToLayer("FogOfWarProjection");
                 _newFovMeshObject.AddComponent<MeshFilter>().mesh = _newMesh;
@@ -75,7 +75,6 @@ namespace Gameplay.FogOfWar
                 revealers[i].Renderer.transform.position = new Vector3(origin.position.x, revealers[i].Renderer.transform.position.y, origin.position.z);
 
                 Vector3 _forward = origin.forward;
-                _forward = _forward.normalized;
                 float _startAngle = Mathf.Atan2(_forward.z, _forward.x) * Mathf.Rad2Deg;
                 _startAngle += revealers[i].Config.FOV;
 
@@ -83,7 +82,7 @@ namespace Gameplay.FogOfWar
 
                 revealers[i].StartingAngle = _startAngle - revealers[i].Config.FOV / 2f;
 
-                revealers[i].Renderer.material.SetVector("_RevealerCenter", revealers[i].Renderer.transform.position);
+                revealers[i].Renderer.material.SetVector("_RevealerCenter", origin.position);
                 revealers[i].Renderer.material.SetVector("_RevealerForward", origin.forward);
             }
         }
@@ -112,8 +111,10 @@ namespace Gameplay.FogOfWar
                 float _angleRad = _angle * (Mathf.PI / 180f);
                 Vector3 _rayDirection = new Vector3(Mathf.Cos(_angleRad), 0, Mathf.Sin(_angleRad));
                 Vector3 _vertex;
+
                 if (Physics.Raycast(origin.position, _rayDirection, out RaycastHit hit, _viewDistance, obstaclesLayers))
                 {
+
                     Vector3 _localHitPoint = revealers[meshIndex].Renderer.transform.InverseTransformPoint(hit.point);
                     _vertex = new Vector3(_localHitPoint.x, _meshOrigin.y, _localHitPoint.z);
                 }
@@ -161,7 +162,7 @@ namespace Gameplay.FogOfWar
             revealers[index].Renderer.material.SetFloat("_FOVAngle", revealers[index].Config.FOV * 0.5f * Mathf.Deg2Rad);
             revealers[index].Renderer.material.SetFloat("_ViewDistance", revealers[index].Config.ViewDistance);
             revealers[index].Renderer.material.SetFloat("_FadeWidth", 10f);
-            revealers[index].Renderer.material.SetFloat("_EdgeFadeWidth", (revealers[index].Config.FOV == 360f) ? 0f : .5f);
+            revealers[index].Renderer.material.SetFloat("_EdgeFadeWidth", (revealers[index].Config.FOV == 360f) ? 0f : (revealers[index].Config.FOV / 250));
         }
 
 

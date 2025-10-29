@@ -16,6 +16,10 @@ public class Rifle : MonoBehaviour, IPlayerTool
     [SerializeField, Tooltip("Prefab of bullet object.")] private Transform shotPoint;
     [SerializeField, Tooltip("Damage of rifle.")] private float damage = 0f;
 
+    [Space]
+    [Header("Animation Points")]
+    [SerializeField] private ToolAnimationKeyPoints keyPoints;
+
 
     private int currentAmmo;
     private bool isBoltClosed = true;
@@ -142,6 +146,6 @@ public class Rifle : MonoBehaviour, IPlayerTool
     public void ShowTool()
     {
         gameObject.SetActive(true);
-        animator.GetRifle();
+        animator.GetTool(keyPoints);
     }
 }

@@ -18,6 +18,7 @@ namespace Gameplay.Player
         {
             _animator.SetWalking(true);
             _animator.SetWalkSpeed(false);
+            _animator.SetAnimationRotation(true);
         }
 
         public override void OnStop()
@@ -26,26 +27,29 @@ namespace Gameplay.Player
 
         public override void OnUpdate()
         {
+            Vector2 playerInput = _manager.Input.Move;
+
             // If there's no input, go idle.
-            if (_manager.Input.Move.magnitude == 0)
+            if (playerInput.magnitude == 0)
             {
                 _manager.SetState<PlayerIdle>();
                 return;
             }
 
+            if (_manager.Input.Run)
+            {
+                _manager.SetState<PlayerRunning>();
+                return;
+            }
+
             _playerMovement.ApplyGravity();
 
-            bool isSprinting = _manager.Input.Run;
-            Vector2 playerInput = _manager.Input.Move;
-
-            Vector3 movementTarget = _playerMovement.CalculateMovementTargetFromInput(playerInput, isSprinting);
+            Vector3 movementTarget = _playerMovement.CalculateMovementTargetFromInput(playerInput, false);
             _playerMovement.MoveTo(movementTarget);
 
             // Rotate based on current rotation mode (movement or mouse)
-            _manager.Rotation.Rotate(playerInput, _manager.Input.Look.Value);
-
-
-            _animator.SetWalkSpeed(isSprinting);
+            //_manager.Rotation.Rotate(playerInput, _manager.Input.Look.Value);
+            _animator.RotateCharacterBody(_manager.Input.Look.Value);
         }
     }
 }
