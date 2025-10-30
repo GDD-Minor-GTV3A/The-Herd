@@ -1,53 +1,39 @@
-using System;
-using System.Collections.Generic;
-
 using UnityEngine;
+using UnityEngine.Pool;
 
-public class GenericPool<T> where T : Component
+/// <summary>
+/// Abstract generic pool for MonoBehaviour objects.
+/// Handles lazy loading and object reuse.
+/// </summary>
+public abstract class GenericPool<T> where T : MonoBehaviour
 {
-    private readonly Func<T> createFunc;
-    private readonly Action<T> onGet;
-    private readonly Action<T> onRelease;
-    private readonly Action<T> onDestroy;
+    private readonly IObjectPool<T> pool;
 
-    private readonly Stack<T> objects;
-    private readonly int maxSize;
-
-    public GenericPool(Func<T> createFunc, Action<T> onGet = null, Action<T> onRelease = null, Action<T> onDestroy = null, int initialCapacity = 10, int maxSize = 50)
+    protected GenericPool(int initialCapacity = 0, int maxSize = 50)
     {
-        if (createFunc == null) throw new ArgumentNullException(nameof(createFunc));
-
-        this.createFunc = createFunc;
-        this.onGet = onGet;
-        this.onRelease = onRelease;
-        this.onDestroy = onDestroy;
-        this.maxSize = maxSize;
-
-        objects = new Stack<T>(initialCapacity);
-
-        for (int i = 0; i < initialCapacity; i++)
-        {
-            objects.Push(createFunc());
-        }
+        pool = new ObjectPool<T>(
+            createFunc: Create,
+            actionOnGet: OnGet,
+            actionOnRelease: OnRelease,
+            actionOnDestroy: OnDestroy,
+            collectionCheck: true,
+            defaultCapacity: initialCapacity,
+            maxSize: maxSize
+        );
     }
 
-    public T Get()
-    {
-        T obj = objects.Count > 0 ? objects.Pop() : createFunc();
-        onGet?.Invoke(obj);
-        return obj;
-    }
+    /// <summary> Called when a new object is needed. </summary>
+    protected abstract T Create();
 
-    public void Release(T obj)
-    {
-        if (objects.Count < maxSize)
-        {
-            onRelease?.Invoke(obj);
-            objects.Push(obj);
-        }
-        else
-        {
-            onDestroy?.Invoke(obj);
-        }
-    }
+    /// <summary> Called when an object is retrieved from the pool. </summary>
+    protected abstract void OnGet(T item);
+
+    /// <summary> Called when an object is returned to the pool. </summary>
+    protected abstract void OnRelease(T item);
+
+    /// <summary> Called when an object is destroyed by the pool. </summary>
+    protected abstract void OnDestroy(T item);
+
+    public T Get() => pool.Get();
+    public void Release(T item) => pool.Release(item);
 }

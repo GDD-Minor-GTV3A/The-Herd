@@ -6,12 +6,12 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    [SerializeField, Tooltip("Bullet speed.")] private float speed = 50f;
-    [SerializeField, Tooltip("Time before bullet despawning.")] private float lifeTime = 5f;
+    [SerializeField] private float speed = 50f;
+    [SerializeField] private float lifeTime = 5f;
 
     private Rigidbody rb;
     private float damage;
-    private System.Action<Bullet> releaseCallback; // callback to return bullet to pool
+    private System.Action<Bullet> releaseCallback;
 
     public void Initialize(float damage, System.Action<Bullet> releaseCallback)
     {
@@ -28,7 +28,7 @@ public class Bullet : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.TryGetComponent<IDamageable>(out IDamageable damageable))
+        if (collision.gameObject.TryGetComponent<IDamageable>(out var damageable))
             damageable.TakeDamage(damage);
 
         StopAllCoroutines();

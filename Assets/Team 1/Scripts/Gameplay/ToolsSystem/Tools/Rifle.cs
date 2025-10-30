@@ -25,28 +25,12 @@ public class Rifle : MonoBehaviour, IPlayerTool
     private bool isCycling = false;
 
     private PlayerAnimator animator;
-    private GenericPool<Bullet> bulletPool;
+    private BulletPool bulletPool;
 
     private void Awake()
     {
-        bulletPool = new GenericPool<Bullet>(
-            createFunc: () =>
-            {
-                Bullet b = Instantiate(bulletPrefab);
-                b.Initialize(damage, ReleaseBullet); // callback for returning
-                b.gameObject.SetActive(false);
-                return b;
-            },
-            onGet: b => b.gameObject.SetActive(true),
-            onRelease: b => b.gameObject.SetActive(false),
-            onDestroy: b => Destroy(b.gameObject),
-            initialCapacity: 0,  // <-- start empty, no bullets pre-created
-            maxSize: 50
-        );
-    }
-    private void ReleaseBullet(Bullet bullet)
-    {
-        bulletPool.Release(bullet);
+        // Initialize the BulletPool, starts empty (lazy-loaded)
+        bulletPool = new BulletPool(bulletPrefab, damage, initialCapacity: 0, maxSize: 50);
     }
 
     public void Initialize(PlayerAnimator animator)
