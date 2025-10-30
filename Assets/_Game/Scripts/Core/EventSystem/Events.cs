@@ -167,6 +167,35 @@ namespace Core.Events
         }
     }
 
+    /// <summary>
+    /// Event broadcast when a quest has successfully started.
+    /// Typically used by the UI or other systems to display the quest entry.
+    /// </summary>
+    public class QuestStartedEvent : GameEvent
+    {
+        private string _questID;
+        public string QuestID => _questID;
+
+        public QuestStartedEvent(string questID)
+        {
+            _questID = questID;
+        }
+    }
+
+        /// <summary>
+    /// Event broadcast when an existing quest’s progress changes (e.g., objectives updated).
+    /// </summary>
+    public class QuestUpdateEvent : GameEvent
+    {
+        private string _questID;
+        public string QuestID => _questID;
+
+        public QuestUpdateEvent(string questID)
+        {
+            _questID = questID;
+        }
+    }
+
     public class CompleteObjectiveEvent : GameEvent
     {
         private string _questID;
