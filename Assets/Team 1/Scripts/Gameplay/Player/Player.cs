@@ -1,10 +1,11 @@
 using System;
 
 using Gameplay.ToolsSystem;
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace Gameplay.Player 
+namespace Gameplay.Player
 {
     /// <summary>
     /// Base player script.

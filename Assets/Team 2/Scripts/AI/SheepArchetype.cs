@@ -1,6 +1,7 @@
-using UnityEngine;
 using Core.AI.Sheep.Personality;
 using Core.AI.Sheep.Personality.Types;
+
+using UnityEngine;
 
 namespace Core.AI.Sheep.Config
 {
@@ -39,10 +40,10 @@ namespace Core.AI.Sheep.Config
         public float GrazeIntervalMax => _grazeIntervalMax;
 
         public AnimatorOverrideController AnimationOverrides => _animationOverrides;
-        
+
         //public int IdleVariantCount => Mathf.Max(1, _idleVariantCount);
         public PersonalityType PersonalityType => _personalityType;
-        
+
         public ISheepPersonality CreatePersonality(SheepStateManager sheep)
         {
             return _personalityType switch

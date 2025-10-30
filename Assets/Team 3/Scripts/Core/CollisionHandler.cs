@@ -1,4 +1,5 @@
 using UnityEditor;
+
 using UnityEngine;
 
 public class CollisionHandler : MonoBehaviour
@@ -13,6 +14,6 @@ public class CollisionHandler : MonoBehaviour
         {
             Debug.Log(other);
         }
-        
+
     }
 }

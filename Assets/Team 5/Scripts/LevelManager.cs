@@ -1,6 +1,7 @@
-using UnityEngine;
 using System;
 using System.Collections;
+
+using UnityEngine;
 
 public class LevelManager : MonoBehaviour
 {
@@ -17,12 +18,12 @@ public class LevelManager : MonoBehaviour
         /* Places the playerprefab at position 0, 0, 0. Position will require changes later.
         *  Also, it currently uses the playerprefab, but the player will probably have a bunch of data attached to it, so it would need to have that data as well.
         */
-        Instantiate(_playerPrefab, new Vector3(21.6790237f,0.261999995f,20.3814964f), Quaternion.identity, _playerParent);
+        Instantiate(_playerPrefab, new Vector3(21.6790237f, 0.261999995f, 20.3814964f), Quaternion.identity, _playerParent);
 
         // Places all the sheep at position 0, 0, 0. Positions will require changes later.
         for (int i = 0; i < _sheepCount; i++)
         {
-            Instantiate(_sheepPrefab, new Vector3(21.6790237f,0.261999995f,20.3814964f), Quaternion.identity, _sheepParent);
+            Instantiate(_sheepPrefab, new Vector3(21.6790237f, 0.261999995f, 20.3814964f), Quaternion.identity, _sheepParent);
         }
     }
 }

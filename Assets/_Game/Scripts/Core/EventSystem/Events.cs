@@ -94,9 +94,9 @@ namespace Core.Events
     {
     }
     #endregion DOG_EVENTS
-    
-    
-    
+
+
+
     #region QUEST_EVENTS
 
     public class StartQuestEvent : GameEvent
@@ -125,7 +125,7 @@ namespace Core.Events
             _objectiveID = objectiveID;
         }
     }
-    
+
     public class QuestCompletedEvent : GameEvent
     {
         private string _questID;
@@ -137,6 +137,6 @@ namespace Core.Events
             _questID = questID;
         }
     }
-    
+
     #endregion QUEST_EVENTS
 }

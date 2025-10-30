@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+
 using Core.Events;
 using Core.Shared;
 using Core.Shared.StateMachine;
+
 using UnityEngine;
 
 namespace Gameplay.Dog

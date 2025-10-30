@@ -8,44 +8,51 @@
         // Variable reference is actually a path for a visit (read) count
         public Path pathForCount { get; set; }
 
-        public Container containerForCount {
-            get {
-                return this.ResolvePath (pathForCount).container;
+        public Container containerForCount
+        {
+            get
+            {
+                return this.ResolvePath(pathForCount).container;
             }
         }
-            
-        public string pathStringForCount { 
-            get {
-                if( pathForCount == null )
+
+        public string pathStringForCount
+        {
+            get
+            {
+                if (pathForCount == null)
                     return null;
 
                 return CompactPathString(pathForCount);
             }
-            set {
+            set
+            {
                 if (value == null)
                     pathForCount = null;
                 else
-                    pathForCount = new Path (value);
+                    pathForCount = new Path(value);
             }
         }
 
-        public VariableReference (string name)
+        public VariableReference(string name)
         {
             this.name = name;
         }
 
         // Require default constructor for serialisation
-        public VariableReference() {}
+        public VariableReference() { }
 
-        public override string ToString ()
+        public override string ToString()
         {
-            if (name != null) {
-                return string.Format ("var({0})", name);
-            } else {
+            if (name != null)
+            {
+                return string.Format("var({0})", name);
+            }
+            else
+            {
                 var pathStr = pathStringForCount;
                 return string.Format("read_count({0})", pathStr);
             }
         }
     }
 }
-

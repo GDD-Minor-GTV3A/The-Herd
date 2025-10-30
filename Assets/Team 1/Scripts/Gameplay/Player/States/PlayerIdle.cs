@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Gameplay.Player 
+namespace Gameplay.Player
 {
     /// <summary>
     /// Player is staying.

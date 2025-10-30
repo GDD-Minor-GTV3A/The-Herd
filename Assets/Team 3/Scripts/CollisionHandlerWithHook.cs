@@ -1,4 +1,5 @@
 using UnityEditor;
+
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -29,6 +30,6 @@ public class CollisionHandlerWithHook : MonoBehaviour
         {
             Debug.Log(other);
         }
-        
+
     }
 }

@@ -1,11 +1,13 @@
-using UnityEngine;
 using System;
-using System.Collections.Generic;
 using System.Collections;
-using Core.Events;
-using Core.Shared.StateMachine;
+using System.Collections.Generic;
+
 using Core.AI.Sheep.Config;
 using Core.AI.Sheep.Personality;
+using Core.Events;
+using Core.Shared.StateMachine;
+
+using UnityEngine;
 using UnityEngine.AI;
 
 using Random = UnityEngine.Random;
@@ -27,7 +29,8 @@ namespace Core.AI.Sheep
         [Tooltip("Movement and herding config")]
         private SheepConfig _config;
 
-        [SerializeField][Tooltip("Sheep's archetype")]
+        [SerializeField]
+        [Tooltip("Sheep's archetype")]
         private SheepArchetype _archetype;
 
         [SerializeField]
@@ -70,20 +73,20 @@ namespace Core.AI.Sheep
         /// Read-only list of neighbouring sheep
         /// </summary>
         public IReadOnlyList<Transform> Neighbours => _neighbours;
-        
+
         private void Awake()
         {
             _agent = GetComponent<NavMeshAgent>();
-            if(_config != null)
+            if (_config != null)
             {
                 _agent.speed = _config.BaseSpeed;
             }
 
-            if(_archetype?.AnimationOverrides != null)
+            if (_archetype?.AnimationOverrides != null)
             {
                 _animation?.ApplyOverrideController(_archetype.AnimationOverrides);
             }
-            
+
             _personality = _archetype?.CreatePersonality(this);
             _behaviorContext = new PersonalityBehaviorContext();
 
@@ -92,7 +95,7 @@ namespace Core.AI.Sheep
 
         private void LateUpdate()
         {
-            if(_animation == null || _agent == null) return;
+            if (_animation == null || _agent == null) return;
             Vector3 v = _agent.velocity;
             v.y = 0f;
             _animation.SetSpeed(v.magnitude);
@@ -102,7 +105,7 @@ namespace Core.AI.Sheep
         {
             EventManager.AddListener<PlayerSquareChangedEvent>(OnPlayerSquareChanged);
             EventManager.AddListener<PlayerSquareTickEvent>(OnPlayerSquareTick);
-            
+
             SetState<SheepGrazeState>();
 
             float interval = _config != null ? _config.Tick : 0.15f;
@@ -114,7 +117,7 @@ namespace Core.AI.Sheep
             EventManager.RemoveListener<PlayerSquareChangedEvent>(OnPlayerSquareChanged);
             EventManager.RemoveListener<PlayerSquareTickEvent>(OnPlayerSquareTick);
 
-            if(_tickCoroutine != null)
+            if (_tickCoroutine != null)
             {
                 StopCoroutine(_tickCoroutine);
                 _tickCoroutine = null;
@@ -157,11 +160,11 @@ namespace Core.AI.Sheep
 
             //Decide on state
             bool outside = FlockingUtility.IsOutSquare(transform.position, _playerCenter, _playerHalfExtents);
-            
+
             // Redundant check, state machine should check if switching to same state
             Type targetState = outside ? typeof(SheepFollowState) : typeof(SheepGrazeState);
-            if(_currentState.GetType() == targetState) return;
-            
+            if (_currentState.GetType() == targetState) return;
+
             if (outside)
                 SetState<SheepFollowState>();
             else
@@ -172,12 +175,12 @@ namespace Core.AI.Sheep
         {
             SetState<SheepFollowState>();
         }
-        
+
         private IEnumerator TickCoroutine(float interval)
         {
             var wait = new WaitForSeconds(interval);
 
-            while(true)
+            while (true)
             {
                 // Update behavior context for personality
                 UpdateBehaviorContext();
@@ -196,7 +199,7 @@ namespace Core.AI.Sheep
         {
             _nextWalkingAwayFromHerdAt = Time.time + _config?.WalkAwayFromHerdTicks ?? DEFAULT_WALK_AWAY_FROM_HERD_TICKS;
         }
-        
+
         public void SetDestinationWithHerding(Vector3 destination) => _personality.SetDestinationWithHerding(destination, this, _behaviorContext);
         public Vector3 GetTargetNearPlayer() => _personality.GetFollowTarget(this, _behaviorContext);
         public Vector3 GetGrazeTarget() => _personality.GetGrazeTarget(this, _behaviorContext);
@@ -213,8 +216,8 @@ namespace Core.AI.Sheep
             _behaviorContext.PlayerPosition = _playerCenter;
             _behaviorContext.PlayerHalfExtents = _playerHalfExtents;
             _behaviorContext.DistanceToPlayer = Vector3.Distance(transform.position, _playerCenter);
-            _behaviorContext.IsPlayerMoving = false; 
-            _behaviorContext.HasThreat = false; 
+            _behaviorContext.IsPlayerMoving = false;
+            _behaviorContext.HasThreat = false;
             _behaviorContext.ThreatPosition = Vector3.zero;
             _behaviorContext.TimeSinceLastAction = Time.time;
             _behaviorContext.NeighborCount = _neighbours.Count;
@@ -289,4 +292,3 @@ namespace Core.AI.Sheep
         }
     }
 }
-

@@ -3,12 +3,16 @@ using System.Text;
 
 namespace Ink.Parsed
 {
-	public abstract class Object
-	{
-        public Runtime.DebugMetadata debugMetadata {
-            get {
-                if (_debugMetadata == null) {
-                    if (parent) {
+    public abstract class Object
+    {
+        public Runtime.DebugMetadata debugMetadata
+        {
+            get
+            {
+                if (_debugMetadata == null)
+                {
+                    if (parent)
+                    {
                         return parent.debugMetadata;
                     }
                 }
@@ -16,53 +20,64 @@ namespace Ink.Parsed
                 return _debugMetadata;
             }
 
-            set {
+            set
+            {
                 _debugMetadata = value;
             }
         }
         private Runtime.DebugMetadata _debugMetadata;
 
-        public bool hasOwnDebugMetadata {
-            get {
+        public bool hasOwnDebugMetadata
+        {
+            get
+            {
                 return _debugMetadata != null;
             }
         }
 
-        public virtual string typeName {
-            get {
+        public virtual string typeName
+        {
+            get
+            {
                 return GetType().Name;
             }
         }
 
-		public Parsed.Object parent { get; set; }
+        public Parsed.Object parent { get; set; }
         public List<Parsed.Object> content { get; protected set; }
 
-        public Parsed.Story story {
-            get {
+        public Parsed.Story story
+        {
+            get
+            {
                 Parsed.Object ancestor = this;
-                while (ancestor.parent) {
+                while (ancestor.parent)
+                {
                     ancestor = ancestor.parent;
                 }
                 return ancestor as Parsed.Story;
             }
         }
 
-		private Runtime.Object _runtimeObject;
-		public Runtime.Object runtimeObject
-		{
-			get {
-				if (_runtimeObject == null) {
-					_runtimeObject = GenerateRuntimeObject ();
-                    if( _runtimeObject )
+        private Runtime.Object _runtimeObject;
+        public Runtime.Object runtimeObject
+        {
+            get
+            {
+                if (_runtimeObject == null)
+                {
+                    _runtimeObject = GenerateRuntimeObject();
+                    if (_runtimeObject)
                         _runtimeObject.debugMetadata = debugMetadata;
-				}
-				return _runtimeObject;
-			}
+                }
+                return _runtimeObject;
+            }
 
-			set {
-				_runtimeObject = value;
-			}
-		}
+            set
+            {
+                _runtimeObject = value;
+            }
+        }
 
         // virtual so that certian object types can return a different
         // path than just the path to the main runtimeObject.
@@ -70,7 +85,8 @@ namespace Ink.Parsed
         // its outer container.
         public virtual Runtime.Path runtimePath
         {
-            get {
+            get
+            {
                 return runtimeObject.path;
             }
         }
@@ -81,7 +97,8 @@ namespace Ink.Parsed
         // but for e.g. choices, it'll be the target container.
         public virtual Runtime.Container containerForCounting
         {
-            get {
+            get
+            {
                 return this.runtimeObject as Runtime.Container;
             }
         }
@@ -92,10 +109,11 @@ namespace Ink.Parsed
             var otherAncestry = otherObj.ancestry;
 
             Parsed.Object highestCommonAncestor = null;
-            int minLength = System.Math.Min (ownAncestry.Count, otherAncestry.Count);
-            for (int i = 0; i < minLength; ++i) {
-                var a1 = ancestry [i];
-                var a2 = otherAncestry [i];
+            int minLength = System.Math.Min(ownAncestry.Count, otherAncestry.Count);
+            for (int i = 0; i < minLength; ++i)
+            {
+                var a1 = ancestry[i];
+                var a2 = otherAncestry[i];
                 if (a1 == a2)
                     highestCommonAncestor = a1;
                 else
@@ -104,41 +122,46 @@ namespace Ink.Parsed
 
             FlowBase commonFlowAncestor = highestCommonAncestor as FlowBase;
             if (commonFlowAncestor == null)
-                commonFlowAncestor = highestCommonAncestor.ClosestFlowBase ();
+                commonFlowAncestor = highestCommonAncestor.ClosestFlowBase();
 
 
-            var pathComponents = new List<Identifier> ();
+            var pathComponents = new List<Identifier>();
             bool hasWeavePoint = false;
             FlowLevel baseFlow = FlowLevel.WeavePoint;
 
             var ancestor = this;
-            while(ancestor && (ancestor != commonFlowAncestor) && !(ancestor is Story)) {
+            while (ancestor && (ancestor != commonFlowAncestor) && !(ancestor is Story))
+            {
 
                 if (ancestor == commonFlowAncestor)
                     break;
 
-                if (!hasWeavePoint) {
+                if (!hasWeavePoint)
+                {
                     var weavePointAncestor = ancestor as IWeavePoint;
-                    if (weavePointAncestor != null && weavePointAncestor.identifier != null) {
-                        pathComponents.Add (weavePointAncestor.identifier);
+                    if (weavePointAncestor != null && weavePointAncestor.identifier != null)
+                    {
+                        pathComponents.Add(weavePointAncestor.identifier);
                         hasWeavePoint = true;
                         continue;
                     }
                 }
 
                 var flowAncestor = ancestor as FlowBase;
-                if (flowAncestor) {
-                    pathComponents.Add (flowAncestor.identifier);
+                if (flowAncestor)
+                {
+                    pathComponents.Add(flowAncestor.identifier);
                     baseFlow = flowAncestor.flowLevel;
                 }
 
                 ancestor = ancestor.parent;
             }
 
-            pathComponents.Reverse ();
+            pathComponents.Reverse();
 
-            if (pathComponents.Count > 0) {
-                return new Path (baseFlow, pathComponents);
+            if (pathComponents.Count > 0)
+            {
+                return new Path(baseFlow, pathComponents);
             }
 
             return null;
@@ -146,16 +169,18 @@ namespace Ink.Parsed
 
         public List<Parsed.Object> ancestry
         {
-            get {
-                var result = new List<Parsed.Object> ();
+            get
+            {
+                var result = new List<Parsed.Object>();
 
                 var ancestor = this.parent;
-                while(ancestor) {
-                    result.Add (ancestor);
+                while (ancestor)
+                {
+                    result.Add(ancestor);
                     ancestor = ancestor.parent;
                 }
 
-                result.Reverse ();
+                result.Reverse();
 
                 return result;
             }
@@ -163,43 +188,49 @@ namespace Ink.Parsed
 
         public string descriptionOfScope
         {
-            get {
-                var locationNames = new List<string> ();
+            get
+            {
+                var locationNames = new List<string>();
 
                 Parsed.Object ancestor = this;
-                while (ancestor) {
+                while (ancestor)
+                {
                     var ancestorFlow = ancestor as FlowBase;
-                    if (ancestorFlow && ancestorFlow.identifier != null) {
-                        locationNames.Add ("'" + ancestorFlow.identifier + "'");
+                    if (ancestorFlow && ancestorFlow.identifier != null)
+                    {
+                        locationNames.Add("'" + ancestorFlow.identifier + "'");
                     }
                     ancestor = ancestor.parent;
                 }
 
-                var scopeSB = new StringBuilder ();
-                if (locationNames.Count > 0) {
-                    var locationsListStr = string.Join (", ", locationNames.ToArray());
-                    scopeSB.Append (locationsListStr);
-                    scopeSB.Append (" and ");
+                var scopeSB = new StringBuilder();
+                if (locationNames.Count > 0)
+                {
+                    var locationsListStr = string.Join(", ", locationNames.ToArray());
+                    scopeSB.Append(locationsListStr);
+                    scopeSB.Append(" and ");
                 }
 
-                scopeSB.Append ("at top scope");
+                scopeSB.Append("at top scope");
 
-                return scopeSB.ToString ();
+                return scopeSB.ToString();
             }
         }
 
         // Return the object so that method can be chained easily
         public T AddContent<T>(T subContent) where T : Parsed.Object
         {
-            if (content == null) {
-                content = new List<Parsed.Object> ();
+            if (content == null)
+            {
+                content = new List<Parsed.Object>();
             }
 
             // Make resilient to content not existing, which can happen
             // in the case of parse errors where we've already reported
             // an error but still want a valid structure so we can
             // carry on parsing.
-            if( subContent ) {
+            if (subContent)
+            {
                 subContent.parent = this;
                 content.Add(subContent);
             }
@@ -209,19 +240,21 @@ namespace Ink.Parsed
 
         public void AddContent<T>(List<T> listContent) where T : Parsed.Object
         {
-            foreach (var obj in listContent) {
-                AddContent (obj);
+            foreach (var obj in listContent)
+            {
+                AddContent(obj);
             }
         }
 
         public T InsertContent<T>(int index, T subContent) where T : Parsed.Object
         {
-            if (content == null) {
-                content = new List<Parsed.Object> ();
+            if (content == null)
+            {
+                content = new List<Parsed.Object>();
             }
 
             subContent.parent = this;
-            content.Insert (index, subContent);
+            content.Insert(index, subContent);
 
             return subContent;
         }
@@ -230,15 +263,17 @@ namespace Ink.Parsed
         public T Find<T>(FindQueryFunc<T> queryFunc = null) where T : class
         {
             var tObj = this as T;
-            if (tObj != null && (queryFunc == null || queryFunc (tObj) == true)) {
+            if (tObj != null && (queryFunc == null || queryFunc(tObj) == true))
+            {
                 return tObj;
             }
 
             if (content == null)
                 return null;
 
-            foreach (var obj in content) {
-                var nestedResult = obj.Find (queryFunc);
+            foreach (var obj in content)
+            {
+                var nestedResult = obj.Find(queryFunc);
                 if (nestedResult != null)
                     return nestedResult;
             }
@@ -249,9 +284,9 @@ namespace Ink.Parsed
 
         public List<T> FindAll<T>(FindQueryFunc<T> queryFunc = null) where T : class
         {
-            var found = new List<T> ();
+            var found = new List<T>();
 
-            FindAll (queryFunc, found);
+            FindAll(queryFunc, found);
 
             return found;
         }
@@ -259,34 +294,40 @@ namespace Ink.Parsed
         void FindAll<T>(FindQueryFunc<T> queryFunc, List<T> foundSoFar) where T : class
         {
             var tObj = this as T;
-            if (tObj != null && (queryFunc == null || queryFunc (tObj) == true)) {
-                foundSoFar.Add (tObj);
+            if (tObj != null && (queryFunc == null || queryFunc(tObj) == true))
+            {
+                foundSoFar.Add(tObj);
             }
 
             if (content == null)
                 return;
 
-            foreach (var obj in content) {
-                obj.FindAll (queryFunc, foundSoFar);
+            foreach (var obj in content)
+            {
+                obj.FindAll(queryFunc, foundSoFar);
             }
         }
 
-		public abstract Runtime.Object GenerateRuntimeObject ();
+        public abstract Runtime.Object GenerateRuntimeObject();
 
         public virtual void ResolveReferences(Story context)
-		{
-            if (content != null) {
-                foreach(var obj in content) {
-                    obj.ResolveReferences (context);
+        {
+            if (content != null)
+            {
+                foreach (var obj in content)
+                {
+                    obj.ResolveReferences(context);
                 }
             }
-		}
+        }
 
         public FlowBase ClosestFlowBase()
         {
             var ancestor = this.parent;
-            while (ancestor) {
-                if (ancestor is FlowBase) {
+            while (ancestor)
+            {
+                if (ancestor is FlowBase)
+                {
                     return (FlowBase)ancestor;
                 }
                 ancestor = ancestor.parent;
@@ -296,49 +337,58 @@ namespace Ink.Parsed
         }
 
         public virtual void Error(string message, Parsed.Object source = null, bool isWarning = false)
-		{
-			if (source == null) {
-				source = this;
-			}
+        {
+            if (source == null)
+            {
+                source = this;
+            }
 
             // Only allow a single parsed object to have a single error *directly* associated with it
-            if (source._alreadyHadError && !isWarning) {
+            if (source._alreadyHadError && !isWarning)
+            {
                 return;
             }
-            if (source._alreadyHadWarning && isWarning) {
+            if (source._alreadyHadWarning && isWarning)
+            {
                 return;
             }
 
-            if (this.parent) {
-                this.parent.Error (message, source, isWarning);
-            } else {
-                throw new System.Exception ("No parent object to send error to: "+message);
+            if (this.parent)
+            {
+                this.parent.Error(message, source, isWarning);
+            }
+            else
+            {
+                throw new System.Exception("No parent object to send error to: " + message);
             }
 
-            if (isWarning) {
+            if (isWarning)
+            {
                 source._alreadyHadWarning = true;
-            } else {
+            }
+            else
+            {
                 source._alreadyHadError = true;
             }
 
-		}
+        }
 
         public void Warning(string message, Parsed.Object source = null)
         {
-            Error (message, source, isWarning: true);
+            Error(message, source, isWarning: true);
         }
 
         // Allow implicit conversion to bool so you don't have to do:
         // if( myObj != null ) ...
-        public static implicit operator bool (Object obj)
+        public static implicit operator bool(Object obj)
         {
-            var isNull = object.ReferenceEquals (obj, null);
+            var isNull = object.ReferenceEquals(obj, null);
             return !isNull;
         }
 
         public static bool operator ==(Object a, Object b)
         {
-            return object.ReferenceEquals (a, b);
+            return object.ReferenceEquals(a, b);
         }
 
         public static bool operator !=(Object a, Object b)
@@ -346,18 +396,17 @@ namespace Ink.Parsed
             return !(a == b);
         }
 
-        public override bool Equals (object obj)
+        public override bool Equals(object obj)
         {
-            return object.ReferenceEquals (obj, this);
+            return object.ReferenceEquals(obj, this);
         }
 
-        public override int GetHashCode ()
+        public override int GetHashCode()
         {
-            return base.GetHashCode ();
+            return base.GetHashCode();
         }
 
         bool _alreadyHadError;
         bool _alreadyHadWarning;
-	}
+    }
 }
-

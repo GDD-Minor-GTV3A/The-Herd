@@ -1,5 +1,6 @@
-using UnityEngine;
 using Core.Shared.StateMachine;
+
+using UnityEngine;
 using UnityEngine.AI;
 
 namespace Core.AI.Sheep
@@ -29,7 +30,8 @@ namespace Core.AI.Sheep
 
         public void OnUpdate()
         {
-            if (_stateManager == null) { return; };
+            if (_stateManager == null) { return; }
+            ;
             Vector3 target = _stateManager.GetTargetNearPlayer();
             _stateManager.SetDestinationWithHerding(target);
         }
@@ -56,7 +58,7 @@ namespace Core.AI.Sheep
         public void OnStart()
         {
             ScheduleNextGraze();
-            if(_stateManager.Agent !=  null && _stateManager?.Animation != null && _stateManager.CanControlAgent())
+            if (_stateManager.Agent != null && _stateManager?.Animation != null && _stateManager.CanControlAgent())
             {
                 _stateManager.Agent.isStopped = false;
                 _stateManager.Animation.SetState((int)SheepAnimState.Idle);
@@ -67,7 +69,7 @@ namespace Core.AI.Sheep
         {
             if (_stateManager == null) { return; }
 
-            if(Time.time < _nextGrazeAt)
+            if (Time.time < _nextGrazeAt)
             {
                 if (HasArrived() && _stateManager.CanControlAgent())
                 {
@@ -104,7 +106,7 @@ namespace Core.AI.Sheep
         private bool HasArrived()
         {
             var agent = _stateManager.Agent;
-            if(agent.pathPending) return false;
+            if (agent.pathPending) return false;
             return agent.remainingDistance <= REACH_THRESHOLD;
         }
     }
@@ -149,7 +151,7 @@ namespace Core.AI.Sheep
 
         public void OnStop()
         {
-            if(_stateManager?.Agent != null && _stateManager.CanControlAgent())
+            if (_stateManager?.Agent != null && _stateManager.CanControlAgent())
             {
                 _stateManager.Agent.isStopped = true;
             }

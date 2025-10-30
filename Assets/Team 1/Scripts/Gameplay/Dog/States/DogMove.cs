@@ -1,4 +1,5 @@
 ﻿using Core.Events;
+
 using UnityEngine;
 
 namespace Gameplay.Dog

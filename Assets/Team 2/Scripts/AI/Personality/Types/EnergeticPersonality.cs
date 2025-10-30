@@ -1,7 +1,9 @@
-using UnityEngine;
 using System;
 using System.Collections.Generic;
+
 using Core.Shared.StateMachine;
+
+using UnityEngine;
 
 using Random = UnityEngine.Random;
 
@@ -19,7 +21,7 @@ namespace Core.AI.Sheep.Personality.Types
         private float _lastBurstTime;
         private const float BURST_COOLDOWN = 8f;
         private const float BURST_CHANCE = 0.3f;
-        
+
         public override Vector3 GetFollowTarget(SheepStateManager sheep, PersonalityBehaviorContext context)
         {
             // Sometimes burst away from player instead of following
@@ -33,7 +35,7 @@ namespace Core.AI.Sheep.Personality.Types
 
             return base.GetFollowTarget(sheep, context); // Use normal behavior
         }
-        
+
         public override void OnPlayerAction(string actionType, SheepStateManager sheep, PersonalityBehaviorContext context)
         {
             // Energetic sheep over-react to player actions - just follow more eagerly

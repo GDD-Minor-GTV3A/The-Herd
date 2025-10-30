@@ -1,6 +1,8 @@
-using UnityEngine;
-using TMPro;
 using System.Collections;
+
+using TMPro;
+
+using UnityEngine;
 using UnityEngine.Rendering;
 
 public class Dialogue : MonoBehaviour
@@ -21,9 +23,9 @@ public class Dialogue : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0))
         {
-            if(textComponent.text == lines[index])
+            if (textComponent.text == lines[index])
             {
                 NextLine();
             }
@@ -53,7 +55,7 @@ public class Dialogue : MonoBehaviour
 
     void NextLine()
     {
-        if (index < lines.Length -1)
+        if (index < lines.Length - 1)
         {
             index++;
             textComponent.text = string.Empty;

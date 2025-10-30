@@ -1,49 +1,59 @@
 
 namespace Ink
 {
-	public class StringParserState
-	{
-		public int lineIndex {
-			get { return currentElement.lineIndex; }
-			set { currentElement.lineIndex = value; }
-		}
+    public class StringParserState
+    {
+        public int lineIndex
+        {
+            get { return currentElement.lineIndex; }
+            set { currentElement.lineIndex = value; }
+        }
 
-		public int characterIndex {
-			get { return currentElement.characterIndex; }
-			set { currentElement.characterIndex = value; }
-		}
+        public int characterIndex
+        {
+            get { return currentElement.characterIndex; }
+            set { currentElement.characterIndex = value; }
+        }
 
-        public int characterInLineIndex {
+        public int characterInLineIndex
+        {
             get { return currentElement.characterInLineIndex; }
             set { currentElement.characterInLineIndex = value; }
         }
 
-        public uint customFlags {
+        public uint customFlags
+        {
             get { return currentElement.customFlags; }
             set { currentElement.customFlags = value; }
         }
 
-        public bool errorReportedAlreadyInScope {
-            get {
+        public bool errorReportedAlreadyInScope
+        {
+            get
+            {
                 return currentElement.reportedErrorInScope;
             }
         }
 
-        public int stackHeight {
-            get {
+        public int stackHeight
+        {
+            get
+            {
                 return _numElements;
             }
         }
 
-		public class Element {
-			public int characterIndex;
+        public class Element
+        {
+            public int characterIndex;
             public int characterInLineIndex;
-			public int lineIndex;
+            public int lineIndex;
             public bool reportedErrorInScope;
             public int uniqueId;
             public uint customFlags;
 
-			public Element() {
+            public Element()
+            {
 
             }
 
@@ -74,98 +84,105 @@ namespace Ink
             }
 
             static int _uniqueIdCounter;
-		}
+        }
 
-		public StringParserState ()
-		{
+        public StringParserState()
+        {
             const int kExpectedMaxStackDepth = 200;
             _stack = new Element[kExpectedMaxStackDepth];
 
-            for (int i = 0; i < kExpectedMaxStackDepth; ++i) {
-                _stack [i] = new Element ();
+            for (int i = 0; i < kExpectedMaxStackDepth; ++i)
+            {
+                _stack[i] = new Element();
             }
 
             _numElements = 1;
-		}
+        }
 
-		public int Push()
-		{
+        public int Push()
+        {
             if (_numElements >= _stack.Length)
-                throw new System.Exception ("Stack overflow in parser state");
+                throw new System.Exception("Stack overflow in parser state");
 
-            var prevElement = _stack [_numElements - 1];
+            var prevElement = _stack[_numElements - 1];
             var newElement = _stack[_numElements];
             _numElements++;
 
-            newElement.CopyFrom (prevElement);
+            newElement.CopyFrom(prevElement);
 
             return newElement.uniqueId;
-		}
+        }
 
         public void Pop(int expectedRuleId)
-		{
-            if (_numElements == 1) {
-				throw new System.Exception ("Attempting to remove final stack element is illegal! Mismatched Begin/Succceed/Fail?");
-			}
+        {
+            if (_numElements == 1)
+            {
+                throw new System.Exception("Attempting to remove final stack element is illegal! Mismatched Begin/Succceed/Fail?");
+            }
 
-            if ( currentElement.uniqueId != expectedRuleId)
-                throw new System.Exception ("Mismatched rule IDs - do you have mismatched Begin/Succeed/Fail?");
+            if (currentElement.uniqueId != expectedRuleId)
+                throw new System.Exception("Mismatched rule IDs - do you have mismatched Begin/Succeed/Fail?");
 
-			// Restore state
+            // Restore state
             _numElements--;
-		}
+        }
 
         public Element Peek(int expectedRuleId)
-		{
+        {
             if (currentElement.uniqueId != expectedRuleId)
-                throw new System.Exception ("Mismatched rule IDs - do you have mismatched Begin/Succeed/Fail?");
+                throw new System.Exception("Mismatched rule IDs - do you have mismatched Begin/Succeed/Fail?");
 
-            return _stack[_numElements-1];
-		}
+            return _stack[_numElements - 1];
+        }
 
         public Element PeekPenultimate()
         {
-            if (_numElements >= 2) {
-                return _stack [_numElements - 2];
-            } else {
+            if (_numElements >= 2)
+            {
+                return _stack[_numElements - 2];
+            }
+            else
+            {
                 return null;
             }
         }
 
-		// Reduce stack height while maintaining currentElement
-		// Remove second last element: i.e. "squash last two elements together"
+        // Reduce stack height while maintaining currentElement
+        // Remove second last element: i.e. "squash last two elements together"
         // Used when succeeding from a rule (and ONLY when succeeding, since
         // the state of the top element is retained).
-		public void Squash()
-		{
-            if (_numElements < 2) {
-				throw new System.Exception ("Attempting to remove final stack element is illegal! Mismatched Begin/Succceed/Fail?");
-			}
+        public void Squash()
+        {
+            if (_numElements < 2)
+            {
+                throw new System.Exception("Attempting to remove final stack element is illegal! Mismatched Begin/Succceed/Fail?");
+            }
 
-            var penultimateEl = _stack [_numElements - 2];
-            var lastEl = _stack [_numElements - 1];
+            var penultimateEl = _stack[_numElements - 2];
+            var lastEl = _stack[_numElements - 1];
 
-            penultimateEl.SquashFrom (lastEl);
+            penultimateEl.SquashFrom(lastEl);
 
             _numElements--;
-		}
+        }
 
         public void NoteErrorReported()
         {
-            foreach (var el in _stack) {
+            foreach (var el in _stack)
+            {
                 el.reportedErrorInScope = true;
             }
         }
 
-		protected Element currentElement
-		{
-			get {
-                return _stack [_numElements - 1];
-			}
-		}
+        protected Element currentElement
+        {
+            get
+            {
+                return _stack[_numElements - 1];
+            }
+        }
 
         private Element[] _stack;
         private int _numElements;
-	}
+    }
 }
-
