@@ -10,10 +10,11 @@ namespace Ink.Parsed
             warningMessage = message;
         }
 
-        public override Runtime.Object GenerateRuntimeObject()
+        public override Runtime.Object GenerateRuntimeObject ()
         {
-            Warning(warningMessage);
+            Warning (warningMessage);
             return null;
         }
     }
 }
+

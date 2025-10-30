@@ -1,11 +1,7 @@
 using System.Collections.Generic;
-
 using Core.Events;
-
 using Ink.Runtime;
-
 using TMPro;
-
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -22,11 +18,11 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _dialogueText;
     [SerializeField] private TextMeshProUGUI _displayNameText;
     [SerializeField] private Animator _portraitAnimator;
-
+    
     [Header("Choices UI")]
     [SerializeField] private GameObject[] _choices;
     private TextMeshProUGUI[] _choicesText;
-
+    
     [Header("Sanity")]
     [Range(1, 3)]
     [SerializeField] private int _sanity = 2; // 1=low, 2=medium, 3=high
@@ -36,7 +32,7 @@ public class DialogueManager : MonoBehaviour
     private Animator _layoutAnimator;
     private string _pendingPortraitState;
     private System.Action _onDialogueFinished;
-
+    
     private static DialogueManager _instance;
 
     // Constants
@@ -48,7 +44,7 @@ public class DialogueManager : MonoBehaviour
     /// <summary>
     /// Gets a value indicating whether dialogue is currently playing.
     /// </summary>
-    public bool IsDialoguePlaying { get; private set; }
+    public bool IsDialoguePlaying { get; private set; } 
 
     /// <summary>
     /// Gets the singleton instance of the DialogueManager.
@@ -56,7 +52,7 @@ public class DialogueManager : MonoBehaviour
     public static DialogueManager GetInstance() => _instance;
 
     public Story Story => _story;
-
+    
     /// <summary>
     /// Initializes the DialogueManager, setting up the UI and singleton instance.
     /// This method is called from the game bootstrap.
@@ -71,19 +67,19 @@ public class DialogueManager : MonoBehaviour
         }
 
         _instance = this;
-
+        
         IsDialoguePlaying = false;
         _dialoguePanel.SetActive(false);
         _layoutAnimator = _dialoguePanel.GetComponent<Animator>();
-
+        
         _choicesText = new TextMeshProUGUI[_choices.Length];
         for (int i = 0; i < _choices.Length; i++)
         {
             _choicesText[i] = _choices[i].GetComponentInChildren<TextMeshProUGUI>();
         }
-
+        
     }
-
+    
 
     private void Update()
     {
@@ -119,7 +115,7 @@ public class DialogueManager : MonoBehaviour
     private void ConfirmChoiceSelection()
     {
         GameObject selectedObject = EventSystem.current?.currentSelectedGameObject;
-
+        
         if (selectedObject == null && _story.currentChoices.Count > 0)
         {
             // Fallback: If no button is selected but choices exist, force-select the first one.
@@ -135,7 +131,7 @@ public class DialogueManager : MonoBehaviour
                 if (_choices[i] == selectedObject)
                 {
                     MakeChoice(i);
-                    return;
+                    return; 
                 }
             }
         }
@@ -154,14 +150,12 @@ public class DialogueManager : MonoBehaviour
         }
 
         _story = new Story(inkJson.text);
-
-        _story.BindExternalFunction("StartQuest", (string questID) =>
-        {
+        
+        _story.BindExternalFunction("StartQuest", (string questID) => {
             StartQuest(questID);
         });
-
-        _story.BindExternalFunction("CompleteObjective", (string questID, string objectiveID) =>
-        {
+        
+        _story.BindExternalFunction("CompleteObjective", (string questID, string objectiveID) => {
             CompleteObjective(questID, objectiveID);
         });
         IsDialoguePlaying = true;
@@ -177,8 +171,8 @@ public class DialogueManager : MonoBehaviour
         _dialogueText.text = string.Empty;
         _pendingPortraitState = null;
         _layoutAnimator?.Play(DEFAULT_LAYOUT_STATE);
-
-        _onDialogueFinished?.Invoke();
+        
+        _onDialogueFinished?.Invoke(); 
         _onDialogueFinished = null;
     }
 
@@ -218,7 +212,7 @@ public class DialogueManager : MonoBehaviour
                     speaker = value;
                     break;
                 case PORTRAIT_TAG:
-                    showPortrait = !value.Equals("false", System.StringComparison.OrdinalIgnoreCase);
+                    showPortrait = !value.Equals("false", System.StringComparison.OrdinalIgnoreCase); 
                     break;
                 case LAYOUT_TAG:
                     _layoutAnimator?.Play(value);
@@ -291,7 +285,7 @@ public class DialogueManager : MonoBehaviour
         {
             int hash = Animator.StringToHash(stateName);
             // Check if the state exists to avoid warnings or hard errors
-            if (_portraitAnimator.HasState(0, hash))
+            if (_portraitAnimator.HasState(0, hash)) 
             {
                 _portraitAnimator.Play(stateName, 0, 0f);
             }
@@ -341,7 +335,7 @@ public class DialogueManager : MonoBehaviour
         {
             _story.ChooseChoiceIndex(index);
             // Immediately continue the story after a choice is made
-            ContinueStory();
+            ContinueStory(); 
         }
     }
 

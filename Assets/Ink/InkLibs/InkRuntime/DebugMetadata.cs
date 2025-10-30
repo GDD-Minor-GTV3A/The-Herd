@@ -11,7 +11,7 @@ namespace Ink.Runtime
         public string fileName = null;
         public string sourceName = null;
 
-        public DebugMetadata()
+        public DebugMetadata ()
         {
         }
 
@@ -61,14 +61,11 @@ namespace Ink.Runtime
             return newDebugMetadata;
         }
 
-        public override string ToString()
+        public override string ToString ()
         {
-            if (fileName != null)
-            {
-                return string.Format("line {0} of {1}", startLineNumber, fileName);
-            }
-            else
-            {
+            if (fileName != null) {
+                return string.Format ("line {0} of {1}", startLineNumber, fileName);
+            } else {
                 return "line " + startLineNumber;
             }
 
@@ -76,3 +73,4 @@ namespace Ink.Runtime
 
     }
 }
+
