@@ -75,10 +75,12 @@
     <Compile Include="Assets\Team 6\Scripts\AI\FieldOfView.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark02.cs" />
     <Compile Include="Assets\Team 8\Scripts\Core\Economy\ShopItemData.cs" />
+    <Compile Include="Assets\Team 9\Scripts\Gameplay\Quests\ObjectiveTrigger.cs" />
     <Compile Include="Assets\Team 6\Scripts\AI\Node.cs" />
     <Compile Include="Assets\Team 6\Scripts\AI\SheepSanity.cs" />
     <Compile Include="Assets\Team 8\Scripts\Core\Economy\CurrencyUI.cs" />
     <Compile Include="Assets\Team 6\Scripts\AI\DetectSheep.cs" />
+    <Compile Include="Assets\Team 9\Scripts\UI\Quest\QuestLogUI.cs" />
     <Compile Include="Assets\Team 7\Scripts\AI\Drekavac\DrekavacStats.cs" />
     <Compile Include="Assets\Team 6\Scripts\Core\ReadOnlyAttribute.cs" />
     <Compile Include="Assets\Team 9\Scripts\Gameplay\Quests\Testing\QuestStarter.cs" />
@@ -145,6 +147,7 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark03.cs" />
     <Compile Include="Assets\Team 6\SheepImplementation\SheepStateManager.cs" />
     <Compile Include="Assets\Team 3\Scripts\Gameplay\Dialogue.cs" />
+    <Compile Include="Assets\Team 9\Scripts\UI\Quest\QuestUIEntry.cs" />
     <Compile Include="Assets\Team 4\Scripts\Player\PlayerBehaviour.cs" />
     <Compile Include="Assets\Team 9\Scripts\UI\Bootstrap.cs" />
     <Compile Include="Assets\Team 5\Scripts\CameraFollowing.cs" />
@@ -182,6 +185,7 @@
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile-2-Pass.shader" />
     <None Include="Assets\TextMesh Pro\Examples &amp; Extras\Fonts\Unity - OFL.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap.shader" />
+    <None Include="Assets\Team 3\dummy.txt" />
     <None Include="Assets\TextMesh Pro\Examples &amp; Extras\Fonts\Oswald-Bold - OFL.txt" />
     <None Include="Assets\TextMesh Pro\Examples &amp; Extras\Fonts\Roboto-Bold - AFL.txt" />
     <None Include="Assets\TextMesh Pro\Examples &amp; Extras\Fonts\Anton OFL.txt" />
@@ -695,16 +699,16 @@
       <HintPath>Library\PackageCache\com.unity.ext.nunit@031a54704bff\net40\unity-custom\nunit.framework.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="DOTween">
+      <HintPath>Assets\Plugins\Demigiant\DOTween\DOTween.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.VisualScripting.Antlr3.Runtime">
       <HintPath>Library\PackageCache\com.unity.visualscripting@b4d700247d4b\Runtime\VisualScripting.Flow\Dependencies\NCalc\Unity.VisualScripting.Antlr3.Runtime.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Mono.Cecil">
       <HintPath>Library\PackageCache\com.unity.nuget.mono-cecil@d6f9955a5d5f\Mono.Cecil.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DOTween">
-      <HintPath>Assets\Plugins\Demigiant\DOTween\DOTween.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="netstandard">
