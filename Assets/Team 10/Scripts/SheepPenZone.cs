@@ -1,5 +1,6 @@
-﻿using UnityEngine;
-using Core.AI.Sheep; // gives access to SheepStateManager
+﻿using Core.AI.Sheep; // gives access to SheepStateManager
+
+using UnityEngine;
 
 public class SheepPenZone : MonoBehaviour
 {

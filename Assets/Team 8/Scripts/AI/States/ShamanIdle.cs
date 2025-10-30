@@ -47,4 +47,3 @@ namespace AI.Shaman
         }
     }
 }
-

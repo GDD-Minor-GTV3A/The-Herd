@@ -20,7 +20,7 @@ namespace Gameplay.Player
         [Header("Health")]
         [Tooltip("Maximum health of the player.")]
         [SerializeField] private float _maxHealth = 100f;
-        
+
         [Tooltip("Starting health of the player.")]
         [SerializeField] private float _currentHealth = 100f;
 

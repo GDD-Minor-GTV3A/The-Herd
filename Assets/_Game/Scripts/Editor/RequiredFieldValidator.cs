@@ -1,7 +1,10 @@
 using System.Reflection;
-using UnityEditor;
-using UnityEngine;
+
 using Core.Shared.Utilities;
+
+using UnityEditor;
+
+using UnityEngine;
 
 public static class RequiredFieldValidator
 {

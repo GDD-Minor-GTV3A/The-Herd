@@ -22,7 +22,7 @@ public class RayProjectile : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             Debug.Log("[RayProjectile] Player hit!");
-           
+
         }
     }
 }

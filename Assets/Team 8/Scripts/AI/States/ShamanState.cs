@@ -22,4 +22,3 @@ namespace AI.Shaman
         public abstract void OnUpdate();
     }
 }
-
