@@ -1,7 +1,3 @@
-using Core.Events;
-
-using TMPro;
-
 using UnityEngine;
 using TMPro;
 
@@ -12,10 +8,7 @@ public class DialogueTrigger : MonoBehaviour
     
     //HANDLE UI SOMEWHERE ELSE!!!!
     [SerializeField] private TextMeshProUGUI _interText;
-
-    [SerializeField] private string questID = "";
-    [SerializeField] private string objectiveID = "";
-
+    
     private const string PLAYER_TAG = "Player";
     
     /// <summary>
@@ -54,7 +47,6 @@ public class DialogueTrigger : MonoBehaviour
         }
         if (Input.GetKey(KeyCode.E))
         {
-            EventManager.Broadcast(new CompleteObjectiveEvent(questID, objectiveID));
             DialogueManager.GetInstance().EnterDialogueMode(_inkJSON);
         }
         //INPUT

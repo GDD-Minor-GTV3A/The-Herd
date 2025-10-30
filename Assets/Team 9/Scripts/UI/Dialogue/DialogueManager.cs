@@ -1,9 +1,9 @@
-using System;
 using System.Collections.Generic;
 using Core.Events;
 using Ink.Runtime;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 /// <summary>
 /// A singleton class that manages the dialogue system,
@@ -20,7 +20,6 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private Animator _portraitAnimator;
     
     [Header("Choices UI")]
-    [SerializeField] private GameObject _choicesPanel; 
     [SerializeField] private GameObject[] _choices;
     private TextMeshProUGUI[] _choicesText;
     
@@ -34,17 +33,13 @@ public class DialogueManager : MonoBehaviour
     private string _pendingPortraitState;
     private System.Action _onDialogueFinished;
     
-    // Variable persistence storage
-    private Dictionary<string, object> _inkVariableState = new Dictionary<string, object>();
-    
     private static DialogueManager _instance;
 
     // Constants
     private const string SPEAKER_TAG = "speaker";
     private const string PORTRAIT_TAG = "portrait";
+    private const string LAYOUT_TAG = "layout";
     private const string DEFAULT_LAYOUT_STATE = "left";
-    private const string NARRATOR_LAYOUT_STATE = "narrator";
-    private const string SHOW_CHOICES_STATE = "showChoices"; 
 
     /// <summary>
     /// Gets a value indicating whether dialogue is currently playing.
@@ -82,11 +77,7 @@ public class DialogueManager : MonoBehaviour
         {
             _choicesText[i] = _choices[i].GetComponentInChildren<TextMeshProUGUI>();
         }
-    }
-
-    private void OnEnable()
-    {
-        EventManager.AddListener<QuestCompletedEvent>(OnQuestCompleted);
+        
     }
     
 
@@ -104,24 +95,47 @@ public class DialogueManager : MonoBehaviour
             _pendingPortraitState = null;
         }
 
-        // --- CHOICE KEYBOARD LOGIC ---
-        // If choices are displayed, allow number keys to select choices
-        if (_story.currentChoices.Count > 0)
-        {
-            if (Input.GetKeyDown(KeyCode.Alpha1)) { MakeChoice(0); return; }
-            if (Input.GetKeyDown(KeyCode.Alpha2)) { MakeChoice(1); return; }
-            if (Input.GetKeyDown(KeyCode.Alpha3)) { MakeChoice(2); return; }
-            // Add more if you have more than 3 choices
-            return;
-        }
-
-        // Use Space for advancing text only when no choices are available
+        // Use Space for both advancing text and confirming a selection.
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            ContinueStory();
+            if (_story.currentChoices.Count == 0)
+            {
+                ContinueStory();
+            }
+            else
+            {
+                ConfirmChoiceSelection();
+            }
         }
     }
 
+    /// <summary>
+    /// Handles the input logic for selecting the currently highlighted choice.
+    /// </summary>
+    private void ConfirmChoiceSelection()
+    {
+        GameObject selectedObject = EventSystem.current?.currentSelectedGameObject;
+        
+        if (selectedObject == null && _story.currentChoices.Count > 0)
+        {
+            // Fallback: If no button is selected but choices exist, force-select the first one.
+            EventSystem.current?.SetSelectedGameObject(_choices[0]);
+            selectedObject = _choices[0];
+        }
+
+        if (selectedObject != null)
+        {
+            for (int i = 0; i < _choices.Length; i++)
+            {
+                // Check if the selected object is one of our choice buttons
+                if (_choices[i] == selectedObject)
+                {
+                    MakeChoice(i);
+                    return; 
+                }
+            }
+        }
+    }
 
     /// <summary>
     /// Enters dialogue mode by loading an Ink story and displaying the first line.
@@ -137,9 +151,6 @@ public class DialogueManager : MonoBehaviour
 
         _story = new Story(inkJson.text);
         
-        // Restore previously saved Ink variables
-        RestoreInkVariables();
-        
         _story.BindExternalFunction("StartQuest", (string questID) => {
             StartQuest(questID);
         });
@@ -147,100 +158,22 @@ public class DialogueManager : MonoBehaviour
         _story.BindExternalFunction("CompleteObjective", (string questID, string objectiveID) => {
             CompleteObjective(questID, objectiveID);
         });
-        
         IsDialoguePlaying = true;
         _dialoguePanel.SetActive(true);
         _onDialogueFinished = onDialogueFinished;
-        _layoutAnimator?.Play(DEFAULT_LAYOUT_STATE);
-        
         ContinueStory();
     }
 
     private void ExitDialogueMode()
     {
-        // Save Ink variables before exiting
-        SaveInkVariables();
-        
         IsDialoguePlaying = false;
         _dialoguePanel.SetActive(false);
         _dialogueText.text = string.Empty;
         _pendingPortraitState = null;
-        _layoutAnimator?.Play(DEFAULT_LAYOUT_STATE); 
+        _layoutAnimator?.Play(DEFAULT_LAYOUT_STATE);
         
         _onDialogueFinished?.Invoke(); 
         _onDialogueFinished = null;
-    }
-
-    /// <summary>
-    /// Saves all Ink variables to persistent storage
-    /// </summary>
-    private void SaveInkVariables()
-    {
-        if (_story == null) return;
-        
-        foreach (string varName in _story.variablesState)
-        {
-            _inkVariableState[varName] = _story.variablesState[varName];
-        }
-        
-        Debug.Log($"Saved {_inkVariableState.Count} Ink variables");
-    }
-
-    /// <summary>
-    /// Restores previously saved Ink variables to the current story
-    /// </summary>
-    private void RestoreInkVariables()
-    {
-        if (_story == null || _inkVariableState.Count == 0) return;
-        
-        foreach (var kvp in _inkVariableState)
-        {
-            try
-            {
-                _story.variablesState[kvp.Key] = kvp.Value;
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogWarning($"Could not restore variable '{kvp.Key}': {e.Message}");
-            }
-        }
-        
-        Debug.Log($"Restored {_inkVariableState.Count} Ink variables");
-    }
-
-    /// <summary>
-    /// Manually set an Ink variable (useful for quest completion triggers)
-    /// </summary>
-    /// <param name="variableName">Name of the Ink variable</param>
-    /// <param name="value">Value to set</param>
-    public void SetInkVariable(string variableName, object value)
-    {
-        _inkVariableState[variableName] = value;
-        
-        // If a story is currently active, also update it directly
-        if (_story != null)
-        {
-            try
-            {
-                _story.variablesState[variableName] = value;
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogWarning($"Could not set variable '{variableName}': {e.Message}");
-            }
-        }
-    }
-
-    /// <summary>
-    /// Get the current value of an Ink variable
-    /// </summary>
-    public object GetInkVariable(string variableName)
-    {
-        if (_inkVariableState.ContainsKey(variableName))
-        {
-            return _inkVariableState[variableName];
-        }
-        return null;
     }
 
     private void ContinueStory()
@@ -281,41 +214,21 @@ public class DialogueManager : MonoBehaviour
                 case PORTRAIT_TAG:
                     showPortrait = !value.Equals("false", System.StringComparison.OrdinalIgnoreCase); 
                     break;
+                case LAYOUT_TAG:
+                    _layoutAnimator?.Play(value);
+                    break;
             }
         }
 
         ApplySpeakerAndPortrait(speaker, showPortrait);
-        UpdateLayout(speaker);
-    }
-
-    /// <summary>
-    /// Updates the layout animation based on the speaker
-    /// </summary>
-    /// <param name="speaker">The current speaker name</param>
-    private void UpdateLayout(string speaker)
-    {
-        if (_layoutAnimator == null)
-        {
-            return;
-        }
-
-        // If speaker is "Narrator", use narrator layout; otherwise use left layout
-        if (!string.IsNullOrEmpty(speaker) && speaker.Equals("Narrator", System.StringComparison.OrdinalIgnoreCase))
-        {
-            _layoutAnimator.Play(NARRATOR_LAYOUT_STATE);
-        }
-        else
-        {
-            _layoutAnimator.Play(DEFAULT_LAYOUT_STATE);
-        }
     }
 
     private void ApplySpeakerAndPortrait(string speaker, bool showPortrait)
     {
         if (string.IsNullOrEmpty(speaker) || speaker.Equals("Narrator", System.StringComparison.OrdinalIgnoreCase))
         {
-            _displayNameText.text = "Narrator";
-            _portraitAnimator?.gameObject.SetActive(false); 
+            _displayNameText.text = string.Empty;
+            _portraitAnimator?.gameObject.SetActive(false);
             return;
         }
 
@@ -340,7 +253,7 @@ public class DialogueManager : MonoBehaviour
 
     private string BuildPortraitStateName(string speaker)
     {
-        // Player has no sanity portraits
+        // Player has no sanityy portraits
         if (speaker.Equals("Player", System.StringComparison.OrdinalIgnoreCase))
         {
             return "Player";
@@ -391,20 +304,6 @@ public class DialogueManager : MonoBehaviour
     private void DisplayChoices()
     {
         var currentChoices = _story.currentChoices;
-        
-        // Use the Animator to control the visibility of the parent panel, using the corrected state name
-        if (currentChoices.Count > 0)
-        {
-            // Transition to an animation state that enables the choices panel
-            _layoutAnimator.Play(SHOW_CHOICES_STATE);
-        }
-        else
-        {
-            // Revert to a default layout state that disables the choices panel
-            _layoutAnimator.Play(DEFAULT_LAYOUT_STATE);
-        }
-        
-        // The script still handles the individual choice buttons
         int i = 0;
         for (; i < currentChoices.Count && i < _choices.Length; i++)
         {
@@ -415,6 +314,12 @@ public class DialogueManager : MonoBehaviour
         for (; i < _choices.Length; i++)
         {
             _choices[i].SetActive(false);
+        }
+
+        // Auto-select the first choice for controller/keyboard navigation
+        if (currentChoices.Count > 0)
+        {
+            EventSystem.current?.SetSelectedGameObject(_choices[0]);
         }
     }
 
@@ -442,19 +347,5 @@ public class DialogueManager : MonoBehaviour
     private void CompleteObjective(string questID, string objectiveID)
     {
         EventManager.Broadcast(new CompleteObjectiveEvent(questID, objectiveID));
-    }
-    
-    /// <summary>
-    /// Called through the EventSystem/Manager
-    /// </summary>
-    public void OnQuestCompleted(QuestCompletedEvent evt)
-    {
-        string questID = evt.QuestID;
-        string inkVariableName = questID + "_completed";
-        if (!string.IsNullOrEmpty(inkVariableName))
-        {
-            SetInkVariable(inkVariableName, true);
-            Debug.Log($"Set Ink variable '{inkVariableName}' to true for completed quest {questID}");
-        }
     }
 }
