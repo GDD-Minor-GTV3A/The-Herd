@@ -1,8 +1,6 @@
 using Core.Events;
 using Core.Shared;
-
 using Gameplay.Player;
-
 using UnityEngine;
 
 namespace Gameplay.ToolsSystem
