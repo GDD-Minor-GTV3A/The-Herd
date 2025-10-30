@@ -1,6 +1,5 @@
-using Core.Shared.StateMachine;
-
 using UnityEngine;
+using Core.Shared.StateMachine;
 using UnityEngine.AI;
 
 namespace Core.AI.Sheep
@@ -30,8 +29,7 @@ namespace Core.AI.Sheep
 
         public void OnUpdate()
         {
-            if (_stateManager == null) { return; }
-            ;
+            if (_stateManager == null) { return; };
             Vector3 target = _stateManager.GetTargetNearPlayer();
             _stateManager.SetDestinationWithHerding(target);
         }
@@ -58,7 +56,7 @@ namespace Core.AI.Sheep
         public void OnStart()
         {
             ScheduleNextGraze();
-            if (_stateManager.Agent != null && _stateManager?.Animation != null && _stateManager.CanControlAgent())
+            if(_stateManager.Agent !=  null && _stateManager?.Animation != null && _stateManager.CanControlAgent())
             {
                 _stateManager.Agent.isStopped = false;
                 _stateManager.Animation.SetState((int)SheepAnimState.Idle);
@@ -69,7 +67,7 @@ namespace Core.AI.Sheep
         {
             if (_stateManager == null) { return; }
 
-            if (Time.time < _nextGrazeAt)
+            if(Time.time < _nextGrazeAt)
             {
                 if (HasArrived() && _stateManager.CanControlAgent())
                 {
@@ -106,7 +104,7 @@ namespace Core.AI.Sheep
         private bool HasArrived()
         {
             var agent = _stateManager.Agent;
-            if (agent.pathPending) return false;
+            if(agent.pathPending) return false;
             return agent.remainingDistance <= REACH_THRESHOLD;
         }
     }
@@ -151,10 +149,47 @@ namespace Core.AI.Sheep
 
         public void OnStop()
         {
-            if (_stateManager?.Agent != null && _stateManager.CanControlAgent())
+            if(_stateManager?.Agent != null && _stateManager.CanControlAgent())
             {
                 _stateManager.Agent.isStopped = true;
             }
+        }
+    }
+
+    /// <summary>
+    /// Freeze the sheep in place, disabling all behavior
+    /// </summary>
+    public class SheepFreezeState : IState
+    {
+        private readonly SheepStateManager _stateManager;
+
+        public SheepFreezeState(SheepStateManager context)
+        {
+            _stateManager = context;
+        }
+
+        public void OnStart()
+        {
+            if (_stateManager.CanControlAgent())
+            {
+                _stateManager.Agent.ResetPath();
+                _stateManager.Agent.isStopped = true;
+            }
+
+            _stateManager.Animation?.SetState((int)SheepAnimState.Idle);
+            _stateManager.DisableBehavior();
+        }
+
+        public void OnUpdate() {} // Sheep remains frozen, no updates needed
+
+        public void OnStop()
+        {
+            if (_stateManager.CanControlAgent())
+            {
+                _stateManager.Agent.isStopped = false;
+            }
+
+            _stateManager.EnableBehavior();
         }
     }
 }

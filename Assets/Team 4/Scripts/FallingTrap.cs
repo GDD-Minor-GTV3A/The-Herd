@@ -1,5 +1,4 @@
 using System.Collections;
-
 using UnityEngine;
 
 public class FallingTrap : MonoBehaviour
@@ -41,7 +40,7 @@ public class FallingTrap : MonoBehaviour
         if (_isFalling)
         {
             // Increase falling speed over time and move down
-            _downSpeed += Time.deltaTime / 10;
+            _downSpeed += Time.deltaTime/10;
             transform.position -= new Vector3(0, _downSpeed, 0);
         }
     }
