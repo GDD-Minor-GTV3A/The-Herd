@@ -7,14 +7,7 @@ public class FallingTrap : MonoBehaviour
     private bool _isFalling = false;
     private float _downSpeed = 0;
     private Vector3 _startPosition;
-
-    /// <summary>
-    /// Initialize start position
-    /// </summary>
-    void Initialize()
-    {
-        this._startPosition = transform.position;
-    }
+    private GameObject _sheepOnTrap;
 
     /// <summary>
     /// Handles collision with trap
@@ -24,11 +17,15 @@ public class FallingTrap : MonoBehaviour
     {
         if (collision.gameObject.name == "Sheep" && !_isFalling)
         {
-            // Temp method to store start position
             this._startPosition = transform.position;
+            _sheepOnTrap = collision.gameObject;
+            
+            // Make sheep a child of the trap so it falls with it
+            _sheepOnTrap.transform.SetParent(transform);
+            
             // Start falling, delete sheep after 4 seconds, move platform back
             _isFalling = true;
-            Destroy(collision.gameObject, 4f);
+            Destroy(_sheepOnTrap, 4f);
             StartCoroutine(ResetTrap());
         }
     }
