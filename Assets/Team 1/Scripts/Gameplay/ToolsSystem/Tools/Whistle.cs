@@ -1,31 +1,16 @@
 using Core.Events;
 using Core.Shared;
 
-using Gameplay.Player;
-
 using UnityEngine;
 
 namespace Gameplay.ToolsSystem
 {
     /// <summary>
-    /// Tool for controlling dogs.
+    /// Tool for dogs controlls.
     /// </summary>
     public class Whistle : MonoBehaviour, IPlayerTool
     {
         private Observable<Vector3> _cursorWorldPosition;
-        private PlayerAnimator _animator;
-
-
-        public void Initialize(PlayerAnimator animator)
-        {
-            _animator = animator;
-        }
-
-
-        public void HideTool()
-        {
-            _animator.RemoveHands();
-        }
 
 
         public void MainUsageFinished()
@@ -43,11 +28,12 @@ namespace Gameplay.ToolsSystem
 
         public void Reload()
         {
-            Debug.Log("Bark!!!");
+            return;
         }
 
         public void SecondaryUsageFinished()
         {
+            return;
         }
 
         public void SecondaryUsageStarted(Observable<Vector3> cursorWorldPosition)
@@ -55,9 +41,6 @@ namespace Gameplay.ToolsSystem
             EventManager.Broadcast(new DogFollowCommandEvent());
         }
 
-        public void ShowTool()
-        {
-        }
 
         private void SendDogMoveCommand()
         {

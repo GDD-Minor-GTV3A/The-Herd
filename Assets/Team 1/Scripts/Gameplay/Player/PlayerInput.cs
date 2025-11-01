@@ -130,7 +130,7 @@ namespace Gameplay.Player
 
             Physics.Raycast(ray, out RaycastHit hitInfo, Mathf.Infinity, _groundLayers);
             worldCursorPosition = hitInfo.point;
-            
+
 
             _cursorWorldPosition.Value = worldCursorPosition;
         }

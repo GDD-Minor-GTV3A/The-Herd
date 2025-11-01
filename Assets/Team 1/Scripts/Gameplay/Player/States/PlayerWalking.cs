@@ -9,10 +9,12 @@ namespace Gameplay.Player
     {
         private readonly PlayerAnimator _animator;
 
+
         public PlayerWalking(PlayerStateManager stateMachine) : base(stateMachine)
         {
             _animator = _manager.AnimatorController as PlayerAnimator;
         }
+
 
         public override void OnStart()
         {
@@ -26,12 +28,8 @@ namespace Gameplay.Player
 
         public override void OnUpdate()
         {
-            // If there's no input, go idle.
             if (_manager.Input.Move.magnitude == 0)
-            {
                 _manager.SetState<PlayerIdle>();
-                return;
-            }
 
             _playerMovement.ApplyGravity();
 
@@ -39,11 +37,9 @@ namespace Gameplay.Player
             Vector2 playerInput = _manager.Input.Move;
 
             Vector3 movementTarget = _playerMovement.CalculateMovementTargetFromInput(playerInput, isSprinting);
+
             _playerMovement.MoveTo(movementTarget);
-
-            // Rotate based on current rotation mode (movement or mouse)
-            _manager.Rotation.Rotate(playerInput, _manager.Input.Look.Value);
-
+            _manager.Rotation.Rotate(playerInput);
 
             _animator.SetWalkSpeed(isSprinting);
         }

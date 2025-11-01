@@ -8,36 +8,46 @@ namespace Ink.Runtime
     /// because the text of the Choice can be dynamically generated.
     /// </summary>
 	public class ChoicePoint : Runtime.Object
-	{
-        public Path pathOnChoice {
-            get {
+    {
+        public Path pathOnChoice
+        {
+            get
+            {
                 // Resolve any relative paths to global ones as we come across them
-                if (_pathOnChoice != null && _pathOnChoice.isRelative) {
+                if (_pathOnChoice != null && _pathOnChoice.isRelative)
+                {
                     var choiceTargetObj = choiceTarget;
-                    if (choiceTargetObj) {
+                    if (choiceTargetObj)
+                    {
                         _pathOnChoice = choiceTargetObj.path;
                     }
                 }
                 return _pathOnChoice;
             }
-            set {
+            set
+            {
                 _pathOnChoice = value;
             }
         }
         Path _pathOnChoice;
 
-        public Container choiceTarget {
-            get {
-                return this.ResolvePath (_pathOnChoice).container;
+        public Container choiceTarget
+        {
+            get
+            {
+                return this.ResolvePath(_pathOnChoice).container;
             }
         }
 
-        public string pathStringOnChoice {
-            get {
-                return CompactPathString (pathOnChoice);
+        public string pathStringOnChoice
+        {
+            get
+            {
+                return CompactPathString(pathOnChoice);
             }
-            set {
-                pathOnChoice = new Path (value);
+            set
+            {
+                pathOnChoice = new Path(value);
             }
         }
 
@@ -47,17 +57,20 @@ namespace Ink.Runtime
         public bool onceOnly { get; set; }
         public bool isInvisibleDefault { get; set; }
 
-        public int flags {
-            get {
+        public int flags
+        {
+            get
+            {
                 int flags = 0;
-                if (hasCondition)         flags |= 1;
-                if (hasStartContent)      flags |= 2;
+                if (hasCondition) flags |= 1;
+                if (hasStartContent) flags |= 2;
                 if (hasChoiceOnlyContent) flags |= 4;
-                if (isInvisibleDefault)   flags |= 8;
-                if (onceOnly)             flags |= 16;
+                if (isInvisibleDefault) flags |= 8;
+                if (onceOnly) flags |= 16;
                 return flags;
             }
-            set {
+            set
+            {
                 hasCondition = (value & 1) > 0;
                 hasStartContent = (value & 2) > 0;
                 hasChoiceOnlyContent = (value & 4) > 0;
@@ -66,24 +79,24 @@ namespace Ink.Runtime
             }
         }
 
-        public ChoicePoint (bool onceOnly)
-		{
-            this.onceOnly = onceOnly;
-		}
-
-        public ChoicePoint() : this(true) {}
-
-        public override string ToString ()
+        public ChoicePoint(bool onceOnly)
         {
-            int? targetLineNum = DebugLineNumberOfPath (pathOnChoice);
-            string targetString = pathOnChoice.ToString ();
+            this.onceOnly = onceOnly;
+        }
 
-            if (targetLineNum != null) {
-                targetString = " line " + targetLineNum + "("+targetString+")";
-            } 
+        public ChoicePoint() : this(true) { }
+
+        public override string ToString()
+        {
+            int? targetLineNum = DebugLineNumberOfPath(pathOnChoice);
+            string targetString = pathOnChoice.ToString();
+
+            if (targetLineNum != null)
+            {
+                targetString = " line " + targetLineNum + "(" + targetString + ")";
+            }
 
             return "Choice: -> " + targetString;
         }
-	}
+    }
 }
-

@@ -13,11 +13,9 @@ GameObject:
   - component: {fileID: 7459348137689414101}
   - component: {fileID: 3774567233091194700}
   - component: {fileID: 5746307369840437512}
+  - component: {fileID: 5958379903018962612}
   - component: {fileID: 3453099663482404469}
   - component: {fileID: -1054761936424281414}
-  - component: {fileID: 6995928359659084051}
-  - component: {fileID: -491631622887226920}
-  - component: {fileID: 4849268893179832380}
   m_Layer: 0
   m_Name: Drekavac
   m_TagString: Untagged
@@ -35,7 +33,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.5, z: 0}
-  m_LocalScale: {x: 3, y: 3, z: 3}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 8012089225165390850}
@@ -125,7 +123,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 7
+  m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
@@ -137,6 +135,36 @@ NavMeshAgent:
   m_BaseOffset: 0.5
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &5958379903018962612
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5210180026808329481}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30fb6b3b2e5adfa4784ab0af0dd1a514, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  circleRadius: 10
+  moveSpeed: 7
+  sprintSpeed: 15
+  dragSpeed: 1.2
+  circleSpeed: 7
+  directionSwitchInterval: 5
+  stalkDurationRange: {x: 10, y: 20}
+  grabPoint: {fileID: 0}
+  dragAwayDistance: 20
+  despawnDistance: 30
+  abortDistance: 30
+  abortSpeed: 15
+  playerCloseAbortDistance: 3
+  animator: {fileID: 2894106569115564131}
+  audioSource: {fileID: -1054761936424281414}
+  Screech: {fileID: 8300000, guid: b4560783bb038eb4db67e1045aec6e8d, type: 3}
+  Chomp: {fileID: 8300000, guid: 2036e76a3f1b8744dbb6b0cdd25e6add, type: 3}
+  Snarl: {fileID: 8300000, guid: 3bb4093fcf9e2d6448213091621f0c19, type: 3}
 --- !u!54 &3453099663482404469
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -261,45 +289,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &6995928359659084051
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5210180026808329481}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94e388cf41c15f5498faf93f4de1dba3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _moveSpeed: 3.5
---- !u!114 &-491631622887226920
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5210180026808329481}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 46cab174efda94649bff3b1fe953186b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _drekavacStats: {fileID: 11400000, guid: 4a1909cd571b0034395a3eca33f3b9e4, type: 2}
---- !u!114 &4849268893179832380
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5210180026808329481}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7714255d71fddbd47b2a8dc7a0f1f1fb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  targetRenderer: {fileID: 7456638971895055803}
 --- !u!1001 &7546363702879626217
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -387,11 +376,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!137 &7456638971895055803 stripped
-SkinnedMeshRenderer:
-  m_CorrespondingSourceObject: {fileID: -8088081830912645550, guid: 7e2e37eb2a22f5748bb0283741fbf01c, type: 3}
-  m_PrefabInstance: {fileID: 7546363702879626217}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8012089225165390850 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 7e2e37eb2a22f5748bb0283741fbf01c, type: 3}

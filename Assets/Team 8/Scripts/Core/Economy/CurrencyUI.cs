@@ -1,5 +1,6 @@
-using UnityEngine;
 using TMPro;
+
+using UnityEngine;
 
 namespace Core.Economy
 {

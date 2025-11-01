@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+
 using Ink.Parsed;
 
 namespace Ink
@@ -8,30 +9,31 @@ namespace Ink
     {
         protected Sequence InnerSequence()
         {
-            Whitespace ();
+            Whitespace();
 
             // Default sequence type
             SequenceType seqType = SequenceType.Stopping;
 
             // Optional explicit sequence type
-            SequenceType? parsedSeqType = (SequenceType?) Parse(SequenceTypeAnnotation);
+            SequenceType? parsedSeqType = (SequenceType?)Parse(SequenceTypeAnnotation);
             if (parsedSeqType != null)
                 seqType = parsedSeqType.Value;
 
             var contentLists = Parse(InnerSequenceObjects);
-            if (contentLists == null || contentLists.Count <= 1) {
+            if (contentLists == null || contentLists.Count <= 1)
+            {
                 return null;
             }
 
-            return new Sequence (contentLists, seqType);
+            return new Sequence(contentLists, seqType);
         }
 
         protected object SequenceTypeAnnotation()
         {
-            var annotation = (SequenceType?) Parse(SequenceTypeSymbolAnnotation);
+            var annotation = (SequenceType?)Parse(SequenceTypeSymbolAnnotation);
 
-            if(annotation == null)
-                annotation = (SequenceType?) Parse(SequenceTypeWordAnnotation);
+            if (annotation == null)
+                annotation = (SequenceType?)Parse(SequenceTypeWordAnnotation);
 
             if (annotation == null)
                 return null;
@@ -56,7 +58,7 @@ namespace Ink
 
         protected object SequenceTypeSymbolAnnotation()
         {
-            if(_sequenceTypeSymbols == null )
+            if (_sequenceTypeSymbols == null)
                 _sequenceTypeSymbols = new CharacterSet("!&~$ ");
 
             var sequenceType = (SequenceType)0;
@@ -64,8 +66,10 @@ namespace Ink
             if (sequenceAnnotations == null)
                 return null;
 
-            foreach(char symbolChar in sequenceAnnotations) {
-                switch(symbolChar) {
+            foreach (char symbolChar in sequenceAnnotations)
+            {
+                switch (symbolChar)
+                {
                     case '!': sequenceType |= SequenceType.Once; break;
                     case '&': sequenceType |= SequenceType.Cycle; break;
                     case '~': sequenceType |= SequenceType.Shuffle; break;
@@ -87,11 +91,12 @@ namespace Ink
             if (sequenceTypes == null || sequenceTypes.Count == 0)
                 return null;
 
-            if (ParseString (":") == null)
+            if (ParseString(":") == null)
                 return null;
 
             var combinedSequenceType = (SequenceType)0;
-            foreach(var seqType in sequenceTypes) {
+            foreach (var seqType in sequenceTypes)
+            {
                 combinedSequenceType |= seqType.Value;
             }
 
@@ -128,14 +133,17 @@ namespace Ink
             return seqType;
         }
 
-            protected List<ContentList> InnerSequenceObjects()
+        protected List<ContentList> InnerSequenceObjects()
         {
             var multiline = Parse(Newline) != null;
 
             List<ContentList> result = null;
-            if (multiline) {
+            if (multiline)
+            {
                 result = Parse(InnerMultilineSequenceObjects);
-            } else {
+            }
+            else
+            {
                 result = Parse(InnerInlineSequenceObjects);
             }
 
@@ -144,38 +152,45 @@ namespace Ink
 
         protected List<ContentList> InnerInlineSequenceObjects()
         {
-            var interleavedContentAndPipes = Interleave<object> (Optional (MixedTextAndLogic), String ("|"), flatten:false);
+            var interleavedContentAndPipes = Interleave<object>(Optional(MixedTextAndLogic), String("|"), flatten: false);
             if (interleavedContentAndPipes == null)
                 return null;
 
-            var result = new List<ContentList> ();
+            var result = new List<ContentList>();
 
             // The content and pipes won't necessarily be perfectly interleaved in the sense that
             // the content can be missing, but in that case it's intended that there's blank content.
             bool justHadContent = false;
-            foreach (object contentOrPipe in interleavedContentAndPipes) {
+            foreach (object contentOrPipe in interleavedContentAndPipes)
+            {
 
                 // Pipe/separator
-                if (contentOrPipe as string == "|") {
+                if (contentOrPipe as string == "|")
+                {
 
                     // Expected content, saw pipe - need blank content now
-                    if (!justHadContent) {
+                    if (!justHadContent)
+                    {
 
                         // Add blank content
-                        result.Add (new ContentList ());
+                        result.Add(new ContentList());
                     }
 
                     justHadContent = false;
                 }
 
                 // Real content
-                else {
+                else
+                {
 
                     var content = contentOrPipe as List<Parsed.Object>;
-                    if (content == null) {
-                        Error ("Expected content, but got " + contentOrPipe + " (this is an ink compiler bug!)");
-                    } else {
-                        result.Add (new ContentList (content));
+                    if (content == null)
+                    {
+                        Error("Expected content, but got " + contentOrPipe + " (this is an ink compiler bug!)");
+                    }
+                    else
+                    {
+                        result.Add(new ContentList(content));
                     }
 
                     justHadContent = true;
@@ -184,48 +199,48 @@ namespace Ink
 
             // Ended in a pipe? Need to insert final blank content
             if (!justHadContent)
-                result.Add (new ContentList ());
+                result.Add(new ContentList());
 
             return result;
         }
 
         protected List<ContentList> InnerMultilineSequenceObjects()
         {
-            MultilineWhitespace ();
+            MultilineWhitespace();
 
-            var contentLists = OneOrMore (SingleMultilineSequenceElement);
+            var contentLists = OneOrMore(SingleMultilineSequenceElement);
             if (contentLists == null)
                 return null;
 
-            return contentLists.Cast<ContentList> ().ToList();
+            return contentLists.Cast<ContentList>().ToList();
         }
 
         protected ContentList SingleMultilineSequenceElement()
         {
-            Whitespace ();
+            Whitespace();
 
             // Make sure we're not accidentally parsing a divert
-            if (ParseString ("->") != null)
+            if (ParseString("->") != null)
                 return null;
 
-            if (ParseString ("-") == null)
+            if (ParseString("-") == null)
                 return null;
 
-            Whitespace ();
+            Whitespace();
 
 
-            List<Parsed.Object> content = StatementsAtLevel (StatementLevel.InnerBlock);
+            List<Parsed.Object> content = StatementsAtLevel(StatementLevel.InnerBlock);
 
             if (content == null)
-                MultilineWhitespace ();
+                MultilineWhitespace();
 
             // Add newline at the start of each branch
-            else {
-                content.Insert (0, new Parsed.Text ("\n"));
+            else
+            {
+                content.Insert(0, new Parsed.Text("\n"));
             }
 
-            return new ContentList (content);
+            return new ContentList(content);
         }
     }
 }
-
