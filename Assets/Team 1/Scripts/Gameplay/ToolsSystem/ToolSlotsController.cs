@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Core.Shared;
 
+using Gameplay.Dog;
 using Gameplay.Player;
 
 using UnityEngine;
@@ -45,6 +46,8 @@ namespace Gameplay.ToolsSystem
 
             _input.Reload.canceled += OnCurrentToolReload;
 
+            _input.DogBark.canceled += OnCurrentToolDogBark;
+
             _input.SecondaryUsage.started += OnCurrentToolSecondaryUseStarted;
             _input.SecondaryUsage.canceled += OnCurrentToolSecondaryUseFinished;
 
@@ -62,8 +65,6 @@ namespace Gameplay.ToolsSystem
             rifle.Initialize(animator);
             SetNewToolToSlotByIndex(rifle, 1);
         }
-
-
         private void UpdateCurrentSlot(InputAction.CallbackContext obj)
         {
             int inputValue = Mathf.RoundToInt(obj.action.ReadValue<Vector2>().y);
@@ -86,10 +87,14 @@ namespace Gameplay.ToolsSystem
 
         private void OnCurrentToolReload(InputAction.CallbackContext obj)
         {
-            if (_toolSlots[_currentToolIndex] != null)
+            if (_currentToolIndex == 1)
                 _toolSlots[_currentToolIndex].Reload();
         }
-
+        private void OnCurrentToolDogBark(InputAction.CallbackContext obj)
+        {
+            if (_currentToolIndex == 0)
+                _toolSlots[_currentToolIndex].TryBark();
+        }
 
         private void OnCurrentToolMainUseStarted(InputAction.CallbackContext obj)
         {

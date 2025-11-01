@@ -31,6 +31,7 @@ namespace Gameplay.Player
         private InputAction _slot1_Action;
         private InputAction _slot2_Action;
         private InputAction _slot3_Action;
+        private InputAction _dogBark;
         #endregion InputActions
 
 
@@ -83,6 +84,8 @@ namespace Gameplay.Player
         /// Input action for slot 3 button. Use this actions: started, performed, canceled.
         /// </summary>
         public InputAction Slot_3 => _slot3_Action;
+
+        public InputAction DogBark => _dogBark;
         #endregion InputActionProps
 
 
@@ -106,6 +109,7 @@ namespace Gameplay.Player
             _slot1_Action = _inputActions.FindActionMap("Player").FindAction("Slot_1");
             _slot2_Action = _inputActions.FindActionMap("Player").FindAction("Slot_2");
             _slot3_Action = _inputActions.FindActionMap("Player").FindAction("Slot_3");
+            _dogBark = _inputActions.FindActionMap("Player").FindAction("DogBark");
 
             // Enable input actions
             _moveAction.Enable();
@@ -118,6 +122,7 @@ namespace Gameplay.Player
             _slot1_Action.Enable();
             _slot2_Action.Enable();
             _slot3_Action.Enable();
+            _dogBark.Enable();
         }
 
 

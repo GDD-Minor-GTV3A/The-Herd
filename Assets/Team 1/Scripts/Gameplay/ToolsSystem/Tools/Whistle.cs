@@ -1,5 +1,7 @@
 using Core.Events;
 using Core.Shared;
+
+using Gameplay.Dog;
 using Gameplay.Player;
 using UnityEngine;
 
@@ -12,11 +14,15 @@ namespace Gameplay.ToolsSystem
     {
         private Observable<Vector3> _cursorWorldPosition;
         private PlayerAnimator _animator;
+        // Add a reference to a DogBark instance
+        [SerializeField] private DogBark _dogBark;
+
 
 
         public void Initialize(PlayerAnimator animator)
         {
             _animator = animator;
+            
         }
 
 
@@ -60,6 +66,16 @@ namespace Gameplay.ToolsSystem
         private void SendDogMoveCommand()
         {
             EventManager.Broadcast(new DogMoveCommandEvent(_cursorWorldPosition.Value));
+        }
+
+        public void TryBark()
+        {
+            Debug.Log(_dogBark);
+            if (_dogBark != null)
+            {
+                _dogBark.TryBark();
+            }
+
         }
     }
 }

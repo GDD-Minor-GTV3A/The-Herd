@@ -2353,8 +2353,35 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3018951382313821739, guid: e9688c71f438a824db99b17c2fba1703, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1785960595897861840}
   m_SourcePrefab: {fileID: 100100000, guid: e9688c71f438a824db99b17c2fba1703, type: 3}
+--- !u!1 &1785960595897861832 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3018951382313821739, guid: e9688c71f438a824db99b17c2fba1703, type: 3}
+  m_PrefabInstance: {fileID: 1785960595897861831}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1785960595897861840
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1785960595897861832}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac26ee3ddf95ea043a7fc36dcaa19464, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _maxBarkDistance: 10
+  _barkAngle: 90
+  _barkCooldown: 2
+  _scareableMask:
+    serializedVersion: 2
+    m_Bits: 0
+  _animator: {fileID: 0}
 --- !u!1001 &5230550193027717823
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2363,6 +2390,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5596723993700161187, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
+      propertyPath: _dogBark
+      value: 
+      objectReference: {fileID: 1785960595897861840}
     - target: {fileID: 6065300022185603627, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
       propertyPath: m_Name
       value: Player

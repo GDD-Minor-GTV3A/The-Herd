@@ -148,4 +148,8 @@ public class Rifle : MonoBehaviour, IPlayerTool
         gameObject.SetActive(true);
         animator.GetTool(keyPoints);
     }
+
+    public void TryBark()
+    {
+    }
 }
