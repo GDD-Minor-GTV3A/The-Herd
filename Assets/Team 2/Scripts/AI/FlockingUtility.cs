@@ -47,13 +47,13 @@ namespace Core.AI.Sheep
                 alignCount++;
             }
 
-            if (alignCount > 0)
+            if(alignCount > 0)
             {
                 alignment /= alignCount;
             }
 
             Vector3 steer = separation * separationWeight + alignment * alignmentWeight;
-            if (steer.sqrMagnitude > steerClamp * steerClamp)
+            if(steer.sqrMagnitude > steerClamp * steerClamp)
             {
                 steer = steer.normalized * steerClamp;
             }

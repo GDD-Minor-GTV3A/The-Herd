@@ -1,21 +1,18 @@
-﻿using System.Diagnostics;
-
-using Ink.Parsed;
+﻿using Ink.Parsed;
+using System.Diagnostics;
 
 namespace Ink
 {
-    public partial class InkParser
-    {
-        protected Choice Choice()
-        {
+	public partial class InkParser
+	{
+		protected Choice Choice()
+		{
             bool onceOnlyChoice = true;
-            var bullets = Interleave<string>(OptionalExclude(Whitespace), String("*"));
-            if (bullets == null)
-            {
+            var bullets = Interleave <string>(OptionalExclude(Whitespace), String("*") );
+            if (bullets == null) {
 
-                bullets = Interleave<string>(OptionalExclude(Whitespace), String("+"));
-                if (bullets == null)
-                {
+                bullets = Interleave <string>(OptionalExclude(Whitespace), String("+") );
+                if (bullets == null) {
                     return null;
                 }
 
@@ -25,12 +22,12 @@ namespace Ink
             // Optional name for the choice
             Identifier optionalName = Parse(BracketedName);
 
-            Whitespace();
+            Whitespace ();
 
             // Optional condition for whether the choice should be shown to the player
             Expression conditionExpr = Parse(ChoiceCondition);
 
-            Whitespace();
+            Whitespace ();
 
             // Ordinarily we avoid parser state variables like these, since
             // nesting would require us to store them in a stack. But since you should
@@ -39,9 +36,9 @@ namespace Ink
             _parsingChoice = true;
 
             ContentList startContent = null;
-            var startTextAndLogic = Parse(MixedTextAndLogic);
+            var startTextAndLogic = Parse (MixedTextAndLogic);
             if (startTextAndLogic != null)
-                startContent = new ContentList(startTextAndLogic);
+                startContent = new ContentList (startTextAndLogic);
 
 
             ContentList optionOnlyContent = null;
@@ -50,55 +47,52 @@ namespace Ink
             // Check for a the weave style format:
             //   * "Hello[."]," he said.
             bool hasWeaveStyleInlineBrackets = ParseString("[") != null;
-            if (hasWeaveStyleInlineBrackets)
-            {
+            if (hasWeaveStyleInlineBrackets) {
 
                 EndTagIfNecessary(startContent);
 
-                var optionOnlyTextAndLogic = Parse(MixedTextAndLogic);
+                var optionOnlyTextAndLogic = Parse (MixedTextAndLogic);
                 if (optionOnlyTextAndLogic != null)
-                    optionOnlyContent = new ContentList(optionOnlyTextAndLogic);
+                    optionOnlyContent = new ContentList (optionOnlyTextAndLogic);
 
 
-                Expect(String("]"), "closing ']' for weave-style option");
+                Expect (String("]"), "closing ']' for weave-style option");
 
                 EndTagIfNecessary(optionOnlyContent);
 
-                var innerTextAndLogic = Parse(MixedTextAndLogic);
-                if (innerTextAndLogic != null)
-                    innerContent = new ContentList(innerTextAndLogic);
+                var innerTextAndLogic = Parse (MixedTextAndLogic);
+                if( innerTextAndLogic != null )
+                    innerContent = new ContentList (innerTextAndLogic);
             }
 
-            Whitespace();
+			Whitespace ();
 
             EndTagIfNecessary(innerContent ?? startContent);
 
             // Finally, now we know we're at the end of the main choice body, parse
             // any diverts separately.
-            var diverts = Parse(MultiDivert);
+            var diverts =  Parse(MultiDivert);
 
             _parsingChoice = false;
 
-            Whitespace();
+            Whitespace ();
 
             // Completely empty choice without even an empty divert?
             bool emptyContent = !startContent && !innerContent && !optionOnlyContent;
             if (emptyContent && diverts == null)
-                Warning("Choice is completely empty. Interpretting as a default fallback choice. Add a divert arrow to remove this warning: * ->");
+                Warning ("Choice is completely empty. Interpretting as a default fallback choice. Add a divert arrow to remove this warning: * ->");
 
             // * [] some text
             else if (!startContent && hasWeaveStyleInlineBrackets && !optionOnlyContent)
-                Warning("Blank choice - if you intended a default fallback choice, use the `* ->` syntax");
+                Warning ("Blank choice - if you intended a default fallback choice, use the `* ->` syntax");
 
-            if (!innerContent) innerContent = new ContentList();
+            if (!innerContent) innerContent = new ContentList ();
 
             EndTagIfNecessary(innerContent);
 
             // Normal diverts on the end of a choice - simply add to the normal content
-            if (diverts != null)
-            {
-                foreach (var divObj in diverts)
-                {
+            if (diverts != null) {
+                foreach (var divObj in diverts) {
                     // may be TunnelOnwards
                     var div = divObj as Divert;
 
@@ -107,16 +101,16 @@ namespace Ink
                     // (as an invisible default choice)
                     if (div && div.isEmpty) continue;
 
-                    innerContent.AddContent(divObj);
+                    innerContent.AddContent (divObj);
                 }
             }
 
             // Terminate main content with a newline since this is the end of the line
             // Note that this will be redundant if the diverts above definitely take
             // the flow away permanently.
-            innerContent.AddContent(new Text("\n"));
+            innerContent.AddContent (new Text ("\n"));
 
-            var choice = new Choice(startContent, optionOnlyContent, innerContent);
+            var choice = new Choice (startContent, optionOnlyContent, innerContent);
             choice.identifier = optionalName;
             choice.indentationDepth = bullets.Count;
             choice.hasWeaveStyleInlineBrackets = hasWeaveStyleInlineBrackets;
@@ -126,18 +120,17 @@ namespace Ink
 
             return choice;
 
-        }
+		}
 
         protected Expression ChoiceCondition()
         {
-            var conditions = Interleave<Expression>(ChoiceSingleCondition, ChoiceConditionsSpace);
+            var conditions = Interleave<Expression> (ChoiceSingleCondition, ChoiceConditionsSpace);
             if (conditions == null)
                 return null;
             else if (conditions.Count == 1)
-                return conditions[0];
-            else
-            {
-                return new MultipleConditionExpression(conditions);
+                return conditions [0];
+            else {
+                return new MultipleConditionExpression (conditions);
             }
         }
 
@@ -145,20 +138,20 @@ namespace Ink
         {
             // Both optional
             // Newline includes initial end of line whitespace
-            Newline();
-            Whitespace();
+            Newline ();
+            Whitespace ();
             return ParseSuccess;
         }
 
         protected Expression ChoiceSingleCondition()
         {
-            if (ParseString("{") == null)
+            if (ParseString ("{") == null)
                 return null;
 
             var condExpr = Expect(Expression, "choice condition inside { }") as Expression;
-            DisallowIncrement(condExpr);
+            DisallowIncrement (condExpr);
 
-            Expect(String("}"), "closing '}' for choice condition");
+            Expect (String ("}"), "closing '}' for choice condition");
 
             return condExpr;
         }
@@ -166,8 +159,7 @@ namespace Ink
         protected Gather Gather()
         {
             object gatherDashCountObj = Parse(GatherDashes);
-            if (gatherDashCountObj == null)
-            {
+            if (gatherDashCountObj == null) {
                 return null;
             }
 
@@ -176,24 +168,23 @@ namespace Ink
             // Optional name for the gather
             Identifier optionalName = Parse(BracketedName);
 
-            var gather = new Gather(optionalName, gatherDashCount);
+            var gather = new Gather (optionalName, gatherDashCount);
 
             // Optional newline before gather's content begins
-            Newline();
+            Newline ();
 
             return gather;
         }
 
         protected object GatherDashes()
         {
-            Whitespace();
+            Whitespace ();
 
             int gatherDashCount = 0;
 
-            while (ParseDashNotArrow() != null)
-            {
+            while (ParseDashNotArrow () != null) {
                 gatherDashCount++;
-                Whitespace();
+                Whitespace ();
             }
 
             if (gatherDashCount == 0)
@@ -204,36 +195,34 @@ namespace Ink
 
         protected object ParseDashNotArrow()
         {
-            var ruleId = BeginRule();
+            var ruleId = BeginRule ();
 
-            if (ParseString("->") == null && ParseSingleCharacter() == '-')
-            {
-                return SucceedRule(ruleId);
-            }
-            else
-            {
-                return FailRule(ruleId);
+            if (ParseString ("->") == null && ParseSingleCharacter () == '-') {
+                return SucceedRule (ruleId);
+            } else {
+                return FailRule (ruleId);
             }
         }
 
         protected Identifier BracketedName()
         {
-            if (ParseString("(") == null)
+            if (ParseString ("(") == null)
                 return null;
 
-            Whitespace();
+            Whitespace ();
 
             Identifier name = Parse(IdentifierWithMetadata);
             if (name == null)
                 return null;
 
-            Whitespace();
+            Whitespace ();
 
-            Expect(String(")"), "closing ')' for bracketed name");
+            Expect (String (")"), "closing ')' for bracketed name");
 
             return name;
         }
 
         bool _parsingChoice;
-    }
+	}
 }
+

@@ -1,6 +1,5 @@
-using System.Collections;
-
 using UnityEngine;
+using System.Collections;
 
 
 namespace TMPro.Examples
@@ -60,7 +59,7 @@ namespace TMPro.Examples
                 if (hasTextChanged)
                 {
                     totalVisibleCharacters = textInfo.characterCount; // Update visible character count.
-                    hasTextChanged = false;
+                    hasTextChanged = false; 
                 }
 
                 if (visibleCount > totalVisibleCharacters)

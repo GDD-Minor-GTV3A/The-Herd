@@ -1,7 +1,6 @@
 using System;
-using System.Collections.Generic;
-
 using UnityEngine;
+using System.Collections.Generic;
 
 /// <summary>
 /// Represents a quest definition.
@@ -14,7 +13,7 @@ public class Quest : ScriptableObject
     [SerializeField] private string _questName;
     [SerializeField] private string _questDescription;
     [SerializeField] private List<QuestObjective> _objectives;
-
+    
     /// <summary>
     /// Public accessors for the questuff.
     /// </summary>
@@ -22,7 +21,7 @@ public class Quest : ScriptableObject
     public string QuestName => _questName;
     public string QuestDescription => _questDescription;
     public IReadOnlyList<QuestObjective> Objectives => _objectives;
-
+    
 }
 
 
@@ -36,22 +35,22 @@ public class QuestObjective
     /// ObjectiveID, use the corresponding NPC/Item/Area ID here.
     /// </summary>
     public string ObjectiveID;
-
+    
     /// <summary>
     /// Objective description.
     /// </summary>
     public string ObjectiveDescription;
-
+    
     /// <summary>
     /// Type of the Objective
     /// </summary>
     public ObjectiveType Type;
-
+    
     /// <summary>
     /// Required amount to complete the objective.
     /// </summary>
     public int RequiredAmount;
-
+    
     /// <summary>
     /// Current amount the player does have.
     /// </summary>
@@ -61,7 +60,7 @@ public class QuestObjective
     /// Gives back the active status of the objective
     /// </summary>
     public bool IsActive { get; private set; }
-
+    
     /// <summary>
     /// Returns true if the current amount is equal to required amount.
     /// </summary>
@@ -92,7 +91,7 @@ public class QuestObjective
 /// <summary>
 /// Represents the type of objective.
 /// </summary>
-public enum ObjectiveType { CollectItem, DefeatEnemy, ReachLocation, TalkNPC, Custom }
+public enum ObjectiveType{ CollectItem, DefeatEnemy, ReachLocation, TalkNPC, Custom}
 
 
 /// <summary>
@@ -106,7 +105,7 @@ public class QuestProgress
     /// Quest to track.
     /// </summary>
     public Quest Quest;
-
+    
     /// <summary>
     /// Copied objective list
     /// </summary>

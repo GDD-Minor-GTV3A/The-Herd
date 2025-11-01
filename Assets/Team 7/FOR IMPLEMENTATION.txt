@@ -1,3 +1,6 @@
+/////////
+Sprint 1
+////////
 To implement this enemy you need to have a navmeshsurface on the ground.
 
 The script SpawnEnemy needs to be modified to have an actual spawncondition in the game, right now it is triggered by pressing E.
@@ -13,3 +16,24 @@ In the Enemey AI I have made a space where you can implement the sheeps AI getti
 If all of this is done When the conditions you have made to make a Drekavac spawn are met the enemy should spawn and act as Expected.
 
 If it is not please contact Lars (larsdecooleman) on Discord for any help
+/////////
+End of Sprint 1
+////////
+
+
+/////////
+Sprint 2
+////////
+1. The new enemy uses a navmesh agent, just like the first one, and currently requires the player to have the "player" tag(This will be changed in the future)
+2. The script SpawnEnemy currently spawns our first enemy(Drekavac) with the "E" key and the Second enemy(Phantom) with the "R" key.
+3. I don't know if the player team has made a health system yet, but if they have you can add a call for dealing damage at line 50 of the PhantomProjectile script.
+4. Expected behavior of the new enemy: 
+If the player is looking in it's general direction, it will try to navigate to an area where the player is not looking. If it's not running to a new ambush spot,
+and the player is not looking in it's direction, it will approach the player. Once it gets within shooting range, the enemy will start charging a shot and fire it at the player.
+If the player at any point manages to continuously look at the phantom for a specific duration(all parameters are specified in the PhantomStats scriptableObject) it will lose one health. If it runs out of health it will be destroyed,
+if it has health left after taking damage it will teleport to a random location and repeat it's behavior.
+
+If it's not behaving as described above, or you got any other questions, feel free to contact us.
+/////////
+End of Sprint 2
+////////

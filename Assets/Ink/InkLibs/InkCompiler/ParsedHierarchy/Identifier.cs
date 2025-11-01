@@ -1,7 +1,5 @@
-namespace Ink.Parsed
-{
-    public class Identifier
-    {
+namespace Ink.Parsed {
+    public class Identifier {
         public string name;
         public Runtime.DebugMetadata debugMetadata;
 

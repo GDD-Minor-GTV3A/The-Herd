@@ -1,8 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using UnityEngine;
 using System.Linq;
-
-using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 
 
 namespace TMPro.Examples

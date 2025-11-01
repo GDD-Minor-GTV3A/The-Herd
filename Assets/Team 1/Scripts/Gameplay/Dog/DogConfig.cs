@@ -3,7 +3,7 @@ using Codice.Client.Common.GameUI;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace Gameplay.Dog
+namespace Gameplay.Dog 
 {
     /// <summary>
     /// Config with all data related to controlls of the dog.

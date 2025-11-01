@@ -11,9 +11,11 @@ GameObject:
   - component: {fileID: 2914724886780533430}
   - component: {fileID: 2287397303660452586}
   - component: {fileID: 3547320230723746160}
+  - component: {fileID: 8004071377219064652}
+  - component: {fileID: 9089501618729050697}
   m_Layer: 0
   m_Name: Sheep
-  m_TagString: Untagged
+  m_TagString: Sheep
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -72,6 +74,46 @@ MonoBehaviour:
   _archetype: {fileID: 11400000, guid: af609ab8455ff234482080e93f959104, type: 2}
   _animation: {fileID: 3637579348649112555}
   _neighbours: []
+  _threatMemory: 1.25
+--- !u!65 &8004071377219064652
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4607321907588713866}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.45125633, y: 1.0975161, z: 1.395524}
+  m_Center: {x: 0.017829545, y: 0.5741986, z: 0.10227728}
+--- !u!114 &9089501618729050697
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4607321907588713866}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb7ab23ced798454990d3f34a610c24d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _sheep: {fileID: 3547320230723746160}
+  _scanRadius: 20
+  _refresh: 0.25
+  enemyMask:
+    serializedVersion: 2
+    m_Bits: 256
 --- !u!1001 &649546134925903636
 PrefabInstance:
   m_ObjectHideFlags: 0

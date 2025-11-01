@@ -6,21 +6,22 @@ namespace Ink.Parsed
 
         public bool isStart;
         public bool inChoice;
-
-        public override Runtime.Object GenerateRuntimeObject()
+        
+        public override Runtime.Object GenerateRuntimeObject ()
         {
-            if (isStart)
+            if( isStart )
                 return Runtime.ControlCommand.BeginTag();
             else
                 return Runtime.ControlCommand.EndTag();
         }
 
-        public override string ToString()
+        public override string ToString ()
         {
-            if (isStart)
+            if( isStart )
                 return "#StartTag";
             else
                 return "#EndTag";
         }
     }
 }
+

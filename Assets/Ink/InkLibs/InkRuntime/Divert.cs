@@ -2,77 +2,60 @@
 
 namespace Ink.Runtime
 {
-    public class Divert : Runtime.Object
-    {
-        public Path targetPath
-        {
-            get
-            {
+	public class Divert : Runtime.Object
+	{
+        public Path targetPath { 
+            get { 
                 // Resolve any relative paths to global ones as we come across them
-                if (_targetPath != null && _targetPath.isRelative)
-                {
+                if (_targetPath != null && _targetPath.isRelative) {
                     var targetObj = targetPointer.Resolve();
-                    if (targetObj)
-                    {
+                    if (targetObj) {
                         _targetPath = targetObj.path;
                     }
                 }
                 return _targetPath;
             }
-            set
-            {
+            set {
                 _targetPath = value;
                 _targetPointer = Pointer.Null;
-            }
+            } 
         }
         Path _targetPath;
 
-        public Pointer targetPointer
-        {
-            get
-            {
-                if (_targetPointer.isNull)
-                {
-                    var targetObj = ResolvePath(_targetPath).obj;
+        public Pointer targetPointer {
+            get {
+                if (_targetPointer.isNull) {
+                    var targetObj = ResolvePath (_targetPath).obj;
 
-                    if (_targetPath.lastComponent.isIndex)
-                    {
+                    if (_targetPath.lastComponent.isIndex) {
                         _targetPointer.container = targetObj.parent as Container;
                         _targetPointer.index = _targetPath.lastComponent.index;
-                    }
-                    else
-                    {
-                        _targetPointer = Pointer.StartOf(targetObj as Container);
+                    } else {
+                        _targetPointer = Pointer.StartOf (targetObj as Container);
                     }
                 }
                 return _targetPointer;
             }
         }
         Pointer _targetPointer;
+        
 
-
-        public string targetPathString
-        {
-            get
-            {
+        public string targetPathString {
+            get {
                 if (targetPath == null)
                     return null;
 
-                return CompactPathString(targetPath);
+                return CompactPathString (targetPath);
             }
-            set
-            {
-                if (value == null)
-                {
+            set {
+                if (value == null) {
                     targetPath = null;
-                }
-                else
-                {
-                    targetPath = new Path(value);
+                } else {
+                    targetPath = new Path (value);
                 }
             }
         }
-
+            
         public string variableDivertName { get; set; }
         public bool hasVariableTarget { get { return variableDivertName != null; } }
 
@@ -84,10 +67,10 @@ namespace Ink.Runtime
 
         public bool isConditional { get; set; }
 
-        public Divert()
-        {
+		public Divert ()
+		{
             pushesToStack = false;
-        }
+		}
 
         public Divert(PushPopType stackPushType)
         {
@@ -95,19 +78,14 @@ namespace Ink.Runtime
             this.stackPushType = stackPushType;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals (object obj)
         {
             var otherDivert = obj as Divert;
-            if (otherDivert)
-            {
-                if (this.hasVariableTarget == otherDivert.hasVariableTarget)
-                {
-                    if (this.hasVariableTarget)
-                    {
+            if (otherDivert) {
+                if (this.hasVariableTarget == otherDivert.hasVariableTarget) {
+                    if (this.hasVariableTarget) {
                         return this.variableDivertName == otherDivert.variableDivertName;
-                    }
-                    else
-                    {
+                    } else {
                         return this.targetPath.Equals(otherDivert.targetPath);
                     }
                 }
@@ -115,68 +93,57 @@ namespace Ink.Runtime
             return false;
         }
 
-        public override int GetHashCode()
+        public override int GetHashCode ()
         {
-            if (hasVariableTarget)
-            {
+            if (hasVariableTarget) {
                 const int variableTargetSalt = 12345;
                 return variableDivertName.GetHashCode() + variableTargetSalt;
-            }
-            else
-            {
+            } else {
                 const int pathTargetSalt = 54321;
                 return targetPath.GetHashCode() + pathTargetSalt;
             }
         }
 
-        public override string ToString()
+        public override string ToString ()
         {
-            if (hasVariableTarget)
-            {
+            if (hasVariableTarget) {
                 return "Divert(variable: " + variableDivertName + ")";
             }
-            else if (targetPath == null)
-            {
+            else if (targetPath == null) {
                 return "Divert(null)";
-            }
-            else
-            {
+            } else {
 
-                var sb = new StringBuilder();
+                var sb = new StringBuilder ();
 
-                string targetStr = targetPath.ToString();
-                int? targetLineNum = DebugLineNumberOfPath(targetPath);
-                if (targetLineNum != null)
-                {
+                string targetStr = targetPath.ToString ();
+                int? targetLineNum = DebugLineNumberOfPath (targetPath);
+                if (targetLineNum != null) {
                     targetStr = "line " + targetLineNum;
                 }
 
-                sb.Append("Divert");
+                sb.Append ("Divert");
 
                 if (isConditional)
-                    sb.Append("?");
+                    sb.Append ("?");
 
-                if (pushesToStack)
-                {
-                    if (stackPushType == PushPopType.Function)
-                    {
-                        sb.Append(" function");
-                    }
-                    else
-                    {
-                        sb.Append(" tunnel");
+                if (pushesToStack) {
+                    if (stackPushType == PushPopType.Function) {
+                        sb.Append (" function");
+                    } else {
+                        sb.Append (" tunnel");
                     }
                 }
 
-                sb.Append(" -> ");
-                sb.Append(targetPathString);
+                sb.Append (" -> ");
+                sb.Append (targetPathString);
 
-                sb.Append(" (");
-                sb.Append(targetStr);
-                sb.Append(")");
+                sb.Append (" (");
+                sb.Append (targetStr);
+                sb.Append (")");
 
-                return sb.ToString();
+                return sb.ToString ();
             }
         }
-    }
+	}
 }
+

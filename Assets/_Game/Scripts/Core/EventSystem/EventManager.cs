@@ -32,13 +32,13 @@ namespace Core.Events
         {
             if (!s_EventLookups.ContainsKey(evt))
             {
-                Action<GameEvent> newAction = (e) => evt((T)e);
-                s_EventLookups[evt] = newAction;
+                Action<GameEvent> _newAction = (e) => evt((T)e);
+                s_EventLookups[evt] = _newAction;
 
-                if (s_Events.TryGetValue(typeof(T), out Action<GameEvent> internalAction))
-                    s_Events[typeof(T)] = internalAction += newAction;
+                if (s_Events.TryGetValue(typeof(T), out Action<GameEvent> _internalAction))
+                    s_Events[typeof(T)] = _internalAction += _newAction;
                 else
-                    s_Events[typeof(T)] = newAction;
+                    s_Events[typeof(T)] = _newAction;
             }
         }
 
@@ -51,13 +51,13 @@ namespace Core.Events
         {
             if (s_EventLookups.TryGetValue(evt, out var action))
             {
-                if (s_Events.TryGetValue(typeof(T), out var tempAction))
+                if (s_Events.TryGetValue(typeof(T), out var _tempAction))
                 {
-                    tempAction -= action;
-                    if (tempAction == null)
+                    _tempAction -= action;
+                    if (_tempAction == null)
                         s_Events.Remove(typeof(T));
                     else
-                        s_Events[typeof(T)] = tempAction;
+                        s_Events[typeof(T)] = _tempAction;
                 }
 
                 s_EventLookups.Remove(evt);
@@ -70,8 +70,8 @@ namespace Core.Events
         /// <param name="evt">Event to broadcast.</param>
         public static void Broadcast(GameEvent evt)
         {
-            if (s_Events.TryGetValue(evt.GetType(), out var action))
-                action.Invoke(evt);
+            if (s_Events.TryGetValue(evt.GetType(), out var _action))
+                _action.Invoke(evt);
         }
 
         /// <summary>

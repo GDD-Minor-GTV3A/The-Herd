@@ -1,5 +1,4 @@
 ﻿using Core.Events;
-
 using UnityEngine;
 
 namespace Gameplay.Dog
@@ -28,14 +27,14 @@ namespace Gameplay.Dog
             _animator.SetWalking(true);
             _animator.SetWakingAnimationSpeedMulti(1f);
 
-            _manager.CurrentTarget.OnValueChanged += UpdateTarget;
+            _manager.CurrentCommandTarget.OnValueChanged += UpdateTarget;
 
             EventManager.AddListener<DogFollowCommandEvent>(OnDogFollowCommand);
         }
 
         public override void OnStop()
         {
-            _manager.CurrentTarget.OnValueChanged -= UpdateTarget;
+            _manager.CurrentCommandTarget.OnValueChanged -= UpdateTarget;
 
             EventManager.RemoveListener<DogFollowCommandEvent>(OnDogFollowCommand);
         }
@@ -51,7 +50,7 @@ namespace Gameplay.Dog
 
         private void UpdateTarget()
         {
-            _dogMovement.MoveTo(_manager.CurrentTarget.Value);
+            _dogMovement.MoveTo(_manager.CurrentCommandTarget.Value);
         }
 
 

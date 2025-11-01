@@ -1,8 +1,7 @@
 using UnityEditor;
-
 using UnityEngine;
 
-[CustomEditor(typeof(FieldOfView))]
+[UnityEditor.CustomEditor(typeof(FieldOfView))]
 public class FieldOfViewEditor : Editor
 {
     private void OnSceneGUI()

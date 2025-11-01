@@ -2,8 +2,9 @@
 {
     public class Void : Runtime.Object
     {
-        public Void()
+        public Void ()
         {
         }
     }
 }
+

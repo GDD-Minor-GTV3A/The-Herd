@@ -1,0 +1,13 @@
+Sheep Panic System Setup Guide
+
+The Sheep Panic System lets sheep react to fear by running away and then returning to their normal behavior after calming down. To make it work, you only need the new SheepPanicController script, the SheepPanicState script, and a few small updates to the SheepStateManager.
+
+First, make sure the SheepPanicController script is added to every sheep prefab in your scene. This script handles sanity buildup, triggers panic when the sanity threshold is reached, and resets everything afterward so the sheep can safely rejoin the herd. In the Inspector, assign the SheepStateManager component of that same sheep to the State Manager field inside the SheepPanicController. You can adjust the panic threshold, flee distance, and optionally enable debug logs if you want to see messages when the sheep panic and recover.
+
+Next, the SheepPanicState script must be placed in the exact same folder as the SheepStateManager. This is important because the state machine relies on both being in the same namespace and location to function correctly. The SheepPanicState controls what the sheep actually do while panicking—mainly running away for a certain distance and then stopping.
+
+The SheepStateManager script itself must include a few small changes that support the panic system. It now needs to handle state locking and unlocking so that while the sheep are panicking, their normal herd behavior (like grazing or following) does not interfere. It also needs a way to reset and resync the herd logic once the panic ends, so the sheep can smoothly return to its normal behavior without getting stuck. These small additions ensure that the panic system works safely alongside the existing state machine.
+
+Once everything is set up, the process works automatically. The monster or any external system increases a sheep’s sanity level when it’s close or scared. When the sanity reaches the defined threshold in the SheepPanicController, the panic sequence starts: the sheep’s state is locked, it enters the SheepPanicState, and runs away. When the panic ends, the controller resets the sanity, unlocks the state, triggers the herd resync, and the sheep continues behaving normally again.
+
+In short, place the SheepPanicState in the same folder as the SheepStateManager, add the SheepPanicController to all sheep, link it to their manager, and make sure the manager includes the panic locking and resync features. With those pieces in place, the sheep will correctly panic, flee, calm down, and return to the herd automatically.

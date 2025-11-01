@@ -30,21 +30,23 @@ namespace Gameplay.Dog
 
         public override void OnStart()
         {
-            _manager.CurrentTarget.OnValueChanged += OnTargetChanged;
+            _manager.CurrentCommandTarget.OnValueChanged += OnTargetChanged;
             _animator.SetWalking(true);
         }
 
         public override void OnStop()
         {
-            _manager.CurrentTarget.OnValueChanged -= OnTargetChanged;
+            _manager.CurrentCommandTarget.OnValueChanged -= OnTargetChanged;
         }
 
         public override void OnUpdate()
         {
+            if (_manager.HeardZone.IsFreeSheepToHeard())
+                _manager.SetState<DogMoveToSheep>();
+
             _dogMovement.MoveTo(CalculateFollowPoint());
             float currentSpeed = _dogMovement.CalculateSpeedToPlayer();
             _animator.CalculateWalkingSpeedMultiplier(currentSpeed);
-
 
             if (!_dogMovement.IsMoving)
                 _manager.SetState<DogIdle>();
