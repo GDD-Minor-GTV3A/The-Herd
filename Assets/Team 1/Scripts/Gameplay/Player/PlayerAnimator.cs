@@ -1,11 +1,7 @@
 using System;
-using System.Collections;
-
 using Core.Shared;
-
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
-using UnityEngine.Rendering.Universal;
 
 namespace Gameplay.Player
 {
@@ -14,22 +10,16 @@ namespace Gameplay.Player
         private PlayerAnimationConstraints animationConstrains;
         private readonly Transform root;
 
-        private CanvasGroup vignette;
-
 
         private const string WalkingParam = "Walk";
         private const string WalkSpeedParam = "WalkSpeed";
 
 
-        private readonly int handsLayerIndex;
-
-        public PlayerAnimator(Animator animator,Transform root, PlayerAnimationConstraints constraints, CanvasGroup vignette) : base(animator)
+        public PlayerAnimator(Animator animator,Transform root, PlayerAnimationConstraints constraints) : base(animator)
         {
-            handsLayerIndex = _animator.GetLayerIndex("Hands Layer");
             this.root = root;
             animationConstrains = constraints;
             RemoveHands();
-            this.vignette = vignette;
         }
 
 
@@ -56,6 +46,9 @@ namespace Gameplay.Player
         }
 
 
+        /// <summary>
+        /// Define if animator controls character rotation or no.
+        /// </summary>
         public void SetAnimationRotation(bool rotate)
         {
             if (rotate)
@@ -72,6 +65,9 @@ namespace Gameplay.Player
         }
 
 
+        /// <summary>
+        /// Moves hands on tool's animation key points.
+        /// </summary>
         public void GetTool(ToolAnimationKeyPoints keyPoints)
         {
             var _handData = animationConstrains.RightHand.data;
@@ -97,6 +93,9 @@ namespace Gameplay.Player
         }
 
 
+        /// <summary>
+        /// Resets hands position.
+        /// </summary>
         public void RemoveHands()
         {
             var _handData = animationConstrains.RightHand.data;
@@ -122,6 +121,9 @@ namespace Gameplay.Player
         }
 
 
+        /// <summary>
+        /// Rotate character towards cursor world position.
+        /// </summary>
         public void RotateCharacterBody(Vector3 mouseWorldPosition)
         {
             Vector3 direction = mouseWorldPosition - root.position;
@@ -140,36 +142,6 @@ namespace Gameplay.Player
 
             animationConstrains.LookTarget.position = new Vector3(mouseWorldPosition.x, animationConstrains.LookTarget.position.y, mouseWorldPosition.z);
         }
-
-
-        public IEnumerator ShowVignetteRoutine(float duration)
-        {
-            float _visibleTime = duration / 4;
-            float _fadeTime = (duration - _visibleTime) / 2;
-
-            float _currentTime = 0;
-
-            while (_currentTime < _fadeTime)
-            {
-                _currentTime += Time.deltaTime;
-                vignette.alpha = Mathf.Lerp(0, 1, _currentTime / _fadeTime);
-                yield return null;
-            }
-
-            vignette.alpha = 1;
-
-            yield return new WaitForSeconds(_visibleTime);
-
-            _currentTime = 0;
-
-            while (_currentTime < _fadeTime)
-            {
-                _currentTime += Time.deltaTime;
-                vignette.alpha = Mathf.Lerp(1, 0, _currentTime / _fadeTime);
-                yield return null;
-            }
-        }
-
     }
 
 

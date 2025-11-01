@@ -1,5 +1,10 @@
+using Core.Shared.Utilities;
+
+using Gameplay.Effects;
 using Gameplay.HealthSystem;
 using Gameplay.ToolsSystem;
+
+using UI.Effects;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
@@ -19,22 +24,26 @@ namespace Gameplay.Player
         [SerializeField] private PlayerAnimationConstraints animationConstrains;
 
         [Space]
+        [Header("Effects")]
+        [Tooltip("Reference to damage effect component.")]
+        [SerializeField, Required] private DamageEffect dmgEffect;
+        [Tooltip("Reference to player vignette effect component.")]
+        [SerializeField, Required] private PlayerVignetteEffect vignetteEffect;
+
+        [Space]
         [Tooltip("Manager of step sounds.")]
         [SerializeField] private StepsSoundManager stepsSoundManager;
         [Tooltip("Reference to input actions map.")]
         [SerializeField] private InputActionAsset inputActions;
-        [Tooltip("Reference to input actions map.")]
-        [SerializeField] private CanvasGroup vignette;
         [Tooltip("Reference to player config.")]
         [SerializeField] private PlayerConfig config;
 
 
         private PlayerMovement _movementController;
-        private PlayerAnimator playerAnimator;
         private Health _health;
-        private Coroutine vigneteRoutine;
 
-
+        [Space]
+        [Header("Events")]
         public UnityEvent OnDamageTaken;
         public UnityEvent OnHealed;
         public UnityEvent OnDied;
@@ -64,6 +73,7 @@ namespace Gameplay.Player
 
             transform.forward = forward;
 
+
             _movementController = GetComponent<PlayerMovement>();
             PlayerStateManager stateManager = GetComponent<PlayerStateManager>();
             PlayerInput playerInput = GetComponent<PlayerInput>();
@@ -77,7 +87,7 @@ namespace Gameplay.Player
 
 
             stepsSoundManager.Initialize();
-            playerAnimator = new PlayerAnimator(animator, transform, animationConstrains, vignette);
+            PlayerAnimator playerAnimator = new PlayerAnimator(animator, transform, animationConstrains);
             stateManager.Initialize(playerInput, _movementController, playerAnimator);
 
             // Init health
@@ -91,6 +101,9 @@ namespace Gameplay.Player
             config.OnValueChanged += UpdateConfigValues;
 
             slotsController.Initialize(playerInput, playerAnimator, 2);
+            
+            dmgEffect.Initialize();
+            vignetteEffect.Initialize();
         }
 
 
@@ -114,9 +127,6 @@ namespace Gameplay.Player
         {
             if (!_health.CanTakeDamage && damage <= 0) return;
             _health.ChangeCurrentHealth(-damage);
-            if (vigneteRoutine != null)
-                StopCoroutine(vigneteRoutine);
-            vigneteRoutine = StartCoroutine(playerAnimator.ShowVignetteRoutine(.7f));
             OnDamageTaken?.Invoke();
 
             if (_health.CurrentHealth == 0)
