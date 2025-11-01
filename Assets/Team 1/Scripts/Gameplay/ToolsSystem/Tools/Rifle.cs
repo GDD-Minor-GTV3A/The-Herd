@@ -35,7 +35,7 @@ public class Rifle : MonoBehaviour, IPlayerTool
 
     private Queue<Bullet> bulletPool = new Queue<Bullet>();
     private PlayerAnimator playerAnimator;
-    private Animator animator;
+    [SerializeField] private Animator animator;
 
 
     /// <summary>
@@ -46,7 +46,7 @@ public class Rifle : MonoBehaviour, IPlayerTool
         this.playerAnimator = playerAnimator;
         currentAmmo = maxAmmo;
 
-        animator = GetComponent<Animator>();
+        //animator = GetComponent<Animator>();
 
 
         // Initialize pool
