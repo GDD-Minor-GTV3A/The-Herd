@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections;
-
+﻿using System.Collections;
 using Core.Shared;
-using Core.Shared.Utilities;
-
 using Gameplay.Player;
-
 using UnityEngine;
 
 public class Rifle : MonoBehaviour, IPlayerTool
