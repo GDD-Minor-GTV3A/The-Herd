@@ -25,6 +25,8 @@ public class QuestLogUI : MonoBehaviour
     /// </summary>
     private readonly Dictionary<string, QuestUIEntry> _questEntries = new();
 
+    private bool _activeState = false;
+    
     /// <summary>
     /// Subscribes to quest-related events when this component is enabled.
     /// </summary>
@@ -91,5 +93,18 @@ public class QuestLogUI : MonoBehaviour
         var questUiEntry = _questEntries[evt.QuestID];
         questUiEntry.MarkCompleted();
     }
-    
+
+    private void Update()
+    {
+        //Enable/Disable QuestLog
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            _activeState = !_activeState;
+                
+            foreach (Transform child in questListContainer.transform)
+            {
+                child.gameObject.SetActive(_activeState);
+            }
+        }
+    }
 }

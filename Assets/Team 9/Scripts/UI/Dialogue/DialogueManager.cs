@@ -442,6 +442,7 @@ public class DialogueManager : MonoBehaviour
     private void CompleteObjective(string questID, string objectiveID)
     {
         EventManager.Broadcast(new CompleteObjectiveEvent(questID, objectiveID));
+        Debug.Log("Completed Objective through dialogue");
     }
     
     /// <summary>

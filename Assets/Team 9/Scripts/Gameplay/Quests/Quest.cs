@@ -3,6 +3,8 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 
+using Core.Events;
+
 /// <summary>
 /// Represents a quest definition stored as a ScriptableObject.
 /// Contains multiple stages, each with one or more objectives.
@@ -250,7 +252,8 @@ public class QuestProgress
     private void AdvanceStage()
     {
         GetCurrentStage()?.SetActive(false);
-
+        
+        EventManager.Broadcast(new QuestCompletedEvent(GetCurrentStage().Stage.StageID));
         _currentStageIndex++;
         if (_currentStageIndex < StageProgresses.Count)
             GetCurrentStage()?.SetActive(true);
@@ -326,6 +329,7 @@ public class QuestStageProgress
         {
             if (state && Objectives.Count > 0)
                 Objectives[0].SetIsActive(true);
+            Debug.Log($"{Objectives[0].ObjectiveID} is active");
         }
     }
 

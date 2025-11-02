@@ -1,8 +1,8 @@
-VAR quest_accepted = false
-VAR all_objectives_completed = false
+VAR QUEST_001_accepted = false
+VAR all_QUEST_001_objectives_completed = false
 VAR QUEST_001_completed = false
-VAR quest_declined = false
-VAR after_quest_completed = false
+VAR QUEST_001_declined = false
+VAR after_QUEST_001_completed = false
 
 EXTERNAL StartQuest(string)
 EXTERNAL CompleteObjective(string, string)
@@ -11,19 +11,19 @@ EXTERNAL CompleteObjective(string, string)
 -> vesna_router
 
 === vesna_router ===
-{ after_quest_completed:
+{ after_QUEST_001_completed:
     -> vesna.after_quest_completed_dialogue
 - else:
     { QUEST_001_completed:
         -> vesna.quest_completed_dialogue
     - else:
-        { all_objectives_completed:
+        { all_QUEST_001_objectives_completed:
             -> vesna.quest_completed_dialogue
         - else:
-            { quest_accepted:
+            { QUEST_001_accepted:
                 -> vesna.quest_in_progress_dialogue
             - else:
-                { quest_declined:
+                { QUEST_001_declined:
                     -> vesna.quest_declined_followup_dialogue
                 - else:
                     -> vesna.intro_dialogue
@@ -128,8 +128,8 @@ If I do this for you, you are in my debt, correct?
 Yes, precisely.
 
 + [Accept quest: I will do it]
-    ~ quest_accepted = true
-    ~ quest_declined = false
+    ~ QUEST_001_accepted = true
+    ~ QUEST_001_declined = false
     ~ StartQuest("QUEST_001")
 
     #speaker:Vesna
@@ -140,8 +140,8 @@ Yes, precisely.
     -> END
 
 + [Decline quest: I have more important matters to attend to than this]
-    ~ quest_accepted = false
-    ~ quest_declined = true
+    ~ QUEST_001_accepted = false
+    ~ QUEST_001_declined = true
 
     #speaker:Vesna
     That is no problem. I will be here if you decide otherwise.
@@ -161,8 +161,8 @@ My bracelet. The one I lost in **[Level 2]**. I understand you were busy before,
 As I mentioned, I would be in your debt. My connection to nature and animals could be invaluable to you and your sheep.
 
 + [Accept quest: Alright, I'll help you find it]
-    ~ quest_accepted = true
-    ~ quest_declined = false
+    ~ QUEST_001_accepted = true
+    ~ QUEST_001_declined = false
     ~ StartQuest("QUEST_001")
 
     #speaker:Vesna
@@ -173,8 +173,8 @@ As I mentioned, I would be in your debt. My connection to nature and animals cou
     -> END
 
 + [Decline quest: No, I still have other priorities]
-    ~ quest_accepted = false
-    ~ quest_declined = true
+    ~ QUEST_001_accepted = false
+    ~ QUEST_001_declined = true
 
     #speaker:Vesna
     I understand. The offer remains open whenever you're ready.
@@ -220,11 +220,11 @@ In fact, in order to prove my sincerity, I will give you one of my Blessings.
 
 //Give the player a reward !!!!
 
-~ after_quest_completed = true
+~ after_QUEST_001_completed = true
 -> END
 
 = after_quest_completed_dialogue
-~ after_quest_completed = true
+~ after_QUEST_001_completed = true
 
 #speaker:Vesna
 {~Well, hello dear. I’m glad to see that you’ve familiarized yourself with the place. | Hi, there. | Ah, look at these adorable sweetings. How I love them! | If you ever need me for something, don’t feel too shy to ask.}

@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20940cab3fddea7469f199b18cd4bb6f, type: 3}
+  m_Name: MaraQuest
+  m_EditorClassIdentifier: 
+  _questID: QUEST_002
+  _questName: Maras quest
+  _questDescription: 
+  _stages:
+  - _stageID: STAGE_001
+    _stageDescription: Retrive the items
+    _objectives:
+    - objectiveID: ITEM_021
+      objectiveDescription: Gather some straw
+      type: 0
+      requiredAmount: 1
+      currentAmount: 0
+    - objectiveID: ITEM_022
+      objectiveDescription: Obtain some cloth
+      type: 0
+      requiredAmount: 1
+      currentAmount: 0
+    - objectiveID: ITEM_023
+      objectiveDescription: Obtain a ribbon
+      type: 0
+      requiredAmount: 1
+      currentAmount: 0
+    - objectiveID: ITEM_024
+      objectiveDescription: Find the mask
+      type: 0
+      requiredAmount: 1
+      currentAmount: 0
+    _isParallel: 1
+  - _stageID: 001
+    _stageDescription: Bring mara the items
+    _objectives:
+    - objectiveID: NPC_MARA_STAGE_1
+      objectiveDescription: talk to Mara
+      type: 3
+      requiredAmount: 1
+      currentAmount: 0
+    _isParallel: 0
+  - _stageID: 002
+    _stageDescription: Deliver the effigy
+    _objectives:
+    - objectiveID: NPC_MARA_STAGE_2
+      objectiveDescription: talk to Mara
+      type: 3
+      requiredAmount: 1
+      currentAmount: 0
+    _isParallel: 0

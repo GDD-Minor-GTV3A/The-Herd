@@ -3,6 +3,8 @@ using System.Linq;
 using UnityEngine;
 using Core.Events;
 
+using UnityEngine.Rendering;
+
 /// <summary>
 /// Manager class to handle active quests and updates
 /// </summary>
@@ -126,7 +128,7 @@ public class QuestManager : MonoBehaviour
         }
 
         questProgress.AddProgress(objectiveID, amount);
-
+        Debug.Log($"COMPLETE OBJECTIVE : QID{questID}, OID{objectiveID}");
         if (questProgress.IsCompleted)
         {
             OnQuestCompleted(questProgress);
@@ -214,7 +216,7 @@ public class QuestManager : MonoBehaviour
     /// <param name="objectiveID"></param>
     public void CompleteObjectiveString(string objectiveID)
     {
-        CompleteObjective("TESTQUEST_001", objectiveID, 1);
+        CompleteObjective("QUEST_002", objectiveID, 1);
     }
 
     

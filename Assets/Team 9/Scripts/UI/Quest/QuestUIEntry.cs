@@ -108,7 +108,7 @@ public class QuestUIEntry : MonoBehaviour
                 }
 
                 text.text = $"{obj.ObjectiveDescription} ({obj.CurrentAmount}/{obj.RequiredAmount})";
-
+                Debug.Log($"Refreshing obj: {obj.ObjectiveID}, Desc: {obj.ObjectiveDescription}, Active: {obj.IsActive}, Completed: {obj.IsCompleted}");
                 if (obj.IsCompleted)
                     text.color = Color.green;
                 else if (obj.IsActive)
