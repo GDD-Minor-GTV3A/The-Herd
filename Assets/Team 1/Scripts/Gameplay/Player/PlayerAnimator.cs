@@ -1,7 +1,7 @@
-using UnityEngine;
-using Core.Shared;
-using UnityEngine.Animations.Rigging;
 using System;
+using Core.Shared;
+using UnityEngine;
+using UnityEngine.Animations.Rigging;
 
 namespace Gameplay.Player
 {
@@ -15,11 +15,8 @@ namespace Gameplay.Player
         private const string WalkSpeedParam = "WalkSpeed";
 
 
-        private readonly int handsLayerIndex;
-
         public PlayerAnimator(Animator animator,Transform root, PlayerAnimationConstraints constraints) : base(animator)
         {
-            handsLayerIndex = _animator.GetLayerIndex("Hands Layer");
             this.root = root;
             animationConstrains = constraints;
             RemoveHands();
@@ -49,6 +46,9 @@ namespace Gameplay.Player
         }
 
 
+        /// <summary>
+        /// Define if animator controls character rotation or no.
+        /// </summary>
         public void SetAnimationRotation(bool rotate)
         {
             if (rotate)
@@ -65,6 +65,9 @@ namespace Gameplay.Player
         }
 
 
+        /// <summary>
+        /// Moves hands on tool's animation key points.
+        /// </summary>
         public void GetTool(ToolAnimationKeyPoints keyPoints)
         {
             var _handData = animationConstrains.RightHand.data;
@@ -90,6 +93,9 @@ namespace Gameplay.Player
         }
 
 
+        /// <summary>
+        /// Resets hands position.
+        /// </summary>
         public void RemoveHands()
         {
             var _handData = animationConstrains.RightHand.data;
@@ -115,6 +121,9 @@ namespace Gameplay.Player
         }
 
 
+        /// <summary>
+        /// Rotate character towards cursor world position.
+        /// </summary>
         public void RotateCharacterBody(Vector3 mouseWorldPosition)
         {
             Vector3 direction = mouseWorldPosition - root.position;
