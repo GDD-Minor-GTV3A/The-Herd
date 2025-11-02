@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 
 using Core.Shared;
 using Core.Shared.Utilities;
@@ -21,10 +22,10 @@ public class Rifle : MonoBehaviour, IPlayerTool
     [SerializeField] private float boltCycleTime = 1.5f;
 
     [Tooltip("Prefab reference for the bullet this rifle fires. Required.")]
-    [SerializeField, Required] private Bullet bulletPrefab;
+    [SerializeField, NotNull] private Bullet bulletPrefab;
 
     [Tooltip("Transform from which bullets are spawned and oriented when firing. Required.")]
-    [SerializeField, Required] private Transform shotPoint;
+    [SerializeField, NotNull] private Transform shotPoint;
 
     [Tooltip("Damage dealt per bullet fired.")]
     [SerializeField] private float damage = 0f;
@@ -33,8 +34,8 @@ public class Rifle : MonoBehaviour, IPlayerTool
     [Header("Animation Points")]
 
     [Tooltip("Defines the key points in the player's animation for this specific tool.")]
-    [SerializeField, Required] private ToolAnimationKeyPoints keyPoints;
-
+    [SerializeField, NotNull] private ToolAnimationKeyPoints keyPoints;
+    
     private int currentAmmo;
     private bool isBoltClosed = true;
     private bool canFire = true;
