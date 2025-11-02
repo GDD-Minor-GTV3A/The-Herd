@@ -60,14 +60,23 @@ public class QuestManager : MonoBehaviour
     /// <param name="quest">Quest ScriptableObject to start</param>
     public void StartQuest(Quest quest)
     {
+        if (CheckIfQuestRunningOrComplete(quest.QuestID))
+        {
+            Debug.Log("QUEST IS ALREADY RUNNING OR COMPLETED!!!");
+            return;
+        }
+
         var progress = new QuestProgress(quest);
         _activeQuests.Add(progress);
+
+        EventManager.Broadcast(new QuestStartedEvent(quest.QuestID));
+        Debug.Log($"Quest started: {quest.QuestName}");
     }
 
     private void OnStartQuestEvent(StartQuestEvent evt)
     {
         Debug.Log($"Starting Quest: {evt.QuestID}");
-        bool checker = false;
+        
         if (CheckIfQuestRunningOrComplete(evt.QuestID))
         {
             Debug.Log("QUEST IS ALREADY RUNNING OR COMPLETED!!!");
@@ -109,8 +118,13 @@ public class QuestManager : MonoBehaviour
     /// <param name="amount">The amount to increment the objective's progress (default 1).</param>
     private void CompleteObjective(string questID, string objectiveID, int amount = 1)
     {
-        foreach (var quest in _activeQuests)
+        var questProgress = GetQuestProgressByID(questID);
+        if (questProgress == null)
         {
+<<<<<<< HEAD
+            Debug.LogWarning($"QuestManager: No quest with ID {questID} found!");
+            return;
+=======
             if (quest.Quest.QuestID != questID) continue;
 
             var obj = quest.Objectives.FirstOrDefault(o => o.ObjectiveID == objectiveID);
@@ -129,10 +143,25 @@ public class QuestManager : MonoBehaviour
                 Debug.Log("QUEST COMPLETE");
             }
             //TODO: QUEST UI UPDATE
+>>>>>>> main
         }
-    }
 
+<<<<<<< HEAD
+        questProgress.AddProgress(objectiveID, amount);
+
+        if (questProgress.IsCompleted)
+        {
+            OnQuestCompleted(questProgress);
+            Debug.Log($"Quest complete: {questProgress.Quest.QuestName}");
+        }
+
+        EventManager.Broadcast(new QuestUpdateEvent(questID));
+    }
     
+
+=======
+    
+>>>>>>> main
     /// <summary>
     /// Returns a Quest by it's ID
     /// </summary>
@@ -167,19 +196,49 @@ public class QuestManager : MonoBehaviour
     /// <returns>List<string></returns>
     public List<string> GetAllQuestObjectiveDescriptions(string questID)
     {
+<<<<<<< HEAD
+        var questProgress = GetQuestProgressByID(questID);
+        if (questProgress == null)
+=======
         var questObjectives = GetQuestProgressByID(questID)?.Objectives;
         
         if (questObjectives == null)
+>>>>>>> main
             return new List<string>();
 
-        List<string> questObjDescriptionList = new List<string>();
-        foreach (var objective in questObjectives)
+        List<string> descriptions = new List<string>();
+
+        foreach (var stage in questProgress.StageProgresses)
         {
-            questObjDescriptionList.Add(objective.ObjectiveDescription);
+            foreach (var obj in stage.Objectives)
+                descriptions.Add(obj.ObjectiveDescription);
         }
 
-        return questObjDescriptionList;
+        return descriptions;
     }
+<<<<<<< HEAD
+
+    public List<string> GetAllActiveQuestObjectiveDescriptions(string questID)
+    {
+        var questProgress = GetQuestProgressByID(questID);
+        if (questProgress == null)
+            return new List<string>();
+
+        List<string> activeDescriptions = new List<string>();
+
+        foreach (var stage in questProgress.StageProgresses)
+        {
+            foreach (var obj in stage.Objectives)
+            {
+                if (obj.IsActive)
+                    activeDescriptions.Add(obj.ObjectiveDescription);
+            }
+        }
+
+        return activeDescriptions;
+    }
+=======
+>>>>>>> main
     
     
     /// <summary>
@@ -191,6 +250,18 @@ public class QuestManager : MonoBehaviour
     {
         CompleteObjective("TESTQUEST_001", objectiveID, 1);
     }
+<<<<<<< HEAD
+
+    
+    // TESTING ONLY
+    public void StartQuestString(string questID)
+    {
+        var quest = GetQuestByID(questID);
+        StartQuest(quest);
+        Debug.Log("QuestStarted");
+    }
+=======
+>>>>>>> main
     
     
     /// <summary>
@@ -205,6 +276,13 @@ public class QuestManager : MonoBehaviour
         _completedQuests.Add(quest);
         
         EventManager.Broadcast(new QuestCompletedEvent(quest.Quest.QuestID));
+<<<<<<< HEAD
+        
+        // Notify DialogueManager to update Ink variables
+        //DialogueManager.GetInstance()?.OnQuestCompleted(quest.Quest.QuestID);
+        
+=======
+>>>>>>> main
         Debug.Log($"Quest completed: {quest.Quest.QuestName}");
         //TODO: Get a reward????
     }
