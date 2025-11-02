@@ -119,6 +119,17 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!114 &51739216 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4250296351205117005, guid: 949b4c49ab05bbb4abde14eee43ce17a, type: 3}
+  m_PrefabInstance: {fileID: 6156032451368726267}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7f76654883101e4ba67ad199abb4ab5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &61717861
 GameObject:
   m_ObjectHideFlags: 0
@@ -2388,10 +2399,34 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 90066509589528700, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
+      propertyPath: config
+      value: 
+      objectReference: {fileID: 11400000, guid: 563dda4c4c726294d80f0e074accedcb, type: 2}
+    - target: {fileID: 90066509589528700, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
+      propertyPath: onShot.m_PersistentCalls.m_Calls.Array.data[2].m_Target
+      value: 
+      objectReference: {fileID: 51739216}
+    - target: {fileID: 90066509589528700, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
+      propertyPath: onShot.m_PersistentCalls.m_Calls.Array.data[2].m_MethodName
+      value: ShakeCamera
+      objectReference: {fileID: 0}
     - target: {fileID: 2447654284081567947, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
       propertyPath: config
       value: 
       objectReference: {fileID: 11400000, guid: 563dda4c4c726294d80f0e074accedcb, type: 2}
+    - target: {fileID: 2534532970623172728, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
+      propertyPath: OnDamageTaken.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 51739216}
+    - target: {fileID: 2534532970623172728, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
+      propertyPath: OnDamageTaken.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ShakeCamera
+      objectReference: {fileID: 0}
+    - target: {fileID: 3925905471705513855, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 1.5080018
+      objectReference: {fileID: 0}
     - target: {fileID: 6065300022185603627, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
       propertyPath: m_Name
       value: Player
@@ -2454,7 +2489,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 366954846902213099, guid: 949b4c49ab05bbb4abde14eee43ce17a, type: 3}
       propertyPath: near clip plane
-      value: 0.001
+      value: 0.01
       objectReference: {fileID: 0}
     - target: {fileID: 1669028158844492960, guid: 949b4c49ab05bbb4abde14eee43ce17a, type: 3}
       propertyPath: m_Name
