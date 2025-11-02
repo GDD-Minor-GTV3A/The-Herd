@@ -6,12 +6,11 @@ using System.Linq;
 using Core.Events;
 using Core.Shared.StateMachine;
 using Core.AI.Sheep.Config;
+using Core.AI.Sheep.Event;
 using Core.AI.Sheep.Personality;
 using UnityEngine.AI;
 
 using Random = UnityEngine.Random;
-using System.Xml.Serialization;
-
 
 namespace Core.AI.Sheep
 {
@@ -470,6 +469,16 @@ namespace Core.AI.Sheep
         public void OnSheepUnfreeze()
         {
             SetState<SheepGrazeState>();
+        }
+
+        /// <summary>
+        /// Removes the sheep from the game.
+        /// Broadcasts a SheepDeathEvent before destroying the GameObject.
+        /// </summary>
+        public void Remove()
+        {
+            EventManager.Broadcast(new SheepDeathEvent(this));
+            Destroy(gameObject);
         }
 
         /// <summary>
