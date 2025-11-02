@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+
+using Core.Events;
 using Core.Shared;
 using Core.Shared.Utilities;
 
@@ -72,9 +74,21 @@ public class Rifle : MonoBehaviour, IPlayerTool
 
     public void MainUsageFinished() { }
 
-    public void SecondaryUsageStarted(Observable<Vector3> cursorWorldPosition) { }
+    public void SecondaryUsageStarted(Observable<Vector3> cursorWorldPosition) 
+    {
+        EventManager.Broadcast(new ZoomCameraEvent(20));
+        EventManager.Broadcast(new ChangeConePlayerRevealerFOVEvent(-50));
+        EventManager.Broadcast(new ChangeConePlayerRevealerDistnaceEvent(50));
+    }
 
-    public void SecondaryUsageFinished() { }
+    public void SecondaryUsageFinished() 
+    {
+        EventManager.Broadcast(new ZoomCameraEvent(-20));
+        EventManager.Broadcast(new ChangeConePlayerRevealerFOVEvent(50));
+        EventManager.Broadcast(new ChangeConePlayerRevealerDistnaceEvent(-50));
+
+
+    }
 
     public void Reload()
     {
