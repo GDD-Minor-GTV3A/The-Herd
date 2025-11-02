@@ -235,6 +235,12 @@ public class QuestManager : MonoBehaviour
     /// <param name="quest">The completed QuestProgress object</param>
     private void OnQuestCompleted(QuestProgress quest)
     {
+        if (!_activeQuests.Contains(quest))
+        {
+            Debug.Log("Quest is already finished");
+            return;
+        }
+        
         _activeQuests.Remove(quest);
         _completedQuests.Add(quest);
         

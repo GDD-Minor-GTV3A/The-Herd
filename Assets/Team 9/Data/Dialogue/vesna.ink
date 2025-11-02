@@ -49,6 +49,8 @@ Vesna looks a bit surprised by the cold tone and short words but hides it behind
 I see. Did you come here by accident or were you running from something like most of us?
 
 + [I don't think that's any of your business.]
+    #speaker:Narrator
+    Vesna’s smile drops a little and she bows her head in apology.
     #speaker:Vesna
     Forgive me, you are right. Your reasons are your reasons alone and I will respect that.
 + [My past.]
@@ -202,13 +204,21 @@ Welcome back! I can see by the look in your eyes that you have good news for me.
 I found your bracelet. Here it is.
 
 #speaker:Vesna
-Oh, thank you so much! You have no idea how much this means to me. As promised, I am now in your debt.
+Wonderful! Ah, thank you so much! You have done me a great favor. 
+
+#speaker:Player
+Now my part is done. You will help me when I need it, correct? 
 
 #speaker:Narrator
-Vesna carefully takes the bracelet and puts it on her wrist, her eyes glistening with unshed tears.
+Something flashes in Vesna’s eyes but her usual smile stays unchanging
 
 #speaker:Vesna
-If you ever need my help with your sheep or anything else within my power, please do not hesitate to ask.
+Well yes, of course. A samodiva never forgets those who have lent her a hand.
+
+#speaker:Vesna
+In fact, in order to prove my sincerity, I will give you one of my Blessings. 
+
+//Give the player a reward !!!!
 
 ~ after_quest_completed = true
 -> END
@@ -217,5 +227,6 @@ If you ever need my help with your sheep or anything else within my power, pleas
 ~ after_quest_completed = true
 
 #speaker:Vesna
-Thanks but now go away please
+{~Well, hello dear. I’m glad to see that you’ve familiarized yourself with the place. | Hi, there. | Ah, look at these adorable sweetings. How I love them! | If you ever need me for something, don’t feel too shy to ask.}
+
 -> END
