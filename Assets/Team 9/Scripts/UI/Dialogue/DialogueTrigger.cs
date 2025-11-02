@@ -1,10 +1,7 @@
-<<<<<<< HEAD
 using Core.Events;
 
 using TMPro;
 
-=======
->>>>>>> main
 using UnityEngine;
 using TMPro;
 
@@ -15,14 +12,10 @@ public class DialogueTrigger : MonoBehaviour
     
     //HANDLE UI SOMEWHERE ELSE!!!!
     [SerializeField] private TextMeshProUGUI _interText;
-<<<<<<< HEAD
 
     [SerializeField] private string questID = "";
     [SerializeField] private string objectiveID = "";
 
-=======
-    
->>>>>>> main
     private const string PLAYER_TAG = "Player";
     
     /// <summary>

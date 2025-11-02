@@ -34,12 +34,9 @@ public class DialogueManager : MonoBehaviour
     private string _pendingPortraitState;
     private System.Action _onDialogueFinished;
     
-<<<<<<< HEAD
     // Variable persistence storage
     private Dictionary<string, object> _inkVariableState = new Dictionary<string, object>();
     
-=======
->>>>>>> main
     private static DialogueManager _instance;
 
     // Constants
@@ -85,15 +82,11 @@ public class DialogueManager : MonoBehaviour
         {
             _choicesText[i] = _choices[i].GetComponentInChildren<TextMeshProUGUI>();
         }
-<<<<<<< HEAD
     }
 
     private void OnEnable()
     {
         EventManager.AddListener<QuestCompletedEvent>(OnQuestCompleted);
-=======
-        
->>>>>>> main
     }
     
 
@@ -129,36 +122,6 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-<<<<<<< HEAD
-=======
-    /// <summary>
-    /// Handles the input logic for selecting the currently highlighted choice.
-    /// </summary>
-    private void ConfirmChoiceSelection()
-    {
-        GameObject selectedObject = EventSystem.current?.currentSelectedGameObject;
-        
-        if (selectedObject == null && _story.currentChoices.Count > 0)
-        {
-            // Fallback: If no button is selected but choices exist, force-select the first one.
-            EventSystem.current?.SetSelectedGameObject(_choices[0]);
-            selectedObject = _choices[0];
-        }
-
-        if (selectedObject != null)
-        {
-            for (int i = 0; i < _choices.Length; i++)
-            {
-                // Check if the selected object is one of our choice buttons
-                if (_choices[i] == selectedObject)
-                {
-                    MakeChoice(i);
-                    return; 
-                }
-            }
-        }
-    }
->>>>>>> main
 
     /// <summary>
     /// Enters dialogue mode by loading an Ink story and displaying the first line.
@@ -174,12 +137,9 @@ public class DialogueManager : MonoBehaviour
 
         _story = new Story(inkJson.text);
         
-<<<<<<< HEAD
         // Restore previously saved Ink variables
         RestoreInkVariables();
         
-=======
->>>>>>> main
         _story.BindExternalFunction("StartQuest", (string questID) => {
             StartQuest(questID);
         });
@@ -205,11 +165,7 @@ public class DialogueManager : MonoBehaviour
         _dialoguePanel.SetActive(false);
         _dialogueText.text = string.Empty;
         _pendingPortraitState = null;
-<<<<<<< HEAD
         _layoutAnimator?.Play(DEFAULT_LAYOUT_STATE); 
-=======
-        _layoutAnimator?.Play(DEFAULT_LAYOUT_STATE);
->>>>>>> main
         
         _onDialogueFinished?.Invoke(); 
         _onDialogueFinished = null;
@@ -324,12 +280,6 @@ public class DialogueManager : MonoBehaviour
                     break;
                 case PORTRAIT_TAG:
                     showPortrait = !value.Equals("false", System.StringComparison.OrdinalIgnoreCase); 
-<<<<<<< HEAD
-=======
-                    break;
-                case LAYOUT_TAG:
-                    _layoutAnimator?.Play(value);
->>>>>>> main
                     break;
             }
         }

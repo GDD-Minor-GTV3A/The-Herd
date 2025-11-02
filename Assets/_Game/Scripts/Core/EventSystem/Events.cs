@@ -268,14 +268,10 @@ namespace Core.Events
             _objectiveID = objectiveID;
         }
     }
-<<<<<<< HEAD
 
     /// <summary>
     /// Event broadcast when a quest is fully completed (all objectives and stages finished).
     /// </summary>
-=======
-    
->>>>>>> main
     public class QuestCompletedEvent : GameEvent
     {
         /// <summary>

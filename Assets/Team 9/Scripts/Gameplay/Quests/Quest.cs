@@ -1,10 +1,7 @@
 using System;
 using UnityEngine;
 using System.Collections.Generic;
-<<<<<<< HEAD
 using System.Linq;
-=======
->>>>>>> main
 
 /// <summary>
 /// Represents a quest definition stored as a ScriptableObject.
@@ -16,18 +13,12 @@ public class Quest : ScriptableObject
     [SerializeField] private string _questID;
     [SerializeField] private string _questName;
     [SerializeField] private string _questDescription;
-<<<<<<< HEAD
     [SerializeField] private List<QuestStage> _stages;
 
-=======
-    [SerializeField] private List<QuestObjective> _objectives;
-    
->>>>>>> main
     /// <summary>
     /// Gets the unique ID of the quest.
     /// </summary>
     public string QuestID => _questID;
-<<<<<<< HEAD
 
     /// <summary>
     /// Gets the name/title of the quest.
@@ -43,12 +34,6 @@ public class Quest : ScriptableObject
     /// Gets the list of stages for this quest.
     /// </summary>
     public IReadOnlyList<QuestStage> Stages => _stages;
-=======
-    public string QuestName => _questName;
-    public string QuestDescription => _questDescription;
-    public IReadOnlyList<QuestObjective> Objectives => _objectives;
-    
->>>>>>> main
 }
 
 
@@ -107,50 +92,27 @@ public class QuestStage
 [Serializable]
 public class QuestObjective
 {
-<<<<<<< HEAD
     [SerializeField] private string objectiveID;
     [SerializeField] private string objectiveDescription;
     [SerializeField] private ObjectiveType type;
     [SerializeField] private int requiredAmount;
     [SerializeField] private int currentAmount;
 
-=======
-    /// <summary>
-    /// ObjectiveID, use the corresponding NPC/Item/Area ID here.
-    /// </summary>
-    public string ObjectiveID;
-    
->>>>>>> main
     /// <summary>
     /// Gets the unique ID of the objective.
     /// </summary>
-<<<<<<< HEAD
     public string ObjectiveID => objectiveID;
 
-=======
-    public string ObjectiveDescription;
-    
->>>>>>> main
     /// <summary>
     /// Gets the description of this objective.
     /// </summary>
-<<<<<<< HEAD
     public string ObjectiveDescription => objectiveDescription;
 
-=======
-    public ObjectiveType Type;
-    
->>>>>>> main
     /// <summary>
     /// Gets the type of this objective.
     /// </summary>
-<<<<<<< HEAD
     public ObjectiveType Type => type;
 
-=======
-    public int RequiredAmount;
-    
->>>>>>> main
     /// <summary>
     /// Gets the required amount to complete this objective.
     /// </summary>
