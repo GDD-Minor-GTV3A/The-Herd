@@ -48,12 +48,4 @@ public class Scare : MonoBehaviour
             spawnPoint.spawn();
         }
     }
-
-    public void test(EnemySpawnpoint[] spawnPoints)
-    {
-        foreach (EnemySpawnpoint spawnPoint in spawnPoints)
-        {
-            spawnPoint.spawn();
-        }
-    }
 }
