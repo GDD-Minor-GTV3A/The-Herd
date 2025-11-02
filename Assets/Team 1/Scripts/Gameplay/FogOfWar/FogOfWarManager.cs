@@ -83,7 +83,7 @@ namespace Gameplay.FogOfWar
 
             foreach (FogRevealer _revealer in revealers)
             {
-                _revealer.CreateFovMeshes(fogProjectionPlane.transform, revealerMaterial, obstaclesLayers);
+                _revealer.Initialize(fogProjectionPlane.transform, revealerMaterial, obstaclesLayers);
             }
 
             fogOfWarConfig.OnValueChanged += UpdateValuesFromFogConfig;

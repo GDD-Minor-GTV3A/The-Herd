@@ -1,5 +1,10 @@
+using Core.Shared.Utilities;
+
+using Gameplay.Effects;
 using Gameplay.HealthSystem;
 using Gameplay.ToolsSystem;
+
+using UI.Effects;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
@@ -15,22 +20,30 @@ namespace Gameplay.Player
     {
         [Header("Animations")]
         [Tooltip("Animator of the player.")]
-        [SerializeField] private Animator _animator;
+        [SerializeField] private Animator animator;
         [SerializeField] private PlayerAnimationConstraints animationConstrains;
 
         [Space]
+        [Header("Effects")]
+        [Tooltip("Reference to damage effect component.")]
+        [SerializeField, Required] private DamageEffect dmgEffect;
+        [Tooltip("Reference to player vignette effect component.")]
+        [SerializeField, Required] private PlayerVignetteEffect vignetteEffect;
+
+        [Space]
         [Tooltip("Manager of step sounds.")]
-        [SerializeField] private StepsSoundManager _stepsSoundManager;
+        [SerializeField] private StepsSoundManager stepsSoundManager;
         [Tooltip("Reference to input actions map.")]
-        [SerializeField] private InputActionAsset _inputActions;
+        [SerializeField] private InputActionAsset inputActions;
         [Tooltip("Reference to player config.")]
-        [SerializeField] private PlayerConfig _config;
+        [SerializeField] private PlayerConfig config;
 
 
         private PlayerMovement _movementController;
         private Health _health;
 
-
+        [Space]
+        [Header("Events")]
         public UnityEvent OnDamageTaken;
         public UnityEvent OnHealed;
         public UnityEvent OnDied;
@@ -60,33 +73,37 @@ namespace Gameplay.Player
 
             transform.forward = forward;
 
+
             _movementController = GetComponent<PlayerMovement>();
             PlayerStateManager stateManager = GetComponent<PlayerStateManager>();
             PlayerInput playerInput = GetComponent<PlayerInput>();
             ToolSlotsController slotsController = GetComponent<ToolSlotsController>();
 
-            playerInput.Initialize(_inputActions);
+            playerInput.Initialize(inputActions);
 
 
             CharacterController characterController = GetComponent<CharacterController>();
-            _movementController.Initialize(characterController, _config);
+            _movementController.Initialize(characterController, config);
 
 
-            _stepsSoundManager.Initialize();
-            PlayerAnimator animator = new PlayerAnimator(_animator,transform, animationConstrains);
-            stateManager.Initialize(playerInput, _movementController, animator);
+            stepsSoundManager.Initialize();
+            PlayerAnimator playerAnimator = new PlayerAnimator(animator, transform, animationConstrains);
+            stateManager.Initialize(playerInput, _movementController, playerAnimator);
 
             // Init health
             _health = new Health(
-                _config.MaxHealth,
-                _config.CurrentHealth,
-                _config.CanTakeDamage,
-                _config.CanBeHealed,
-                _config.CanDie
+                config.MaxHealth,
+                config.CurrentHealth,
+                config.CanTakeDamage,
+                config.CanBeHealed,
+                config.CanDie
             );
-            _config.OnValueChanged += UpdateConfigValues;
+            config.OnValueChanged += UpdateConfigValues;
 
-            slotsController.Initialize(playerInput, animator, 2);
+            slotsController.Initialize(playerInput, playerAnimator, 2);
+            
+            dmgEffect.Initialize();
+            vignetteEffect.Initialize();
         }
 
 
@@ -102,7 +119,7 @@ namespace Gameplay.Player
 
         private void OnDestroy()
         {
-            _config.OnValueChanged -= UpdateConfigValues;
+            config.OnValueChanged -= UpdateConfigValues;
         }
 
 
