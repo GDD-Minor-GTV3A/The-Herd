@@ -1,7 +1,9 @@
 ﻿using System.Collections;
+using Core.Events;
 using Core.Shared;
 using Gameplay.Player;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Rifle : MonoBehaviour, IPlayerTool
 {
@@ -15,6 +17,12 @@ public class Rifle : MonoBehaviour, IPlayerTool
     [Header("Animation Points")]
     [SerializeField, Tooltip("Defines the key points in the player's animation for this specific tool.")]
     private ToolAnimationKeyPoints keyPoints;
+    [SerializeField] private Animator animator;
+
+
+    [Space]
+    [SerializeField] private UnityEvent onShot;
+
 
     // --- Runtime State ---
     private int currentAmmo;
@@ -23,10 +31,11 @@ public class Rifle : MonoBehaviour, IPlayerTool
     private bool isCycling = false;
     private bool isReloading = false;
 
-    private PlayerAnimator animator;
+    private PlayerAnimator playerAnimator;
     private BulletPool bulletPool;
 
-    private void Awake()
+
+    public void Initialize(PlayerAnimator animator)
     {
         if (config == null)
         {
@@ -37,11 +46,8 @@ public class Rifle : MonoBehaviour, IPlayerTool
 
         // Initialize the bullet pool using values from config
         bulletPool = new BulletPool(config.BulletPrefab, config.Damage, initialCapacity: 0, maxSize: config.MaxPoolSize);
-    }
 
-    public void Initialize(PlayerAnimator animator)
-    {
-        this.animator = animator;
+        playerAnimator = animator;
         currentAmmo = config.MaxAmmo;
         gameObject.SetActive(false);
     }
@@ -53,8 +59,18 @@ public class Rifle : MonoBehaviour, IPlayerTool
     }
 
     public void MainUsageFinished() { }
-    public void SecondaryUsageStarted(Observable<Vector3> cursorWorldPosition) { }
-    public void SecondaryUsageFinished() { }
+    public void SecondaryUsageStarted(Observable<Vector3> cursorWorldPosition) 
+    {
+        EventManager.Broadcast(new ZoomCameraEvent(20));
+        EventManager.Broadcast(new ChangeConePlayerRevealerFOVEvent(-50));
+        EventManager.Broadcast(new ChangeConePlayerRevealerDistnaceEvent(50));
+    }
+    public void SecondaryUsageFinished() 
+    {
+        EventManager.Broadcast(new ZoomCameraEvent(-20));
+        EventManager.Broadcast(new ChangeConePlayerRevealerFOVEvent(50));
+        EventManager.Broadcast(new ChangeConePlayerRevealerDistnaceEvent(-50));
+    }
 
     private void Fire()
     {
@@ -67,6 +83,8 @@ public class Rifle : MonoBehaviour, IPlayerTool
         bullet.transform.SetPositionAndRotation(shotPoint.position, shotPoint.rotation);
         bullet.Shoot(shotPoint.forward);
 
+        onShot?.Invoke();
+        animator.SetTrigger("BoltCycle");
         StartCoroutine(AutoBoltCycle());
     }
 
@@ -105,6 +123,8 @@ public class Rifle : MonoBehaviour, IPlayerTool
     {
         if (currentAmmo == config.MaxAmmo) yield break;
 
+        animator.SetTrigger("Reload");
+
         canFire = false;
         isReloading = true;
         yield return new WaitForSeconds(config.ReloadTime);
@@ -123,12 +143,14 @@ public class Rifle : MonoBehaviour, IPlayerTool
         isReloading = false;
 
         gameObject.SetActive(false);
-        animator.RemoveHands();
+        playerAnimator.RemoveHands();
     }
 
     public void ShowTool()
     {
         gameObject.SetActive(true);
-        animator.GetTool(keyPoints);
+        playerAnimator.GetTool(keyPoints);
+        animator.SetFloat("BoltCycleSpeed", 1 / config.BoltCycleTime);
+        animator.SetFloat("ReloadSpeed", 1 / config.ReloadTime);
     }
 }

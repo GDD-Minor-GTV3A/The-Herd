@@ -24,13 +24,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1243627065942430194}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.4857291, y: -0.51387477, z: 0.4857291, w: 0.51387477}
+  m_LocalRotation: {x: -0.5, y: 0.5, z: 0.5, w: 0.5}
   m_LocalPosition: {x: 0.239, y: -0.008285793, z: 0.01}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7190389080938143296}
-  m_LocalEulerAnglesHint: {x: 86.774, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 90}
 --- !u!1 &1755403620699033845
 GameObject:
   m_ObjectHideFlags: 0
@@ -57,7 +57,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1755403620699033845}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0.67, y: 4.56, z: 1.3599985}
   m_LocalScale: {x: 3.5, y: 3.5, z: 3.5}
   m_ConstrainProportionsScale: 1
@@ -77,12 +77,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e425490b7dd14c41ae7453691823ddd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxAmmo: 5
-  fireCooldown: 1
-  boltCycleTime: 1.5
-  bulletPrefab: {fileID: 9139095716783313779, guid: 93f5674f1ddbf184ebe9fafbcbe29b3a, type: 3}
+  config: {fileID: 11400000, guid: 563dda4c4c726294d80f0e074accedcb, type: 2}
   shotPoint: {fileID: 3960985787802172437}
-  damage: 0
+  keyPoints:
+    RightHandTarget: {fileID: 1089401446526029045}
+    RightHandHint: {fileID: 3857206537794059734}
+    LeftHandTarget: {fileID: 7477371135425352274}
+    LeftHandHint: {fileID: 4681287239971752800}
+    ShouldersTarget: {fileID: 111427293374878925}
+  animator: {fileID: 4759434604285812370}
   onShot:
     m_PersistentCalls:
       m_Calls:
@@ -122,12 +125,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  keyPoints:
-    RightHandTarget: {fileID: 1089401446526029045}
-    RightHandHint: {fileID: 3857206537794059734}
-    LeftHandTarget: {fileID: 7477371135425352274}
-    LeftHandHint: {fileID: 4681287239971752800}
-    ShouldersTarget: {fileID: 111427293374878925}
 --- !u!1773428102 &7040839071110727952
 ParentConstraint:
   m_ObjectHideFlags: 0
@@ -138,12 +135,12 @@ ParentConstraint:
   m_Enabled: 1
   serializedVersion: 2
   m_Weight: 1
-  m_TranslationAtRest: {x: 0.67, y: 4.56, z: 1.3599987}
-  m_RotationAtRest: {x: 0, y: 90, z: 0}
+  m_TranslationAtRest: {x: 0.6700004, y: 4.56, z: 1.5080018}
+  m_RotationAtRest: {x: 0, y: 90.00001, z: 2.0908449}
   m_TranslationOffsets:
-  - {x: 0.6700004, y: 1.0206933, z: 1.5673836}
+  - {x: 0.6700004, y: 1.0488346, z: 1.5677924}
   m_RotationOffsets:
-  - {x: 0, y: 90.00001, z: 2.9231143}
+  - {x: 0, y: 90.00001, z: 2.923114}
   m_AffectTranslationX: 1
   m_AffectTranslationY: 0
   m_AffectTranslationZ: 1
@@ -216,7 +213,7 @@ Transform:
   m_GameObject: {fileID: 4851134420659084614}
   serializedVersion: 2
   m_LocalRotation: {x: 0.5, y: 0.50000006, z: 0.5, w: 0.50000006}
-  m_LocalPosition: {x: 0.1414287, y: -0.3800003, z: -0.34414315}
+  m_LocalPosition: {x: -0.176, y: -0.098, z: -0.602}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -308,13 +305,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8339589467182167752}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.5, y: 0.5, z: 0.5, w: 0.5}
-  m_LocalPosition: {x: 0.0700001, y: -0.0028573438, z: -0.047000006}
+  m_LocalRotation: {x: 0.5, y: -0.5, z: -0.5, w: 0.5}
+  m_LocalPosition: {x: 0.07, y: -0.0028573442, z: -0.094}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7190389080938143296}
-  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 90}
+  m_LocalEulerAnglesHint: {x: 180, y: 90, z: 90}
 --- !u!1 &9029558422420285078
 GameObject:
   m_ObjectHideFlags: 0
