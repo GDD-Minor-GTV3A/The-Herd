@@ -1,12 +1,19 @@
 using System.Collections;
 
+using Core.Shared.Utilities;
+
 using Gameplay.HealthSystem;
 
 using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
+    [Header("Bullet Settings")]
+
+    [Tooltip("Speed at which the bullet travels after being fired.")]
     [SerializeField] private float speed = 50f;
+
+    [Tooltip("Time in seconds before the bullet is automatically returned to the pool if it doesn't hit anything.")]
     [SerializeField] private float lifeTime = 5f;
 
     private Rigidbody rb;

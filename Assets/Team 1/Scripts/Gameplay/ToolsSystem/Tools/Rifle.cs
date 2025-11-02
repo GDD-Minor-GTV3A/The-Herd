@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 
 using Core.Shared;
+using Core.Shared.Utilities;
 
 using Gameplay.Player;
 
@@ -9,20 +10,36 @@ using UnityEngine;
 public class Rifle : MonoBehaviour, IPlayerTool
 {
     [Header("Bolt-Action Settings")]
+
+    [Tooltip("Maximum number of rounds the rifle can hold at once.")]
     [SerializeField] private int maxAmmo = 5;
+
+    [Tooltip("Total time (in seconds) to fully reload the rifle.")]
     [SerializeField] private float reload = 5f;
+
+    [Tooltip("Total duration (in seconds) for a complete bolt cycle (open, eject, close).")]
     [SerializeField] private float boltCycleTime = 1.5f;
-    [SerializeField] private Bullet bulletPrefab;
-    [SerializeField] private Transform shotPoint;
+
+    [Tooltip("Prefab reference for the bullet this rifle fires. Required.")]
+    [SerializeField, Required] private Bullet bulletPrefab;
+
+    [Tooltip("Transform from which bullets are spawned and oriented when firing. Required.")]
+    [SerializeField, Required] private Transform shotPoint;
+
+    [Tooltip("Damage dealt per bullet fired.")]
     [SerializeField] private float damage = 0f;
 
+
     [Header("Animation Points")]
-    [SerializeField] private ToolAnimationKeyPoints keyPoints;
+
+    [Tooltip("Defines the key points in the player's animation for this specific tool.")]
+    [SerializeField, Required] private ToolAnimationKeyPoints keyPoints;
 
     private int currentAmmo;
     private bool isBoltClosed = true;
     private bool canFire = true;
     private bool isCycling = false;
+    private bool isReloading = false;
 
     private PlayerAnimator animator;
     private BulletPool bulletPool;
@@ -53,6 +70,8 @@ public class Rifle : MonoBehaviour, IPlayerTool
     private void Fire()
     {
         if (currentAmmo <= 0) return;
+
+        if (isReloading) return;
 
         currentAmmo--;
         canFire = false;
@@ -96,12 +115,16 @@ public class Rifle : MonoBehaviour, IPlayerTool
     {
         if (currentAmmo == maxAmmo) yield break;
 
+        if (isReloading) yield break;
+
         canFire = false;
+        isReloading = true;
         yield return new WaitForSeconds(reload);
 
         currentAmmo = maxAmmo;
         isBoltClosed = true;
         canFire = true;
+        isReloading = false;
     }
 
     public void HideTool()
