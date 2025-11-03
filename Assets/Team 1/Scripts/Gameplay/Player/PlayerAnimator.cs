@@ -41,8 +41,6 @@ namespace Gameplay.Player
 
             int roundYRotation = Mathf.RoundToInt(yRotation - startYRotation);
 
-            Debug.Log(roundYRotation);
-
             if (roundYRotation != 0)
             {
                 float tempX = x;
