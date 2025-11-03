@@ -16,6 +16,7 @@ namespace Gameplay.ToolsSystem
     {
         [SerializeField] private Whistle whistle;
         [SerializeField] private Rifle rifle;
+        [SerializeField] private List<GameObject> slotUIRoots = new List<GameObject>();
 
 
         private List<IPlayerTool> _toolSlots = new List<IPlayerTool>();
@@ -82,6 +83,8 @@ namespace Gameplay.ToolsSystem
 
             if (_toolSlots[_currentToolIndex] != null)
                 _toolSlots[_currentToolIndex].ShowTool();
+
+            UpdateSlotUI(_currentToolIndex);
         }
 
 
@@ -132,6 +135,15 @@ namespace Gameplay.ToolsSystem
             _toolSlots[index] = toolToSet;
         }
 
+        private void UpdateSlotUI(int activeIndex)
+        {
+            
+            for (int i = 0; i < slotUIRoots.Count; i++)
+            {
+                if (slotUIRoots[i] == null) continue;
+                slotUIRoots[i].SetActive(i == activeIndex && _toolSlots.Count > i && _toolSlots[i] != null);
+            }
+        }
 
         private void OnDestroy()
         {
