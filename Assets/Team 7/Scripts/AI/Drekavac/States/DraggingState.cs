@@ -31,7 +31,8 @@ namespace AI.Drekavac.States
             if (Vector3.Distance(_manager.transform.position, _manager.GetPlayerLocation()) >
                 _manager.GetStats().despawnDistance)
             {
-                _manager.Despawn();
+                _manager.ReleaseGrabbedObject();
+                _manager.SetState<BigState>();
                 return;
             }
 
