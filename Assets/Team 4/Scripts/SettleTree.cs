@@ -4,18 +4,24 @@ public class SettleTree : MonoBehaviour
 {
     private Rigidbody rb;
 
-    public void Initialize()
+    private void Awake() //Fixed compile error caused by initialized function (Yeremey from Integration)
     {
         rb = GetComponent<Rigidbody>();
+        if (rb == null)
+        {
+            Debug.LogError("SettleTree: Missing Rigidbody!", this);
+            enabled = false;
+        }
     }
 
-    public void Update()
+    private void Update()
     {
+        if (rb == null) return;
+
         if (rb.IsSleeping())
         {
             rb.isKinematic = true;
-
-            this.enabled = false;
+            enabled = false;
         }
     }
 }
