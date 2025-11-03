@@ -58,7 +58,5 @@ namespace Core.AI.Sheep.Personality
         /// Called when sheep rejoins herd
         /// </summary>
         void OnRejoinedHerd(SheepStateManager sheep, PersonalityBehaviorContext context);
-        
-        void OnDeath(SheepStateManager sheep, PersonalityBehaviorContext context);
     }
 }
