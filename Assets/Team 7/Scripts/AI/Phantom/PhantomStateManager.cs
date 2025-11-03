@@ -1,15 +1,7 @@
 using System;
 using System.Collections.Generic;
-
-using AI;
-using AI.Phantom;
-using AI.Phantom.States;
-
-using Core;
 using Core.Shared.StateMachine;
 using Core.Shared.Utilities;
-
-using Phantom;
 
 using Team_7.Scripts.AI.Phantom.States;
 
@@ -147,7 +139,7 @@ namespace Team_7.Scripts.AI.Phantom
         public PhantomProjectile StartCharging()
         {
             _chargingProjectile = Instantiate(stats.projectile, projectileSpawn.transform.position, transform.rotation, transform);
-            _chargingProjectile.Init(stats.chargeDuration, stats.projectileSpeed, stats.maxProjectileScale, stats.projectileRange);
+            _chargingProjectile.Init(stats.chargeDuration, stats.projectileSpeed, stats.maxProjectileScale, stats.projectileRange, stats.damage);
 
             return _chargingProjectile;
         }

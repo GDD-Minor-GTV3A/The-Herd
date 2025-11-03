@@ -1,7 +1,3 @@
-using AI;
-using AI.Drekavac;
-using AI.Drekavac.States;
-using Core;
 using UnityEngine;
 
 namespace Team_7.Scripts.AI.Drekavac.States

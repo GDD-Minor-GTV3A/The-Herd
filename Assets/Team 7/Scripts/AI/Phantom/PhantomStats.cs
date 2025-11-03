@@ -1,11 +1,7 @@
-using AI.Phantom;
-
-using Team_7.Scripts.AI.Phantom;
-
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace Phantom
+namespace Team_7.Scripts.AI.Phantom
 {
     [CreateAssetMenu(fileName = "PhantomStats", menuName = "Scriptable Objects/PhantomStats")]
     public class PhantomStats : ScriptableObject

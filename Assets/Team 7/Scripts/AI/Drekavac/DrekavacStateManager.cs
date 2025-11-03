@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
-using Core;
 using Core.Shared.StateMachine;
-using AI.Drekavac.States;
 using Core.Shared.Utilities;
 
 using Team_7.Scripts.AI.Drekavac.States;
 
-namespace AI.Drekavac
+using UnityEngine;
+
+namespace Team_7.Scripts.AI.Drekavac
 {
     /// <summary>
     ///     Manages the behavior of a "Drekavac" type enemy, adding this component to an object makes it behave like a "Drekavac".

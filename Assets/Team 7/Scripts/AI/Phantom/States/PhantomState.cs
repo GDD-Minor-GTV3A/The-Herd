@@ -1,9 +1,4 @@
-using Core;
-using Phantom;
-
-using Team_7.Scripts.AI.Phantom;
-
-namespace AI.Phantom.States
+namespace Team_7.Scripts.AI.Phantom.States
 {
     public class PhantomState : GenericEnemyState
     {

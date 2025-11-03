@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Core
+namespace Team_7.Scripts.AI
 {
     public class AudioController
     {

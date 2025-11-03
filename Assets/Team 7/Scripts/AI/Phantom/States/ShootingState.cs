@@ -1,12 +1,8 @@
-using UnityEngine;
-using Phantom;
-using Core;
-
-using Team_7.Scripts.AI.Phantom;
-
 using Unity.VisualScripting;
 
-namespace AI.Phantom.States
+using UnityEngine;
+
+namespace Team_7.Scripts.AI.Phantom.States
 {
     public class ShootingState : PhantomState
     {
