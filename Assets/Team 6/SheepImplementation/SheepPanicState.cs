@@ -34,7 +34,7 @@ namespace Core.AI.Sheep
             agent.isStopped = false;
             agent.SetDestination(fleeTarget);
 
-            stateManager.Animation?.SetState((int)SheepAnimState.Run);
+            //stateManager.Animation?.SetState((int)SheepAnimState.Run);
             Debug.Log($"[{stateManager.name}] 🏃 Fleeing to {fleeTarget}");
         }
 
