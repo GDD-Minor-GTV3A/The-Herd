@@ -1,9 +1,13 @@
+using AI;
+using AI.Drekavac;
+using AI.Drekavac.States;
+
 using Core;
 
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace AI.Drekavac.States
+namespace Team_7.Scripts.AI.Drekavac.States
 {
     /// <summary>
     ///     Handles the behavior of an enemy while it's dragging an object.

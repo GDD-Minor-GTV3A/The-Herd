@@ -1,12 +1,13 @@
-using _Game.Team_7.Scripts;
-
+using AI;
+using AI.Drekavac;
+using AI.Drekavac.States;
+using Core;
 using UnityEngine;
-using UnityEngine.AI;
 
 namespace Team_7.Scripts.AI.Drekavac.States
 {
     /// <summary>
-    ///     Enemy "Big" state — the Drekavac charges directly at the player and attacks repeatedly when close.
+    ///     Enemy "Big" state ï¿½ the Drekavac charges directly at the player and attacks repeatedly when close.
     /// </summary>
     public class BigState : DrekavacState
     {

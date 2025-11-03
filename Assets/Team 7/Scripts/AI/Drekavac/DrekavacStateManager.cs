@@ -6,6 +6,8 @@ using Core.Shared.StateMachine;
 using AI.Drekavac.States;
 using Core.Shared.Utilities;
 
+using Team_7.Scripts.AI.Drekavac.States;
+
 namespace AI.Drekavac
 {
     /// <summary>
