@@ -935,6 +935,82 @@ MonoBehaviour:
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 23800000, guid: 71f7377a573dc5944bade3a4bbd7e582, type: 2}
   m_BuildHeightMesh: 0
+--- !u!1001 &102101435
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2227196654983824338, guid: 17ea78bb19d907b4ba46f65605485dd7, type: 3}
+      propertyPath: slideHeight
+      value: 7.86
+      objectReference: {fileID: 0}
+    - target: {fileID: 2799953546465733927, guid: 17ea78bb19d907b4ba46f65605485dd7, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2.66
+      objectReference: {fileID: 0}
+    - target: {fileID: 2799953546465733927, guid: 17ea78bb19d907b4ba46f65605485dd7, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1370.013
+      objectReference: {fileID: 0}
+    - target: {fileID: 2799953546465733927, guid: 17ea78bb19d907b4ba46f65605485dd7, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 143.21
+      objectReference: {fileID: 0}
+    - target: {fileID: 2799953546465733927, guid: 17ea78bb19d907b4ba46f65605485dd7, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 1097.324
+      objectReference: {fileID: 0}
+    - target: {fileID: 2799953546465733927, guid: 17ea78bb19d907b4ba46f65605485dd7, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.943801
+      objectReference: {fileID: 0}
+    - target: {fileID: 2799953546465733927, guid: 17ea78bb19d907b4ba46f65605485dd7, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2799953546465733927, guid: 17ea78bb19d907b4ba46f65605485dd7, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.3305143
+      objectReference: {fileID: 0}
+    - target: {fileID: 2799953546465733927, guid: 17ea78bb19d907b4ba46f65605485dd7, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2799953546465733927, guid: 17ea78bb19d907b4ba46f65605485dd7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2799953546465733927, guid: 17ea78bb19d907b4ba46f65605485dd7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -38.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 2799953546465733927, guid: 17ea78bb19d907b4ba46f65605485dd7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3283333340339320733, guid: 17ea78bb19d907b4ba46f65605485dd7, type: 3}
+      propertyPath: m_Name
+      value: SlidingDoor
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 17ea78bb19d907b4ba46f65605485dd7, type: 3}
+--- !u!114 &102101436 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2227196654983824338, guid: 17ea78bb19d907b4ba46f65605485dd7, type: 3}
+  m_PrefabInstance: {fileID: 102101435}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a25d9e7b2f8370b4793e63763d408184, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &106399822 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3424240208859925620, guid: 89fb10b1593db0d48b355b874480fb56, type: 3}
@@ -8155,6 +8231,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d30b83ab4c69c140bdf67f5d2586e3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  doorsToOpen:
+  - {fileID: 102101436}
 --- !u!4 &1161718896 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3424240208859925620, guid: 89fb10b1593db0d48b355b874480fb56, type: 3}
@@ -13364,6 +13442,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d30b83ab4c69c140bdf67f5d2586e3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  doorsToOpen: []
 --- !u!1001 &2092237049
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14335,3 +14414,4 @@ SceneRoots:
   - {fileID: 9127239762900592213}
   - {fileID: 787511245}
   - {fileID: 1000059226}
+  - {fileID: 102101435}
