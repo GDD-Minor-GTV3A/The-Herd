@@ -55,5 +55,11 @@ namespace Team_7.Scripts.AI.Phantom
         public float projectileSpeed = 15f;
         [Tooltip("How far the projectile travels before it gets deleted.")]
         public float projectileRange = 50f;
+        
+        [Header("Audio Settings")] 
+        public AudioClip? screechSound;
+        public AudioClip? projectileChargeSound;
+        public AudioClip? projectileShootSound;
+        public AudioClip? whooshSound;
     }
 }

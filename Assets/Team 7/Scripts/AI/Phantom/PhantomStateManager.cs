@@ -76,7 +76,7 @@ namespace Team_7.Scripts.AI.Phantom
             //TODO Do this in a different way
             if (stats.damage > 0 )
                 SpawnClones(stats.initialCloneAmount);
-
+            
             SetState<WanderingState>();
         }
 
@@ -140,7 +140,8 @@ namespace Team_7.Scripts.AI.Phantom
         {
             _chargingProjectile = Instantiate(stats.projectile, projectileSpawn.transform.position, transform.rotation, transform);
             _chargingProjectile.Init(stats.chargeDuration, stats.projectileSpeed, stats.maxProjectileScale, stats.projectileRange, stats.damage);
-
+            _audioController.PlayClip(stats.projectileChargeSound);
+            
             return _chargingProjectile;
         }
 
@@ -149,6 +150,7 @@ namespace Team_7.Scripts.AI.Phantom
             if (!_chargingProjectile.IsLaunched() && _chargingProjectile != null)
                 Destroy(_chargingProjectile.gameObject);
             
+            _audioController.StopClip();
             _chargingProjectile = null;
         }
 
@@ -189,6 +191,7 @@ namespace Team_7.Scripts.AI.Phantom
                 else
                 {
                     DestroyClones();
+                    _audioController.PlayClip(stats.screechSound);
                     Destroy(gameObject);
                 }
             }

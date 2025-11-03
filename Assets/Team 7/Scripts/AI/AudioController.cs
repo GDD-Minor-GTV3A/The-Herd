@@ -15,5 +15,10 @@ namespace Team_7.Scripts.AI
             _audioSource.clip = clip;
             _audioSource.Play();
         }
+
+        public void StopClip()
+        {
+            _audioSource.Stop();
+        }
     }
 }
