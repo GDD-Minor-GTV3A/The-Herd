@@ -15,9 +15,6 @@ namespace Gameplay.Player
 
         public override void OnStart()
         {
-            _animator.SetWalking(true);
-            _animator.SetWalkSpeed(true);
-
             _animator.SetAnimationRotation(false);
         }
 
@@ -48,8 +45,9 @@ namespace Gameplay.Player
             Vector3 movementTarget = _playerMovement.CalculateMovementTargetFromInput(playerInput, true);
             _playerMovement.MoveTo(movementTarget);
 
-            // Rotate based on current rotation mode (movement or mouse)
             _movement.Rotate(playerInput);
+
+            _animator.Walking(_manager.Input.Move, true);
         }
     }
 }

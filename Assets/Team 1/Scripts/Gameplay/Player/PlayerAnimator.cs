@@ -10,15 +10,17 @@ namespace Gameplay.Player
         private PlayerAnimationConstraints animationConstrains;
         private readonly Transform root;
 
+        private readonly float startYRotation;
 
-        private const string WalkingParam = "Walk";
-        private const string WalkSpeedParam = "WalkSpeed";
+        private const string WalkingX = "X";
+        private const string WalkingY = "Y";
 
 
         public PlayerAnimator(Animator animator,Transform root, PlayerAnimationConstraints constraints) : base(animator)
         {
             this.root = root;
             animationConstrains = constraints;
+            startYRotation = root.eulerAngles.y;
             RemoveHands();
         }
 
@@ -27,22 +29,44 @@ namespace Gameplay.Player
         /// Sets walking animation state.
         /// </summary>
         /// <param name="walking">Is walking.</param>
-        public void SetWalking(bool walking)
+        public void Walking(Vector2 walkingDirection, bool sprint = false)
         {
-            _animator.SetBool(WalkingParam, walking);
-        }
+            float x = walkingDirection.x;
+            float y = walkingDirection.y;
 
+            x /= (sprint) ? 1 : 2;
+            y /= (sprint) ? 1 : 2;
 
-        /// <summary>
-        /// Changes walk speed animation multiplier.
-        /// </summary>
-        /// <param name="sprint"> Is player sprinting.</param>
-        public void SetWalkSpeed(bool sprint)
-        {
-            if (sprint)
-                _animator.SetFloat(WalkSpeedParam, 2f);
-            else
-                _animator.SetFloat(WalkSpeedParam, 1f);
+            float yRotation = root.eulerAngles.y;
+
+            int roundYRotation = Mathf.RoundToInt(yRotation - startYRotation);
+
+            Debug.Log(roundYRotation);
+
+            if (roundYRotation != 0)
+            {
+                float tempX = x;
+                float tempY = y;
+
+                switch (Mathf.Abs(roundYRotation / 90)) 
+                {
+                    case 1:
+                        x = tempY;
+                        y = -tempX;
+                        break;
+                    case 2:
+                        x *= -1;
+                        y *= -1;
+                        break;
+                    case 3:
+                        x = -tempY;
+                        y = tempX;
+                        break;
+                }
+            }
+
+            _animator.SetFloat(WalkingX, x);
+            _animator.SetFloat(WalkingY, y);
         }
 
 
@@ -130,10 +154,10 @@ namespace Gameplay.Player
             direction.Normalize();
             float angle = Vector3.SignedAngle(root.forward, direction, root.up);
 
-            if (angle <= -90f)
+            if (angle <= -80f)
                 root.Rotate(0, -90, 0);
 
-            if (angle >= 90f)
+            if (angle >= 80f)
                 root.Rotate(0, 90, 0);
 
             if (Mathf.Round(root.rotation.eulerAngles.y) % 90 == 0)

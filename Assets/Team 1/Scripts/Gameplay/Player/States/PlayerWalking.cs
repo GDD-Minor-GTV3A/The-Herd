@@ -16,8 +16,6 @@ namespace Gameplay.Player
 
         public override void OnStart()
         {
-            _animator.SetWalking(true);
-            _animator.SetWalkSpeed(false);
             _animator.SetAnimationRotation(true);
         }
 
@@ -41,7 +39,6 @@ namespace Gameplay.Player
                 _manager.SetState<PlayerRunning>();
                 return;
             }
-
             _playerMovement.ApplyGravity();
 
             Vector3 movementTarget = _playerMovement.CalculateMovementTargetFromInput(playerInput, false);
@@ -50,6 +47,8 @@ namespace Gameplay.Player
             // Rotate based on current rotation mode (movement or mouse)
             //_manager.Rotation.Rotate(playerInput, _manager.Input.Look.Value);
             _animator.RotateCharacterBody(_manager.Input.Look.Value);
+
+            _animator.Walking(_manager.Input.Move);
         }
     }
 }
