@@ -11,16 +11,16 @@ namespace Ink.Parsed
         public Identifier constantIdentifier { get; protected set; }
         public Expression expression { get; protected set; }
 
-        public ConstantDeclaration(Identifier name, Expression assignedExpression)
+        public ConstantDeclaration (Identifier name, Expression assignedExpression)
         {
             this.constantIdentifier = name;
 
             // Defensive programming in case parsing of assignedExpression failed
-            if (assignedExpression)
+            if( assignedExpression )
                 this.expression = AddContent(assignedExpression);
         }
 
-        public override Runtime.Object GenerateRuntimeObject()
+        public override Runtime.Object GenerateRuntimeObject ()
         {
             // Global declarations don't generate actual procedural
             // runtime objects, but instead add a global variable to the story itself.
@@ -28,20 +28,19 @@ namespace Ink.Parsed
             return null;
         }
 
-        public override void ResolveReferences(Story context)
+        public override void ResolveReferences (Story context)
         {
-            base.ResolveReferences(context);
+            base.ResolveReferences (context);
 
-            context.CheckForNamingCollisions(this, constantIdentifier, Story.SymbolType.Var);
+            context.CheckForNamingCollisions (this, constantIdentifier, Story.SymbolType.Var);
         }
 
-        public override string typeName
-        {
-            get
-            {
+        public override string typeName {
+            get {
                 return "Constant";
             }
         }
 
     }
 }
+

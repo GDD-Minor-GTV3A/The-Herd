@@ -48,6 +48,7 @@ GameObject:
   - component: {fileID: 1760065637640053547}
   - component: {fileID: 7416635866833742566}
   - component: {fileID: 5625958612211428767}
+  - component: {fileID: 9214176816918502379}
   m_Layer: 0
   m_Name: Phantom
   m_TagString: Untagged
@@ -65,8 +66,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 3, y: 3, z: 3}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 6875526604532686950}
   - {fileID: 2196462663053284987}
@@ -156,7 +157,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 3.5
+  m_Speed: 7
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
@@ -318,6 +319,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94e388cf41c15f5498faf93f4de1dba3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _moveSpeed: 3.5
+--- !u!114 &9214176816918502379
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3946352212915325662}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7714255d71fddbd47b2a8dc7a0f1f1fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetRenderer: {fileID: 3616214363761434966}
 --- !u!1001 &6404257731302541197
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -422,6 +437,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 2268221463581285857}
   m_SourcePrefab: {fileID: 100100000, guid: 4d03a3a3c2ff89e43b5dc855b230d267, type: 3}
+--- !u!137 &3616214363761434966 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -1526964690268444965, guid: 4d03a3a3c2ff89e43b5dc855b230d267, type: 3}
+  m_PrefabInstance: {fileID: 6404257731302541197}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &6062152585087515356 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 4d03a3a3c2ff89e43b5dc855b230d267, type: 3}

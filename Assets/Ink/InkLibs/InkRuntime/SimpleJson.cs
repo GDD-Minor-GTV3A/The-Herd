@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Text;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace Ink.Runtime
 {
@@ -11,9 +11,9 @@ namespace Ink.Runtime
     /// </summary>
     public static class SimpleJson
     {
-        public static Dictionary<string, object> TextToDictionary(string text)
+        public static Dictionary<string, object> TextToDictionary (string text)
         {
-            return new Reader(text).ToDictionary();
+            return new Reader (text).ToDictionary ();
         }
 
         public static List<object> TextToArray(string text)
@@ -23,17 +23,17 @@ namespace Ink.Runtime
 
         class Reader
         {
-            public Reader(string text)
+            public Reader (string text)
             {
                 _text = text;
                 _offset = 0;
 
-                SkipWhitespace();
+                SkipWhitespace ();
 
-                _rootObject = ReadObject();
+                _rootObject = ReadObject ();
             }
 
-            public Dictionary<string, object> ToDictionary()
+            public Dictionary<string, object> ToDictionary ()
             {
                 return (Dictionary<string, object>)_rootObject;
             }
@@ -43,7 +43,7 @@ namespace Ink.Runtime
                 return (List<object>)_rootObject;
             }
 
-            bool IsNumberChar(char c)
+            bool IsNumberChar (char c)
             {
                 return c >= '0' && c <= '9' || c == '.' || c == '-' || c == '+' || c == 'E' || c == 'e';
             }
@@ -53,126 +53,121 @@ namespace Ink.Runtime
                 return c >= '0' && c <= '9' || c == '-' || c == '+';
             }
 
-            object ReadObject()
+            object ReadObject ()
             {
-                var currentChar = _text[_offset];
+                var currentChar = _text [_offset];
 
-                if (currentChar == '{')
-                    return ReadDictionary();
-
+                if( currentChar == '{' )
+                    return ReadDictionary ();
+                
                 else if (currentChar == '[')
-                    return ReadArray();
+                    return ReadArray ();
 
                 else if (currentChar == '"')
-                    return ReadString();
+                    return ReadString ();
 
                 else if (IsFirstNumberChar(currentChar))
-                    return ReadNumber();
+                    return ReadNumber ();
 
-                else if (TryRead("true"))
+                else if (TryRead ("true"))
                     return true;
 
-                else if (TryRead("false"))
+                else if (TryRead ("false"))
                     return false;
 
-                else if (TryRead("null"))
+                else if (TryRead ("null"))
                     return null;
 
-                throw new System.Exception("Unhandled object type in JSON: " + _text.Substring(_offset, 30));
+                throw new System.Exception ("Unhandled object type in JSON: "+_text.Substring (_offset, 30));
             }
 
-            Dictionary<string, object> ReadDictionary()
+            Dictionary<string, object> ReadDictionary ()
             {
-                var dict = new Dictionary<string, object>();
+                var dict = new Dictionary<string, object> ();
 
-                Expect("{");
+                Expect ("{");
 
-                SkipWhitespace();
+                SkipWhitespace ();
 
                 // Empty dictionary?
-                if (TryRead("}"))
+                if (TryRead ("}"))
                     return dict;
 
-                do
-                {
+                do {
 
-                    SkipWhitespace();
+                    SkipWhitespace ();
 
                     // Key
-                    var key = ReadString();
-                    Expect(key != null, "dictionary key");
+                    var key = ReadString ();
+                    Expect (key != null, "dictionary key");
 
-                    SkipWhitespace();
+                    SkipWhitespace ();
 
                     // :
-                    Expect(":");
+                    Expect (":");
 
-                    SkipWhitespace();
+                    SkipWhitespace ();
 
                     // Value
-                    var val = ReadObject();
-                    Expect(val != null, "dictionary value");
+                    var val = ReadObject ();
+                    Expect (val != null, "dictionary value");
 
                     // Add to dictionary
-                    dict[key] = val;
+                    dict [key] = val;
 
-                    SkipWhitespace();
+                    SkipWhitespace ();
 
-                } while (TryRead(","));
+                } while ( TryRead (",") );
 
-                Expect("}");
+                Expect ("}");
 
                 return dict;
             }
 
-            List<object> ReadArray()
+            List<object> ReadArray ()
             {
-                var list = new List<object>();
+                var list = new List<object> ();
 
-                Expect("[");
+                Expect ("[");
 
-                SkipWhitespace();
+                SkipWhitespace ();
 
                 // Empty list?
-                if (TryRead("]"))
+                if (TryRead ("]"))
                     return list;
 
-                do
-                {
+                do {
 
-                    SkipWhitespace();
+                    SkipWhitespace ();
 
                     // Value
-                    var val = ReadObject();
+                    var val = ReadObject ();
 
                     // Add to array
-                    list.Add(val);
+                    list.Add (val);
 
-                    SkipWhitespace();
+                    SkipWhitespace ();
 
-                } while (TryRead(","));
+                } while (TryRead (","));
 
-                Expect("]");
+                Expect ("]");
 
                 return list;
             }
 
-            string ReadString()
+            string ReadString ()
             {
-                Expect("\"");
+                Expect ("\"");
 
                 var sb = new StringBuilder();
 
-                for (; _offset < _text.Length; _offset++)
-                {
-                    var c = _text[_offset];
+                for (; _offset < _text.Length; _offset++) {
+                    var c = _text [_offset];
 
-                    if (c == '\\')
-                    {
+                    if (c == '\\') {
                         // Escaped character
                         _offset++;
-                        if (_offset >= _text.Length)
-                        {
+                        if (_offset >= _text.Length) {
                             throw new Exception("Unexpected EOF while reading string");
                         }
                         c = _text[_offset];
@@ -196,19 +191,15 @@ namespace Ink.Runtime
                                 break;
                             case 'u':
                                 // 4-digit Unicode
-                                if (_offset + 4 >= _text.Length)
-                                {
+                                if (_offset + 4 >=_text.Length) {
                                     throw new Exception("Unexpected EOF while reading string");
                                 }
                                 var digits = _text.Substring(_offset + 1, 4);
                                 int uchar;
-                                if (int.TryParse(digits, System.Globalization.NumberStyles.AllowHexSpecifier, System.Globalization.CultureInfo.InvariantCulture, out uchar))
-                                {
+                                if (int.TryParse(digits, System.Globalization.NumberStyles.AllowHexSpecifier, System.Globalization.CultureInfo.InvariantCulture, out uchar)) {
                                     sb.Append((char)uchar);
                                     _offset += 4;
-                                }
-                                else
-                                {
+                                } else {
                                     throw new Exception("Invalid Unicode escape character at offset " + (_offset - 1));
                                 }
                                 break;
@@ -216,66 +207,55 @@ namespace Ink.Runtime
                                 // The escaped character is invalid per json spec
                                 throw new Exception("Invalid Unicode escape character at offset " + (_offset - 1));
                         }
-                    }
-                    else if (c == '"')
-                    {
+                    } else if( c == '"' ) {
                         break;
-                    }
-                    else
-                    {
+                    } else {
                         sb.Append(c);
                     }
                 }
 
-                Expect("\"");
+                Expect ("\"");
                 return sb.ToString();
             }
 
-            object ReadNumber()
+            object ReadNumber ()
             {
                 var startOffset = _offset;
 
                 bool isFloat = false;
-                for (; _offset < _text.Length; _offset++)
-                {
-                    var c = _text[_offset];
+                for (; _offset < _text.Length; _offset++) {
+                    var c = _text [_offset];
                     if (c == '.' || c == 'e' || c == 'E') isFloat = true;
-                    if (IsNumberChar(c))
+                    if (IsNumberChar (c))
                         continue;
                     else
                         break;
                 }
 
-                string numStr = _text.Substring(startOffset, _offset - startOffset);
+                string numStr = _text.Substring (startOffset, _offset - startOffset);
 
-                if (isFloat)
-                {
+                if (isFloat) {
                     float f;
-                    if (float.TryParse(numStr, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out f))
-                    {
+                    if (float.TryParse (numStr, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out f)) {
                         return f;
                     }
-                }
-                else
-                {
+                } else {
                     int i;
-                    if (int.TryParse(numStr, out i))
-                    {
+                    if (int.TryParse (numStr, out i)) {
                         return i;
                     }
                 }
 
-                throw new System.Exception("Failed to parse number value: " + numStr);
+                throw new System.Exception ("Failed to parse number value: "+numStr);
             }
 
-            bool TryRead(string textToRead)
+            bool TryRead (string textToRead)
             {
                 if (_offset + textToRead.Length > _text.Length)
                     return false;
-
-                for (int i = 0; i < textToRead.Length; i++)
-                {
-                    if (textToRead[i] != _text[_offset + i])
+                
+                for (int i = 0; i < textToRead.Length; i++) {
+                    if (textToRead [i] != _text [_offset + i])
                         return false;
                 }
 
@@ -284,35 +264,30 @@ namespace Ink.Runtime
                 return true;
             }
 
-            void Expect(string expectedStr)
+            void Expect (string expectedStr)
             {
-                if (!TryRead(expectedStr))
-                    Expect(false, expectedStr);
+                if (!TryRead (expectedStr))
+                    Expect (false, expectedStr);
             }
 
-            void Expect(bool condition, string message = null)
+            void Expect (bool condition, string message = null)
             {
-                if (!condition)
-                {
-                    if (message == null)
-                    {
+                if (!condition) {
+                    if (message == null) {
                         message = "Unexpected token";
-                    }
-                    else
-                    {
+                    } else {
                         message = "Expected " + message;
                     }
                     message += " at offset " + _offset;
 
-                    throw new System.Exception(message);
+                    throw new System.Exception (message);
                 }
             }
 
-            void SkipWhitespace()
+            void SkipWhitespace ()
             {
-                while (_offset < _text.Length)
-                {
-                    var c = _text[_offset];
+                while (_offset < _text.Length) {
+                    var c = _text [_offset];
                     if (c == ' ' || c == '\t' || c == '\n' || c == '\r')
                         _offset++;
                     else
@@ -494,22 +469,15 @@ namespace Ink.Runtime
                 // _writer.Write(formatStr, obj (the float)) requires boxing
                 // Following implementation seems to work ok but requires creating temporary garbage string.
                 string floatStr = f.ToString(System.Globalization.CultureInfo.InvariantCulture);
-                if (floatStr == "Infinity")
-                {
+                if( floatStr == "Infinity" ) {
                     _writer.Write("3.4E+38"); // JSON doesn't support, do our best alternative
-                }
-                else if (floatStr == "-Infinity")
-                {
+                } else if (floatStr == "-Infinity") {
                     _writer.Write("-3.4E+38"); // JSON doesn't support, do our best alternative
-                }
-                else if (floatStr == "NaN")
-                {
+                } else if ( floatStr == "NaN" ) {
                     _writer.Write("0.0"); // JSON doesn't support, not much we can do
-                }
-                else
-                {
+                } else {
                     _writer.Write(floatStr);
-                    if (!floatStr.Contains(".") && !floatStr.Contains("E"))
+                    if (!floatStr.Contains(".") && !floatStr.Contains("E")) 
                         _writer.Write(".0"); // ensure it gets read back in as a floating point value
                 }
             }
@@ -676,3 +644,4 @@ namespace Ink.Runtime
 
     }
 }
+
