@@ -30,6 +30,15 @@ namespace Gameplay.Dog
         [Tooltip("Distance between player and dog, when dog's speed is max.")]
         [SerializeField] private float _maxDistance;
 
+        [Header("Bark Settings")]
+        public float MaxBarkDistance = 10f;
+        public float BarkAngle = 90f;
+        public float BarkCooldown = 2f;
+        public LayerMask ScareableMask;
+
+        [Header("Debug")]
+        public bool DrawBarkArea = false;
+
 
         public event UnityAction<DogConfig> OnValueChanged;
 

@@ -42,12 +42,15 @@ namespace Gameplay.Dog
             stateManager.Initialize(_movementController, _dogAnimator, _heardZone, _playerTransform, _config);
 
             _config.OnValueChanged += UpdateValues;
+            UpdateValues(_config);
         }
 
         private void UpdateValues(DogConfig config)
         {
             _movementController.UpdateValues(config);
             _dogAnimator.UpdateAnimationValues(config);
+            var bark = GetComponent<DogBark>();
+            bark.Initialize(config);
 
         }
 
