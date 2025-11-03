@@ -4,17 +4,27 @@ public class ApplyForceBrick : MonoBehaviour
 {
     Rigidbody rb;
     public bool isLeft = false;
-    void Start()
+    public WallBreakTrigger wallBreak;
+
+
+    public void Update()
+    {
+        if (wallBreak.forceApplied)
+        {
+            ForceApplied();
+            wallBreak.forceApplied = false;
+        }
+    }
+    public void ForceApplied()
     {
         rb = GetComponent<Rigidbody>();
         if (isLeft)
-        {
-            rb.AddForce(Vector3.left * 20, ForceMode.Impulse);
-            return;
+        {   
+            rb.AddRelativeForce(Vector3.left * 1000, ForceMode.Impulse);
         }
         else
         {
-            rb.AddForce(Vector3.right * 20, ForceMode.Impulse);
+            rb.AddRelativeForce(Vector3.right * 1000, ForceMode.Impulse);
         }
     }
 }
