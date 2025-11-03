@@ -45,6 +45,7 @@ namespace Gameplay.Dog
 
             onDogBark?.Invoke(); // trigger animation/sound via UnityEvent
 
+
             Collider[] hits = Physics.OverlapSphere(transform.position, _config.MaxBarkDistance, _config.ScareableMask);
 
             foreach (Collider hit in hits)
