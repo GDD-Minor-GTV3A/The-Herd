@@ -3,6 +3,8 @@ using UnityEngine.AI;
 using Phantom;
 using Core;
 
+using Team_7.Scripts.AI.Phantom;
+
 namespace AI.Phantom.States
 {
     public class WanderingState : PhantomState

@@ -1,15 +1,26 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
+
+using AI;
+using AI.Phantom;
+using AI.Phantom.States;
+
 using Core;
 using Core.Shared.StateMachine;
-using Phantom;
-
-using Random = UnityEngine.Random;
-using AI.Phantom.States;
 using Core.Shared.Utilities;
 
-namespace AI.Phantom
+using Phantom;
+
+using Team_7.Scripts.AI.Phantom.States;
+
+using Unity.VisualScripting;
+
+using UnityEngine;
+
+using IState = Core.Shared.StateMachine.IState;
+using Random = UnityEngine.Random;
+
+namespace Team_7.Scripts.AI.Phantom
 {
     public class PhantomStateManager : CharacterStateManager<IState>
     {
@@ -23,6 +34,8 @@ namespace AI.Phantom
         private Transform _playerTransform;
         private GameObject _playerObject;
         private float _startedLooking;
+        private float _lastCloneSpawn;
+        private List<PhantomFake> _clones = new();
 
         public void Initialize()
         {
@@ -67,12 +80,31 @@ namespace AI.Phantom
             }
 
             _currentHealth = stats.health;
+            
+            //TODO Do this in a different way
+            if (stats.damage > 0 )
+                SpawnClones(stats.initialCloneAmount);
+
             SetState<WanderingState>();
         }
 
         protected override void Update()
         {
             base.Update();
+
+            if (!GetComponent<PhantomFake>())
+            {
+                if (_lastCloneSpawn + stats.cloneSpawnDelay < Time.time && _lastCloneSpawn != 0)
+                {
+                    SpawnClones(1);
+                }
+            }
+            
+            //TODO move this logic somewhere else(PhantomClone.cs)
+            // Only make the enemy take damage from being looked at if stunned and a clone
+            if (stats.damage <= 0 || _currentState is not StunnedState)
+                return;
+            
             _playerTransform = _playerObject.transform;
 
             var playerTransform = _playerTransform;
@@ -122,13 +154,25 @@ namespace AI.Phantom
 
         public void CancelCharging()
         {
-            if (!_chargingProjectile.IsLaunched())
-                Destroy(_chargingProjectile);
+            if (!_chargingProjectile.IsLaunched() && _chargingProjectile != null)
+                Destroy(_chargingProjectile.gameObject);
             
             _chargingProjectile = null;
         }
 
         private void Respawn()
+        {
+            DestroyClones();
+            transform.position += GenerateRandomSpawn();
+
+            //TODO Do this in a different way
+            if (stats.damage > 0 )
+                SpawnClones(stats.initialCloneAmount);
+
+            SetState<WanderingState>();
+        }
+
+        private Vector3 GenerateRandomSpawn()
         {
             // Pick a random direction on the unit sphere
             Vector3 randomDirection = Random.onUnitSphere;
@@ -136,8 +180,50 @@ namespace AI.Phantom
             // Pick a random distance between min and max
             float randomDistance = Random.Range(stats.minRespawnDistance, stats.maxRespawnDistance);
             
-            transform.position += randomDirection * randomDistance;
-            SetState<WanderingState>();
+            return randomDirection * randomDistance;
+        }
+
+        //TODO Replace this with a listener for dog barking
+        private void OnCollisionEnter(Collision collision)
+        {
+            if (stats.damage <= 0)
+                return;
+            
+            if (collision.gameObject.CompareTag("Player"))
+            {
+                _currentHealth -= 1;
+                if (_currentHealth > 0)
+                    Respawn();
+                else
+                {
+                    DestroyClones();
+                    Destroy(gameObject);
+                }
+            }
+        }
+
+        public void SpawnClones(int amount)
+        {
+            for (int i = 0; i < amount; i++)
+            {
+                var clone = Instantiate(stats.fake, transform.position, transform.rotation);
+                _clones.Add(clone);
+                clone.transform.position += GenerateRandomSpawn();
+            }
+
+            _lastCloneSpawn = Time.time;
+        }
+
+        public void DestroyClones()
+        {
+            foreach (var clone in _clones)
+            {
+                if (!clone.gameObject.IsDestroyed()){
+                {
+                    Destroy(clone.gameObject);
+                }}
+            }
+            _clones.Clear();
         }
 
         //TODO replace the way the player is found

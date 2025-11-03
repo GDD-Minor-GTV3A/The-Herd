@@ -2,6 +2,10 @@ using UnityEngine;
 using Phantom;
 using Core;
 
+using Team_7.Scripts.AI.Phantom;
+
+using Unity.VisualScripting;
+
 namespace AI.Phantom.States
 {
     public class ShootingState : PhantomState
@@ -30,7 +34,7 @@ namespace AI.Phantom.States
         public override void OnUpdate()
         {
             _movement.LookAt(_manager.GetPlayerTransform().position);
-            if (Time.time - _chargeStart > _stats.chargeDuration && !projectile.IsLaunched())
+            if (Time.time - _chargeStart > _stats.chargeDuration && !projectile.IsLaunched() && !projectile.IsDestroyed())
             {
                 projectile.Launch();
                 _animator.SetThrowing(true);
