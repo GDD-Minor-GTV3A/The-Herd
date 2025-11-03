@@ -37,3 +37,16 @@ If it's not behaving as described above, or you got any other questions, feel fr
 /////////
 End of Sprint 2
 ////////
+
+
+/////////
+Sprint 3
+////////
+1. The projectile shot by the Phantom enemy should now deal 1 damage, only the one shot by the real phantom deals damage, projectiles shot by the fake clones deal 0 damage.
+2. The phantom enemy now spawns 4 fake clones that behave and look identical to a real one, the only difference is that the fake ones deal no damage. It continues spawning more fake ones until defeated, all fake versions disappear when the main phantom loses health.
+3. Currently the real phantom takes damage by the player walking into it, this will require the Phantom to be stunned first in the future, which should happen if the dog barks nearby.
+If the player team implemented barking this sprint(I couldn't find any barking related stuff on their branch), please contact me so I can make it react to that instead. 
+All code to make the phantom first be stunned before being able to be damaged already exists, so the phantom only needs to be set to the stunned state if the dog barks nearby(and the stunned state condition needs to be added to the if statement at line 187 in PhantomStateManager.cs).
+/////////
+End of Sprint 3
+////////

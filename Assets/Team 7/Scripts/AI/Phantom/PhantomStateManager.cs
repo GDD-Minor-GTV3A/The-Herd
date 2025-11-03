@@ -183,7 +183,8 @@ namespace Team_7.Scripts.AI.Phantom
             if (stats.damage <= 0)
                 return;
             
-            if (collision.gameObject.CompareTag("Player"))
+            // TODO && _currentState is StunnedState, add this to the if statement once dog barking is added and the ghost can be stunned by the barking.
+            if (collision.gameObject.CompareTag("Player")) //Change this to a "Dog" tag if it's added to the dog, or if the dog's bark is added please contact me so I can 
             {
                 _currentHealth -= 1;
                 if (_currentHealth > 0)
