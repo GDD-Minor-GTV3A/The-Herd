@@ -34,6 +34,7 @@ public class Rifle : MonoBehaviour, IPlayerTool
     private PlayerAnimator playerAnimator;
     private BulletPool bulletPool;
 
+    public int CurrentAmmo => currentAmmo;
 
     public void Initialize(PlayerAnimator animator)
     {
