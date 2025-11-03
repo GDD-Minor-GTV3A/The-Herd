@@ -1,6 +1,4 @@
 using Core.Events;
-using Core.Shared;
-
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -10,7 +8,10 @@ namespace Gameplay.Dog
     public class DogBark : MonoBehaviour
     {
         [SerializeField] private UnityEvent onDogBark;
-        
+
+        [Header("Debug")]
+        [SerializeField] private bool drawBarkArea = false;
+
         private DogConfig _config;
 
         private float _lastBarkTime;
@@ -62,7 +63,7 @@ namespace Gameplay.Dog
                 }
             }
 
-            if (_config.DrawBarkArea)
+            if (drawBarkArea)
                 DrawDebugBarkZone();
         }
 

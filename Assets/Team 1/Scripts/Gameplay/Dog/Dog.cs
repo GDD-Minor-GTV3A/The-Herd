@@ -23,6 +23,7 @@ namespace Gameplay.Dog
 
         private DogMovementController _movementController;
         private DogAnimator _dogAnimator;
+        private DogBark bark;
 
 
         /// <summary>
@@ -38,6 +39,9 @@ namespace Gameplay.Dog
 
             _dogAnimator = new DogAnimator(_animator, _config);
 
+            bark = GetComponent<DogBark>();
+            bark.Initialize(_config);
+
             DogStateManager stateManager = GetComponent<DogStateManager>();
             stateManager.Initialize(_movementController, _dogAnimator, _heardZone, _playerTransform, _config);
 
@@ -49,9 +53,8 @@ namespace Gameplay.Dog
         {
             _movementController.UpdateValues(config);
             _dogAnimator.UpdateAnimationValues(config);
-            var bark = GetComponent<DogBark>();
-            bark.Initialize(config);
 
+            bark.Initialize(_config);
         }
 
         // for test, needs to be moved to bootstrap

@@ -1,5 +1,3 @@
-using Codice.Client.Common.GameUI;
-
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -31,13 +29,15 @@ namespace Gameplay.Dog
         [SerializeField] private float _maxDistance;
 
         [Header("Bark Settings")]
-        public float MaxBarkDistance = 10f;
-        public float BarkAngle = 90f;
-        public float BarkCooldown = 2f;
-        public LayerMask ScareableMask;
-
-        [Header("Debug")]
-        public bool DrawBarkArea = false;
+        [Tooltip("Max distance of bark.")]
+        [SerializeField] private float _maxBarkDistance = 10f;
+        [Tooltip("Angle of bark effect.")]
+        [SerializeField] private float _barkAngle = 90f;
+        [Tooltip("Cooldown between barks.")]
+        [SerializeField] private float _barkCooldown = 2f;
+        [Tooltip("Physics layers of objects that can be scared.")]
+        [SerializeField] private LayerMask _scareableMask;
+        
 
 
         public event UnityAction<DogConfig> OnValueChanged;
@@ -72,6 +72,12 @@ namespace Gameplay.Dog
         /// Distance between player and dog, when dog's speed is max.
         /// </summary>
         public float MaxDistance => _maxDistance;
+
+
+        public float MaxBarkDistance => _maxBarkDistance;
+        public float BarkAngle => _barkAngle;
+        public float BarkCooldown => _barkCooldown;
+        public LayerMask ScareableMask => _scareableMask;
 
 
         private void OnValidate()
