@@ -7,7 +7,7 @@ using Core.AI.Sheep;
 namespace Gameplay.Dog
 {
     [RequireComponent(typeof(Collider))]
-    public class HeardZone : MonoBehaviour
+    public class HerdZone : MonoBehaviour
     {
         [Header("Herding Settings")]
         [SerializeField] private bool joinIfOutside = true;

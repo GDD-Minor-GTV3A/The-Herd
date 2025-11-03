@@ -12,7 +12,7 @@ namespace Gameplay.Dog
         [Tooltip("Transform of player object to follow.")]
         [SerializeField] private Transform _playerTransform;
         [Tooltip("Heard zone reference.")]
-        [SerializeField] private HeardZone _heardZone;
+        [SerializeField] private HerdZone _heardZone;
         [Tooltip("Manager of step sounds.")]
         [SerializeField] private StepsSoundManager _stepsSoundManager;
         [Tooltip("Animator of the dog.")]
