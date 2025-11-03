@@ -153,4 +153,8 @@ public class Rifle : MonoBehaviour, IPlayerTool
         animator.SetFloat("BoltCycleSpeed", 1 / config.BoltCycleTime);
         animator.SetFloat("ReloadSpeed", 1 / config.ReloadTime);
     }
+
+    public void TryBark()
+    {
+    }
 }
