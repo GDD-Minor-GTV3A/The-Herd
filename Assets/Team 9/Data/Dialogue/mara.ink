@@ -176,13 +176,16 @@ Mara picks up a sheep skull from the corner. Her hands tremble as she carves pag
 It is done. The effigy breathes now.  
 You must carry it to the altar, north of the village. Cast it into the frozen water, or the hunger of winter will never end.
 
-+ [And if I refuse?]
-    #speaker:Mara
-    Then you will feed her with your flock… and your soul.
-    ~ CompleteObjective("QUEST_002", "NPC_MARA_STAGE_1")
-    ~ all_QUEST_002_objectives_completed = true
-    -> END
+#speaker:Player
+And if I refuse?
 
+#speaker:Mara
+Then you will feed her with your flock… and your soul.
+~ CompleteObjective("QUEST_002", "NPC_MARA_STAGE_1")
+~ all_QUEST_002_objectives_completed = true
+-> END
+
+    
 
 
 = quest_completed_dialogue
@@ -196,10 +199,12 @@ The sheep panic. The dog refuses to approach. Mara appears near the altar.
 #speaker:Mara
 Throw it into the water… let her wake.
 
-+ [And if I don’t?]
-    #speaker:Mara
-    Then the frost will claim you… one breath at a time.
--
+#speaker:Player
+And if I don't?
+
+#speaker:Mara
+Then the frost will claim you… one breath at a time.
+
 
 #speaker:Narrator
 The player casts the effigy into the frozen waters.  
