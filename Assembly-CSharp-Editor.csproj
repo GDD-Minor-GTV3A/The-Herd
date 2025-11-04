@@ -1396,9 +1396,17 @@
       <Project>{BC34C984-9886-2822-5D0D-5BB1AE478F6F}</Project>
       <Name>Team1</Name>
     </ProjectReference>
+    <ProjectReference Include="Core.Shared.Editor.csproj">
+      <Project>{BBCF919E-F925-DDA1-F691-A3B10A4B7D60}</Project>
+      <Name>Core.Shared.Editor</Name>
+    </ProjectReference>
     <ProjectReference Include="Events.csproj">
       <Project>{E65029FA-14DF-2913-D2FD-13670D85E867}</Project>
       <Name>Events</Name>
+    </ProjectReference>
+    <ProjectReference Include="Core.Shared.csproj">
+      <Project>{24B79E9B-F40C-A357-D73B-AB53B38AE6EC}</Project>
+      <Name>Core.Shared</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

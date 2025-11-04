@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Serialization;
 
+#nullable enable // Chris: This needs to be added for nullable values to work. Otherwise it will show a warning
 namespace Team_7.Scripts.AI.Phantom
 {
     [CreateAssetMenu(fileName = "PhantomStats", menuName = "Scriptable Objects/PhantomStats")]
@@ -14,7 +15,7 @@ namespace Team_7.Scripts.AI.Phantom
         [Tooltip("The amount of seconds between spawning a new clone while in the shooting state")]
         public float cloneSpawnDelay = 5;
         [FormerlySerializedAs("clone")] [Tooltip("The clone prefab")]
-        public PhantomFake fake;
+        public PhantomFake? fake; // Chris: Made this nullable to avoid a warning. You can delete this comment once its fixed.
         [Tooltip("How long the player should continuously look at the enemy before it loses 1 health.")]
         public float lookDuration = 2;
         [Tooltip("The minimum distance from it's previous location the enemy will respawn at.")]
@@ -46,7 +47,7 @@ namespace Team_7.Scripts.AI.Phantom
 
         [Header("Projectile Settings")] 
         [Tooltip("The projectile prefab")]
-        public PhantomProjectile projectile;
+        public PhantomProjectile? projectile; // Chris: Made this nullable to avoid a warning. You can delete this comment once its fixed.
         [Tooltip("The scale of the projectile after it is fully charged")]
         public Vector3 maxProjectileScale = new (0.35f, 0.35f, 0.35f);
         [Tooltip("The amount of damage the projectile does to the player whenever it hits.")]

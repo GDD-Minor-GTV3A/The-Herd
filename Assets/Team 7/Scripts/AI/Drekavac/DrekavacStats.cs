@@ -1,5 +1,6 @@
 using UnityEngine;
 
+#nullable enable // Chris: This needs to be added for nullable values to work. Otherwise it will show a warning
 namespace Team_7.Scripts.AI.Drekavac
 {
     /// <summary>

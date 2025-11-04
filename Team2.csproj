@@ -70,6 +70,7 @@
     <Compile Include="Assets\Team 2\Scripts\AI\SheepStates.cs" />
     <Compile Include="Assets\Team 2\Scripts\AI\FlockingUtility.cs" />
     <Compile Include="Assets\Team 2\Scripts\AI\ThreatSensor.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\SheepSanity.cs" />
     <Compile Include="Assets\Team 2\Scripts\AI\Personality\Types\NervousPersonality.cs" />
     <Compile Include="Assets\Team 2\Scripts\AI\Personality\BaseSheepPersonality.cs" />
     <Compile Include="Assets\Team 2\Scripts\EventDemoSimulator.cs" />
@@ -1133,6 +1134,10 @@
     <ProjectReference Include="Events.csproj">
       <Project>{E65029FA-14DF-2913-D2FD-13670D85E867}</Project>
       <Name>Events</Name>
+    </ProjectReference>
+    <ProjectReference Include="Core.Shared.csproj">
+      <Project>{24B79E9B-F40C-A357-D73B-AB53B38AE6EC}</Project>
+      <Name>Core.Shared</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
