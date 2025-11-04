@@ -20,7 +20,9 @@ namespace Team_7.Scripts.AI.Drekavac
         private EnemyMovementController _enemyMovementController;
         private DrekavacAnimatorController _drekavacAnimatorController;
         private GameObject _playerObject;
+        private GameObject _dogObject;
         private Vector3 _playerLocation;
+        private Vector3 _dogLocation;
         private Transform _grabPoint = null!;
         private GameObject _grabbedObject;
         private Rigidbody _grabbedObjectRb;
@@ -55,6 +57,9 @@ namespace Team_7.Scripts.AI.Drekavac
             _playerObject = GameObject.FindGameObjectWithTag("Player");
             _playerLocation = _playerObject.transform.position;
 
+            _dogObject = GameObject.Find("Dog");
+            _dogLocation = _dogObject.transform.position;
+
             // Find sheep
             // TODO replace this
             _sheep = GameObject.FindGameObjectsWithTag("Sheep");
@@ -83,7 +88,8 @@ namespace Team_7.Scripts.AI.Drekavac
         {
             base.Update();
             _playerLocation = _playerObject.transform.position;
-            if (_currentState is not FleeingState && _currentState is not BigState && Vector3.Distance(transform.position, _playerLocation) <= _drekavacStats.fleeTriggerDistance)
+            _dogLocation = _dogObject.transform.position;
+            if (_currentState is not FleeingState && _currentState is not BigState && (Vector3.Distance(transform.position, _playerLocation) <= _drekavacStats.fleeTriggerDistance || Vector3.Distance(transform.position, _dogLocation) <= _drekavacStats.fleeTriggerDistance))
                 Flee();
         }
 
