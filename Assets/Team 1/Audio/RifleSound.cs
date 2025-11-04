@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class RifleAudio : MonoBehaviour
 {
-    [SerializeField] private AudioSource audioSource; // Assign an AudioSource in Inspector
-    [SerializeField] private AudioClip shotClip;      // Assign your gunshot clip
+    [SerializeField] private AudioSource audioSource; 
+    [SerializeField] private AudioClip shotClip;      
     public void PlayShot()
     {
         if (audioSource != null && shotClip != null)

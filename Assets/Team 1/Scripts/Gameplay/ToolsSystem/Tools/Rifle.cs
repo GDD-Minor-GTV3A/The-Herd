@@ -23,6 +23,9 @@ public class Rifle : MonoBehaviour, IPlayerTool
     [Space]
     [SerializeField] private UnityEvent onShot;
 
+    [SerializeField] private AudioSource audioSource;   
+    [SerializeField] private AudioClip reloadClip;      
+
 
     // --- Runtime State ---
     private int currentAmmo;
@@ -125,6 +128,11 @@ public class Rifle : MonoBehaviour, IPlayerTool
         if (currentAmmo == config.MaxAmmo) yield break;
 
         animator.SetTrigger("Reload");
+
+        if (audioSource != null && reloadClip != null)
+        {
+            audioSource.PlayOneShot(reloadClip);
+        }
 
         canFire = false;
         isReloading = true;

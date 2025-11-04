@@ -3,17 +3,17 @@ using TMPro;
 
 public class AmmoDisplay : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI ammoText; // drag your TMP text here in the Inspector
-    [SerializeField] private Rifle rifle;              // reference to the script that holds the ammo value
+    [SerializeField] private TextMeshProUGUI ammoText; 
+    [SerializeField] private Rifle rifle;              
 
     private void Start()
     {
-        UpdateAmmoText(); // set initial value
+        UpdateAmmoText(); 
     }
 
     private void Update()
     {
-        UpdateAmmoText(); // update every frame (simple)
+        UpdateAmmoText(); 
     }
 
     private void UpdateAmmoText()
