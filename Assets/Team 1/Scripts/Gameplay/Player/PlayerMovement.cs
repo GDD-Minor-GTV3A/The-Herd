@@ -18,6 +18,8 @@ namespace Gameplay.Player
         private float _runSpeed;
         private float _gravity;
 
+        private float _rotationSpeed;
+
         private float _verticalVelocity = 0f;
 
 
@@ -38,6 +40,27 @@ namespace Gameplay.Player
         public override void MoveTo(Vector3 target)
         {
             _controller.Move(target);
+        }
+
+
+        public void Rotate(Vector3 input)
+        {
+            if (input.sqrMagnitude < 0.0001f)
+                return;
+
+            Vector3 forward = _camera.transform.forward;
+            Vector3 right = _camera.transform.right;
+
+            forward.y = 0f;
+            right.y = 0f;
+
+            forward.Normalize();
+            right.Normalize();
+
+            Vector3 move = forward * input.y + right * input.x;
+
+            Quaternion targetRotation = Quaternion.LookRotation(move);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, _rotationSpeed * Time.deltaTime);
         }
 
 
@@ -99,6 +122,7 @@ namespace Gameplay.Player
             _walkSpeed = config.WalkSpeed;
             _runSpeed = config.RunSpeed;
             _gravity = config.Gravity;
+            _rotationSpeed = config.RotationSpeed;
         }
     }
 }
