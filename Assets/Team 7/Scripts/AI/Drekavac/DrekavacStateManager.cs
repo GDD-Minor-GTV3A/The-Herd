@@ -103,6 +103,7 @@ namespace Team_7.Scripts.AI.Drekavac
         
         private void GrabObject(GameObject grabbedObject)
         {
+            Debug.Log(gameObject.name + " is grabbing " + grabbedObject.name); // Chris: Temporary debug to check if the enemy gets the sheep
             if (grabbedObject == null) return;
             CreateGrabPoint();
             //IMP02 CODE FOR DISABELING SHEEP AI WHEN GRABBED
