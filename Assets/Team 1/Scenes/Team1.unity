@@ -3757,7 +3757,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 070f8cd4afa946b4f855b4eab69417c1, type: 3}
   - {fileID: 8300000, guid: 2b4c2319175750a49ab05a4bcb1423f0, type: 3}
   - {fileID: 8300000, guid: 53d9e363acd148841919876c8f7cfbdd, type: 3}
-  minPitch: 0.5
+  minPitch: 0.75
   maxPitch: 1
 --- !u!82 &1813006626
 AudioSource:
@@ -3772,7 +3772,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.14
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -4143,6 +4143,10 @@ PrefabInstance:
     - target: {fileID: 2534532970623172728, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
       propertyPath: OnDamageTaken.m_PersistentCalls.m_Calls.Array.data[3].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 2630018077343924956, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5609012314165025320, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
       propertyPath: slotUIRoots.Array.size
