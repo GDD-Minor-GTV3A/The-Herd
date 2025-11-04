@@ -1,7 +1,6 @@
 using UnityEngine;
-using Core;
 
-namespace AI.Drekavac.States
+namespace Team_7.Scripts.AI.Drekavac.States
 {
     /// <summary>
     ///     Handles the behavior of an enemy while it's trying to home in on a target.

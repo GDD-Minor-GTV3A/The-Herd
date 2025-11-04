@@ -3,7 +3,7 @@ using Core.Shared;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace AI
+namespace Team_7.Scripts.AI
 {
     [RequireComponent(typeof(NavMeshAgent))]
     public class EnemyMovementController : MovementController

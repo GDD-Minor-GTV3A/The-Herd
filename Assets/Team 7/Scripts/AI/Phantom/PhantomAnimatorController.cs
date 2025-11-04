@@ -1,7 +1,8 @@
-using UnityEngine;
 using Core.Shared;
 
-namespace AI.Phantom
+using UnityEngine;
+
+namespace Team_7.Scripts.AI.Phantom
 {
     public class PhantomAnimatorController : AnimatorController
     {
