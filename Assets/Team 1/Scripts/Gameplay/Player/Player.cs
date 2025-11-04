@@ -31,6 +31,10 @@ namespace Gameplay.Player
         [SerializeField, Required] private PlayerVignetteEffect vignetteEffect;
 
         [Space]
+        [Header("UI")]
+        [SerializeField, Required] private HPBar hpBar;
+
+        [Space]
         [Tooltip("Manager of step sounds.")]
         [SerializeField] private StepsSoundManager stepsSoundManager;
         [Tooltip("Reference to input actions map.")]
@@ -104,6 +108,7 @@ namespace Gameplay.Player
             
             dmgEffect.Initialize();
             vignetteEffect.Initialize();
+            hpBar.Initialize(_health);
         }
 
 
