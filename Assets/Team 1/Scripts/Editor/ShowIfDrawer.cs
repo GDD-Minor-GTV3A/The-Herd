@@ -2,6 +2,9 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
+// Chris: Putting if EDITOR to avoid compile errors while building the game.
+// Chris: I'm aware that Unity should skip these if they are in 'Editor' folder, but for some reason it doesn't do that.
+#if EDITOR
 namespace CustomEditor.Attributes
 {
     [CustomPropertyDrawer(typeof(ShowIfAttribute))]
@@ -64,3 +67,5 @@ namespace CustomEditor.Attributes
         }
     }
 }
+
+#endif
