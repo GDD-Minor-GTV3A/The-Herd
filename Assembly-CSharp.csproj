@@ -66,6 +66,7 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextEventHandler.cs" />
     <Compile Include="Assets\Team 6\Scripts\AI\LookAtPlayer.cs" />
     <Compile Include="Assets\Team 7\Scripts\AI\Drekavac\States\HuntingState.cs" />
+    <Compile Include="Assets\Team 7\Scripts\AI\Phantom\PhantomFake.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\EnvMapAnimator.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextSelector_A.cs" />
     <Compile Include="Assets\Team 1\Audio\DamageSound.cs" />
@@ -82,7 +83,6 @@
     <Compile Include="Assets\Team 1\Audio\RifleSound.cs" />
     <Compile Include="Assets\Team 9\Scripts\Gameplay\Quests\ObjectiveTrigger.cs" />
     <Compile Include="Assets\Team 6\Scripts\AI\Node.cs" />
-    <Compile Include="Assets\Team 6\Scripts\AI\SheepSanity.cs" />
     <Compile Include="Assets\Team 8\Scripts\Core\Economy\CurrencyUI.cs" />
     <Compile Include="Assets\Team 6\Scripts\AI\DetectSheep.cs" />
     <Compile Include="Assets\Team 9\Scripts\UI\Quest\QuestLogUI.cs" />
@@ -126,6 +126,8 @@
     <Compile Include="Assets\Team 3\Scripts\Core\BackgroundMusicHandler.cs" />
     <Compile Include="Assets\Team 7\Scripts\AI\Drekavac\States\DraggingState.cs" />
     <Compile Include="Assets\Team 7\Scripts\AI\Drekavac\States\DrekavacState.cs" />
+    <Compile Include="Assets\Team 7\Scripts\AI\Phantom\States\StunnedState.cs" />
+    <Compile Include="Assets\Team 7\Scripts\AI\Drekavac\States\BigState.cs" />
     <Compile Include="Assets\Team 10\Scripts\SheepPenZone.cs" />
     <Compile Include="Assets\Team 7\Scripts\AI\Phantom\PhantomStateManager.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01_UGUI.cs" />
@@ -1487,6 +1489,14 @@
     <ProjectReference Include="Team1.csproj">
       <Project>{BC34C984-9886-2822-5D0D-5BB1AE478F6F}</Project>
       <Name>Team1</Name>
+    </ProjectReference>
+    <ProjectReference Include="Core.Shared.csproj">
+      <Project>{24B79E9B-F40C-A357-D73B-AB53B38AE6EC}</Project>
+      <Name>Core.Shared</Name>
+    </ProjectReference>
+    <ProjectReference Include="Core.Shared.Editor.csproj">
+      <Project>{BBCF919E-F925-DDA1-F691-A3B10A4B7D60}</Project>
+      <Name>Core.Shared.Editor</Name>
     </ProjectReference>
     <ProjectReference Include="Events.csproj">
       <Project>{E65029FA-14DF-2913-D2FD-13670D85E867}</Project>
