@@ -4,7 +4,7 @@ using UnityEngine.Events;
 
 public class SpawnTrigger : MonoBehaviour
 {
-    [SerializeField] private Transform[] spawnPoints;
+    [SerializeField] private EnemySpawnpoint[] spawnPoints;
 
     [SerializeField] private SpawnTriggerEvent onSpawnTriggered;
 
@@ -28,4 +28,4 @@ public class SpawnTrigger : MonoBehaviour
 }
 
 [System.Serializable]
-public class SpawnTriggerEvent : UnityEvent<Transform[]> { }
+public class SpawnTriggerEvent : UnityEvent<EnemySpawnpoint[]> { }
