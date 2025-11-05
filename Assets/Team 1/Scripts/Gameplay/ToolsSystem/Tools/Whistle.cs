@@ -28,29 +28,29 @@ namespace Gameplay.ToolsSystem
 
         public void MainUsageFinished()
         {
-            _cursorWorldPosition.OnValueChanged -= SendDogMoveCommand;
-            _cursorWorldPosition = null;
         }
 
         public void MainUsageStarted(Observable<Vector3> cursorWorldPosition)
         {
-            _cursorWorldPosition = cursorWorldPosition;
-            SendDogMoveCommand();
-            _cursorWorldPosition.OnValueChanged += SendDogMoveCommand;
+            TryBark();
         }
 
         public void Reload()
         {
-            Debug.Log("Bark!!!");
+            EventManager.Broadcast(new DogFollowCommandEvent());
         }
 
         public void SecondaryUsageFinished()
         {
+            _cursorWorldPosition.OnValueChanged -= SendDogMoveCommand;
+            _cursorWorldPosition = null;
         }
 
         public void SecondaryUsageStarted(Observable<Vector3> cursorWorldPosition)
         {
-            EventManager.Broadcast(new DogFollowCommandEvent());
+            _cursorWorldPosition = cursorWorldPosition;
+            SendDogMoveCommand();
+            _cursorWorldPosition.OnValueChanged += SendDogMoveCommand;
         }
 
         public void ShowTool()
@@ -60,6 +60,11 @@ namespace Gameplay.ToolsSystem
         private void SendDogMoveCommand()
         {
             EventManager.Broadcast(new DogMoveCommandEvent(_cursorWorldPosition.Value));
+        }
+
+        public void TryBark()
+        {
+            EventManager.Broadcast(new DogBarkEvent());
         }
     }
 }

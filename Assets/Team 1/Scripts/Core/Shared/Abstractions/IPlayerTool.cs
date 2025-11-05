@@ -23,6 +23,7 @@ namespace Core.Shared
         /// </summary>
         public abstract void Reload();
 
+        public abstract void TryBark();
         /// <summary>
         /// Called when RMB pressed.
         /// </summary>

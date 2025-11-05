@@ -23,6 +23,9 @@ public class Rifle : MonoBehaviour, IPlayerTool
     [Space]
     [SerializeField] private UnityEvent onShot;
 
+    [SerializeField] private AudioSource audioSource;   
+    [SerializeField] private AudioClip reloadClip;      
+
 
     // --- Runtime State ---
     private int currentAmmo;
@@ -34,6 +37,7 @@ public class Rifle : MonoBehaviour, IPlayerTool
     private PlayerAnimator playerAnimator;
     private BulletPool bulletPool;
 
+    public int CurrentAmmo => currentAmmo;
 
     public void Initialize(PlayerAnimator animator)
     {
@@ -125,6 +129,11 @@ public class Rifle : MonoBehaviour, IPlayerTool
 
         animator.SetTrigger("Reload");
 
+        if (audioSource != null && reloadClip != null)
+        {
+            audioSource.PlayOneShot(reloadClip);
+        }
+
         canFire = false;
         isReloading = true;
         yield return new WaitForSeconds(config.ReloadTime);
@@ -152,5 +161,9 @@ public class Rifle : MonoBehaviour, IPlayerTool
         playerAnimator.GetTool(keyPoints);
         animator.SetFloat("BoltCycleSpeed", 1 / config.BoltCycleTime);
         animator.SetFloat("ReloadSpeed", 1 / config.ReloadTime);
+    }
+
+    public void TryBark()
+    {
     }
 }
