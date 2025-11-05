@@ -113,7 +113,7 @@ namespace Core.AI.Sheep
             Vector3 v = _agent.velocity;
             v.y = 0f;
             _animation.SetSpeed(v.magnitude);
-            Debug.Log("Set speed to: "  + v.magnitude);
+            // Debug.Log("Set speed to: "  + v.magnitude);    |   Chris: Commenting this out cuz it keeps sending log every frame which is annoying
         }
 
         private void OnEnable()
