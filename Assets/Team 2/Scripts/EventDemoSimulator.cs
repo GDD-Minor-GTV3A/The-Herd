@@ -1,6 +1,8 @@
 using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
+using Core.Events;
+using Core.AI.Sheep.Event;
 
 namespace Core.AI.Sheep
 {
@@ -33,6 +35,19 @@ namespace Core.AI.Sheep
         [SerializeField]
         [Tooltip("Offset from selected sheep for threat position")]
         private Vector3 _threatOffset = new Vector3(3f, 0f, 0f);
+
+        [Header("Spawn Settings")]
+        [SerializeField]
+        [Tooltip("Sheep prefab to spawn")]
+        private GameObject _sheepPrefab;
+
+        [SerializeField]
+        [Tooltip("Player transform for spawn position")]
+        private Transform _playerTransform;
+
+        [SerializeField]
+        [Tooltip("Offset from player for spawn position")]
+        private Vector3 _spawnOffset = new Vector3(2f, 2f, 0f);
 
         private int _selectedSheepIndex = 0;
         private float _hideTextAt;
@@ -75,9 +90,6 @@ namespace Core.AI.Sheep
                     case KeyCode.Tab:
                         SelectNextSheep();
                         break;
-                    case KeyCode.R:
-                        RefreshSheepList();
-                        break;
 
                     // Sheep-Specific Events
                     case KeyCode.F:
@@ -86,7 +98,13 @@ namespace Core.AI.Sheep
                     case KeyCode.T:
                         TriggerThreatDetected();
                         break;
-                    case KeyCode.H: // Help
+                    case KeyCode.K:
+                        KillSelectedSheep();
+                        break;
+                    case KeyCode.J:
+                        SpawnSheep();
+                        break;
+                    case KeyCode.H:
                         ShowHelp();
                         break;
                 }
@@ -194,19 +212,6 @@ namespace Core.AI.Sheep
             Debug.Log($"[EventDemo] Sheep{state} triggered on {_selectedSheep.name}");
         }
 
-        private void TriggerSheepUnfreeze()
-        {
-            if (_selectedSheep == null)
-            {
-                DisplayEventFeedback("<color=red>No sheep selected!</color>\nPress Tab to select a sheep");
-                return;
-            }
-
-            _selectedSheep.OnSheepUnfreeze();
-            DisplayEventFeedback($"<color=#00FFFFFF>Sheep Unfreeze</color>\nSheep: {_selectedSheep.name}\nState: Unfrozen");
-            Debug.Log($"[EventDemo] SheepUnfreeze triggered on {_selectedSheep.name}");
-        }
-
         private void TriggerThreatDetected()
         {
             if (_selectedSheep == null)
@@ -222,7 +227,7 @@ namespace Core.AI.Sheep
             Debug.Log($"[EventDemo] ThreatDetected triggered on {_selectedSheep.name} at position {threatPosition}");
         }
 
-        private void TriggerSeparatedFromHerd()
+        private void KillSelectedSheep()
         {
             if (_selectedSheep == null)
             {
@@ -230,35 +235,52 @@ namespace Core.AI.Sheep
                 return;
             }
 
-            _selectedSheep.OnSeparatedFromHerd();
-            DisplayEventFeedback($"<color=#FFA500FF>Separated From Herd</color>\nSheep: {_selectedSheep.name}");
-            Debug.Log($"[EventDemo] SeparatedFromHerd triggered on {_selectedSheep.name}");
+            string sheepName = _selectedSheep.name;
+            _selectedSheep.Remove();
+            _allSheep.Remove(_selectedSheep);
+            _selectedSheep = null;
+
+            DisplayEventFeedback($"<color=red>Sheep Death</color>\nKilled: {sheepName}");
+            Debug.Log($"[EventDemo] Sheep killed: {sheepName}");
+
+            // Select next sheep if available
+            if (_allSheep.Count > 0)
+            {
+                _selectedSheepIndex = Mathf.Min(_selectedSheepIndex, _allSheep.Count - 1);
+                SelectSheep(_selectedSheepIndex);
+            }
         }
 
-        private void TriggerRejoinedHerd()
+        private void SpawnSheep()
         {
-            if (_selectedSheep == null)
+            if (_sheepPrefab == null)
             {
-                DisplayEventFeedback("<color=red>No sheep selected!</color>\nPress Tab to select a sheep");
+                DisplayEventFeedback("<color=red>No sheep prefab assigned!</color>\nAssign prefab in inspector");
                 return;
             }
 
-            _selectedSheep.OnRejoinedHerd();
-            DisplayEventFeedback($"<color=#00FF00FF>Rejoined Herd</color>\nSheep: {_selectedSheep.name}");
-            Debug.Log($"[EventDemo] RejoinedHerd triggered on {_selectedSheep.name}");
-        }
-
-        private void TriggerPlayerAction(string actionType)
-        {
-            if (_selectedSheep == null)
+            if (_playerTransform == null)
             {
-                DisplayEventFeedback("<color=red>No sheep selected!</color>\nPress Tab to select a sheep");
+                DisplayEventFeedback("<color=red>No player transform assigned!</color>\nAssign transform in inspector");
                 return;
             }
 
-            _selectedSheep.OnPlayerAction(actionType);
-            DisplayEventFeedback($"<color=yellow>Player Action</color>\nSheep: {_selectedSheep.name}\nAction: {actionType}");
-            Debug.Log($"[EventDemo] PlayerAction '{actionType}' triggered on {_selectedSheep.name}");
+            Vector3 spawnPosition = _playerTransform.position + _playerTransform.forward * _spawnOffset.z + _playerTransform.right * _spawnOffset.x + Vector3.up * _spawnOffset.y;
+
+            GameObject newSheepObj = Instantiate(_sheepPrefab, spawnPosition, Quaternion.identity);
+            SheepStateManager newSheep = newSheepObj.GetComponent<SheepStateManager>();
+
+            if (newSheep != null)
+            {
+                _allSheep.Add(newSheep);
+                EventManager.Broadcast(new SheepJoinEvent(newSheep));
+                DisplayEventFeedback($"<color=#00FF00FF>Sheep Spawned</color>\nName: {newSheepObj.name}\nPosition: {spawnPosition}");
+            }
+            else
+            {
+                DisplayEventFeedback("<color=red>Spawned object has no SheepStateManager!</color>");
+                Debug.LogError("[EventDemo] Spawned sheep prefab does not have SheepStateManager component!");
+            }
         }
 
         #endregion
@@ -269,15 +291,16 @@ namespace Core.AI.Sheep
 
 <b><color=#00FFFFFF>SHEEP SELECTION</color></b>
 <color=yellow>Tab</color> - Select Next Sheep
-<color=yellow>R</color> - Refresh Sheep List
 
 <b><color=#00FFFFFF>SHEEP EVENTS</color></b> (Selected Sheep)
 <color=yellow>F</color> - Freeze Sheep
 <color=yellow>T</color> - Threat Detected
+<color=yellow>K</color> - Kill Sheep (Death Event)
+<color=yellow>J</color> - Spawn Sheep (Join Event)
 
 <color=yellow>H</color> - Show This Help";
 
-            DisplayEventFeedback(help, 10f);
+            DisplayEventFeedback(help, 15f);
             Debug.Log("[EventDemo] Help displayed");
         }
 
