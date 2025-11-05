@@ -13,10 +13,6 @@ namespace Gameplay.Player
         /// Player input.
         /// </summary>
         public PlayerInput Input { get; private set; }
-        /// <summary>
-        /// Player rotation class.
-        /// </summary>
-        public PlayerRotation Rotation { get; private set; }
 
 
         /// <summary>
@@ -25,11 +21,10 @@ namespace Gameplay.Player
         /// <param name="input">Player input class.</param>
         /// <param name="movement">Player movement class.</param>
         /// <param name="playerRotation">Player rotation class.</param>
-        public void Initialize(PlayerInput input, PlayerMovement movement, PlayerAnimator animator, PlayerRotation playerRotation)
+        public void Initialize(PlayerInput input, PlayerMovement movement, PlayerAnimator animator)
         {
             Input = input;
             _movementController = movement;
-            Rotation = playerRotation;
             _animatorController = animator;
 
             InitializeStatesMap();
@@ -43,6 +38,7 @@ namespace Gameplay.Player
             {
                 { typeof(PlayerIdle), new PlayerIdle(this) },
                 { typeof(PlayerWalking), new PlayerWalking(this) },
+                { typeof(PlayerRunning), new PlayerRunning(this) },
             };
         }
     }

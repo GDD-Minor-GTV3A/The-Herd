@@ -83,7 +83,7 @@ namespace Gameplay.FogOfWar
 
             foreach (FogRevealer _revealer in revealers)
             {
-                _revealer.CreateFovMeshes(fogProjectionPlane.transform, revealerMaterial, obstaclesLayers);
+                _revealer.Initialize(fogProjectionPlane.transform, revealerMaterial, obstaclesLayers);
             }
 
             fogOfWarConfig.OnValueChanged += UpdateValuesFromFogConfig;
@@ -370,6 +370,7 @@ namespace Gameplay.FogOfWar
         private void Update()
         {
             fogProjectionPlane.transform.position = new Vector3(playerTransform.position.x, fogProjectionPlane.transform.position.y, playerTransform.position.z);
+            fogProjectionPlane.transform.rotation = playerTransform.rotation;
             fogEffectPlane.transform.position = new Vector3(fogEffectPlane.transform.position.x, playerTransform.position.y, fogEffectPlane.transform.position.z);
 
             UpdateHiddenObjectsVisibility();

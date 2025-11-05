@@ -105,6 +105,41 @@ namespace Core.Events
 
     #endregion DOG_EVENTS
 
+    #region CAMERA_EVENTS
+    public class ZoomCameraEvent : GameEvent
+    {
+        public float Value { get; }
+
+        public ZoomCameraEvent(float value)
+        {
+            Value = value;
+        }
+    }
+
+    #endregion CAMERA_EVENTS
+
+    #region REVEALERS_EVENTS
+    public class ChangeConePlayerRevealerFOVEvent : GameEvent
+    {
+        public float Value { get; }
+
+        public ChangeConePlayerRevealerFOVEvent(float value)
+        {
+            Value = value;
+        }
+    }
+
+    public class ChangeConePlayerRevealerDistnaceEvent : GameEvent
+    {
+        public float Value { get; }
+
+        public ChangeConePlayerRevealerDistnaceEvent(float value)
+        {
+            Value = value;
+        }
+    }
+
+    #endregion REVEALERS_EVENTS
 
     #region FOW_EVENTS
     /// <summary>
