@@ -186,7 +186,8 @@ namespace Gameplay.FogOfWar
             revealers[index].Renderer.material.SetFloat("_FOVAngle", GetRevealerFOV(index) * 0.5f * Mathf.Deg2Rad);
             revealers[index].Renderer.material.SetFloat("_ViewDistance", GetRevealerDistance(index));
             revealers[index].Renderer.material.SetFloat("_FadeWidth", 10f);
-            revealers[index].Renderer.material.SetFloat("_EdgeFadeWidth", (GetRevealerFOV(index) == 360f) ? 0f : (GetRevealerFOV(index) / 250));
+            //revealers[index].Renderer.material.SetFloat("_EdgeFadeWidth", (GetRevealerFOV(index) == 360f) ? 0f : (GetRevealerFOV(index) / 250));
+            revealers[index].Renderer.material.SetFloat("_EdgeFadeWidth", 0);
         }
 
 

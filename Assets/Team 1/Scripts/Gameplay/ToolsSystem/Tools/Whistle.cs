@@ -8,7 +8,7 @@ namespace Gameplay.ToolsSystem
     /// <summary>
     /// Tool for controlling dogs.
     /// </summary>
-    public class Whistle : MonoBehaviour, IPlayerTool
+    public class Whistle : PlayerTool
     {
         private Observable<Vector3> _cursorWorldPosition;
         private PlayerAnimator _animator;
@@ -16,45 +16,48 @@ namespace Gameplay.ToolsSystem
 
         public void Initialize(PlayerAnimator animator)
         {
+            HideUI();
             _animator = animator;
         }
 
 
-        public void HideTool()
+        public override void HideTool()
         {
+            base.HideTool();
             _animator.RemoveHands();
         }
 
 
-        public void MainUsageFinished()
+        public override void MainUsageFinished()
         {
         }
 
-        public void MainUsageStarted(Observable<Vector3> cursorWorldPosition)
+        public override void MainUsageStarted(Observable<Vector3> cursorWorldPosition)
         {
             TryBark();
         }
 
-        public void Reload()
+        public override void Reload()
         {
             EventManager.Broadcast(new DogFollowCommandEvent());
         }
 
-        public void SecondaryUsageFinished()
+        public override void SecondaryUsageFinished()
         {
             _cursorWorldPosition.OnValueChanged -= SendDogMoveCommand;
             _cursorWorldPosition = null;
         }
 
-        public void SecondaryUsageStarted(Observable<Vector3> cursorWorldPosition)
+        public override void SecondaryUsageStarted(Observable<Vector3> cursorWorldPosition)
         {
             _cursorWorldPosition = cursorWorldPosition;
             SendDogMoveCommand();
             _cursorWorldPosition.OnValueChanged += SendDogMoveCommand;
         }
 
-        public void ShowTool()
+        public override void ShowTool()
         {
+            base.ShowTool();
         }
 
         private void SendDogMoveCommand()
@@ -62,7 +65,7 @@ namespace Gameplay.ToolsSystem
             EventManager.Broadcast(new DogMoveCommandEvent(_cursorWorldPosition.Value));
         }
 
-        public void TryBark()
+        private void TryBark()
         {
             EventManager.Broadcast(new DogBarkEvent());
         }

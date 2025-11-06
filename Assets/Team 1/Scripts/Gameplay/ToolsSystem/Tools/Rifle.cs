@@ -5,7 +5,7 @@ using Gameplay.Player;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class Rifle : MonoBehaviour, IPlayerTool
+public class Rifle : PlayerTool
 {
     [Header("Configuration")]
     [SerializeField, Tooltip("Rifle config asset.")]
@@ -45,6 +45,8 @@ public class Rifle : MonoBehaviour, IPlayerTool
             return;
         }
 
+        HideUI();
+
         // Initialize the bullet pool using values from config
         bulletPool = new BulletPool(config.BulletPrefab, config.Damage, initialCapacity: 0, maxSize: config.MaxPoolSize);
 
@@ -53,20 +55,20 @@ public class Rifle : MonoBehaviour, IPlayerTool
         gameObject.SetActive(false);
     }
 
-    public void MainUsageStarted(Observable<Vector3> cursorWorldPosition)
+    public override void MainUsageStarted(Observable<Vector3> cursorWorldPosition)
     {
         if (!canFire || isCycling || !isBoltClosed || currentAmmo <= 0) return;
         Fire();
     }
 
-    public void MainUsageFinished() { }
-    public void SecondaryUsageStarted(Observable<Vector3> cursorWorldPosition) 
+    public override void MainUsageFinished() { }
+    public override void SecondaryUsageStarted(Observable<Vector3> cursorWorldPosition) 
     {
         EventManager.Broadcast(new ZoomCameraEvent(20));
         EventManager.Broadcast(new ChangeConePlayerRevealerFOVEvent(-50));
         EventManager.Broadcast(new ChangeConePlayerRevealerDistnaceEvent(50));
     }
-    public void SecondaryUsageFinished() 
+    public override void SecondaryUsageFinished() 
     {
         EventManager.Broadcast(new ZoomCameraEvent(-20));
         EventManager.Broadcast(new ChangeConePlayerRevealerFOVEvent(50));
@@ -114,7 +116,7 @@ public class Rifle : MonoBehaviour, IPlayerTool
         canFire = true;
     }
 
-    public void Reload()
+    public override void Reload()
     {
         if (!isCycling && !isReloading)
             StartCoroutine(ReloadRoutine());
@@ -136,8 +138,9 @@ public class Rifle : MonoBehaviour, IPlayerTool
         isReloading = false;
     }
 
-    public void HideTool()
+    public override void HideTool()
     {
+        base.HideTool();
         isBoltClosed = true;
         canFire = true;
         isCycling = false;
@@ -147,15 +150,12 @@ public class Rifle : MonoBehaviour, IPlayerTool
         playerAnimator.RemoveHands();
     }
 
-    public void ShowTool()
+    public override void ShowTool()
     {
+        base.ShowTool();
         gameObject.SetActive(true);
         playerAnimator.GetTool(keyPoints);
         animator.SetFloat("BoltCycleSpeed", 1 / config.BoltCycleTime);
         animator.SetFloat("ReloadSpeed", 1 / config.ReloadTime);
-    }
-
-    public void TryBark()
-    {
     }
 }

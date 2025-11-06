@@ -16,11 +16,10 @@ namespace Gameplay.ToolsSystem
     {
         [SerializeField] private Whistle whistle;
         [SerializeField] private Rifle rifle;
-        [SerializeField] private List<GameObject> slotUIRoots = new List<GameObject>();
         [SerializeField] private List<GameObject> weaponSlotsUIRoots = new List<GameObject> ();
 
 
-        private List<IPlayerTool> _toolSlots = new List<IPlayerTool>();
+        private List<PlayerTool> _toolSlots = new List<PlayerTool>();
         private int _currentToolIndex;
         private int _slotsAmount;
 
@@ -48,8 +47,6 @@ namespace Gameplay.ToolsSystem
 
             _input.Reload.canceled += OnCurrentToolReload;
 
-            _input.DogBark.canceled += OnCurrentToolDogBark;
-
             _input.SecondaryUsage.started += OnCurrentToolSecondaryUseStarted;
             _input.SecondaryUsage.canceled += OnCurrentToolSecondaryUseFinished;
 
@@ -66,6 +63,8 @@ namespace Gameplay.ToolsSystem
 
             rifle.Initialize(animator);
             SetNewToolToSlotByIndex(rifle, 1);
+
+            SetCurrentSlotByIndex(0);
         }
         private void UpdateCurrentSlot(InputAction.CallbackContext obj)
         {
@@ -93,11 +92,6 @@ namespace Gameplay.ToolsSystem
         {
             if (_currentToolIndex == 1)
                 _toolSlots[_currentToolIndex].Reload();
-        }
-        private void OnCurrentToolDogBark(InputAction.CallbackContext obj)
-        {
-            if (_currentToolIndex == 0)
-                _toolSlots[_currentToolIndex].TryBark();
         }
 
         private void OnCurrentToolMainUseStarted(InputAction.CallbackContext obj)
@@ -131,20 +125,13 @@ namespace Gameplay.ToolsSystem
         /// </summary>
         /// <param name="toolToSet">Tool to add.</param>
         /// <param name="index">Index of slot to add.</param>
-        public void SetNewToolToSlotByIndex(IPlayerTool toolToSet, int index)
+        public void SetNewToolToSlotByIndex(PlayerTool toolToSet, int index)
         {
             _toolSlots[index] = toolToSet;
         }
 
         private void UpdateSlotUI(int activeIndex)
         {
-            
-            for (int i = 0; i < slotUIRoots.Count; i++)
-            {
-                if (slotUIRoots[i] == null) continue;
-                slotUIRoots[i].SetActive(i == activeIndex && _toolSlots.Count > i && _toolSlots[i] != null);
-            }
-
             for (int i = 0; i < weaponSlotsUIRoots.Count; i++)
             {
                 if (weaponSlotsUIRoots[i] == null) continue;

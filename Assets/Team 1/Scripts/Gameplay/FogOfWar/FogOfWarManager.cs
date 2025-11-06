@@ -353,6 +353,7 @@ namespace Gameplay.FogOfWar
             positionsBuffer.SetData(positionsData);
 
             hiddenComputeShader.SetVector("_PlayerPosition", playerTransform.position);
+            //hiddenComputeShader.SetMatrix("_PlayerRotation", fogProjectionPlane.localToWorldMatrix);
 
             int _threadsToStart = Mathf.CeilToInt((float)hiddenObjects.Count / threadsAmount);
 
@@ -370,7 +371,6 @@ namespace Gameplay.FogOfWar
         private void Update()
         {
             fogProjectionPlane.transform.position = new Vector3(playerTransform.position.x, fogProjectionPlane.transform.position.y, playerTransform.position.z);
-            fogProjectionPlane.transform.rotation = playerTransform.rotation;
             fogEffectPlane.transform.position = new Vector3(fogEffectPlane.transform.position.x, playerTransform.position.y, fogEffectPlane.transform.position.z);
 
             UpdateHiddenObjectsVisibility();

@@ -49,7 +49,7 @@ namespace Gameplay.Dog
         /// <summary>
         /// Sets walking animation speed multiplier.
         /// </summary>
-        /// <param name="multiplier">New vaue for multiplier.</param>
+        /// <param name="multiplier">New value for multiplier.</param>
         public void SetWakingAnimationSpeedMulti(float multiplier)
         {
             _animator.SetFloat(WalkSpeedParam, multiplier);

@@ -1,5 +1,5 @@
 using System;
-
+using Core.Shared.Utilities;
 using UnityEngine;
 
 namespace Core.Shared
@@ -7,8 +7,12 @@ namespace Core.Shared
     /// <summary>
     /// Interface for every tool that can be used by character(weapon, whistle, etc.).
     /// </summary>
-    public interface IPlayerTool
+    public abstract class PlayerTool : MonoBehaviour
     {
+        [SerializeField, Tooltip("UI of this tool."), Required]
+        private GameObject toolUI;
+
+
         /// <summary>
         /// Called when LMB pressed.
         /// </summary>
@@ -23,7 +27,6 @@ namespace Core.Shared
         /// </summary>
         public abstract void Reload();
 
-        public abstract void TryBark();
         /// <summary>
         /// Called when RMB pressed.
         /// </summary>
@@ -34,8 +37,24 @@ namespace Core.Shared
         public abstract void SecondaryUsageFinished();
 
 
-        public abstract void HideTool();
-        public abstract void ShowTool();
+        public virtual void HideTool()
+        {
+            HideUI();
+        }
+        public virtual void ShowTool()
+        {
+            ShowUI();
+        }
+
+
+        protected virtual void HideUI()
+        {
+            toolUI.SetActive(false);
+        }
+        protected virtual void ShowUI()
+        {
+            toolUI.SetActive(true);
+        }
     }
 }
 

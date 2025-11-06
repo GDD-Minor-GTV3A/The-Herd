@@ -1318,6 +1318,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3925905471705513855}
+  - {fileID: 684429177517817503}
   m_Father: {fileID: 7191174862489174219}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1927531510701147144
@@ -1986,6 +1987,51 @@ MonoBehaviour:
     m_HintWeight: 1
     m_MaintainTargetPositionOffset: 0
     m_MaintainTargetRotationOffset: 0
+--- !u!1 &3548856809926149607
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 684429177517817503}
+  - component: {fileID: 6791105778019880036}
+  m_Layer: 0
+  m_Name: Whistle
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &684429177517817503
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3548856809926149607}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1680720439466075468}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6791105778019880036
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3548856809926149607}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f443d8737c57ee469f41db89e1bafe2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  toolUI: {fileID: 953459982875781791}
 --- !u!1 &3659927459483104390
 GameObject:
   m_ObjectHideFlags: 0
@@ -3741,7 +3787,6 @@ GameObject:
   - component: {fileID: 409883977748963457}
   - component: {fileID: 2256758700414420681}
   - component: {fileID: 5609012314165025320}
-  - component: {fileID: 5596723993700161187}
   - component: {fileID: 4211922807001302086}
   - component: {fileID: 8164424966025947972}
   - component: {fileID: 6597110005201757264}
@@ -3935,26 +3980,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e382328f2c902c4db558d79cb2a5c79, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  whistle: {fileID: 5596723993700161187}
+  whistle: {fileID: 6791105778019880036}
   rifle: {fileID: 90066509589528700}
-  slotUIRoots:
-  - {fileID: 953459982875781791}
-  - {fileID: 949660333806974429}
   weaponSlotsUIRoots:
   - {fileID: 6802355956383504878}
   - {fileID: 6007217952915050631}
---- !u!114 &5596723993700161187
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6065300022185603627}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f443d8737c57ee469f41db89e1bafe2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!208 &4211922807001302086
 NavMeshObstacle:
   m_ObjectHideFlags: 0
@@ -5054,6 +5084,10 @@ PrefabInstance:
       propertyPath: rifle
       value: 
       objectReference: {fileID: 90066509589528700}
+    - target: {fileID: 1448986603116302612, guid: dfa17764dfc588242bd72ea40cc0a040, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2335905167346398566, guid: dfa17764dfc588242bd72ea40cc0a040, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
@@ -5389,6 +5423,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.y
       value: 90
       objectReference: {fileID: 0}
+    - target: {fileID: 8179064682616622531, guid: a8f50b7b9de7dd04eb79e19c3a814d7f, type: 3}
+      propertyPath: toolUI
+      value: 
+      objectReference: {fileID: 949660333806974429}
     - target: {fileID: 8179064682616622531, guid: a8f50b7b9de7dd04eb79e19c3a814d7f, type: 3}
       propertyPath: animator
       value: 
