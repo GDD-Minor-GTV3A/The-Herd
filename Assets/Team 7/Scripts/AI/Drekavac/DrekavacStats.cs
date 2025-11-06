@@ -30,8 +30,8 @@ namespace Team_7.Scripts.AI.Drekavac
         public float fleeTriggerDistance = 3f;
     
         [Header("Audio Settings")]
-        public AudioClip? screechSound;
-        public AudioClip? chompSound;
-        public AudioClip? snarlSound;
+        public AudioClip screechSound;
+        public AudioClip chompSound;
+        public AudioClip snarlSound;
     }
 }
