@@ -90,6 +90,7 @@
     <Compile Include="Assets\Team 11\Scripts\ChangeScene.cs" />
     <Compile Include="Assets\Team 9\Scripts\NPC\NPCDialogTrigger.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_ExampleScript_01.cs" />
+    <Compile Include="Assets\Team 3\Scripts\Gameplay\TutorialTriggerHandler.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMPro_InstructionOverlay.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexShakeB.cs" />
     <Compile Include="Assets\Team 6\Scripts\AI\SanityController.cs" />
@@ -127,7 +128,7 @@
     <Compile Include="Assets\Team 7\Scripts\AI\Drekavac\DrekavacStateManager.cs" />
     <Compile Include="Assets\Ink\Demos\Basic Demo\Scripts\QuitGameOnKeypress.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ChatController.cs" />
-    <Compile Include="Assets\Team 3\Scripts\Gameplay\CollisionHandlerWithHook.cs" />
+    <Compile Include="Assets\Team 3\Scripts\UI\TutorialFader.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_DigitValidator.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_FrameRateCounter.cs" />
     <Compile Include="Assets\Team 7\Scripts\AI\Archived\DrekavacAI.cs" />
@@ -149,6 +150,7 @@
     <Compile Include="Assets\Team 5\Scripts\CameraFollowing.cs" />
     <Compile Include="Assets\Team 3\Scripts\Core\ViewClearing.cs" />
     <Compile Include="Assets\_Game\Scripts\Core\GameBootstrap.cs" />
+    <Compile Include="Assets\Team 3\Scripts\Gameplay\CollisionOffshoot.cs" />
     <Compile Include="Assets\Team 3\Scripts\Core\ViewClearingBackup.cs" />
     <Compile Include="Assets\Ink\Demos\Basic Demo\Scripts\BasicInkExample.cs" />
     <Compile Include="Assets\Team 7\Scripts\AI\Phantom\PhantomStats.cs" />
@@ -161,6 +163,7 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextConsoleSimulator.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TeleType.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextEventCheck.cs" />
+    <Compile Include="Assets\Team 3\Scripts\Gameplay\AmbianceLoaderCollision.cs" />
     <Compile Include="Assets\Team 8\Scripts\Core\Economy\CurrencyData.cs" />
     <Compile Include="Assets\Team 7\Scripts\AI\Drekavac\States\FleeingState.cs" />
     <Compile Include="Assets\Team 3\Scripts\Core\AmbienceRing.cs" />
@@ -1069,12 +1072,12 @@
       <HintPath>Library\ScriptAssemblies\Unity.Animation.Rigging.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary">
-      <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Unity.Multiplayer.Center.Common">
       <HintPath>Library\ScriptAssemblies\Unity.Multiplayer.Center.Common.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary">
+      <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.TextMeshPro">
