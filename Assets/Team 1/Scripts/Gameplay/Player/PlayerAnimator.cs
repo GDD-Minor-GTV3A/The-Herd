@@ -153,16 +153,33 @@ namespace Gameplay.Player
             float angle = Vector3.SignedAngle(root.forward, direction, root.up);
 
             if (angle <= -80f)
+            {
                 root.Rotate(0, -90, 0);
+                animationConstrains.LookTarget.position = new Vector3(mouseWorldPosition.x, animationConstrains.LookTarget.position.y, mouseWorldPosition.z);
+                return;
+            }
 
             if (angle >= 80f)
+            {
                 root.Rotate(0, 90, 0);
+                animationConstrains.LookTarget.position = new Vector3(mouseWorldPosition.x, animationConstrains.LookTarget.position.y, mouseWorldPosition.z);
+                return;
+            }
 
             if (Mathf.Round(root.rotation.eulerAngles.y) % 90 == 0)
+            {
                 root.Rotate(0, 45, 0);
+                animationConstrains.LookTarget.position = new Vector3(mouseWorldPosition.x, animationConstrains.LookTarget.position.y, mouseWorldPosition.z);
+                return;
+            }
+
+            Vector3 targetPosition = new Vector3(mouseWorldPosition.x, animationConstrains.LookTarget.position.y, mouseWorldPosition.z);
+
+            if (Vector3.Distance(targetPosition, animationConstrains.LookTarget.position) < 0.01f)
+                return;
 
 
-            animationConstrains.LookTarget.position = new Vector3(mouseWorldPosition.x, animationConstrains.LookTarget.position.y, mouseWorldPosition.z);
+            animationConstrains.LookTarget.position = Vector3.Lerp(animationConstrains.LookTarget.position, targetPosition, Time.deltaTime * 10f);
         }
     }
 

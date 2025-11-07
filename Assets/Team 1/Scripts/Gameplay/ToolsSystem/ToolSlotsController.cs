@@ -1,9 +1,6 @@
 using System.Collections.Generic;
 using Core.Shared;
-
-using Gameplay.Dog;
 using Gameplay.Player;
-
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -16,7 +13,7 @@ namespace Gameplay.ToolsSystem
     {
         [SerializeField] private Whistle whistle;
         [SerializeField] private Rifle rifle;
-        [SerializeField] private List<GameObject> weaponSlotsUIRoots = new List<GameObject> ();
+        [SerializeField] private ToolSlotsUIController toolSlotsUI;
 
 
         private List<PlayerTool> _toolSlots = new List<PlayerTool>();
@@ -56,6 +53,7 @@ namespace Gameplay.ToolsSystem
             _input.Slot_2.started += (obj) => SetCurrentSlotByIndex(1);
             _input.Slot_3.started += (obj) => SetCurrentSlotByIndex(2);
 
+            toolSlotsUI.Initilaize();
 
             // test
             whistle.Initialize(animator);
@@ -68,7 +66,7 @@ namespace Gameplay.ToolsSystem
         }
         private void UpdateCurrentSlot(InputAction.CallbackContext obj)
         {
-            int inputValue = Mathf.RoundToInt(obj.action.ReadValue<Vector2>().y);
+            int inputValue = -Mathf.RoundToInt(obj.action.ReadValue<Vector2>().y);
 
             SetCurrentSlotByIndex(_currentToolIndex + inputValue);
         }
@@ -84,7 +82,7 @@ namespace Gameplay.ToolsSystem
             if (_toolSlots[_currentToolIndex] != null)
                 _toolSlots[_currentToolIndex].ShowTool();
 
-            UpdateSlotUI(_currentToolIndex);
+            toolSlotsUI.ChangeHighlightedSlot(_currentToolIndex);
         }
 
 
@@ -130,14 +128,6 @@ namespace Gameplay.ToolsSystem
             _toolSlots[index] = toolToSet;
         }
 
-        private void UpdateSlotUI(int activeIndex)
-        {
-            for (int i = 0; i < weaponSlotsUIRoots.Count; i++)
-            {
-                if (weaponSlotsUIRoots[i] == null) continue;
-                weaponSlotsUIRoots[i].SetActive(i == activeIndex && _toolSlots.Count > i && _toolSlots[i] != null);
-            }
-        }
 
         private void OnDestroy()
         {
