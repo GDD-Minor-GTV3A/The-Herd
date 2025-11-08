@@ -1,11 +1,11 @@
 using UnityEngine;
 using Core.Shared.StateMachine;
 using UnityEngine.AI;
-
+using System.Collections.Generic;
 namespace Core.AI.Sheep
 {
     /// <summary>
-    /// Following player if outside of the square
+    /// Following player if outside the square
     /// </summary>
     public sealed class SheepFollowState : IState
     {
@@ -24,7 +24,7 @@ namespace Core.AI.Sheep
                 _stateManager.Agent.isStopped = false;
             }
             _stateManager.Agent.isStopped = false;
-            _stateManager.Animation?.SetState((int)SheepAnimState.Walk);
+            //_stateManager.Animation?.SetState((int)SheepAnimState.Walk);
         }
 
         public void OnUpdate()
@@ -59,7 +59,7 @@ namespace Core.AI.Sheep
             if(_stateManager.Agent !=  null && _stateManager?.Animation != null && _stateManager.CanControlAgent())
             {
                 _stateManager.Agent.isStopped = false;
-                _stateManager.Animation.SetState((int)SheepAnimState.Idle);
+                //_stateManager.Animation.SetState((int)SheepAnimState.Idle);
             }
         }
 
@@ -79,7 +79,7 @@ namespace Core.AI.Sheep
             _stateManager.Agent.isStopped = false;
             _currentTarget = _stateManager.GetGrazeTarget();
             _stateManager.SetDestinationWithHerding(_currentTarget);
-            _stateManager.Animation?.SetState((int)SheepAnimState.Walk);
+            //_stateManager.Animation?.SetState((int)SheepAnimState.Walk);
             ScheduleNextGraze();
         }
 
@@ -125,20 +125,27 @@ namespace Core.AI.Sheep
 
         public void OnStart()
         {
-            if (_stateManager == null) return;
+            if (!_stateManager) return;
 
             _currentTarget = _stateManager.GetTargetOutsideOfHerd();
 
-            if (_stateManager?.Agent != null && _stateManager?.Animation != null && _stateManager.CanControlAgent())
+            if (_stateManager?.Agent && _stateManager?.Animation && _stateManager.CanControlAgent())
             {
                 _stateManager.Agent.isStopped = false;
-                _stateManager.Animation.SetState((int)SheepAnimState.Walk);
+                //_stateManager.Animation.SetState((int)SheepAnimState.Walk);
+                if (SheepSoundManager.Instance)
+                {
+                    SheepSoundManager.Instance.PlaySoundClip(_stateManager.Archetype.DeathSound,
+                        _stateManager.gameObject.transform,
+                        100f,
+                        Random.Range(0.9f, 1.8f));
+                }
             }
         }
 
         public void OnUpdate()
         {
-            if (_stateManager == null || _stateManager.Agent == null) return;
+            if (!_stateManager || !_stateManager.Agent) return;
             if (_stateManager.CanControlAgent())
             {
                 _stateManager.Agent.isStopped = false;
@@ -149,7 +156,7 @@ namespace Core.AI.Sheep
 
         public void OnStop()
         {
-            if(_stateManager?.Agent != null && _stateManager.CanControlAgent())
+            if(_stateManager?.Agent && _stateManager.CanControlAgent())
             {
                 _stateManager.Agent.isStopped = true;
             }
@@ -176,7 +183,7 @@ namespace Core.AI.Sheep
                 _stateManager.Agent.isStopped = true;
             }
 
-            _stateManager.Animation?.SetState((int)SheepAnimState.Idle);
+            //_stateManager.Animation?.SetState((int)SheepAnimState.Idle);
             _stateManager.DisableBehavior();
         }
 
@@ -191,5 +198,32 @@ namespace Core.AI.Sheep
 
             _stateManager.EnableBehavior();
         }
+    }
+
+    public class SheepDieState : IState
+    {
+        private readonly SheepStateManager _stateManager;
+
+        public SheepDieState(SheepStateManager context)
+        {
+            _stateManager = context;
+        }
+        // ReSharper disable Unity.PerformanceAnalysis
+        public void OnStart()
+        {
+            _stateManager.DisableBehavior();
+            if (SheepSoundManager.Instance)
+            {
+                SheepSoundManager.Instance.PlaySoundClip(_stateManager.Archetype.DeathSound, 
+                    _stateManager.gameObject.transform,
+                    100.0f,
+                    Random.Range(0.9f, 1.8f));
+            }
+            //possible ragdoll setup in here in the next sprint
+        }
+
+        public void OnUpdate() { } //no logic needed for now in here
+        
+        public void OnStop() { } //no logic needed for now in here
     }
 }

@@ -6,12 +6,11 @@ using System.Linq;
 using Core.Events;
 using Core.Shared.StateMachine;
 using Core.AI.Sheep.Config;
+using Core.AI.Sheep.Event;
 using Core.AI.Sheep.Personality;
 using UnityEngine.AI;
 
 using Random = UnityEngine.Random;
-using System.Xml.Serialization;
-
 
 namespace Core.AI.Sheep
 {
@@ -110,10 +109,11 @@ namespace Core.AI.Sheep
 
         private void LateUpdate()
         {
-            if(_animation == null || _agent == null) return;
+            if(!_animation || !_agent) return;
             Vector3 v = _agent.velocity;
             v.y = 0f;
             _animation.SetSpeed(v.magnitude);
+            // Debug.Log("Set speed to: "  + v.magnitude);    |   Chris: Commenting this out cuz it keeps sending log every frame which is annoying
         }
 
         private void OnEnable()
@@ -165,6 +165,7 @@ namespace Core.AI.Sheep
                 {typeof(SheepGrazeState), new SheepGrazeState(this)},
                 {typeof(SheepWalkAwayFromHerdState), new SheepWalkAwayFromHerdState(this)},
                 {typeof(SheepFreezeState), new SheepFreezeState(this)},
+                {typeof(SheepDieState), new SheepDieState(this)},
             };
         }
 
@@ -470,6 +471,21 @@ namespace Core.AI.Sheep
         public void OnSheepUnfreeze()
         {
             SetState<SheepGrazeState>();
+        }
+
+        public void OnSheepDie()
+        {
+            _personality.OnDeath(this, _behaviorContext);
+        }
+
+        /// <summary>
+        /// Removes the sheep from the game.
+        /// Broadcasts a SheepDeathEvent before destroying the GameObject.
+        /// </summary>
+        public void Remove()
+        {
+            EventManager.Broadcast(new SheepDeathEvent(this));
+            Destroy(gameObject);
         }
 
         /// <summary>

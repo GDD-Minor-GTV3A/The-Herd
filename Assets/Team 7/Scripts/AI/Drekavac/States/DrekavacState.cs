@@ -1,6 +1,4 @@
-using Core;
-
-namespace AI.Drekavac.States
+namespace Team_7.Scripts.AI.Drekavac.States
 {
     public class DrekavacState : GenericEnemyState
     {

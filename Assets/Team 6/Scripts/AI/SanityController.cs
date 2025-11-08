@@ -1,100 +1,106 @@
-using System.Collections;
-using System.Collections.Generic;
 
+// Chris: Should this script exist? I didn't see it on Team#2 branch so maybe Git messed up something with changes?
+
+/*using System.Collections;
 using UnityEngine;
 
-public class SanityController : MonoBehaviour
+namespace Core.AI.Enemies
 {
-    public int minSheepToAffect = 2;
-    public int maxSheepToAffect = 3;
-    public int sanityGainPerTick = 1;
-    public float tickInterval = 1f;
-    [SerializeField] private AudioSource audioSource;
-    [SerializeField] private AudioClip confuseRiser;
-    [Range(0f, 1f)][SerializeField] private float effectVolume = 0.8f;
-
-
-    private DetectSheep detector;
-    private bool soundPlaying = false;
-    private void Start()
+    /// <summary>
+    /// Applies fear over time to sheep detected by a DetectSheep component.
+    /// Attach this to any enemy (Drekavac, Wolf, etc.) that has a DetectSheep child.
+    /// </summary>
+    [RequireComponent(typeof(DetectSheep))]
+    public sealed class SanityController : MonoBehaviour
     {
-        detector = GetComponent<DetectSheep>();
-        if (detector == null)
+        [Header("Fear Tick Settings")]
+        [SerializeField] private float tickInterval = 0.5f;
+        [SerializeField] private float fearPerTick = 1f;
+
+        private DetectSheep _detector;
+        private Coroutine _loop;
+        private int _tickCounter;
+
+        private void Awake()
         {
-            Debug.LogError("SanityController requires DetectSheep component.");
-            enabled = false;
-            return;
+            _detector = GetComponent<DetectSheep>();
+            if (_detector == null)
+                Debug.LogError($"[SanityController] ❌ Missing DetectSheep component on {name}");
         }
-        if (audioSource == null)
-            audioSource = GetComponent<AudioSource>();
 
-        StartCoroutine(SanityGainRoutine());
-    }
-
-    private IEnumerator SanityGainRoutine()
-    {
-        WaitForSeconds wait = new WaitForSeconds(tickInterval);
-
-        while (true)
+        private void OnEnable()
         {
-            yield return wait;
+            Debug.Log($"[SanityController] ✅ Enabled on {name} (interval={tickInterval}, fear={fearPerTick})");
+            _loop = StartCoroutine(FearTickLoop());
+        }
 
-            List<Transform> sheepInRange = new List<Transform>(detector.visibleTargets);
-            int sheepToAffect = Random.Range(minSheepToAffect, maxSheepToAffect + 1);
-
-            if (sheepInRange.Count == 0) continue;
-
-            if (sheepInRange.Count <= sheepToAffect)
+        private void OnDisable()
+        {
+            if (_loop != null)
             {
-                foreach (Transform sheep in sheepInRange)
-                    TryAddSanity(sheep);
+                StopCoroutine(_loop);
+                _loop = null;
+                Debug.Log($"[SanityController] 🛑 Disabled on {name}");
             }
-            else
+        }
+
+        private IEnumerator FearTickLoop()
+        {
+            WaitForSeconds wait = new WaitForSeconds(tickInterval);
+
+            while (true)
             {
-                for (int i = 0; i < sheepToAffect; i++)
+                _tickCounter++;
+                if (_detector == null)
                 {
-                    int index = Random.Range(0, sheepInRange.Count);
-                    Transform chosenSheep = sheepInRange[index];
-                    TryAddSanity(chosenSheep);
-                    sheepInRange.RemoveAt(index); // Avoid duplicates this tick
+                    Debug.LogWarning($"[SanityController] ⚠️ No DetectSheep assigned for {name}, stopping loop.");
+                    yield break;
                 }
+
+                var targets = _detector.visibleTargets;
+                int count = targets.Count;
+
+                Debug.Log($"[SanityController] Tick #{_tickCounter} | Detected {count} sheep");
+
+                for (int i = 0; i < count; i++)
+                {
+                    Transform sheep = targets[i];
+                    if (sheep == null) continue;
+
+                    Debug.Log($"[SanityController] 🐑 {name} affecting {sheep.name}");
+
+                    if (sheep.TryGetComponent<Core.AI.Sheep.SheepSanity>(out var sanity))
+                    {
+                        if (!sanity.IsPanicking) // ✅ skip already-panicking sheep
+                        {
+                            sanity.GainSanity(fearPerTick, transform.position);
+                            Debug.Log($"[SanityController] {sheep.name} gained +{fearPerTick} sanity");
+                        }
+                        else
+                        {
+                            Debug.Log($"[SanityController] {sheep.name} already panicking, skipping tick.");
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"[SanityController] ⚠️ {sheep.name} has no SheepSanity component!");
+                    }
+                }
+
+                yield return wait;
             }
         }
+
+#if UNITY_EDITOR
+        private void OnDrawGizmosSelected()
+        {
+            if (_detector == null) return;
+            Gizmos.color = new Color(1f, 0.2f, 0.2f, 0.15f);
+            Gizmos.DrawSphere(transform.position, _detector.radius);
+            UnityEditor.Handles.color = Color.red;
+            UnityEditor.Handles.Label(transform.position + Vector3.up * 2f, $"Fear radius = {_detector.radius}");
+        }
+#endif
     }
-
-    private void TryAddSanity(Transform sheep)
-    {
-        if (sheep.TryGetComponent<SheepSanity>(out var sanity))
-        {
-            sanity.GainSanity(sanityGainPerTick);
-        }
-        if (confuseRiser != null && audioSource != null)
-        {
-            audioSource.pitch = Random.Range(0.95f, 1.05f);
-            audioSource.PlayOneShot(confuseRiser, effectVolume);
-        }
-    }
-
-    private void HandleAffectSound(bool hasSheep)
-    {
-        if (confuseRiser == null || audioSource == null)
-            return;
-
-
-        if (hasSheep && !soundPlaying)
-        {
-            audioSource.clip = confuseRiser;
-            audioSource.PlayOneShot(confuseRiser, effectVolume);
-
-            audioSource.Play();
-            soundPlaying = true;
-        }
-
-        else if (!hasSheep && soundPlaying)
-        {
-            audioSource.Stop();
-            soundPlaying = false;
-        }
-    }
-
 }
+*/

@@ -1,67 +1,93 @@
+using System.Collections;
 using UnityEngine;
 using TMPro;
-using System.Collections;
-using UnityEngine.Rendering;
 
-public class Dialogue : MonoBehaviour
+namespace Project.UI
 {
-    public TextMeshProUGUI textComponent;
-    public string[] lines;
-    public float textSpeed;
-
-    private int index;
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    /// <summary>
+    /// Handles dialogue text display by typing each character over time.
+    /// Allows skipping or advancing dialogue lines with mouse input.
+    /// </summary>
+    public class Dialogue : MonoBehaviour
     {
-        textComponent.text = string.Empty;
-        StartDialogue();
-    }
+        [Header("UI Components")]
+        [Tooltip("Text component used to display dialogue.")]
+        [SerializeField] private TextMeshProUGUI textComponent;
 
-    // Update is called once per frame
-    void Update()
-    {
-        if(Input.GetMouseButtonDown(0))
+        [Header("Dialogue Settings")]
+        [Tooltip("Lines of dialogue to display in sequence.")]
+        [SerializeField] private string[] lines;
+
+        [Tooltip("Delay in seconds between each character.")]
+        [Range(0.01f, 0.5f)]
+        [SerializeField] private float textSpeed = 0.05f;
+
+        private int currentIndex;
+
+        /// <summary>
+        /// Initializes the dialogue by clearing text and starting the first line.
+        /// </summary>
+        private void Start()
         {
-            if(textComponent.text == lines[index])
+            textComponent.text = string.Empty;
+            StartDialogue();
+        }
+
+        /// <summary>
+        /// Checks for mouse input to skip or advance dialogue lines.
+        /// </summary>
+        private void Update()
+        {
+            if (Input.GetMouseButtonDown(0))
             {
-                NextLine();
+                if (textComponent.text == lines[currentIndex])
+                {
+                    NextLine();
+                }
+                else
+                {
+                    StopAllCoroutines();
+                    textComponent.text = lines[currentIndex];
+                }
+            }
+        }
+
+        /// <summary>
+        /// Starts displaying the dialogue from the first line.
+        /// </summary>
+        private void StartDialogue()
+        {
+            currentIndex = 0;
+            StartCoroutine(TypeLine());
+        }
+
+        /// <summary>
+        /// Types out each character of the current dialogue line over time.
+        /// </summary>
+        private IEnumerator TypeLine()
+        {
+            foreach (char _character in lines[currentIndex].ToCharArray())
+            {
+                textComponent.text += _character;
+                yield return new WaitForSeconds(textSpeed);
+            }
+        }
+
+        /// <summary>
+        /// Advances to the next line or hides the dialogue box when finished.
+        /// </summary>
+        private void NextLine()
+        {
+            if (currentIndex < lines.Length - 1)
+            {
+                currentIndex++;
+                textComponent.text = string.Empty;
+                StartCoroutine(TypeLine());
             }
             else
             {
-                StopAllCoroutines();
-                textComponent.text = lines[index];
+                gameObject.SetActive(false);
             }
-        }
-    }
-
-    void StartDialogue()
-    {
-        index = 0;
-        StartCoroutine(TypeLine());
-    }
-
-    IEnumerator TypeLine()
-    {
-        // Type each character 1 by 1
-        foreach (char c in lines[index].ToCharArray())
-        {
-            textComponent.text += c;
-            yield return new WaitForSeconds(textSpeed);
-        }
-    }
-
-    void NextLine()
-    {
-        if (index < lines.Length -1)
-        {
-            index++;
-            textComponent.text = string.Empty;
-            StartCoroutine(TypeLine());
-        }
-        else
-        {
-            gameObject.SetActive(false);
         }
     }
 }
