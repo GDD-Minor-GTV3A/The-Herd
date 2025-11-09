@@ -23,7 +23,7 @@ import asyncio
 import zipfile
 from argparse import ArgumentParser, Namespace
 from dataclasses import dataclass
-from logging import StreamHandler, getLogger
+from logging import INFO, StreamHandler, getLogger
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -36,14 +36,25 @@ ZIP_FILE = ROOT / "the-herd.zip"
 
 logger = getLogger(__name__)
 logger.addHandler(StreamHandler())
-logger.setLevel("DEBUG")
+logger.setLevel(INFO)
 
 
 GH_ARGS = [
-    "discussion_category", "draft", "fail_on_no_commits", "generate_notes",
-    "latest", "notes", "notes_file", "notes_from_tag", "notes_start_tag",
-    "prerelease", "target", "title", "verify_tag",
+    "discussion_category",
+    "draft",
+    "fail_on_no_commits",
+    "generate_notes",
+    "latest",
+    "notes",
+    "notes_file",
+    "notes_from_tag",
+    "notes_start_tag",
+    "prerelease",
+    "target",
+    "title",
+    "verify_tag",
 ]
+
 
 class Args(Namespace):
     """Command line context."""
@@ -82,6 +93,7 @@ class Args(Namespace):
                 case _:
                     logger.debug("Unused setting type/value: %s=%r", i, val)
 
+
 parser = ArgumentParser(description="Create a new GH release.")
 for arg, typ in Args.__annotations__.items():
     match typ:
@@ -95,6 +107,7 @@ for arg, typ in Args.__annotations__.items():
         case _:
             logger.debug("Unknown argument type: %s", typ)
 args: Args = parser.parse_args(namespace=Args())
+
 
 @dataclass
 class SemVer:
@@ -118,13 +131,17 @@ class SemVer:
         """Bump the minor version."""
         return SemVer(self.major, self.minor + 1, 0)
 
+
 async def zip_dist() -> None:
     """Zip the dist folder into a single zip file for GH releases."""
+    logger.info("Zipping files from %s to %s", BUILD_DIR, ZIP_FILE)
     with zipfile.ZipFile(ZIP_FILE, "w") as zf:
         for file in BUILD_DIR.glob("**/*"):
             if "DoNotShip" in file.name:
                 continue
             zf.write(file, file.relative_to(BUILD_DIR))
+            logger.debug("Added file to zip: %s", file)
+
 
 async def get_tag() -> SemVer:
     """Get the current git tag."""
@@ -140,6 +157,7 @@ async def get_tag() -> SemVer:
     logger.info("Current tag: %s", stdout.decode().strip())
     return SemVer.from_str(stdout.decode().strip())
 
+
 async def create_release() -> None:
     """Create a GH release."""
     # Build argument list to avoid shell quoting/globbing issues
@@ -147,6 +165,7 @@ async def create_release() -> None:
     command += args.generate_setting_flags()
 
     logger.debug("Creating release with command: %s", command)
+    logger.info("Uploading release %s.", args.tag)
     proc = await asyncio.create_subprocess_exec(
         *command,
         stdout=asyncio.subprocess.PIPE,
@@ -158,6 +177,7 @@ async def create_release() -> None:
         raise RuntimeError(msg)
     logger.info("Release created successfully: %s", stdout.decode())
 
+
 async def set_defaults() -> None:
     """Set default values for settings if not provided."""
     tag = await get_tag()
@@ -167,6 +187,8 @@ async def set_defaults() -> None:
     args.tag = args.tag or tag
     args.title = args.title or f"Release {tag}"
     args.notes = args.notes or f"Automated release of version {tag}."
+    logger.info("Successfully set up context for release.")
+
 
 async def test_gh_cli() -> None:
     """Test if GH CLI is installed and authenticated."""
@@ -181,6 +203,7 @@ async def test_gh_cli() -> None:
         msg = "GH CLI is not installed or authenticated. Install and authenticate it: https://cli.github.com/"
         raise RuntimeError(msg)
     logger.debug("GH CLI is installed and authenticated.")
+
 
 async def main() -> None:
     """Entry point."""
