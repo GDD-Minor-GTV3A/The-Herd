@@ -9,6 +9,9 @@ additionally --dist-dir and --zip-file are supported to override the default pat
 prepend with `no` to set boolean flags to false.
     example: `--no-latest`
 
+Make sure you have the GH CLI installed and authenticated:
+    https://cli.github.com/
+
 USAGE:
     python release.py [options]
     python release.py --help
@@ -159,6 +162,20 @@ async def set_defaults() -> None:
     args.tag = args.tag or tag
     args.title = args.title or f"Release {tag}"
     args.notes = args.notes or f"Automated release of version {tag}."
+
+async def test_gh_cli() -> None:
+    """Test if GH CLI is installed and authenticated."""
+    proc = await asyncio.create_subprocess_exec(
+        *["gh", "auth", "status"],
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    _, stderr = await proc.communicate()
+    if proc.returncode != 0:
+        logger.debug("GH CLI auth status stderr: %s", stderr.decode())
+        msg = "GH CLI is not installed or authenticated. Install and authenticate it: https://cli.github.com/"
+        raise RuntimeError(msg)
+    logger.debug("GH CLI is installed and authenticated.")
 
 async def main() -> None:
     """Entry point."""
