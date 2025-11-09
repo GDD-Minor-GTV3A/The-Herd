@@ -38,9 +38,17 @@ logger = getLogger(__name__)
 logger.addHandler(StreamHandler())
 logger.setLevel("DEBUG")
 
-class GithubSettings:
-    """Command line arguments. matches https://cli.github.com/manual/gh_release_create."""
 
+GH_ARGS = [
+    "discussion_category", "draft", "fail_on_no_commits", "generate_notes",
+    "latest", "notes", "notes_file", "notes_from_tag", "notes_start_tag",
+    "prerelease", "target", "title", "verify_tag",
+]
+
+class Args(Namespace):
+    """Command line context."""
+
+    # GitHub CLI release settings. matches https://cli.github.com/manual/gh_release_create.
     discussion_category: str | None = None
     draft: bool = True
     fail_on_no_commits: bool = True
@@ -55,16 +63,13 @@ class GithubSettings:
     title: str | None = None
     verify_tag: bool = False
 
-class Args(Namespace, GithubSettings):
-    """Command line context."""
-
     tag: SemVer | None = None
     dist_dir: Path = BUILD_DIR
     zip_file: Path = ZIP_FILE
 
     def generate_setting_flags(self) -> Generator[str]:
         """Generate command line flags from settings as a list of tokens."""
-        for i in GithubSettings.__annotations__:
+        for i in GH_ARGS:
             val = getattr(self, i)
             match val:
                 # true  -> add flag
