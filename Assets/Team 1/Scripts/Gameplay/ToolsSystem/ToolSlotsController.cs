@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using Core.Shared;
+using Core.Shared.Utilities;
+
 using Gameplay.Player;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -15,18 +17,17 @@ namespace Gameplay.ToolsSystem
         [SerializeField] private Rifle rifle;
         [SerializeField] private ToolSlotsUIController toolSlotsUI;
 
+        [Space]
+        [Header("Audio")]
+        [SerializeField, Required] private AudioSource sfxSource;
+
 
         private List<PlayerTool> _toolSlots = new List<PlayerTool>();
         private int _currentToolIndex;
         private int _slotsAmount;
 
-        private Gameplay.Player.PlayerInput _input;
+        private Player.PlayerInput _input;
 
-        [Space]
-        [Header("Audio")]
-        [SerializeField] private AudioSource sfxSource;
-        [SerializeField] private AudioClip whistleEquipSfx;
-        [SerializeField] private AudioClip rifleEquipSfx;
         private bool _initializedFirstSlot;
         
 
@@ -37,7 +38,7 @@ namespace Gameplay.ToolsSystem
         /// </summary>
         /// <param name="input">Player input class.</param>
         /// <param name="slotsAmount">Max amount of available slots.</param>
-        public void Initialize(Gameplay.Player.PlayerInput input, PlayerAnimator animator, int slotsAmount)
+        public void Initialize(Player.PlayerInput input, PlayerAnimator animator, int slotsAmount)
         {
             _input = input;
             _slotsAmount = slotsAmount;
@@ -45,7 +46,7 @@ namespace Gameplay.ToolsSystem
             for (int i = 0; i < _slotsAmount; i++)
                 _toolSlots.Add(null);
 
-            _currentToolIndex = 0;
+            _currentToolIndex = -1;
 
 
             _input.MainUsage.started += OnCurrentToolMainUseStarted;
@@ -86,7 +87,7 @@ namespace Gameplay.ToolsSystem
             if (index == _currentToolIndex) 
                 return;
 
-            if (_toolSlots[_currentToolIndex] != null)
+            if (_currentToolIndex >= 0 && _toolSlots[_currentToolIndex] != null)
                 _toolSlots[_currentToolIndex].HideTool();
 
             index = Mathf.Clamp(index, 0, _slotsAmount-1);
@@ -95,16 +96,12 @@ namespace Gameplay.ToolsSystem
             var newTool = _toolSlots[_currentToolIndex];
             if (newTool != null) newTool.ShowTool();
 
-            if (_initializedFirstSlot && sfxSource != null && newTool is MonoBehaviour mb)
+            if (_initializedFirstSlot && sfxSource != null && newTool.EquipSound != null)
             {
-                AudioClip clip = null;
+                if (sfxSource.isPlaying)
+                    sfxSource.Stop();
 
-                if (ReferenceEquals(newTool, whistle))
-                    clip = whistleEquipSfx;
-                else if (ReferenceEquals(newTool, rifle))
-                    clip = rifleEquipSfx;
-
-                if (clip != null) sfxSource.PlayOneShot(clip);
+                sfxSource.PlayOneShot(newTool.EquipSound);
             }
 
             toolSlotsUI.ChangeHighlightedSlot(_currentToolIndex);

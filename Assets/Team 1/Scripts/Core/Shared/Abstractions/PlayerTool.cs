@@ -11,6 +11,11 @@ namespace Core.Shared
     {
         [SerializeField, Tooltip("UI of this tool."), Required]
         private GameObject toolUI;
+        [SerializeField, Tooltip("This sound plays when this tool is equipped."), Required]
+        private AudioClip toolEquipSound;
+
+
+        public AudioClip EquipSound => toolEquipSound;
 
 
         /// <summary>
