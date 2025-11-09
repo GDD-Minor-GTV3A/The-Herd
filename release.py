@@ -1,0 +1,192 @@
+"""Create a new release, tagging the current commit and publishing it to GH releases.
+
+Skips the debug information in dist/*DoNotShip
+Builds a zip out of dist/* as an artifact to publish to GH releases.
+
+see documentation for arguments: https://cli.github.com/manual/gh_release_create
+additionally --dist-dir and --zip-file are supported to override the default paths.
+
+prepend with `no` to set boolean flags to false.
+    example: `--no-latest`
+
+USAGE:
+    python release.py [options]
+    python release.py --help
+"""
+
+from __future__ import annotations
+
+import asyncio
+import zipfile
+from argparse import ArgumentParser, Namespace
+from dataclasses import dataclass
+from logging import StreamHandler, getLogger
+from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
+
+ROOT = Path(__file__).parent
+BUILD_DIR = ROOT / "dist"
+ZIP_FILE = ROOT / "the-herd.zip"
+
+logger = getLogger(__name__)
+logger.addHandler(StreamHandler())
+logger.setLevel("DEBUG")
+
+class GithubSettings:
+    """Command line arguments. matches https://cli.github.com/manual/gh_release_create."""
+
+    discussion_category: str | None = None
+    draft: bool = True
+    fail_on_no_commits: bool = True
+    generate_notes: bool = True
+    latest: bool = True
+    notes: str | None = None
+    notes_file: Path | None = None
+    notes_from_tag: bool = False
+    notes_start_tag: str | None = None
+    prerelease: bool = False
+    target: str = "main"
+    title: str | None = None
+    verify_tag: bool = True
+
+class Args(Namespace, GithubSettings):
+    """Command line context."""
+
+    tag: SemVer | None = None
+    dist_dir: Path = BUILD_DIR
+    zip_file: Path = ZIP_FILE
+    create_tag: bool = True
+
+    def generate_setting_flags(self) -> Generator[str]:
+        """Generate command line flags from settings as a list of tokens."""
+        for i in GithubSettings.__annotations__:
+            val = getattr(self, i)
+            match val:
+                # true  -> add flag
+                # false -> skip (we support --no- flags via parser)
+                case True:
+                    yield f"--{i.replace('_', '-')}"
+                case str() | Path():
+                    yield f"--{i.replace('_', '-')}"
+                    yield str(val)
+                case _:
+                    logger.debug("Unused setting type/value: %s=%r", i, val)
+
+parser = ArgumentParser(description="Create a new GH release.")
+for arg, typ in Args.__annotations__.items():
+    match typ:
+        case bool():
+            parser.add_argument(f"--{arg.replace('_', '-')}", action="store_true")
+            parser.add_argument(f"--no-{arg.replace('_', '-')}", action="store_false", dest=arg)
+        case str():
+            parser.add_argument(f"--{arg.replace('_', '-')}", type=str, default=getattr(Args, arg))
+        case Path():
+            parser.add_argument(f"--{arg.replace('_', '-')}", type=Path, default=getattr(Args, arg))
+        case _:
+            logger.debug("Unknown argument type: %s", typ)
+args: Args = parser.parse_args(namespace=Args())
+
+@dataclass
+class SemVer:
+    """Semantic Versioning representation."""
+
+    major: int
+    minor: int
+    patch: int
+
+    @staticmethod
+    def from_str(version: str) -> SemVer:
+        """Create a SemVer from a string."""
+        major, minor, patch = map(int, version.lstrip("v").split("."))
+        return SemVer(major, minor, patch)
+
+    def __str__(self) -> str:
+        """Convert to string."""
+        return f"v{self.major}.{self.minor}.{self.patch}"
+
+    def bump_minor(self) -> SemVer:
+        """Bump the minor version."""
+        return SemVer(self.major, self.minor + 1, 0)
+
+async def zip_dist() -> None:
+    """Zip the dist folder into a single zip file for GH releases."""
+    with zipfile.ZipFile(ZIP_FILE, "w") as zf:
+        for file in BUILD_DIR.glob("**/*"):
+            if "DoNotShip" in file.name:
+                continue
+            zf.write(file, file.relative_to(BUILD_DIR))
+
+async def get_tag() -> SemVer:
+    """Get the current git tag."""
+    proc = await asyncio.create_subprocess_exec(
+        *["git", "describe", "--tags", "--abbrev=0"],
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    stdout, stderr = await proc.communicate()
+    if proc.returncode != 0:
+        msg = f"Failed to get git tag: {stderr.decode()}"
+        raise RuntimeError(msg)
+    logger.info("Current tag: %s", stdout.decode().strip())
+    return SemVer.from_str(stdout.decode().strip())
+
+async def create_release() -> None:
+    """Create a GH release."""
+    # Build argument list to avoid shell quoting/globbing issues
+    command: list[str] = f"gh release create {args.tag} {args.zip_file}".split()
+    command += args.generate_setting_flags()
+
+    logger.debug("Creating release with command: %s", command)
+    proc = await asyncio.create_subprocess_exec(
+        *command,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    stdout, stderr = await proc.communicate()
+    if proc.returncode != 0:
+        msg = f"Failed to create release: {stderr.decode()}"
+        raise RuntimeError(msg)
+    logger.info("Release created successfully: %s", stdout.decode())
+
+async def create_tag() -> None:
+    """Create a git tag."""
+    command: list[str] = f"git tag {args.tag} -m {args.title}".split()
+
+    logger.debug("Creating tag with command: %s", command)
+    proc = await asyncio.create_subprocess_exec(
+        *command,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    stdout, stderr = await proc.communicate()
+    if proc.returncode != 0:
+        msg = f"Failed to create tag: {stderr.decode()}"
+        raise RuntimeError(msg)
+    logger.info("Tag created successfully: %s", stdout.decode())
+
+async def set_defaults() -> None:
+    """Set default values for settings if not provided."""
+    tag = await get_tag()
+    tag = tag.bump_minor()
+
+    # Set default title and notes if not provided
+    args.tag = args.tag or tag
+    args.title = args.title or f"Release {tag}"
+    args.notes = args.notes or f"Automated release of version {tag}."
+
+async def main() -> None:
+    """Entry point."""
+    await asyncio.gather(
+        zip_dist(),
+        set_defaults(),
+    )
+    if args.create_tag:
+        await create_tag()
+    await create_release()
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
