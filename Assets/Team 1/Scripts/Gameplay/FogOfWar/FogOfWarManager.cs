@@ -353,6 +353,7 @@ namespace Gameplay.FogOfWar
             positionsBuffer.SetData(positionsData);
 
             hiddenComputeShader.SetVector("_PlayerPosition", playerTransform.position);
+            //hiddenComputeShader.SetMatrix("_PlayerRotation", fogProjectionPlane.localToWorldMatrix);
 
             int _threadsToStart = Mathf.CeilToInt((float)hiddenObjects.Count / threadsAmount);
 

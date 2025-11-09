@@ -44,7 +44,7 @@ namespace Gameplay.Player
             Vector3 movementTarget = _playerMovement.CalculateMovementTargetFromInput(playerInput, false);
             _playerMovement.MoveTo(movementTarget);
 
-            // Rotate based on current rotation mode (movement or mouse)
+            // Rotate based on current rotation mode (movement or mouse)z
             //_manager.Rotation.Rotate(playerInput, _manager.Input.Look.Value);
             _animator.RotateCharacterBody(_manager.Input.Look.Value);
 

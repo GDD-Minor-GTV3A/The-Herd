@@ -14,7 +14,7 @@ namespace Gameplay.CameraSettings
         [SerializeField, Tooltip("Camera type.")] private CameraType cameraType;
         [SerializeField, Tooltip("Distance from camera to the player.")] private float defaultCameraDistance = 30;
         [SerializeField, ShowIf("ShowFOV"), Tooltip("FOV of perspective camera.")] private float FOV = 40;
-        [SerializeField, Tooltip("Objects before this plane will not be rendered.")] private float nearClipPlane = 0;
+        [SerializeField, Tooltip("Objects before this plane will not be rendered.")] private float nearClipPlane = 1;
         [SerializeField, Tooltip("Objects after this plane will not be rendered.")] private float farClipPlane = 1000;
         [SerializeField, Tooltip("Layers to render on main camera.")] private LayerMask renderLayers;
         [SerializeField, Tooltip("Position of camera.")] private Vector3 cameraAngles = new Vector3(30, 0 ,0);
@@ -75,8 +75,8 @@ namespace Gameplay.CameraSettings
             if (nearClipPlane > farClipPlane)
                 nearClipPlane = farClipPlane;
 
-            if (cameraType == CameraType.Perspective && nearClipPlane <= 0)
-                nearClipPlane = 0.001f;
+            if (cameraType == CameraType.Perspective && nearClipPlane <= 1)
+                nearClipPlane = 1f;
                 
 
 

@@ -161,8 +161,10 @@ namespace Gameplay.Player
             if (Mathf.Round(root.rotation.eulerAngles.y) % 90 == 0)
                 root.Rotate(0, 45, 0);
 
+            Vector3 targetPosition = new Vector3(mouseWorldPosition.x, animationConstrains.LookTarget.position.y, mouseWorldPosition.z);
 
-            animationConstrains.LookTarget.position = new Vector3(mouseWorldPosition.x, animationConstrains.LookTarget.position.y, mouseWorldPosition.z);
+            animationConstrains.LookTarget.position = targetPosition;
+
         }
     }
 
