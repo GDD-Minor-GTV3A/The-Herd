@@ -50,7 +50,7 @@ class GithubSettings:
     prerelease: bool = False
     target: str = "main"
     title: str | None = None
-    verify_tag: bool = True
+    verify_tag: bool = False
 
 class Args(Namespace, GithubSettings):
     """Command line context."""
@@ -58,7 +58,6 @@ class Args(Namespace, GithubSettings):
     tag: SemVer | None = None
     dist_dir: Path = BUILD_DIR
     zip_file: Path = ZIP_FILE
-    create_tag: bool = True
 
     def generate_setting_flags(self) -> Generator[str]:
         """Generate command line flags from settings as a list of tokens."""
@@ -151,22 +150,6 @@ async def create_release() -> None:
         raise RuntimeError(msg)
     logger.info("Release created successfully: %s", stdout.decode())
 
-async def create_tag() -> None:
-    """Create a git tag."""
-    command: list[str] = f"git tag {args.tag} -m {args.title}".split()
-
-    logger.debug("Creating tag with command: %s", command)
-    proc = await asyncio.create_subprocess_exec(
-        *command,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-    stdout, stderr = await proc.communicate()
-    if proc.returncode != 0:
-        msg = f"Failed to create tag: {stderr.decode()}"
-        raise RuntimeError(msg)
-    logger.info("Tag created successfully: %s", stdout.decode())
-
 async def set_defaults() -> None:
     """Set default values for settings if not provided."""
     tag = await get_tag()
@@ -183,8 +166,6 @@ async def main() -> None:
         zip_dist(),
         set_defaults(),
     )
-    if args.create_tag:
-        await create_tag()
     await create_release()
 
 
