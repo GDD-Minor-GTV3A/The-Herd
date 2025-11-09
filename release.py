@@ -4,7 +4,7 @@ Skips the debug information in dist/*DoNotShip
 Builds a zip out of dist/* as an artifact to publish to GH releases.
 
 see documentation for arguments: https://cli.github.com/manual/gh_release_create
-additionally --dist-dir and --zip-file are supported to override the default paths.
+additionally --tag, --dist-dir and --zip-file are supported to override the default paths.
 
 prepend with `no` to set boolean flags to false.
     example: `--no-latest`
