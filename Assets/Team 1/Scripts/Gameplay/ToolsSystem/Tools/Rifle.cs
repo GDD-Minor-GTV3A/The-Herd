@@ -1,156 +1,161 @@
-using System.Collections;
-using System.Collections.Generic;
-
+ï»¿using System.Collections;
+using Core.Events;
 using Core.Shared;
-
+using Gameplay.Player;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Rifle : MonoBehaviour, IPlayerTool
 {
-    [Header("Bolt-Action Settings")]
-    [SerializeField] private int maxAmmo = 5;
-    [SerializeField] private float fireCooldown = 1f; // Delay between shots (simulates bolt time)
-    [SerializeField] private float boltCycleTime = 1.5f; // How long the bolt cycle takes
-    [SerializeField] private GameObject bulletPrefab;
+    [Header("Configuration")]
+    [SerializeField, Tooltip("Rifle config asset.")]
+    private RifleConfig config;
 
+    [SerializeField, Tooltip("Transform from which bullets are spawned.")]
+    private Transform shotPoint;
+
+    [Header("Animation Points")]
+    [SerializeField, Tooltip("Defines the key points in the player's animation for this specific tool.")]
+    private ToolAnimationKeyPoints keyPoints;
+    [SerializeField] private Animator animator;
+
+
+    [Space]
+    [SerializeField] private UnityEvent onShot;
+
+
+    // --- Runtime State ---
     private int currentAmmo;
     private bool isBoltClosed = true;
     private bool canFire = true;
     private bool isCycling = false;
+    private bool isReloading = false;
 
-    private Queue<Bullet> bulletPool = new Queue<Bullet>();
-    [SerializeField] private int poolSize = 5;
+    private PlayerAnimator playerAnimator;
+    private BulletPool bulletPool;
 
-    private void Start()
+    public int CurrentAmmo => currentAmmo;
+
+    public void Initialize(PlayerAnimator animator)
     {
-        currentAmmo = maxAmmo;
-
-        // Initialize pool
-        for (int i = 0; i < poolSize; i++)
+        if (config == null)
         {
-            GameObject b = Instantiate(bulletPrefab);
-            b.SetActive(false);
-            bulletPool.Enqueue(b.GetComponent<Bullet>());
+            Debug.LogError("RifleConfig not assigned in inspector!");
+            enabled = false;
+            return;
         }
+
+        // Initialize the bullet pool using values from config
+        bulletPool = new BulletPool(config.BulletPrefab, config.Damage, initialCapacity: 0, maxSize: config.MaxPoolSize);
+
+        playerAnimator = animator;
+        currentAmmo = config.MaxAmmo;
+        gameObject.SetActive(false);
     }
 
     public void MainUsageStarted(Observable<Vector3> cursorWorldPosition)
     {
-        if (!canFire || isCycling)
-            return;
-
-        if (!isBoltClosed)
-        {
-            Debug.Log("Bolt open — cannot fire");
-            return;
-        }
-
-        if (currentAmmo <= 0)
-        {
-            Debug.Log("Out of ammo — reload!");
-            return;
-        }
-
+        if (!canFire || isCycling || !isBoltClosed || currentAmmo <= 0) return;
         Fire();
     }
 
     public void MainUsageFinished() { }
-
-    public void SecondaryUsageStarted(Observable<Vector3> cursorWorldPosition) { }
-
-    public void SecondaryUsageFinished() { }
-
-    public void Reload()
+    public void SecondaryUsageStarted(Observable<Vector3> cursorWorldPosition) 
     {
-        if (!isCycling)
-        {
-            StartCoroutine(ReloadRoutine());
-        }
+        EventManager.Broadcast(new ZoomCameraEvent(20));
+        EventManager.Broadcast(new ChangeConePlayerRevealerFOVEvent(-50));
+        EventManager.Broadcast(new ChangeConePlayerRevealerDistnaceEvent(50));
+    }
+    public void SecondaryUsageFinished() 
+    {
+        EventManager.Broadcast(new ZoomCameraEvent(-20));
+        EventManager.Broadcast(new ChangeConePlayerRevealerFOVEvent(50));
+        EventManager.Broadcast(new ChangeConePlayerRevealerDistnaceEvent(-50));
     }
 
     private void Fire()
     {
-        if (bulletPool.Count == 0)
-        {
-            Debug.Log("No bullets available in pool!");
-            return;
-        }
+        if (currentAmmo <= 0 || isReloading || !canFire) return;
 
-        Debug.Log("Rifle: Bullet fired!");
         currentAmmo--;
         canFire = false;
 
-        // Get bullet from pool
-        Bullet bullet = bulletPool.Dequeue();
-        bullet.transform.position = transform.position + transform.forward * 1.5f + Vector3.up * 1.2f;
-        bullet.transform.rotation = Quaternion.identity;
-        bullet.gameObject.SetActive(true);
-        bullet.Shoot(transform.forward);
+        Bullet bullet = bulletPool.Get();
+        bullet.transform.SetPositionAndRotation(shotPoint.position, shotPoint.rotation);
+        bullet.Shoot(shotPoint.forward);
 
-        // Return bullet to pool after its lifetime
-        StartCoroutine(ReturnBulletToPool(bullet, 5f));
-
-        // Start the automatic bolt cycle
+        onShot?.Invoke();
+        animator.SetTrigger("BoltCycle");
         StartCoroutine(AutoBoltCycle());
-    }
-
-    private IEnumerator ReturnBulletToPool(Bullet bullet, float time)
-    {
-        yield return new WaitForSeconds(time);
-        bullet.gameObject.SetActive(false);
-        bulletPool.Enqueue(bullet);
     }
 
     private IEnumerator AutoBoltCycle()
     {
         isCycling = true;
-        Debug.Log("Cycling bolt automatically...");
-
         isBoltClosed = false;
-        yield return new WaitForSeconds(boltCycleTime / 3f);
 
-        Debug.Log("Shell ejected");
-        yield return new WaitForSeconds(boltCycleTime / 3f);
+        float step = config.BoltCycleTime / 3f;
 
-        if (currentAmmo > 0)
+        yield return new WaitForSeconds(step); // open bolt
+        yield return new WaitForSeconds(step); // eject round
+
+        if (currentAmmo <= 0)
         {
-            Debug.Log($"Round chambered ({currentAmmo}/{maxAmmo} left)");
-        }
-        else
-        {
-            Debug.Log("No ammo left — reload required");
             isCycling = false;
             isBoltClosed = true;
             canFire = true;
-            Debug.Log("Bolt closed, reload available");
             yield break;
         }
 
-        yield return new WaitForSeconds(boltCycleTime / 3f);
+        yield return new WaitForSeconds(step); // close bolt
+
         isBoltClosed = true;
-        Debug.Log("Bolt closed, ready to fire again");
-
-        // Wait for small cooldown to simulate player resetting aim
-        yield return new WaitForSeconds(fireCooldown);
-
         isCycling = false;
         canFire = true;
     }
 
+    public void Reload()
+    {
+        if (!isCycling && !isReloading)
+            StartCoroutine(ReloadRoutine());
+    }
+
     private IEnumerator ReloadRoutine()
     {
-        if (currentAmmo == maxAmmo)
-        {
-            Debug.Log("Magazine full — reload skipped");
-            yield break;
-        }
+        if (currentAmmo == config.MaxAmmo) yield break;
+
+        animator.SetTrigger("Reload");
 
         canFire = false;
-        Debug.Log("Reloading magazine...");
-        yield return new WaitForSeconds(boltCycleTime * 2f);
-        currentAmmo = maxAmmo;
+        isReloading = true;
+        yield return new WaitForSeconds(config.ReloadTime);
+
+        currentAmmo = config.MaxAmmo;
         isBoltClosed = true;
-        Debug.Log("Reload complete");
         canFire = true;
+        isReloading = false;
+    }
+
+    public void HideTool()
+    {
+        isBoltClosed = true;
+        canFire = true;
+        isCycling = false;
+        isReloading = false;
+
+        gameObject.SetActive(false);
+        playerAnimator.RemoveHands();
+    }
+
+    public void ShowTool()
+    {
+        gameObject.SetActive(true);
+        playerAnimator.GetTool(keyPoints);
+        animator.SetFloat("BoltCycleSpeed", 1 / config.BoltCycleTime);
+        animator.SetFloat("ReloadSpeed", 1 / config.ReloadTime);
+    }
+
+    public void TryBark()
+    {
     }
 }

@@ -1,9 +1,9 @@
+using System;
 using System.Collections.Generic;
 using Core.Events;
 using Ink.Runtime;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 /// <summary>
 /// A singleton class that manages the dialogue system,
@@ -20,6 +20,7 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private Animator _portraitAnimator;
     
     [Header("Choices UI")]
+    [SerializeField] private GameObject _choicesPanel; 
     [SerializeField] private GameObject[] _choices;
     private TextMeshProUGUI[] _choicesText;
     
@@ -41,8 +42,9 @@ public class DialogueManager : MonoBehaviour
     // Constants
     private const string SPEAKER_TAG = "speaker";
     private const string PORTRAIT_TAG = "portrait";
-    private const string LAYOUT_TAG = "layout";
     private const string DEFAULT_LAYOUT_STATE = "left";
+    private const string NARRATOR_LAYOUT_STATE = "narrator";
+    private const string SHOW_CHOICES_STATE = "showChoices"; 
 
     /// <summary>
     /// Gets a value indicating whether dialogue is currently playing.
@@ -81,7 +83,12 @@ public class DialogueManager : MonoBehaviour
             _choicesText[i] = _choices[i].GetComponentInChildren<TextMeshProUGUI>();
         }
     }
-    
+
+    private void OnEnable()
+    {
+        EventManager.AddListener<QuestCompletedEvent>(OnQuestCompleted);
+    }
+
 
     private void Update()
     {
@@ -97,47 +104,24 @@ public class DialogueManager : MonoBehaviour
             _pendingPortraitState = null;
         }
 
-        // Use Space for both advancing text and confirming a selection.
+        // --- CHOICE KEYBOARD LOGIC ---
+        // If choices are displayed, allow number keys to select choices
+        if (_story.currentChoices.Count > 0)
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha1)) { MakeChoice(0); return; }
+            if (Input.GetKeyDown(KeyCode.Alpha2)) { MakeChoice(1); return; }
+            if (Input.GetKeyDown(KeyCode.Alpha3)) { MakeChoice(2); return; }
+            // Add more if you have more than 3 choices
+            return;
+        }
+
+        // Use Space for advancing text only when no choices are available
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            if (_story.currentChoices.Count == 0)
-            {
-                ContinueStory();
-            }
-            else
-            {
-                ConfirmChoiceSelection();
-            }
+            ContinueStory();
         }
     }
 
-    /// <summary>
-    /// Handles the input logic for selecting the currently highlighted choice.
-    /// </summary>
-    private void ConfirmChoiceSelection()
-    {
-        GameObject selectedObject = EventSystem.current?.currentSelectedGameObject;
-        
-        if (selectedObject == null && _story.currentChoices.Count > 0)
-        {
-            // Fallback: If no button is selected but choices exist, force-select the first one.
-            EventSystem.current?.SetSelectedGameObject(_choices[0]);
-            selectedObject = _choices[0];
-        }
-
-        if (selectedObject != null)
-        {
-            for (int i = 0; i < _choices.Length; i++)
-            {
-                // Check if the selected object is one of our choice buttons
-                if (_choices[i] == selectedObject)
-                {
-                    MakeChoice(i);
-                    return; 
-                }
-            }
-        }
-    }
 
     /// <summary>
     /// Enters dialogue mode by loading an Ink story and displaying the first line.
@@ -167,6 +151,8 @@ public class DialogueManager : MonoBehaviour
         IsDialoguePlaying = true;
         _dialoguePanel.SetActive(true);
         _onDialogueFinished = onDialogueFinished;
+        _layoutAnimator?.Play(DEFAULT_LAYOUT_STATE);
+        
         ContinueStory();
     }
 
@@ -179,7 +165,7 @@ public class DialogueManager : MonoBehaviour
         _dialoguePanel.SetActive(false);
         _dialogueText.text = string.Empty;
         _pendingPortraitState = null;
-        _layoutAnimator?.Play(DEFAULT_LAYOUT_STATE);
+        _layoutAnimator?.Play(DEFAULT_LAYOUT_STATE); 
         
         _onDialogueFinished?.Invoke(); 
         _onDialogueFinished = null;
@@ -295,21 +281,41 @@ public class DialogueManager : MonoBehaviour
                 case PORTRAIT_TAG:
                     showPortrait = !value.Equals("false", System.StringComparison.OrdinalIgnoreCase); 
                     break;
-                case LAYOUT_TAG:
-                    _layoutAnimator?.Play(value);
-                    break;
             }
         }
 
         ApplySpeakerAndPortrait(speaker, showPortrait);
+        UpdateLayout(speaker);
+    }
+
+    /// <summary>
+    /// Updates the layout animation based on the speaker
+    /// </summary>
+    /// <param name="speaker">The current speaker name</param>
+    private void UpdateLayout(string speaker)
+    {
+        if (_layoutAnimator == null)
+        {
+            return;
+        }
+
+        // If speaker is "Narrator", use narrator layout; otherwise use left layout
+        if (!string.IsNullOrEmpty(speaker) && speaker.Equals("Narrator", System.StringComparison.OrdinalIgnoreCase))
+        {
+            _layoutAnimator.Play(NARRATOR_LAYOUT_STATE);
+        }
+        else
+        {
+            _layoutAnimator.Play(DEFAULT_LAYOUT_STATE);
+        }
     }
 
     private void ApplySpeakerAndPortrait(string speaker, bool showPortrait)
     {
         if (string.IsNullOrEmpty(speaker) || speaker.Equals("Narrator", System.StringComparison.OrdinalIgnoreCase))
         {
-            _displayNameText.text = string.Empty;
-            _portraitAnimator?.gameObject.SetActive(false);
+            _displayNameText.text = "Narrator";
+            _portraitAnimator?.gameObject.SetActive(false); 
             return;
         }
 
@@ -385,6 +391,20 @@ public class DialogueManager : MonoBehaviour
     private void DisplayChoices()
     {
         var currentChoices = _story.currentChoices;
+        
+        // Use the Animator to control the visibility of the parent panel, using the corrected state name
+        if (currentChoices.Count > 0)
+        {
+            // Transition to an animation state that enables the choices panel
+            _layoutAnimator.Play(SHOW_CHOICES_STATE);
+        }
+        else
+        {
+            // Revert to a default layout state that disables the choices panel
+            _layoutAnimator.Play(DEFAULT_LAYOUT_STATE);
+        }
+        
+        // The script still handles the individual choice buttons
         int i = 0;
         for (; i < currentChoices.Count && i < _choices.Length; i++)
         {
@@ -395,12 +415,6 @@ public class DialogueManager : MonoBehaviour
         for (; i < _choices.Length; i++)
         {
             _choices[i].SetActive(false);
-        }
-
-        // Auto-select the first choice for controller/keyboard navigation
-        if (currentChoices.Count > 0)
-        {
-            EventSystem.current?.SetSelectedGameObject(_choices[0]);
         }
     }
 
@@ -428,15 +442,15 @@ public class DialogueManager : MonoBehaviour
     private void CompleteObjective(string questID, string objectiveID)
     {
         EventManager.Broadcast(new CompleteObjectiveEvent(questID, objectiveID));
+        Debug.Log("Completed Objective through dialogue");
     }
     
     /// <summary>
-    /// Called by QuestManager when a quest is completed to update dialogue state
+    /// Called through the EventSystem/Manager
     /// </summary>
-    public void OnQuestCompleted(string questID)
+    public void OnQuestCompleted(QuestCompletedEvent evt)
     {
-        // Map quest IDs to their corresponding Ink variables
-        // Example: "QUEST_001" -> "vesna_quest_completed"
+        string questID = evt.QuestID;
         string inkVariableName = questID + "_completed";
         if (!string.IsNullOrEmpty(inkVariableName))
         {

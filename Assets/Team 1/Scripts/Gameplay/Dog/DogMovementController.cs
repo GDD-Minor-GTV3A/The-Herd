@@ -1,9 +1,8 @@
 using Core.Shared;
-
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace Gameplay.Dog
+namespace Gameplay.Dog 
 {
     /// <summary>
     /// Movement controller for the dog.
@@ -11,7 +10,7 @@ namespace Gameplay.Dog
     public class DogMovementController : MovementController
     {
         private NavMeshAgent _agent;
-
+        
         private float _minSpeed;
         private float _maxSpeed;
         private float _baseSpeed;
@@ -23,7 +22,7 @@ namespace Gameplay.Dog
         /// <summary>
         /// True - dog is moving or pending the path, false - dog is in idle state.
         /// </summary>
-        public bool IsMoving => (_agent.hasPath || _agent.pathPending);
+        public bool IsMoving => (_agent.hasPath || _agent.pathPending || _agent.remainingDistance > _agent.stoppingDistance || _agent.velocity.sqrMagnitude > 0.1f);
 
 
         /// <summary>

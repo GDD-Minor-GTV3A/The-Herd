@@ -2,20 +2,26 @@ using UnityEngine;
 
 public class SettleTree : MonoBehaviour
 {
-    //private Rigidbody rb;
+    private Rigidbody rb;
 
-    //public void Initialize()
-    //{
-    //    rb = GetComponent<Rigidbody>();
-    //}
+    private void Awake() //Fixed compile error caused by initialized function (Yeremey from Integration)
+    {
+        rb = GetComponent<Rigidbody>();
+        if (rb == null)
+        {
+            Debug.LogError("SettleTree: Missing Rigidbody!", this);
+            enabled = false;
+        }
+    }
 
-    //public void Update()
-    //{
-    //    if (rb.IsSleeping())
-    //    {
-    //        rb.isKinematic = true;
+    private void Update()
+    {
+        if (rb == null) return;
 
-    //        this.enabled = false;
-    //    }
-    //}
+        if (rb.IsSleeping())
+        {
+            rb.isKinematic = true;
+            enabled = false;
+        }
+    }
 }
