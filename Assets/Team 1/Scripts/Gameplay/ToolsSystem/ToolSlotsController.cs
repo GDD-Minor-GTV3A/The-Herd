@@ -22,6 +22,15 @@ namespace Gameplay.ToolsSystem
 
         private Gameplay.Player.PlayerInput _input;
 
+        [Space]
+        [Header("Audio")]
+        [SerializeField] private AudioSource sfxSource;
+        [SerializeField] private AudioClip whistleEquipSfx;
+        [SerializeField] private AudioClip rifleEquipSfx;
+        private bool _initializedFirstSlot;
+        
+
+
 
         /// <summary>
         /// Initialization method.
@@ -63,6 +72,7 @@ namespace Gameplay.ToolsSystem
             SetNewToolToSlotByIndex(rifle, 1);
 
             SetCurrentSlotByIndex(0);
+            _initializedFirstSlot = true;
         }
         private void UpdateCurrentSlot(InputAction.CallbackContext obj)
         {
@@ -73,17 +83,35 @@ namespace Gameplay.ToolsSystem
 
         private void SetCurrentSlotByIndex(int index)
         {
+            if (index == _currentToolIndex) 
+                return;
+
             if (_toolSlots[_currentToolIndex] != null)
                 _toolSlots[_currentToolIndex].HideTool();
 
             index = Mathf.Clamp(index, 0, _slotsAmount-1);
             _currentToolIndex = index;
 
-            if (_toolSlots[_currentToolIndex] != null)
-                _toolSlots[_currentToolIndex].ShowTool();
+            var newTool = _toolSlots[_currentToolIndex];
+            if (newTool != null) newTool.ShowTool();
+
+            if (_initializedFirstSlot && sfxSource != null && newTool is MonoBehaviour mb)
+            {
+                AudioClip clip = null;
+
+                if (ReferenceEquals(newTool, whistle))
+                    clip = whistleEquipSfx;
+                else if (ReferenceEquals(newTool, rifle))
+                    clip = rifleEquipSfx;
+
+                if (clip != null) sfxSource.PlayOneShot(clip);
+            }
 
             toolSlotsUI.ChangeHighlightedSlot(_currentToolIndex);
+        
         }
+
+        
 
 
         private void OnCurrentToolReload(InputAction.CallbackContext obj)

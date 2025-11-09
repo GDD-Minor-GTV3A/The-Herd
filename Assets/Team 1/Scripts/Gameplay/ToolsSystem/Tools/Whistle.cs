@@ -13,6 +13,8 @@ namespace Gameplay.ToolsSystem
         private Observable<Vector3> _cursorWorldPosition;
         private PlayerAnimator _animator;
 
+     
+
 
         public void Initialize(PlayerAnimator animator)
         {

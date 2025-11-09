@@ -23,6 +23,8 @@ public class Rifle : PlayerTool
     [Space]
     [SerializeField] private UnityEvent onShot;
 
+ 
+
 
     // --- Runtime State ---
     private int currentAmmo;

@@ -1096,6 +1096,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7191174862489174219, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
   m_PrefabInstance: {fileID: 5230550193027717823}
   m_PrefabAsset: {fileID: 0}
+--- !u!82 &1813006617 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: 3864333901635965738, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
+  m_PrefabInstance: {fileID: 5230550193027717823}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2096844683 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7917487680442802504, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
@@ -1175,6 +1180,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 90066509589528700, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
+      propertyPath: equipSFX
+      value: 
+      objectReference: {fileID: 8300000, guid: 46885e453e711d347a34f86af8333bc5, type: 3}
+    - target: {fileID: 90066509589528700, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
       propertyPath: onShot.m_PersistentCalls.m_Calls.Array.data[2].m_Target
       value: 
       objectReference: {fileID: 51739216}
@@ -1250,10 +1259,26 @@ PrefabInstance:
       propertyPath: m_Data.m_SourceObjects.m_Item0.transform
       value: 
       objectReference: {fileID: 2096844683}
+    - target: {fileID: 5609012314165025320, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
+      propertyPath: sfxSource
+      value: 
+      objectReference: {fileID: 1813006617}
+    - target: {fileID: 5609012314165025320, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
+      propertyPath: rifleEquipSfx
+      value: 
+      objectReference: {fileID: 8300000, guid: 46885e453e711d347a34f86af8333bc5, type: 3}
+    - target: {fileID: 5609012314165025320, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
+      propertyPath: whistleEquipSfx
+      value: 
+      objectReference: {fileID: 8300000, guid: 2cdbff1ab7ea897428091678d410c20c, type: 3}
     - target: {fileID: 6065300022185603627, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 6791105778019880036, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
+      propertyPath: equipSFX
+      value: 
+      objectReference: {fileID: 8300000, guid: 2cdbff1ab7ea897428091678d410c20c, type: 3}
     - target: {fileID: 6899045010453004440, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
       propertyPath: m_Sources.Array.data[0].sourceTransform
       value: 
@@ -1313,6 +1338,10 @@ PrefabInstance:
     - target: {fileID: 7628562527369306875, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7940098435907933061, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 21.352936
       objectReference: {fileID: 0}
     - target: {fileID: 9220633436221397549, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
       propertyPath: _player
