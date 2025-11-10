@@ -9,7 +9,7 @@ public class PathLighting : MonoBehaviour
 
     private void Awake()
     {
-        currentLight = GetComponent<Light>();
+        currentLight = GetComponentInChildren<Light>();
         
         if (previousLight == null)
         {
