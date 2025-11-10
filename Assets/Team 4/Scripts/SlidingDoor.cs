@@ -21,7 +21,6 @@ public class SlidingDoor : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        Debug.Log("Trigger entered by: " + other.name);
         if (other.CompareTag("Player"))
         {
             if (!isLocked && !isOpen)
