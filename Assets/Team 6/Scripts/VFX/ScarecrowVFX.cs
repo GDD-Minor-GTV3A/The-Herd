@@ -4,13 +4,13 @@ using UnityEngine;
 public class ScarecrowVFX : MonoBehaviour
 {
     [Header("Visuals")]
-    public Renderer headRenderer;      
+    public Renderer headRenderer;
     public Color glowColor = new Color(1f, 0.35f, 0f);
     [Range(0f, 8f)] public float glowIntensity = 4f;
 
     [Header("Particle & Light")]
-    public ParticleSystem burstParticles;       
-    public Light pointLight;                    
+    public ParticleSystem burstParticles;
+    public Light pointLight;
     public float lightIntensity = 3f;
     public float lightRange = 6f;
 
@@ -21,17 +21,23 @@ public class ScarecrowVFX : MonoBehaviour
     Material _instanceMat;
     Color _originalEmissionColor;
     bool _isPlaying;
+    int _emissionColorID;
 
     void Awake()
     {
         if (headRenderer == null) headRenderer = GetComponent<Renderer>();
+
         if (headRenderer != null)
         {
             _instanceMat = headRenderer.material;
+            _emissionColorID = Shader.PropertyToID("_EmissionColor");
+
+            if (_instanceMat.HasProperty(_emissionColorID))
+                _originalEmissionColor = _instanceMat.GetColor(_emissionColorID);
+            else
+                _originalEmissionColor = Color.black;
+
             _instanceMat.EnableKeyword("_EMISSION");
-            _originalEmissionColor = _instanceMat.HasProperty("_EmissionColor")
-                ? _instanceMat.GetColor("_EmissionColor")
-                : Color.black;
         }
 
         if (pointLight != null)
@@ -54,17 +60,16 @@ public class ScarecrowVFX : MonoBehaviour
         if (burstParticles != null) burstParticles.Play();
         if (pointLight != null) pointLight.intensity = lightIntensity;
 
-        if (_instanceMat != null && _instanceMat.HasProperty("_EmissionColor"))
+        if (_instanceMat != null && _instanceMat.HasProperty(_emissionColorID))
         {
-            Color emission = glowColor * glowIntensity;
-            _instanceMat.SetColor("_EmissionColor", emission);
-            DynamicGI.SetEmissive(headRenderer, emission);
+            Color emission = glowColor * Mathf.LinearToGammaSpace(glowIntensity);
+            _instanceMat.SetColor(_emissionColorID, emission);
         }
 
         yield return new WaitForSeconds(vfxDuration - fadeDuration);
 
         float t = 0f;
-        Color start = _instanceMat.GetColor("_EmissionColor");
+        Color start = _instanceMat.GetColor(_emissionColorID);
         while (t < fadeDuration)
         {
             t += Time.deltaTime;
@@ -73,8 +78,7 @@ public class ScarecrowVFX : MonoBehaviour
             if (_instanceMat != null)
             {
                 Color c = Color.Lerp(start, _originalEmissionColor, p);
-                _instanceMat.SetColor("_EmissionColor", c);
-                DynamicGI.SetEmissive(headRenderer, c);
+                _instanceMat.SetColor(_emissionColorID, c);
             }
 
             if (pointLight != null)
@@ -85,7 +89,7 @@ public class ScarecrowVFX : MonoBehaviour
 
         if (pointLight != null) pointLight.intensity = 0f;
         if (_instanceMat != null)
-            _instanceMat.SetColor("_EmissionColor", _originalEmissionColor);
+            _instanceMat.SetColor(_emissionColorID, _originalEmissionColor);
 
         _isPlaying = false;
     }
