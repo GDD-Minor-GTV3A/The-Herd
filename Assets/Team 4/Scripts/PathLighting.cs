@@ -25,7 +25,7 @@ public class PathLighting : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            if (nextLight != null)
+            if (nextLight != null && currentLight.enabled)
             {
                 nextLight.TurnOn();
             }
