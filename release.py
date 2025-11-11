@@ -75,6 +75,7 @@ class Args(Namespace):
     title: str | None = None
     verify_tag: bool = False
 
+    # Additional settings
     tag: SemVer | None = None
     dist_dir: Path = BUILD_DIR
     zip_file: Path = ZIP_FILE
