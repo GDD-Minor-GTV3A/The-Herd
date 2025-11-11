@@ -3,7 +3,9 @@ using Core.Events;
 using Core.Shared;
 using Gameplay.Player;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 public class Rifle : PlayerTool
 {
@@ -18,6 +20,17 @@ public class Rifle : PlayerTool
     [SerializeField, Tooltip("Defines the key points in the player's animation for this specific tool.")]
     private ToolAnimationKeyPoints keyPoints;
     [SerializeField] private Animator animator;
+
+    [Space]
+    [Header("UI")]
+    [SerializeField] private Slider reloadSlider;
+    [SerializeField] private GameObject reloadUIRoot;
+    private Coroutine reloadCo;
+
+    [Space]
+    [Header("Sound")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip reloadSFX;
 
 
     [Space]
@@ -121,27 +134,57 @@ public class Rifle : PlayerTool
     public override void Reload()
     {
         if (!isCycling && !isReloading)
-            StartCoroutine(ReloadRoutine());
+            reloadCo = StartCoroutine(ReloadRoutine());
     }
 
     private IEnumerator ReloadRoutine()
     {
         if (currentAmmo == config.MaxAmmo) yield break;
 
-        animator.SetTrigger("Reload");
-
         canFire = false;
         isReloading = true;
-        yield return new WaitForSeconds(config.ReloadTime);
 
+        SetReloadUIVisible(true);
+        SetReloadProgress(1f);
+
+        animator.SetTrigger("Reload");
+
+        if (audioSource != null && reloadSFX != null)
+            audioSource.PlayOneShot(reloadSFX);
+
+        float duration = config.ReloadTime;
+        float t = 0f;
+
+        while (t < duration)
+        {
+            if (!gameObject.activeInHierarchy) { CleanupReloadUICancel(); yield break; }
+
+            t += Time.deltaTime;
+
+            
+            float remaining = Mathf.Clamp01(1f - (t / duration));
+            SetReloadProgress(remaining);
+
+            yield return null;
+        }
+
+        //yield return new WaitForSeconds(config.ReloadTime);
+        
         currentAmmo = config.MaxAmmo;
         isBoltClosed = true;
         canFire = true;
         isReloading = false;
+
+        SetReloadProgress(0f);
+        SetReloadUIVisible(false);
+        reloadCo = null;
     }
 
     public override void HideTool()
     {
+        if (reloadCo != null) { StopCoroutine(reloadCo); reloadCo = null; }
+        SetReloadUIVisible(false);
+
         base.HideTool();
         isBoltClosed = true;
         canFire = true;
@@ -154,10 +197,34 @@ public class Rifle : PlayerTool
 
     public override void ShowTool()
     {
+        
+        SetReloadUIVisible(false);
+        SetReloadProgress(1f);
+
         base.ShowTool();
         gameObject.SetActive(true);
         playerAnimator.GetTool(keyPoints);
         animator.SetFloat("BoltCycleSpeed", 1 / config.BoltCycleTime);
         animator.SetFloat("ReloadSpeed", 1 / config.ReloadTime);
+
+    }
+
+    private void SetReloadUIVisible(bool visible)
+    {
+        if (reloadUIRoot != null) reloadUIRoot.SetActive(visible);
+        else if (reloadSlider != null) reloadSlider.gameObject.SetActive(visible);
+    }
+
+    private void SetReloadProgress(float v)
+    {
+        if (reloadSlider != null) reloadSlider.value = v; 
+    }
+
+    private void CleanupReloadUICancel()
+    {
+        isReloading = false;
+        canFire = true;
+        SetReloadUIVisible(false);
+        reloadCo = null;
     }
 }
