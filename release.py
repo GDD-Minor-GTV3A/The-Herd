@@ -1,3 +1,4 @@
+#usr/bin/env python3
 """Create a new release, tagging the current commit and publishing it to GH releases.
 
 Skips the debug information in dist/*DoNotShip
