@@ -15,6 +15,10 @@ namespace Core.Shared
         [SerializeField, Tooltip("This sound plays when this tool is equipped."), Required]
         private AudioClip toolEquipSound;
 
+        [Header("Animation Points")]
+        [SerializeField, Tooltip("Defines the key points in the player's animation for this specific tool.")]
+        protected ToolAnimationKeyPoints keyPoints;
+
         [Space]
         [Header("Events")]
         public UnityEvent OnMainUse;

@@ -109,7 +109,7 @@ namespace Gameplay.Player
             float speed = isRunning ? _runSpeed : _walkSpeed;
 
 
-            return move * speed * Time.deltaTime;
+            return move * (speed * Time.deltaTime);
         }
 
 
