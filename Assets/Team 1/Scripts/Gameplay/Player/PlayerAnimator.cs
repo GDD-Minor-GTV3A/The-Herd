@@ -1,19 +1,27 @@
-using UnityEngine;
+using System;
 using Core.Shared;
+using UnityEngine;
+using UnityEngine.Animations.Rigging;
 
-namespace Gameplay.Player 
+namespace Gameplay.Player
 {
     public class PlayerAnimator : AnimatorController
     {
-        private const string WalkingParam = "Walk";
-        private const string WalkSpeedParam = "WalkSpeed";
+        private PlayerAnimationConstraints animationConstrains;
+        private readonly Transform root;
+
+        private readonly float startYRotation;
+
+        private const string WalkingX = "X";
+        private const string WalkingY = "Y";
 
 
-        private readonly int handsLayerIndex;
-
-        public PlayerAnimator(Animator animator) : base(animator)
+        public PlayerAnimator(Animator animator,Transform root, PlayerAnimationConstraints constraints) : base(animator)
         {
-            handsLayerIndex = _animator.GetLayerIndex("Hands Layer");
+            this.root = root;
+            animationConstrains = constraints;
+            startYRotation = root.eulerAngles.y;
+            RemoveHands();
         }
 
 
@@ -21,38 +29,154 @@ namespace Gameplay.Player
         /// Sets walking animation state.
         /// </summary>
         /// <param name="walking">Is walking.</param>
-        public void SetWalking(bool walking)
+        public void Walking(Vector2 walkingDirection, bool sprint = false)
         {
-            _animator.SetBool(WalkingParam, walking);
+            float x = walkingDirection.x;
+            float y = walkingDirection.y;
+
+            x /= (sprint) ? 1 : 2;
+            y /= (sprint) ? 1 : 2;
+
+            float yRotation = root.eulerAngles.y;
+
+            int roundYRotation = Mathf.RoundToInt(yRotation - startYRotation);
+
+            if (roundYRotation != 0)
+            {
+                float tempX = x;
+                float tempY = y;
+
+                switch (Mathf.Abs(roundYRotation / 90)) 
+                {
+                    case 1:
+                        x = tempY;
+                        y = -tempX;
+                        break;
+                    case 2:
+                        x *= -1;
+                        y *= -1;
+                        break;
+                    case 3:
+                        x = -tempY;
+                        y = tempX;
+                        break;
+                }
+            }
+
+            _animator.SetFloat(WalkingX, x);
+            _animator.SetFloat(WalkingY, y);
         }
 
 
         /// <summary>
-        /// Changes walk speed animation multiplier.
+        /// Define if animator controls character rotation or no.
         /// </summary>
-        /// <param name="sprint"> Is player sprinting.</param>
-        public void SetWalkSpeed(bool sprint)
+        public void SetAnimationRotation(bool rotate)
         {
-            if (sprint)
-                _animator.SetFloat(WalkSpeedParam, 2f);
+            if (rotate)
+            {
+                animationConstrains.HeadAim.weight = 1;
+                animationConstrains.BodyAim.weight = 1;
+            }
             else
-                _animator.SetFloat(WalkSpeedParam, 1f);
+            {
+                animationConstrains.HeadAim.weight = 0;
+                animationConstrains.BodyAim.weight = 0;
+                animationConstrains.LookTarget.position = root.transform.position + root.transform.forward * 10;
+            }
         }
 
 
-        public void GetRifle()
+        /// <summary>
+        /// Moves hands on tool's animation key points.
+        /// </summary>
+        public void GetTool(ToolAnimationKeyPoints keyPoints)
         {
-            _animator.SetTrigger("GetRifle");
-            _animator.SetLayerWeight(handsLayerIndex, 1);
+            var _handData = animationConstrains.RightHand.data;
+            _handData.target = keyPoints.RightHandTarget;
+            _handData.hint = keyPoints.RightHandHint;
+            animationConstrains.RightHand.data = _handData;
+
+            _handData = animationConstrains.LeftHand.data;
+            _handData.target = keyPoints.LeftHandTarget;
+            _handData.hint = keyPoints.LeftHandHint;
+            animationConstrains.LeftHand.data = _handData;
+
+
+            var _shouldersData = animationConstrains.ShoulderAim.data;
+            var _targets = _shouldersData.sourceObjects;
+            _targets.Add(new WeightedTransform(keyPoints.ShouldersTarget, 1));
+            _shouldersData.sourceObjects = _targets;
+            animationConstrains.ShoulderAim.data = _shouldersData;
+
+            animationConstrains.RightHand.weight = 1;
+            animationConstrains.LeftHand.weight = 1;
+            animationConstrains.ShoulderAim.weight = 1;
         }
 
 
+        /// <summary>
+        /// Resets hands position.
+        /// </summary>
         public void RemoveHands()
         {
-            _animator.SetLayerWeight(handsLayerIndex, 0);
+            var _handData = animationConstrains.RightHand.data;
+            _handData.target = null;
+            _handData.hint = null;
+            animationConstrains.RightHand.data = _handData;
+
+            _handData = animationConstrains.LeftHand.data;
+            _handData.target = null;
+            _handData.hint = null;
+            animationConstrains.LeftHand.data = _handData;
+
+
+            var _shouldersData = animationConstrains.ShoulderAim.data;
+            var _targets = _shouldersData.sourceObjects;
+            _targets.Clear();
+            _shouldersData.sourceObjects = _targets;
+            animationConstrains.ShoulderAim.data = _shouldersData;
+
+            animationConstrains.RightHand.weight = 0;
+            animationConstrains.LeftHand.weight = 0;
+            animationConstrains.ShoulderAim.weight = 0;
         }
 
+
+        /// <summary>
+        /// Rotate character towards cursor world position.
+        /// </summary>
+        public void RotateCharacterBody(Vector3 mouseWorldPosition)
+        {
+            Vector3 direction = mouseWorldPosition - root.position;
+            direction.Normalize();
+            float angle = Vector3.SignedAngle(root.forward, direction, root.up);
+
+            if (angle <= -80f)
+                root.Rotate(0, -90, 0);
+
+            if (angle >= 80f)
+                root.Rotate(0, 90, 0);
+
+            if (Mathf.Round(root.rotation.eulerAngles.y) % 90 == 0)
+                root.Rotate(0, 45, 0);
+
+
+            animationConstrains.LookTarget.position = new Vector3(mouseWorldPosition.x, animationConstrains.LookTarget.position.y, mouseWorldPosition.z);
+        }
+    }
+
+
+    [Serializable]
+    public struct PlayerAnimationConstraints
+    {
+        public MultiAimConstraint BodyAim;
+        public MultiAimConstraint HeadAim;
+        public MultiAimConstraint ShoulderAim;
+        public TwoBoneIKConstraint LeftHand;
+        public TwoBoneIKConstraint RightHand;
+
+        public Transform LookTarget;
     }
 }
-
 

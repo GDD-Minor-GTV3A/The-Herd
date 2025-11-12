@@ -1,8 +1,8 @@
-using UnityEngine;
-using Phantom;
-using Core;
+using Unity.VisualScripting;
 
-namespace AI.Phantom.States
+using UnityEngine;
+
+namespace Team_7.Scripts.AI.Phantom.States
 {
     public class ShootingState : PhantomState
     {
@@ -30,8 +30,10 @@ namespace AI.Phantom.States
         public override void OnUpdate()
         {
             _movement.LookAt(_manager.GetPlayerTransform().position);
-            if (Time.time - _chargeStart > _stats.chargeDuration && !projectile.IsLaunched())
+            if (Time.time - _chargeStart > _stats.chargeDuration && !projectile.IsLaunched() && !projectile.IsDestroyed())
             {
+                _audio.StopClip();
+                _audio.PlayClip(_stats.projectileShootSound);
                 projectile.Launch();
                 _animator.SetThrowing(true);
                 _animator.SetCharging(false);

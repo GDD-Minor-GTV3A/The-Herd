@@ -12,8 +12,13 @@ public class ChangeScene : MonoBehaviour
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Backspace)) 
-        { 
-            SceneManager.LoadScene(currentScene+1);
+        {
+
+            if(SceneManager.sceneCountInBuildSettings == currentScene+1)
+                SceneManager.LoadScene(0);
+            else
+                SceneManager.LoadScene(currentScene + 1);
+
         }
     }
 }

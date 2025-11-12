@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Core
+namespace Team_7.Scripts.AI
 {
     public class AudioController
     {
@@ -14,6 +14,11 @@ namespace Core
         {
             _audioSource.clip = clip;
             _audioSource.Play();
+        }
+
+        public void StopClip()
+        {
+            _audioSource.Stop();
         }
     }
 }
