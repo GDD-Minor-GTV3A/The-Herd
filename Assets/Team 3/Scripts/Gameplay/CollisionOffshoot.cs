@@ -1,16 +1,14 @@
 using UnityEditor;
+
 using UnityEngine;
 using UnityEngine.Events;
 
-public class AmbianceLoaderCollision : MonoBehaviour
+public class CollisionOffshoot : MonoBehaviour
 {
     /// <summary>
     /// The event that plays when the player enters this collider
     /// </summary>
-    public UnityEvent<AudioClip[]> collisionResult;
-
-    [Tooltip ("Array of Ambiance sounds to pass along to the ambiance player.")]
-    [SerializeField] private AudioClip[] areaAmbianceList;
+    public UnityEvent collisionResult;
 
     /// <summary>
     /// whether the eventcall disables itself after usage, making it callable only once
@@ -22,12 +20,16 @@ public class AmbianceLoaderCollision : MonoBehaviour
     {
         if (other.tag == "Player")
         {
-            collisionResult?.Invoke(areaAmbianceList);
+            collisionResult?.Invoke();
             if (oneTimeEvent)
             {
                 transform.gameObject.SetActive(false);
             }
         }
-        
+        else
+        {
+            Debug.Log(other);
+        }
+
     }
 }
