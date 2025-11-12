@@ -1,5 +1,6 @@
 using Core.Events;
 using Core.Shared;
+using Gameplay.Dog;
 using Gameplay.Player;
 using UnityEngine;
 
@@ -10,16 +11,20 @@ namespace Gameplay.ToolsSystem
     /// </summary>
     public class Whistle : PlayerTool
     {
+        [SerializeField] private DogConfig dogConfig;
+
+
         private Observable<Vector3> _cursorWorldPosition;
         private PlayerAnimator _animator;
-
-     
 
 
         public void Initialize(PlayerAnimator animator)
         {
             HideUI();
             _animator = animator;
+
+            CooldownUI cooldown = toolUI.GetComponentInChildren<CooldownUI>(true);
+            if (cooldown != null) cooldown.Initialize(dogConfig.BarkCooldown);
         }
 
 
@@ -36,11 +41,13 @@ namespace Gameplay.ToolsSystem
 
         public override void MainUsageStarted(Observable<Vector3> cursorWorldPosition)
         {
+            OnMainUse?.Invoke();
             TryBark();
         }
 
         public override void Reload()
         {
+            OnReload?.Invoke();
             EventManager.Broadcast(new DogFollowCommandEvent());
         }
 
@@ -52,6 +59,7 @@ namespace Gameplay.ToolsSystem
 
         public override void SecondaryUsageStarted(Observable<Vector3> cursorWorldPosition)
         {
+            OnSecondaryUse?.Invoke();
             _cursorWorldPosition = cursorWorldPosition;
             SendDogMoveCommand();
             _cursorWorldPosition.OnValueChanged += SendDogMoveCommand;

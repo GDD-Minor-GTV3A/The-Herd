@@ -1,8 +1,6 @@
-using System.Collections;
 using Core.Events;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UI;
 
 namespace Gameplay.Dog
 {
@@ -11,11 +9,9 @@ namespace Gameplay.Dog
     {
         [SerializeField] private UnityEvent onDogBark;
 
-        [Header("UI")]
-        [SerializeField] private Slider cooldownSlider;
-
         [Header("Debug")]
         [SerializeField] private bool drawBarkArea = false;
+
 
         private DogConfig _config;
 
@@ -23,23 +19,16 @@ namespace Gameplay.Dog
 
         private Coroutine _cooldownCo;
 
+
         public void Initialize(DogConfig config)
         {
             _config = config;
-            SetCooldownVisible(false);
-            SetCooldownProgress(0f);
         }
 
-        private void Awake()
-        {
-            SetCooldownVisible(false);
-            SetCooldownProgress(0f);
-        }
 
         private void OnEnable()
         {
             EventManager.AddListener<DogBarkEvent>(OnBarkCommand);
-            SetCooldownVisible(false);
         }
 
         private void OnDisable()
@@ -51,7 +40,6 @@ namespace Gameplay.Dog
                 StopCoroutine(_cooldownCo);
                 _cooldownCo = null;
             }
-            SetCooldownVisible(false);
         }
 
         private void OnBarkCommand(DogBarkEvent evt)
@@ -67,8 +55,6 @@ namespace Gameplay.Dog
             _lastBarkTime = Time.time;
 
             onDogBark?.Invoke(); // trigger animation/sound via UnityEvent
-
-            StartCooldownUI(_config.BarkCooldown);
 
             Collider[] hits = Physics.OverlapSphere(transform.position, _config.MaxBarkDistance, _config.ScareableMask);
 
@@ -90,46 +76,6 @@ namespace Gameplay.Dog
 
             if (drawBarkArea)
                 DrawDebugBarkZone();
-        }
-
-        private void StartCooldownUI(float duration)
-        {
-            if (cooldownSlider == null || duration <= 0f) return;
-
-            
-            SetCooldownVisible(true);
-            SetCooldownProgress(1f);
-
-            if (_cooldownCo != null) StopCoroutine(_cooldownCo);
-            _cooldownCo = StartCoroutine(CooldownRoutine(duration));
-        }
-
-        private IEnumerator CooldownRoutine(float duration)
-        {
-            float t = 0f;
-            while (t < duration)
-            {
-                t += Time.deltaTime;
-                float remaining = 1f - Mathf.Clamp01(t / duration); // full -> empty
-                SetCooldownProgress(remaining);
-                yield return null;
-            }
-
-            SetCooldownProgress(0f);
-            SetCooldownVisible(false);
-            _cooldownCo = null;
-        }
-
-        private void SetCooldownProgress(float v)
-        {
-            if (cooldownSlider != null)
-                cooldownSlider.value = v; 
-        }
-
-        private void SetCooldownVisible(bool visible)
-        {
-            if (cooldownSlider != null)
-                cooldownSlider.gameObject.SetActive(visible);
         }
 
 

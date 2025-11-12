@@ -1,6 +1,7 @@
 using System;
 using Core.Shared.Utilities;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Core.Shared
 {
@@ -10,9 +11,15 @@ namespace Core.Shared
     public abstract class PlayerTool : MonoBehaviour
     {
         [SerializeField, Tooltip("UI of this tool."), Required]
-        private GameObject toolUI;
+        protected GameObject toolUI;
         [SerializeField, Tooltip("This sound plays when this tool is equipped."), Required]
         private AudioClip toolEquipSound;
+
+        [Space]
+        [Header("Events")]
+        public UnityEvent OnMainUse;
+        public UnityEvent OnReload;
+        public UnityEvent OnSecondaryUse;
 
 
         public AudioClip EquipSound => toolEquipSound;
