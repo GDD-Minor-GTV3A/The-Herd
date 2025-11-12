@@ -76,9 +76,9 @@ class Args(Namespace):
     verify_tag: bool = False
 
     # Additional settings
-    tag: SemVer | None = None
-    dist_dir: Path = BUILD_DIR
-    zip_file: Path = ZIP_FILE
+    tag: SemVer | None = None # Custom tag to use for the release
+    dist_dir: Path = BUILD_DIR # Directory to zip for the release
+    zip_file: Path = ZIP_FILE # Zip file to create for the release
 
     def generate_setting_flags(self) -> Generator[str]:
         """Generate command line flags from settings as a list of tokens."""
