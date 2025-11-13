@@ -42,13 +42,19 @@ namespace Gameplay.FogOfWar
                 System.Type _type = _collider.GetType();
                 Collider _newCollider = _obstacleObject.AddComponent(_type) as Collider;
 
-                BindingFlags _flags = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public;
 
                 if (_collider is MeshCollider meshCollider)
                 {
                     MeshCollider newMesh = (MeshCollider)_newCollider;
                     newMesh.sharedMesh = meshCollider.sharedMesh;
                     newMesh.convex = true;
+                }
+
+                if (_collider is BoxCollider boxCollider)
+                {
+                    BoxCollider newBox = (BoxCollider)_newCollider;
+                    newBox.center = boxCollider.center;
+                    newBox.size = boxCollider.size;
                 }
 
                 _newCollider.isTrigger = true;
