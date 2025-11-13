@@ -58,7 +58,10 @@ namespace Team_7.Scripts.AI.Drekavac
             _playerLocation = _playerObject.transform.position;
 
             _dogObject = GameObject.Find("Dog");
-            _dogLocation = _dogObject.transform.position;
+            if (_dogObject != null)
+            {
+                _dogLocation = _dogObject.transform.position;
+            }
 
             // Find sheep
             // TODO replace this
@@ -88,7 +91,10 @@ namespace Team_7.Scripts.AI.Drekavac
         {
             base.Update();
             _playerLocation = _playerObject.transform.position;
-            _dogLocation = _dogObject.transform.position;
+            if (_dogObject != null)
+            {
+                _dogLocation = _dogObject.transform.position;
+            }
             if (_currentState is not FleeingState && _currentState is not BigState && (Vector3.Distance(transform.position, _playerLocation) <= _drekavacStats.fleeTriggerDistance || Vector3.Distance(transform.position, _dogLocation) <= _drekavacStats.fleeTriggerDistance))
                 Flee();
         }
