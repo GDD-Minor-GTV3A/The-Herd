@@ -23,6 +23,12 @@ namespace Gameplay.FogOfWar
         /// </summary>
         public float MapLowestPoint => mapLowestPoint;
 
+        [field: SerializeField]
+        public float MapWidth {  get; private set; }
+
+        [field: SerializeField]
+        public float MapLength {  get; private set; }
+
 
         /// <summary>
         /// Invokes when any values changes.

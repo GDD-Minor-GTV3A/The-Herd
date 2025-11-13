@@ -1,5 +1,7 @@
 using System.Reflection;
+
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace Gameplay.FogOfWar 
 {
@@ -49,7 +51,7 @@ namespace Gameplay.FogOfWar
                     newMesh.convex = true;
                 }
 
-                _collider.isTrigger = true;
+                _newCollider.isTrigger = true;
             }
         }
     }
