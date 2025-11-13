@@ -328,7 +328,8 @@ namespace Core.AI.Sheep
         private void OnDisable()
         {
             // Remove all highlights
-            foreach (var sheep in _originalMaterials.Keys)
+            var copy = _originalMaterials.Keys;
+            foreach (var sheep in copy)
             {
                 RemoveHighlight(sheep);
             }

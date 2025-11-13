@@ -270,7 +270,7 @@ namespace Core.AI.Sheep
             if (CanControlAgent())
             {
                 Agent.autoRepath = true;
-                Agent.acceleration = Mathf.Max(Agent.acceleration, (Config?.BaseSpeed ?? 2.2f) * 6f);
+                Agent.acceleration = Mathf.Max(Agent.acceleration, (Config?.BaseSpeed ?? 2.2f));
                 Agent.angularSpeed = Mathf.Max(Agent.angularSpeed, 1080f);
                 Agent.obstacleAvoidanceType = ObstacleAvoidanceType.HighQualityObstacleAvoidance;
             }
