@@ -176,6 +176,45 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: febf33429c943c84f8bb4964255b7836, type: 3}
+--- !u!1 &76084026 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5233793423635030239, guid: d4b0b88e113767841b45938e666f190d, type: 3}
+  m_PrefabInstance: {fileID: 329264973}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &76084030
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 76084026}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce4e00d1828c3d647b1cc09a9b180d7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!64 &76084031
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 76084026}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 8421744311104621043, guid: 279df2dd5e975ed4a9f33461d3c678d1, type: 3}
 --- !u!1 &76321583
 GameObject:
   m_ObjectHideFlags: 0
@@ -1028,7 +1067,13 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5233793423635030239, guid: d4b0b88e113767841b45938e666f190d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 76084031}
+    - targetCorrespondingSourceObject: {fileID: 5233793423635030239, guid: d4b0b88e113767841b45938e666f190d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 76084030}
   m_SourcePrefab: {fileID: 100100000, guid: d4b0b88e113767841b45938e666f190d, type: 3}
 --- !u!4 &414398794 stripped
 Transform:
@@ -6300,7 +6345,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &2128779651
 MonoBehaviour:
   m_ObjectHideFlags: 0
