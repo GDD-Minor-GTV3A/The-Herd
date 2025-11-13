@@ -42,9 +42,11 @@ namespace Gameplay.FogOfWar
 
                 BindingFlags _flags = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public;
 
-                foreach (FieldInfo _field in _type.GetFields(_flags))
+                if (_collider is MeshCollider meshCollider)
                 {
-                    _field.SetValue(_newCollider, _field.GetValue(_collider));
+                    MeshCollider newMesh = (MeshCollider)_newCollider;
+                    newMesh.sharedMesh = meshCollider.sharedMesh;
+                    newMesh.convex = true;
                 }
 
                 _collider.isTrigger = true;
