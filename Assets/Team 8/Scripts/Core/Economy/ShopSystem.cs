@@ -1,6 +1,5 @@
-using TMPro;
-
 using UnityEngine;
+using TMPro;
 
 namespace Core.Economy
 {
@@ -13,7 +12,7 @@ namespace Core.Economy
     public class ShopSystem : MonoBehaviour
     {
         [Header("References")]
-        [SerializeField] private Player _player;
+        [SerializeField] private PlayerWallet _player; 
 
         [Header("UI Output")]
         [SerializeField] private TMP_Text _messageText;
@@ -24,7 +23,7 @@ namespace Core.Economy
         [Header("Shop Items")]
         [SerializeField] private ShopItemData[] _items;
 
-        private Wallet _wallet;
+        private Wallet _wallet; 
 
         private void Start()
         {
@@ -42,10 +41,10 @@ namespace Core.Economy
                 Debug.LogError("Player has no wallet!");
                 return;
             }
-
+            
             // Subscribe to wallet updates so UI refreshes automatically
             _wallet.OnCurrencyChanged += HandleCurrencyChanged;
-
+            
             // Initialize UI balances at startup
             UpdateAllBalances();
         }
@@ -56,7 +55,7 @@ namespace Core.Economy
             if (_wallet != null)
                 _wallet.OnCurrencyChanged -= HandleCurrencyChanged;
         }
-
+        
         /// <summary>
         /// Attempts to buy the given shop item.
         /// Deducts currency if possible, shows success or failure message,
@@ -79,7 +78,7 @@ namespace Core.Economy
             // Update currency displays regardless of outcome
             UpdateAllBalances();
         }
-
+        
         /// <summary>
         /// Writes a message to the console + UI text field.
         /// </summary>
