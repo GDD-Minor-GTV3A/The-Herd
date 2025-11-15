@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using Core.Shared.StateMachine;
 
+using Unity.Properties;
+
 using Random = UnityEngine.Random;
 
 namespace Core.AI.Sheep.Personality
@@ -30,7 +32,7 @@ namespace Core.AI.Sheep.Personality
         public virtual Vector3 GetFollowTarget(SheepStateManager sheep, PersonalityBehaviorContext context)
         {
             float baseDistance = sheep.Archetype?.FollowDistance ?? DEFAULT_FOLLOW_DISTANCE;
-            float want = Mathf.Min(0.5f, baseDistance);
+            float want = baseDistance;
 
             Vector3 dir = (context.PlayerPosition - sheep.transform.position);
             dir.y = 0f;
@@ -68,7 +70,39 @@ namespace Core.AI.Sheep.Personality
         public virtual void SetDestinationWithHerding(Vector3 destination, SheepStateManager sheep, PersonalityBehaviorContext context)
         {
             Vector3 goal = context.HasThreat && context.Threats.Count > 0
-                ? ComputeEscapeDestination(sheep, context) : destination;
+                ? ComputeEscapeDestination(sheep, context)
+                : destination;
+            
+            Vector3 playerPos = context.PlayerPosition;
+            playerPos.y = 0f;
+
+            float avoidRadius = sheep.Config?.PlayerAvoidRadius ?? 1.5f;
+            float avoidRadiusSqr = avoidRadius * avoidRadius;
+
+            Vector3 goalFlat = goal;
+            goalFlat.y = 0f;
+            
+            Vector3 fromPlayerToGoal = goalFlat - playerPos;
+            float sqrDistanceToPlayer = fromPlayerToGoal.sqrMagnitude;
+
+            if (sqrDistanceToPlayer < avoidRadiusSqr)
+            {
+                if (sqrDistanceToPlayer < 0.0001f)
+                {
+                    fromPlayerToGoal = sheep.transform.position - playerPos;
+                    fromPlayerToGoal.y = 0f;
+
+                    if (fromPlayerToGoal.sqrMagnitude < 0.0001f)
+                    {
+                        Vector2 rand = UnityEngine.Random.insideUnitCircle.normalized;
+                        fromPlayerToGoal = new Vector3(rand.x, 0f, rand.y);
+                    }
+                }
+                
+                fromPlayerToGoal.Normalize();
+                goal = playerPos + fromPlayerToGoal * avoidRadius;
+            }
+
             Vector3 desired = goal - sheep.transform.position;
             desired.y = 0f;
 
@@ -77,7 +111,7 @@ namespace Core.AI.Sheep.Personality
             float alignW = sheep.Config?.AlignmentWeight ?? 0.6f;
             float clamp = sheep.Config?.SteerClamp ?? 2.5f;
 
-            Vector3 steer = FlockingUtility.Steering(
+            Vector3 flockSteer = FlockingUtility.Steering(
                 sheep.transform,
                 sheep.Neighbours,
                 sepDist,
@@ -86,24 +120,40 @@ namespace Core.AI.Sheep.Personality
                 clamp
             );
 
-            Vector3 final = sheep.transform.position + desired + steer;
+            Vector3 repulsion = Vector3.zero;
+            Vector3 fromPlayerToSheep = sheep.transform.position - playerPos;
+            fromPlayerToSheep.y = 0f;
+            
+            float distToPlayer = fromPlayerToSheep.magnitude;
+
+            if (distToPlayer < avoidRadius && distToPlayer > 0.001f)
+            {
+                float t = 1f - (distToPlayer / avoidRadius);
+                float repulsionWeight = sheep.Config?.PlayerAvoidWeight ?? 1.5f;
+                Vector3 dir = fromPlayerToSheep / distToPlayer;
+                repulsion = dir * (t * repulsionWeight);
+            }
+            
+            Vector3 final = sheep.transform.position + desired + flockSteer + repulsion;
 
             if (sheep.CanControlAgent())
             {
                 float baseSpeed = sheep.Config?.BaseSpeed ?? 2.2f;
-                bool isFLeeing = context.HasThreat;
+                bool isFleeing = context.HasThreat;
                 
-                sheep.Agent.speed = isFLeeing ? baseSpeed * 1.5f : baseSpeed;
+                sheep.Agent.speed = isFleeing ? baseSpeed * 1.5f : baseSpeed;
                 sheep.Agent.SetDestination(final);
 
-                if (isFLeeing)
+                if (isFleeing)
                 {
                     Vector3 look = final - sheep.transform.position;
                     look.y = 0f;
                     if (look.sqrMagnitude > 0.0001f)
                     {
                         var q = Quaternion.LookRotation(look);
-                        sheep.transform.rotation = Quaternion.Slerp(sheep.transform.rotation, q, Time.deltaTime * 10f);
+                        sheep.transform.rotation = Quaternion.Slerp(sheep.transform.rotation, 
+                            q,
+                            Time.deltaTime * 10f);
                     }
                 }
             }
