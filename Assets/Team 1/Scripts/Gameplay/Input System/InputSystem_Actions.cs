@@ -190,6 +190,15 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""DogBark"",
+                    ""type"": ""Button"",
+                    ""id"": ""142a9102-4436-4423-a86a-1310506a2bfc"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -207,7 +216,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                 {
                     ""name"": ""WASD"",
                     ""id"": ""00ca640b-d935-4593-8157-c05846ea39b3"",
-                    ""path"": ""Dpad"",
+                    ""path"": ""Dpad(mode=1)"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -476,6 +485,28 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
                     ""action"": ""SlotsScroll"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""aa9ed306-73b0-425d-971a-b1ab47f4ec83"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DogBark"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7352c3f9-a112-4a5d-9bd6-0b8704330475"",
+                    ""path"": ""<Gamepad>/buttonEast"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Gamepad"",
+                    ""action"": ""DogBark"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1074,6 +1105,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Player_Slot_2 = m_Player.FindAction("Slot_2", throwIfNotFound: true);
         m_Player_Slot_3 = m_Player.FindAction("Slot_3", throwIfNotFound: true);
         m_Player_SlotsScroll = m_Player.FindAction("SlotsScroll", throwIfNotFound: true);
+        m_Player_DogBark = m_Player.FindAction("DogBark", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1178,6 +1210,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Slot_2;
     private readonly InputAction m_Player_Slot_3;
     private readonly InputAction m_Player_SlotsScroll;
+    private readonly InputAction m_Player_DogBark;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1233,6 +1266,10 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/SlotsScroll".
         /// </summary>
         public InputAction @SlotsScroll => m_Wrapper.m_Player_SlotsScroll;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/DogBark".
+        /// </summary>
+        public InputAction @DogBark => m_Wrapper.m_Player_DogBark;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1292,6 +1329,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @SlotsScroll.started += instance.OnSlotsScroll;
             @SlotsScroll.performed += instance.OnSlotsScroll;
             @SlotsScroll.canceled += instance.OnSlotsScroll;
+            @DogBark.started += instance.OnDogBark;
+            @DogBark.performed += instance.OnDogBark;
+            @DogBark.canceled += instance.OnDogBark;
         }
 
         /// <summary>
@@ -1336,6 +1376,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @SlotsScroll.started -= instance.OnSlotsScroll;
             @SlotsScroll.performed -= instance.OnSlotsScroll;
             @SlotsScroll.canceled -= instance.OnSlotsScroll;
+            @DogBark.started -= instance.OnDogBark;
+            @DogBark.performed -= instance.OnDogBark;
+            @DogBark.canceled -= instance.OnDogBark;
         }
 
         /// <summary>
@@ -1713,6 +1756,13 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnSlotsScroll(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "DogBark" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnDogBark(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

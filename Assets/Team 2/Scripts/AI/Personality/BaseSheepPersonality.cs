@@ -181,6 +181,11 @@ namespace Core.AI.Sheep.Personality
             // Not handled by default
         }
 
+        public virtual void OnDeath(SheepStateManager sheep, PersonalityBehaviorContext context)
+        {
+            sheep.SetState<SheepDieState>();
+        }
+
         #endregion
 
 

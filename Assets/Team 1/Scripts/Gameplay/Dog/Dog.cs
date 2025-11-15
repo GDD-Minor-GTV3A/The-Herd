@@ -12,7 +12,7 @@ namespace Gameplay.Dog
         [Tooltip("Transform of player object to follow.")]
         [SerializeField] private Transform _playerTransform;
         [Tooltip("Heard zone reference.")]
-        [SerializeField] private HeardZone _heardZone;
+        [SerializeField] private HerdZone _heardZone;
         [Tooltip("Manager of step sounds.")]
         [SerializeField] private StepsSoundManager _stepsSoundManager;
         [Tooltip("Animator of the dog.")]
@@ -23,6 +23,7 @@ namespace Gameplay.Dog
 
         private DogMovementController _movementController;
         private DogAnimator _dogAnimator;
+        private DogBark bark;
 
 
         /// <summary>
@@ -38,10 +39,14 @@ namespace Gameplay.Dog
 
             _dogAnimator = new DogAnimator(_animator, _config);
 
+            bark = GetComponent<DogBark>();
+            bark.Initialize(_config);
+
             DogStateManager stateManager = GetComponent<DogStateManager>();
             stateManager.Initialize(_movementController, _dogAnimator, _heardZone, _playerTransform, _config);
 
             _config.OnValueChanged += UpdateValues;
+            UpdateValues(_config);
         }
 
         private void UpdateValues(DogConfig config)
@@ -49,6 +54,7 @@ namespace Gameplay.Dog
             _movementController.UpdateValues(config);
             _dogAnimator.UpdateAnimationValues(config);
 
+            bark.Initialize(_config);
         }
 
         // for test, needs to be moved to bootstrap

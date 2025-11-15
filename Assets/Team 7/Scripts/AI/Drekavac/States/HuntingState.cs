@@ -1,7 +1,7 @@
 using UnityEngine;
-using Core;
 
-namespace AI.Drekavac.States
+#nullable enable // Chris: This needs to be added for nullable values to work. Otherwise it will show a warning
+namespace Team_7.Scripts.AI.Drekavac.States
 {
     /// <summary>
     ///     Handles the behavior of an enemy while it's trying to home in on a target.

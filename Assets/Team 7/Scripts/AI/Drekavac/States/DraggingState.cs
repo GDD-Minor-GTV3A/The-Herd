@@ -1,9 +1,7 @@
-using Core;
-
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace AI.Drekavac.States
+namespace Team_7.Scripts.AI.Drekavac.States
 {
     /// <summary>
     ///     Handles the behavior of an enemy while it's dragging an object.
@@ -31,7 +29,8 @@ namespace AI.Drekavac.States
             if (Vector3.Distance(_manager.transform.position, _manager.GetPlayerLocation()) >
                 _manager.GetStats().despawnDistance)
             {
-                _manager.Despawn();
+                _manager.ReleaseGrabbedObject();
+                _manager.SetState<BigState>();
                 return;
             }
 

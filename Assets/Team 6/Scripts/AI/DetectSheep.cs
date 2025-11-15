@@ -4,25 +4,20 @@ using UnityEngine;
 
 public class DetectSheep : MonoBehaviour
 {
-    public float radius;
+    public float radius = 15f;
     [Range(0, 360)]
-    public float angle;
+    public float angle = 360f;
 
-    public LayerMask targetMask;  
-    public LayerMask obstructionMask;  
+    public LayerMask targetMask;
+    public LayerMask obstructionMask;
 
-    [HideInInspector]
-    public List<Transform> visibleTargets = new List<Transform>();
+    [HideInInspector] public List<Transform> visibleTargets = new();
 
-    private void Start()
-    {
-        StartCoroutine(FOVRoutine());
-    }
+    private void Start() => StartCoroutine(FOVRoutine());
 
     private IEnumerator FOVRoutine()
     {
         WaitForSeconds wait = new WaitForSeconds(0.2f);
-
         while (true)
         {
             yield return wait;
@@ -38,7 +33,7 @@ public class DetectSheep : MonoBehaviour
 
         foreach (Collider targetCollider in rangeChecks)
         {
-            if (!targetCollider.CompareTag("sheep"))
+            if (!targetCollider.CompareTag("Sheep"))
                 continue;
 
             Transform target = targetCollider.transform;

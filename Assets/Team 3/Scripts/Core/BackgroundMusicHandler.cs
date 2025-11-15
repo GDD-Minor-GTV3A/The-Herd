@@ -1,114 +1,159 @@
 ﻿using System.Collections;
+
 using UnityEngine;
 
-public class BackgroundMusicHandler : MonoBehaviour
+namespace Project.Audio
 {
-    public AudioSource musicSource;
-    public AudioSource windSource;    
-    public AudioClip[] musicClips;    
-
-    public float fadeSeconds = 1.5f;
-
-    public float windPauseSeconds = 5f;
-
-    [Range(0f, 1f)] public float musicVolume = 1.0f;
-    [Range(0f, 1f)] public float windUnderMusicVolume = 0.2f;
-    [Range(0f, 1f)] public float windDuringPauseVolume = 0.8f;
-
-    private int _index = 0;
-
-    private void Awake()
+    /// <summary>
+    /// Handles background music with wind ambience, including fades between tracks
+    /// and pauses.
+    /// </summary>
+    public class BackgroundMusicHandler : MonoBehaviour
     {
-        if (!musicSource || !windSource || musicClips == null || musicClips.Length == 0)
+        [Header("Audio Sources")]
+        [Tooltip("AudioSource used for music playback.")]
+        [SerializeField] private AudioSource musicSource;
+
+        [Tooltip("AudioSource used for wind ambience.")]
+        [SerializeField] private AudioSource windSource;
+
+        [Header("Music Clips")]
+        [Tooltip("Playlist of music clips to play.")]
+        [SerializeField] private AudioClip[] musicClips;
+
+        [Header("Timing")]
+        [Tooltip("Seconds used for fading volumes in/out.")]
+        [SerializeField] private float fadeSeconds = 1.5f;
+
+        [Tooltip("Seconds to wait with wind ambience between music tracks.")]
+        [SerializeField] private float windPauseSeconds = 5f;
+
+        [Header("Volumes")]
+        [Tooltip("Music volume while a track is playing.")]
+        [Range(0f, 1f)]
+        [SerializeField] private float musicVolume = 1.0f;
+
+        [Tooltip("Wind volume while music is playing.")]
+        [Range(0f, 1f)]
+        [SerializeField] private float windUnderMusicVolume = 0.2f;
+
+        [Tooltip("Wind volume during the pause between tracks.")]
+        [Range(0f, 1f)]
+        [SerializeField] private float windDuringPauseVolume = 0.8f;
+
+        private int currentIndex = 0;
+
+        private void Awake()
         {
-            Debug.LogError("Make sure all fields are filled");
-            enabled = false; return;
+            if (!musicSource || !windSource || musicClips == null || musicClips.Length == 0)
+            {
+                Debug.LogError("BackgroundMusicHandler: Please assign Music Source, Wind Source, and at least one Music Clip.");
+                enabled = false;
+                return;
+            }
+
+            musicSource.playOnAwake = false;
+            musicSource.loop = false;
+            musicSource.spatialBlend = 0f;
+            musicSource.volume = 0f;
+
+            windSource.loop = true;
+            windSource.spatialBlend = 0f;
+
+            if (!windSource.isPlaying && windSource.clip)
+            {
+                windSource.Play();
+            }
+
+            windSource.volume = 0f;
         }
 
-        musicSource.playOnAwake = false;
-        musicSource.loop = false;
-        musicSource.spatialBlend = 0f;
-        musicSource.volume = 0f;
-
-        windSource.loop = true;
-        windSource.spatialBlend = 0f;
-        if (!windSource.isPlaying && windSource.clip) windSource.Play();
-        windSource.volume = 0f;
-    }
-
-    private void Start()
-    {
-        StartCoroutine(LoopRoutine());
-    }
-
-    private IEnumerator LoopRoutine()
-    {
-        yield return FadeVolume(windSource, windUnderMusicVolume, fadeSeconds);
-
-        while (true)
+        private void Start()
         {
-            var clip = musicClips[_index];
-            if (!clip) { _index = (_index + 1) % musicClips.Length; continue; }
+            StartCoroutine(MusicLoopRoutine());
+        }
 
-            musicSource.clip = clip;
-            musicSource.time = 0f;
-            musicSource.volume = 0f;
-            musicSource.Play();
+        private IEnumerator MusicLoopRoutine()
+        {
+            yield return FadeVolume(windSource, windUnderMusicVolume, fadeSeconds);
 
-            StartCoroutine(FadeVolume(windSource, windUnderMusicVolume, fadeSeconds));
-
-            yield return FadeVolume(musicSource, musicVolume, fadeSeconds);
-
-            bool fadingOut = false;
-            while (musicSource.clip == clip)
+            while (true)
             {
-                float length = Mathf.Max(clip.length, fadeSeconds + 0.05f);
-                float remaining = Mathf.Max(0f, length - musicSource.time);
-
-                if (!fadingOut && remaining <= fadeSeconds + 0.02f)
+                var _clip = musicClips[currentIndex];
+                if (!_clip)
                 {
-                    fadingOut = true;
-                    StartCoroutine(FadeVolume(musicSource, 0f, fadeSeconds));
-                    StartCoroutine(FadeVolume(windSource, windDuringPauseVolume, fadeSeconds));
+                    currentIndex = (currentIndex + 1) % musicClips.Length;
+                    continue;
                 }
 
-                if (fadingOut && (musicSource.volume <= 0.001f || !musicSource.isPlaying))
+                musicSource.clip = _clip;
+                musicSource.time = 0f;
+                musicSource.volume = 0f;
+                musicSource.Play();
+
+                StartCoroutine(FadeVolume(windSource, windUnderMusicVolume, fadeSeconds));
+                yield return FadeVolume(musicSource, musicVolume, fadeSeconds);
+
+                bool _isFadingOut = false;
+
+                while (musicSource.clip == _clip)
                 {
-                    break;
+                    float _length = Mathf.Max(_clip.length, fadeSeconds + 0.05f);
+                    float _remaining = Mathf.Max(0f, _length - musicSource.time);
+
+                    if (!_isFadingOut && _remaining <= fadeSeconds + 0.02f)
+                    {
+                        _isFadingOut = true;
+                        StartCoroutine(FadeVolume(musicSource, 0f, fadeSeconds));
+                        StartCoroutine(FadeVolume(windSource, windDuringPauseVolume, fadeSeconds));
+                    }
+
+                    if (_isFadingOut && (musicSource.volume <= 0.001f || !musicSource.isPlaying))
+                    {
+                        break;
+                    }
+
+                    yield return null;
                 }
 
+                musicSource.Stop();
+                musicSource.volume = 0f;
+
+                if (windPauseSeconds > 0f)
+                {
+                    yield return new WaitForSecondsRealtime(windPauseSeconds);
+                }
+
+                yield return FadeVolume(windSource, windUnderMusicVolume, fadeSeconds);
+
+                currentIndex = (currentIndex + 1) % musicClips.Length;
+            }
+        }
+
+        private IEnumerator FadeVolume(AudioSource source, float targetVolume, float durationSeconds)
+        {
+            if (!source || durationSeconds <= 0f)
+            {
+                if (source)
+                {
+                    source.volume = targetVolume;
+                }
+
+                yield break;
+            }
+
+            float _startVolume = source.volume;
+            float _t = 0f;
+
+            while (_t < durationSeconds)
+            {
+                _t += Time.unscaledDeltaTime;
+                float _k = Mathf.Clamp01(_t / durationSeconds);
+                source.volume = Mathf.Lerp(_startVolume, targetVolume, _k);
                 yield return null;
             }
 
-            musicSource.Stop();
-            musicSource.volume = 0f;
-
-            if (windPauseSeconds > 0f)
-                yield return new WaitForSecondsRealtime(windPauseSeconds);
-
-            yield return FadeVolume(windSource, windUnderMusicVolume, fadeSeconds);
-
-            _index = (_index + 1) % musicClips.Length;
+            source.volume = targetVolume;
         }
-    }
-
-    private IEnumerator FadeVolume(AudioSource src, float target, float duration)
-    {
-        if (!src || duration <= 0f)
-        {
-            if (src) src.volume = target;
-            yield break;
-        }
-
-        float start = src.volume;
-        float t = 0f;
-        while (t < duration)
-        {
-            t += Time.unscaledDeltaTime;
-            float k = Mathf.Clamp01(t / duration);
-            src.volume = Mathf.Lerp(start, target, k);
-            yield return null;
-        }
-        src.volume = target;
     }
 }

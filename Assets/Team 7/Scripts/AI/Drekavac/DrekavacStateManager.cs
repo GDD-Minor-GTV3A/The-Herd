@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
-using Core;
 using Core.Shared.StateMachine;
-using AI.Drekavac.States;
 using Core.Shared.Utilities;
 
-namespace AI.Drekavac
+using Team_7.Scripts.AI.Drekavac.States;
+
+using UnityEngine;
+
+namespace Team_7.Scripts.AI.Drekavac
 {
     /// <summary>
     ///     Manages the behavior of a "Drekavac" type enemy, adding this component to an object makes it behave like a "Drekavac".
@@ -19,7 +20,9 @@ namespace AI.Drekavac
         private EnemyMovementController _enemyMovementController;
         private DrekavacAnimatorController _drekavacAnimatorController;
         private GameObject _playerObject;
+        private GameObject _dogObject;
         private Vector3 _playerLocation;
+        private Vector3 _dogLocation;
         private Transform _grabPoint = null!;
         private GameObject _grabbedObject;
         private Rigidbody _grabbedObjectRb;
@@ -54,6 +57,9 @@ namespace AI.Drekavac
             _playerObject = GameObject.FindGameObjectWithTag("Player");
             _playerLocation = _playerObject.transform.position;
 
+            _dogObject = GameObject.Find("Dog");
+            _dogLocation = _dogObject.transform.position;
+
             // Find sheep
             // TODO replace this
             _sheep = GameObject.FindGameObjectsWithTag("Sheep");
@@ -68,7 +74,8 @@ namespace AI.Drekavac
                 { typeof(HuntingState), new HuntingState(this, _enemyMovementController, _drekavacStats, _drekavacAnimatorController, _audioController) },
                 { typeof(StalkingState), new StalkingState(this, _enemyMovementController, _drekavacStats, _drekavacAnimatorController, _audioController) },
                 { typeof(DraggingState), new DraggingState(this, _enemyMovementController, _drekavacStats, _drekavacAnimatorController, _audioController) },
-                { typeof(FleeingState), new FleeingState(this, _enemyMovementController, _drekavacStats, _drekavacAnimatorController, _audioController) }
+                { typeof(FleeingState), new FleeingState(this, _enemyMovementController, _drekavacStats, _drekavacAnimatorController, _audioController) },
+                { typeof(BigState), new BigState(this, _enemyMovementController, _drekavacStats, _drekavacAnimatorController, _audioController) }
             };
         }
 
@@ -81,7 +88,8 @@ namespace AI.Drekavac
         {
             base.Update();
             _playerLocation = _playerObject.transform.position;
-            if (_currentState is not FleeingState && Vector3.Distance(transform.position, _playerLocation) <= _drekavacStats.fleeTriggerDistance)
+            _dogLocation = _dogObject.transform.position;
+            if (_currentState is not FleeingState && _currentState is not BigState && (Vector3.Distance(transform.position, _playerLocation) <= _drekavacStats.fleeTriggerDistance || Vector3.Distance(transform.position, _dogLocation) <= _drekavacStats.fleeTriggerDistance))
                 Flee();
         }
 
@@ -95,6 +103,7 @@ namespace AI.Drekavac
         
         private void GrabObject(GameObject grabbedObject)
         {
+            Debug.Log(gameObject.name + " is grabbing " + grabbedObject.name); // Chris: Temporary debug to check if the enemy gets the sheep
             if (grabbedObject == null) return;
             CreateGrabPoint();
             //IMP02 CODE FOR DISABELING SHEEP AI WHEN GRABBED
