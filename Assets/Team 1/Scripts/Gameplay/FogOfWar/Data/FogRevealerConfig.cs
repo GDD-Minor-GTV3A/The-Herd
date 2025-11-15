@@ -7,10 +7,10 @@ namespace Gameplay.FogOfWar
     /// <summary>
     /// Config for revealer of Fog Of War.
     /// </summary>
-    [CreateAssetMenu(fileName = "FogRevealerConfig", menuName = "Configs/FogRevealerConfig")]
+    [CreateAssetMenu(fileName = "FogRevealerConfig", menuName = "Configs/Revealers/BasicFogRevealerConfig")]
     public class FogRevealerConfig : ScriptableObject
     {
-        [SerializeField, Range(10f, 361f), Tooltip("Angle of view in degrees.")] private float fov = 90f;
+        [SerializeField, Range(10f, 360f), Tooltip("Angle of view in degrees.")] private float fov = 90f;
         [SerializeField, Tooltip("Distance of view.")] private float viewDistance = 10f;
         [SerializeField, Tooltip("Quality of field of view shape. Affects performance!")] private uint rayCount = 50;
         [SerializeField, Tooltip("True if you want to update this revealer regularly, false if you don't want this revealer to be updated.")] private bool isStatic = true;
