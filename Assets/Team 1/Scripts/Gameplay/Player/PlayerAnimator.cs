@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Core.Shared;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
@@ -7,7 +8,22 @@ namespace Gameplay.Player
 {
     public class PlayerAnimator : AnimatorController
     {
+        RigBuilder rig;
+
         private PlayerAnimationConstraints animationConstrains;
+
+        private readonly Transform lookTarget;
+        private readonly Transform rightHandTarget;
+        private readonly Transform rightHandHint;
+        private readonly Transform leftHandTarget;
+        private readonly Transform leftHandHint;
+        private readonly Transform shouldersTarget;
+
+        private Coroutine rightHandCor;
+        private Coroutine leftHandCor;
+        private Coroutine shouldersCor;
+
+        private readonly Player player;
         private readonly Transform root;
 
         private readonly float startYRotation;
@@ -16,11 +32,24 @@ namespace Gameplay.Player
         private const string WalkingY = "Y";
 
 
-        public PlayerAnimator(Animator animator,Transform root, PlayerAnimationConstraints constraints) : base(animator)
+        public PlayerAnimator(Animator animator, RigBuilder rig, Player player, Transform root, PlayerAnimationConstraints constraints) : base(animator)
         {
             this.root = root;
+            this.rig = rig;
+            this.player = player;
             animationConstrains = constraints;
             startYRotation = root.eulerAngles.y;
+
+            lookTarget = animationConstrains.HeadAim.data.sourceObjects[0].transform;
+
+            rightHandTarget = animationConstrains.RightHand.data.target;
+            rightHandHint = animationConstrains.RightHand.data.hint;
+
+            leftHandTarget = animationConstrains.LeftHand.data.target;
+            leftHandHint = animationConstrains.LeftHand.data.hint;
+
+            shouldersTarget = animationConstrains.ShoulderAim.data.sourceObjects[0].transform;
+
             RemoveHands();
         }
 
@@ -82,7 +111,7 @@ namespace Gameplay.Player
             {
                 animationConstrains.HeadAim.weight = 0;
                 animationConstrains.BodyAim.weight = 0;
-                animationConstrains.LookTarget.position = root.transform.position + root.transform.forward * 10;
+                lookTarget.position = root.transform.position + root.transform.forward * 10;
             }
         }
 
@@ -92,27 +121,76 @@ namespace Gameplay.Player
         /// </summary>
         public void GetTool(ToolAnimationKeyPoints keyPoints)
         {
-            var _handData = animationConstrains.RightHand.data;
-            _handData.target = keyPoints.RightHandTarget;
-            _handData.hint = keyPoints.RightHandHint;
-            animationConstrains.RightHand.data = _handData;
+            TwoBoneIKConstraintData _handData;
 
-            _handData = animationConstrains.LeftHand.data;
-            _handData.target = keyPoints.LeftHandTarget;
-            _handData.hint = keyPoints.LeftHandHint;
-            animationConstrains.LeftHand.data = _handData;
+            if (keyPoints.RightHandTarget != null)
+            {
+                animationConstrains.RightHand.weight = 1;
+
+                if (keyPoints.RightHandHint != null)
+                {
+                    _handData = animationConstrains.RightHand.data;
+                    _handData.hintWeight = 1;
+                    animationConstrains.RightHand.data = _handData;
+                }
+
+                rightHandCor = player.StartCoroutine(HandRoutine(rightHandTarget, rightHandHint, keyPoints.RightHandTarget, keyPoints.RightHandHint));
+
+            }
+
+            if (keyPoints.LeftHandTarget != null)
+            {
+                animationConstrains.LeftHand.weight = 1;
+
+                if (keyPoints.LeftHandHint != null)
+                {
+                    _handData = animationConstrains.LeftHand.data;
+                    _handData.hintWeight = 1;
+                    animationConstrains.LeftHand.data = _handData;
+                }
+
+                leftHandCor = player.StartCoroutine(HandRoutine(leftHandTarget, leftHandHint, keyPoints.LeftHandTarget, keyPoints.LeftHandHint));
+            }
 
 
-            var _shouldersData = animationConstrains.ShoulderAim.data;
-            var _targets = _shouldersData.sourceObjects;
-            _targets.Add(new WeightedTransform(keyPoints.ShouldersTarget, 1));
-            _shouldersData.sourceObjects = _targets;
-            animationConstrains.ShoulderAim.data = _shouldersData;
 
-            animationConstrains.RightHand.weight = 1;
-            animationConstrains.LeftHand.weight = 1;
-            animationConstrains.ShoulderAim.weight = 1;
+            if (keyPoints.ShouldersTarget != null)
+            {
+                animationConstrains.ShoulderAim.weight = 1;
+
+                shouldersCor = player.StartCoroutine(ShouldersRoutine(keyPoints.ShouldersTarget));
+            }
         }
+
+
+        private IEnumerator HandRoutine(Transform baseHandTarget, Transform baseHandHint, Transform newHandTarget, Transform newHandHint)
+        {
+            while (true)
+            {
+                baseHandTarget.position = newHandTarget.position;
+                baseHandTarget.rotation = newHandTarget.rotation;
+                if (newHandHint != null)
+                {
+                    baseHandHint.position = newHandHint.position;
+                    baseHandHint.rotation = newHandHint.rotation;
+                }
+
+                yield return null;
+            }
+        }
+
+
+        private IEnumerator ShouldersRoutine(Transform newShouldersTarget)
+        {
+            while (true)
+            {
+                shouldersTarget.position = newShouldersTarget.position;
+                shouldersTarget.rotation = newShouldersTarget.rotation;
+
+                yield return null;
+            }
+        }
+
 
 
         /// <summary>
@@ -120,26 +198,38 @@ namespace Gameplay.Player
         /// </summary>
         public void RemoveHands()
         {
-            var _handData = animationConstrains.RightHand.data;
-            _handData.target = null;
-            _handData.hint = null;
-            animationConstrains.RightHand.data = _handData;
-
-            _handData = animationConstrains.LeftHand.data;
-            _handData.target = null;
-            _handData.hint = null;
-            animationConstrains.LeftHand.data = _handData;
-
-
-            var _shouldersData = animationConstrains.ShoulderAim.data;
-            var _targets = _shouldersData.sourceObjects;
-            _targets.Clear();
-            _shouldersData.sourceObjects = _targets;
-            animationConstrains.ShoulderAim.data = _shouldersData;
+            TwoBoneIKConstraintData _handData;
 
             animationConstrains.RightHand.weight = 0;
+
+            _handData = animationConstrains.RightHand.data;
+            _handData.hintWeight = 0;
+            animationConstrains.RightHand.data = _handData;
+
+            if (rightHandCor != null)
+            {
+                player.StopCoroutine(rightHandCor);
+                rightHandCor = null;
+            }
+
             animationConstrains.LeftHand.weight = 0;
+
+            _handData = animationConstrains.LeftHand.data;
+            _handData.hintWeight = 0;
+            animationConstrains.LeftHand.data = _handData;
+
+            if (leftHandCor != null)
+            {
+                player.StopCoroutine(leftHandCor);
+                leftHandCor = null;
+            }
+
             animationConstrains.ShoulderAim.weight = 0;
+            if (shouldersCor != null)
+            {
+                player.StopCoroutine(shouldersCor);
+                shouldersCor = null;
+            }
         }
 
 
@@ -152,19 +242,18 @@ namespace Gameplay.Player
             direction.Normalize();
             float angle = Vector3.SignedAngle(root.forward, direction, root.up);
 
-            if (angle <= -80f)
+            if (angle <= -70f)
                 root.Rotate(0, -90, 0);
 
-            if (angle >= 80f)
+            if (angle >= 70f)
                 root.Rotate(0, 90, 0);
 
-            if (Mathf.Round(root.rotation.eulerAngles.y) % 90 == 0)
-                root.Rotate(0, 45, 0);
 
-            Vector3 targetPosition = new Vector3(mouseWorldPosition.x, animationConstrains.LookTarget.position.y, mouseWorldPosition.z);
+            Vector3 targetPosition = new Vector3(mouseWorldPosition.x, lookTarget.position.y, mouseWorldPosition.z);
 
-            animationConstrains.LookTarget.position = targetPosition;
+            lookTarget.position = targetPosition;
 
+            rig.Evaluate(Time.smoothDeltaTime);
         }
     }
 
@@ -177,8 +266,6 @@ namespace Gameplay.Player
         public MultiAimConstraint ShoulderAim;
         public TwoBoneIKConstraint LeftHand;
         public TwoBoneIKConstraint RightHand;
-
-        public Transform LookTarget;
     }
 }
 

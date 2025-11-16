@@ -1,9 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-
-using Core.Events;
-
 using UnityEngine;
 
 
@@ -128,7 +125,7 @@ namespace Gameplay.FogOfWar
                 if (Physics.Raycast(origin.position, _rayDirection, out RaycastHit hit, _viewDistance, obstaclesLayers))
                 {
 
-                    Vector3 _localHitPoint = revealers[meshIndex].Renderer.transform.InverseTransformPoint(hit.point);
+                    Vector3 _localHitPoint = revealers[meshIndex].Renderer.transform.InverseTransformPoint(hit.point + _rayDirection * 3);
                     _vertex = new Vector3(_localHitPoint.x, _meshOrigin.y, _localHitPoint.z);
                 }
                 else
@@ -186,8 +183,7 @@ namespace Gameplay.FogOfWar
             revealers[index].Renderer.material.SetFloat("_FOVAngle", GetRevealerFOV(index) * 0.5f * Mathf.Deg2Rad);
             revealers[index].Renderer.material.SetFloat("_ViewDistance", GetRevealerDistance(index));
             revealers[index].Renderer.material.SetFloat("_FadeWidth", 10f);
-            //revealers[index].Renderer.material.SetFloat("_EdgeFadeWidth", (GetRevealerFOV(index) == 360f) ? 0f : (GetRevealerFOV(index) / 250));
-            revealers[index].Renderer.material.SetFloat("_EdgeFadeWidth", 0);
+            revealers[index].Renderer.material.SetFloat("_EdgeFadeWidth", (GetRevealerFOV(index) == 360f) ? 0f : (GetRevealerFOV(index) / 250));
         }
 
 

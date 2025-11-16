@@ -1,8 +1,4 @@
-﻿
-using System;
-
-using Core.Events;
-
+﻿using Core.Events;
 using UnityEngine;
 
 namespace Gameplay.FogOfWar

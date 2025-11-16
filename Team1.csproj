@@ -63,7 +63,6 @@
   <ItemGroup>
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\States\PlayerState.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\IScareable.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Editor\ShowIfDrawer.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\States\DogFollowPlayer.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Effects\DamageEffect.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\ScareTypes.cs" />
@@ -87,10 +86,13 @@
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\States\DogMove.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\StepsSoundManager.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\PlayerAnimator.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\SheepFogRevealer.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\Data\LevelData.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\Data\FogRevealerConfig.cs" />
     <Compile Include="Assets\Team 1\Scripts\UI\Effects\PlayerVignetteEffect.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\HealthSystem\IKillable.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\Data\SheepFogRevealerConfig.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\Effects\DogCommandMarker.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\States\PlayerIdle.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\PlayerMovement.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\Player.cs" />
@@ -99,11 +101,11 @@
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\HerdZone.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\HealthSystem\HealthTester.cs" />
     <Compile Include="Assets\Team 1\Scripts\Core\Shared\Abstractions\PlayerTool.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Attributes\ShowIfAttribute.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\PlayerStateManager.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Camera\CameraConfig.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\ToolsSystem\Tools\GenericPool.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\Data\FogOfWarConfig.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Editor\ShowIfAttribute.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\DogAnimator.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\HiddenInFog.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\States\PlayerRunning.cs" />
@@ -119,6 +121,7 @@
     <Compile Include="Assets\Team 1\Scripts\Gameplay\HealthSystem\IHealable.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\ToolsSystem\Tools\Whistle.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\PlayerConfig.cs" />
+    <Compile Include="Assets\Team 1\Scripts\UI\RotationTowardsCamera.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\States\DogMoveToSheep.cs" />
   </ItemGroup>
   <ItemGroup>

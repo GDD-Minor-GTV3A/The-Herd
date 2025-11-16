@@ -12,26 +12,31 @@ namespace Gameplay.ToolsSystem
     public class Whistle : PlayerTool
     {
         [SerializeField] private DogConfig dogConfig;
+        [SerializeField] private DogCommandMarker markerPrefab;
 
 
         private Observable<Vector3> _cursorWorldPosition;
-        private PlayerAnimator _animator;
+        private PlayerAnimator playerAnimator;
+        private DogCommandMarker markerObject;
 
 
         public void Initialize(PlayerAnimator animator)
         {
             HideUI();
-            _animator = animator;
+            playerAnimator = animator;
 
             CooldownUI cooldown = toolUI.GetComponentInChildren<CooldownUI>(true);
             if (cooldown != null) cooldown.Initialize(dogConfig.BarkCooldown);
+
+            markerObject = Instantiate(markerPrefab);
+            markerObject.Initialize();
         }
 
 
         public override void HideTool()
         {
             base.HideTool();
-            _animator.RemoveHands();
+            playerAnimator.RemoveHands();
         }
 
 
@@ -68,10 +73,12 @@ namespace Gameplay.ToolsSystem
         public override void ShowTool()
         {
             base.ShowTool();
+            playerAnimator.GetTool(keyPoints);
         }
 
         private void SendDogMoveCommand()
         {
+            markerObject.StartEffect(_cursorWorldPosition.Value);
             EventManager.Broadcast(new DogMoveCommandEvent(_cursorWorldPosition.Value));
         }
 

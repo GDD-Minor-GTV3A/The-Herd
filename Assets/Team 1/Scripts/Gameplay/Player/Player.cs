@@ -6,6 +6,7 @@ using Gameplay.ToolsSystem;
 
 using UI.Effects;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
@@ -18,6 +19,8 @@ namespace Gameplay.Player
     [RequireComponent(typeof(PlayerInput), typeof(ToolSlotsController), typeof(CharacterController))]
     public class Player : MonoBehaviour, IDamageable, IHealable, IKillable
     {
+        [SerializeField] RigBuilder rig;
+
         [Header("Animations")]
         [Tooltip("Animator of the player.")]
         [SerializeField] private Animator animator;
@@ -91,7 +94,7 @@ namespace Gameplay.Player
 
 
             stepsSoundManager.Initialize();
-            PlayerAnimator playerAnimator = new PlayerAnimator(animator, transform, animationConstrains);
+            PlayerAnimator playerAnimator = new PlayerAnimator(animator, rig, this, transform, animationConstrains);
             stateManager.Initialize(playerInput, _movementController, playerAnimator);
 
             // Init health

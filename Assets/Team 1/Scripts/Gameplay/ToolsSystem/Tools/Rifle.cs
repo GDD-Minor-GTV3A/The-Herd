@@ -14,9 +14,6 @@ public class Rifle : PlayerTool
     [SerializeField, Tooltip("Transform from which bullets are spawned.")]
     private Transform shotPoint;
 
-    [Header("Animation Points")]
-    [SerializeField, Tooltip("Defines the key points in the player's animation for this specific tool.")]
-    private ToolAnimationKeyPoints keyPoints;
     [SerializeField] private Animator animator;
 
 
