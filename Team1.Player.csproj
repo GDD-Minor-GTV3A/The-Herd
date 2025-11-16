@@ -62,18 +62,24 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\States\PlayerState.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\IScareable.cs" />
     <Compile Include="Assets\Team 1\Scripts\Editor\ShowIfDrawer.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\States\DogFollowPlayer.cs" />
-    <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\HeardZone.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\Effects\DamageEffect.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\ScareTypes.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\FogRevealer.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\Dog.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\FogOfWarManager.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Camera\CameraManager.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\States\PlayerWalking.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\ToolsSystem\Tools\Bullet.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\ToolsSystem\Tools\RifleConfig.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\ToolsSystem\Tools\Rifle.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\PlayerFogRevealer.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\HealthSystem\IDamagable.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\PlayerRotation.cs" />
+    <Compile Include="Assets\Team 1\Scripts\UI\UIScripts\AmmoDisplay.cs" />
+    <Compile Include="Assets\Team 1\Scripts\UI\UIScripts\HPBar.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\States\DogState.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\ViewObstacle.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\States\DogMove.cs" />
@@ -81,18 +87,25 @@
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\PlayerAnimator.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\Data\LevelData.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\Data\FogRevealerConfig.cs" />
+    <Compile Include="Assets\Team 1\Scripts\UI\Effects\PlayerVignetteEffect.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\HealthSystem\IKillable.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Input System\InputSystem_Actions.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\States\PlayerIdle.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\PlayerMovement.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\Player.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\DogBark.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\DogBarkEvent.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\HerdZone.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\HealthSystem\HealthTester.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\PlayerStateManager.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Camera\CameraConfig.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\ToolsSystem\Tools\GenericPool.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\Data\FogOfWarConfig.cs" />
     <Compile Include="Assets\Team 1\Scripts\Editor\ShowIfAttribute.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\DogAnimator.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\HiddenInFog.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\States\PlayerRunning.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\ToolsSystem\Tools\BulletPool.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\HealthSystem\Health.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\DogMovementController.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\PlayerInput.cs" />
@@ -108,6 +121,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Team 1\Scripts\Team1.asmdef" />
+    <None Include="Assets\Team 1\Scripts\UI\Resources\Shader\Grayscale.shader" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -912,6 +926,14 @@
     </Reference>
     <Reference Include="Unity.Cinemachine">
       <HintPath>Library\ScriptAssemblies\Unity.Cinemachine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Animation.Rigging">
+      <HintPath>Library\ScriptAssemblies\Unity.Animation.Rigging.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">

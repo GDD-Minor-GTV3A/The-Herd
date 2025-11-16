@@ -64,12 +64,14 @@
     <Compile Include="Assets\Team 2\Scripts\AI\Personality\Types\EnergeticPersonality.cs" />
     <Compile Include="Assets\Team 2\Scripts\AI\Personality\PersonalityBehaviorContext.cs" />
     <Compile Include="Assets\Team 2\Scripts\Sound\SheepSoundManager.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\SanityTracker.cs" />
     <Compile Include="Assets\Team 2\Scripts\AI\Personality\Types\LazyPersonality.cs" />
     <Compile Include="Assets\Team 2\Scripts\AI\Personality\Types\NormalPersonality.cs" />
     <Compile Include="Assets\Team 2\Scripts\Sound\SheepSoundDriver.cs" />
     <Compile Include="Assets\Team 2\Scripts\AI\SheepStates.cs" />
     <Compile Include="Assets\Team 2\Scripts\AI\FlockingUtility.cs" />
     <Compile Include="Assets\Team 2\Scripts\AI\ThreatSensor.cs" />
+    <Compile Include="Assets\Team 2\Scripts\AI\SheepSanity.cs" />
     <Compile Include="Assets\Team 2\Scripts\AI\Personality\Types\NervousPersonality.cs" />
     <Compile Include="Assets\Team 2\Scripts\AI\Personality\BaseSheepPersonality.cs" />
     <Compile Include="Assets\Team 2\Scripts\EventDemoSimulator.cs" />
@@ -78,6 +80,7 @@
     <Compile Include="Assets\Team 2\Scripts\AI\Personality\ISheepPersonality.cs" />
     <Compile Include="Assets\Team 2\Scripts\AI\SheepStateManager.cs" />
     <Compile Include="Assets\Team 2\Scripts\AI\SheepRejoinTester.cs" />
+    <Compile Include="Assets\Team 2\Scripts\Event\SheepEvents.cs" />
     <Compile Include="Assets\Team 2\Scripts\AI\SheepAnimationDriver.cs" />
     <Compile Include="Assets\Team 2\Scripts\AI\SheepAnimState.cs" />
     <Compile Include="Assets\Team 2\Scripts\AI\Personality\Types\StubbornPersonality.cs" />
@@ -901,6 +904,10 @@
     <ProjectReference Include="Events.Player.csproj">
       <Project>{087F42A0-C12B-8EC2-A271-77FBEFD54DC9}</Project>
       <Name>Events.Player</Name>
+    </ProjectReference>
+    <ProjectReference Include="Core.Shared.Player.csproj">
+      <Project>{CB78C5C7-B138-A524-A69B-CF6FC033F75D}</Project>
+      <Name>Core.Shared.Player</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
