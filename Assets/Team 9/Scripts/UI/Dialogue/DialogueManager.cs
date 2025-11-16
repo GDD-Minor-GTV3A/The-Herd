@@ -44,12 +44,12 @@ public class DialogueManager : MonoBehaviour
     private const string PORTRAIT_TAG = "portrait";
     private const string DEFAULT_LAYOUT_STATE = "left";
     private const string NARRATOR_LAYOUT_STATE = "narrator";
-    private const string SHOW_CHOICES_STATE = "showChoices"; 
+    private const string SHOW_CHOICES_STATE = "showChoices";
 
     /// <summary>
     /// Gets a value indicating whether dialogue is currently playing.
     /// </summary>
-    public bool IsDialoguePlaying { get; private set; } 
+    public bool IsDialoguePlaying { get; private set; } = false;
 
     /// <summary>
     /// Gets the singleton instance of the DialogueManager.
