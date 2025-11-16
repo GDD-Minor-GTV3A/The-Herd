@@ -32,6 +32,7 @@ namespace Gameplay.Player
         private InputAction _slot2_Action;
         private InputAction _slot3_Action;
         private InputAction _dogBark;
+        private InputAction _mapKey;
         #endregion InputActions
 
 
@@ -86,6 +87,8 @@ namespace Gameplay.Player
         public InputAction Slot_3 => _slot3_Action;
 
         public InputAction DogBark => _dogBark;
+
+        public InputAction MapKey => _mapKey;
         #endregion InputActionProps
 
 
@@ -110,6 +113,7 @@ namespace Gameplay.Player
             _slot2_Action = _inputActions.FindActionMap("Player").FindAction("Slot_2");
             _slot3_Action = _inputActions.FindActionMap("Player").FindAction("Slot_3");
             _dogBark = _inputActions.FindActionMap("Player").FindAction("DogBark");
+            _mapKey = _inputActions.FindActionMap("Player").FindAction("Mapkey");
 
             // Enable input actions
             _moveAction.Enable();
@@ -123,6 +127,7 @@ namespace Gameplay.Player
             _slot2_Action.Enable();
             _slot3_Action.Enable();
             _dogBark.Enable();
+            _mapKey.Enable();
         }
 
 

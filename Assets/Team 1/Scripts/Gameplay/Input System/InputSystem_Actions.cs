@@ -199,6 +199,15 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""MapKey"",
+                    ""type"": ""Button"",
+                    ""id"": ""7098b340-500e-4284-a854-6f82074a5874"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -507,6 +516,17 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": "";Gamepad"",
                     ""action"": ""DogBark"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""236e0da1-d38d-47f7-92fd-00336cd699d4"",
+                    ""path"": ""<Keyboard>/i"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MapKey"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1106,6 +1126,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Player_Slot_3 = m_Player.FindAction("Slot_3", throwIfNotFound: true);
         m_Player_SlotsScroll = m_Player.FindAction("SlotsScroll", throwIfNotFound: true);
         m_Player_DogBark = m_Player.FindAction("DogBark", throwIfNotFound: true);
+        m_Player_MapKey = m_Player.FindAction("MapKey", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1211,6 +1232,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Slot_3;
     private readonly InputAction m_Player_SlotsScroll;
     private readonly InputAction m_Player_DogBark;
+    private readonly InputAction m_Player_MapKey;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1270,6 +1292,10 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/DogBark".
         /// </summary>
         public InputAction @DogBark => m_Wrapper.m_Player_DogBark;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/MapKey".
+        /// </summary>
+        public InputAction @MapKey => m_Wrapper.m_Player_MapKey;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1332,6 +1358,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @DogBark.started += instance.OnDogBark;
             @DogBark.performed += instance.OnDogBark;
             @DogBark.canceled += instance.OnDogBark;
+            @MapKey.started += instance.OnMapKey;
+            @MapKey.performed += instance.OnMapKey;
+            @MapKey.canceled += instance.OnMapKey;
         }
 
         /// <summary>
@@ -1379,6 +1408,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @DogBark.started -= instance.OnDogBark;
             @DogBark.performed -= instance.OnDogBark;
             @DogBark.canceled -= instance.OnDogBark;
+            @MapKey.started -= instance.OnMapKey;
+            @MapKey.performed -= instance.OnMapKey;
+            @MapKey.canceled -= instance.OnMapKey;
         }
 
         /// <summary>
@@ -1763,6 +1795,13 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnDogBark(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "MapKey" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnMapKey(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.
