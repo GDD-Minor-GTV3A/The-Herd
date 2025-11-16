@@ -213,6 +213,7 @@ MonoBehaviour:
   _sheepPrefab: {fileID: 4607321907588713866, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
   _playerTransform: {fileID: 1738240099}
   _spawnOffset: {x: 2, y: 2, z: 0}
+  _sanityPointsChange: 16
 --- !u!4 &307022816
 Transform:
   m_ObjectHideFlags: 0
@@ -3577,7 +3578,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b850b0730321e746bb9163021484692, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxSheepCount: 10
+  _sheepPrefab: {fileID: 4607321907588713866, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
+  _playerTransform: {fileID: 1738240099}
+  _spawnDistance: 15
   _showDebug: 1
   _debugText: {fileID: 937231271}
 --- !u!1660057539 &9223372036854775807

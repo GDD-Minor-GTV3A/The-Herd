@@ -49,6 +49,11 @@ namespace Core.AI.Sheep
         [Tooltip("Offset from player for spawn position")]
         private Vector3 _spawnOffset = new Vector3(2f, 2f, 0f);
 
+        [Header("Sanity Settings")]
+        [SerializeField]
+        [Tooltip("Amount of sanity points to add/remove per key press")]
+        private int _sanityPointsChange = 2;
+
         private int _selectedSheepIndex = 0;
         private float _hideTextAt;
         private string _currentEventText = "";
@@ -104,6 +109,18 @@ namespace Core.AI.Sheep
                     case KeyCode.J:
                         SpawnSheep();
                         break;
+
+                    // Sanity Control
+                    case KeyCode.Equals:
+                    case KeyCode.Plus:
+                    case KeyCode.KeypadPlus:
+                        IncreaseSanity();
+                        break;
+                    case KeyCode.Minus:
+                    case KeyCode.KeypadMinus:
+                        DecreaseSanity();
+                        break;
+
                     case KeyCode.H:
                         ShowHelp();
                         break;
@@ -285,6 +302,24 @@ namespace Core.AI.Sheep
 
         #endregion
 
+        #region Sanity Control
+
+        private void IncreaseSanity()
+        {
+            SanityTracker.AddSanityPoints(_sanityPointsChange);
+            DisplayEventFeedback($"<color=#00FF00FF>Sanity Increased</color>\nAdded {_sanityPointsChange} points");
+            Debug.Log($"[EventDemo] Added {_sanityPointsChange} sanity points");
+        }
+
+        private void DecreaseSanity()
+        {
+            SanityTracker.RemoveSanityPoints(_sanityPointsChange);
+            DisplayEventFeedback($"<color=#FF0000FF>Sanity Decreased</color>\nRemoved {_sanityPointsChange} points");
+            Debug.Log($"[EventDemo] Removed {_sanityPointsChange} sanity points");
+        }
+
+        #endregion
+
         private void ShowHelp()
         {
             string help = @"<b>Sheep Event Demo Simulator</b>
@@ -297,6 +332,10 @@ namespace Core.AI.Sheep
 <color=yellow>T</color> - Threat Detected
 <color=yellow>K</color> - Kill Sheep (Death Event)
 <color=yellow>J</color> - Spawn Sheep (Join Event)
+
+<b><color=#00FFFFFF>SANITY CONTROL</color></b>
+<color=yellow>+</color> - Increase Sanity Points
+<color=yellow>-</color> - Decrease Sanity Points
 
 <color=yellow>H</color> - Show This Help";
 
