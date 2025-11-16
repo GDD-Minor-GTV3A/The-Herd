@@ -1544,11 +1544,11 @@ AudioSource:
   m_GameObject: {fileID: 1499901291}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 355428252071530209, guid: 62d417deb6376ba4794f2c75909ee160, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 0.347
+  m_Volume: 0.218
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -1646,6 +1646,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   audioSource: {fileID: 1499901298}
   bark: {fileID: 8300000, guid: 604794e3c85757148af21c0f38327c06, type: 3}
+  ambientClips:
+  - {fileID: 8300000, guid: 33e55650c38681643845f4f6f696685a, type: 3}
+  - {fileID: 8300000, guid: 552f66f252e0f434db4c6d90c3d57afe, type: 3}
+  - {fileID: 8300000, guid: cd6bdfa04da595243884c45ac0cb871d, type: 3}
+  - {fileID: 8300000, guid: e3dfb55e96a942d43ad5e219d2ebad3a, type: 3}
+  minDelay: 4
+  maxDelay: 10
 --- !u!1 &1501583735
 GameObject:
   m_ObjectHideFlags: 0
@@ -1726,6 +1733,26 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 6897622384613972298, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
   m_PrefabInstance: {fileID: 5230550193027717823}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1563586428 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8487744472858736520, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
+  m_PrefabInstance: {fileID: 5230550193027717823}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1563586431
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1563586428}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4def056c2934f8a45bb28408d9497679, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!1 &1690952260
 GameObject:
   m_ObjectHideFlags: 0
@@ -2607,6 +2634,9 @@ PrefabInstance:
       insertIndex: 1
       addedObject: {fileID: 1973422129}
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8487744472858736520, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1563586431}
     - targetCorrespondingSourceObject: {fileID: 3548856809926149607, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1314960914}
