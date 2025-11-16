@@ -52,7 +52,7 @@ namespace Gameplay.ToolsSystem
             _input.MainUsage.started += OnCurrentToolMainUseStarted;
             _input.MainUsage.canceled += OnCurrentToolMainUseFinished;
 
-            _input.Reload.canceled += OnCurrentToolReload;
+            _input.Reload.started += OnCurrentToolReload;
 
             _input.SecondaryUsage.started += OnCurrentToolSecondaryUseStarted;
             _input.SecondaryUsage.canceled += OnCurrentToolSecondaryUseFinished;
@@ -113,7 +113,7 @@ namespace Gameplay.ToolsSystem
 
         private void OnCurrentToolReload(InputAction.CallbackContext obj)
         {
-            if (_currentToolIndex == 1)
+            if (_toolSlots[_currentToolIndex] != null)
                 _toolSlots[_currentToolIndex].Reload();
         }
 
