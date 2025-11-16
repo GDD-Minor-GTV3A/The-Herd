@@ -8,8 +8,6 @@ public class WhistleSound : MonoBehaviour
 
     public void PlayHerd()
     {
-        Debug.Log("I tried");
-
         if (audioSource != null && herdClip != null)
         {
             audioSource.PlayOneShot(herdClip);
