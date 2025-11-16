@@ -40,8 +40,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5099687504222892736}
-  - component: {fileID: 8179064682616622531}
+  - component: {fileID: 7628405949233320924}
   - component: {fileID: 7040839071110727952}
+  - component: {fileID: 3789517453397081463}
+  - component: {fileID: 5399391070473412256}
   m_Layer: 0
   m_Name: Rifle
   m_TagString: Untagged
@@ -65,7 +67,7 @@ Transform:
   - {fileID: 3575827215569942670}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
---- !u!114 &8179064682616622531
+--- !u!114 &7628405949233320924
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -74,19 +76,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 1755403620699033845}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5e425490b7dd14c41ae7453691823ddd, type: 3}
+  m_Script: {fileID: 11500000, guid: 45b42243065ad864383c0b849590f585, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  config: {fileID: 11400000, guid: 563dda4c4c726294d80f0e074accedcb, type: 2}
-  shotPoint: {fileID: 3960985787802172437}
+  toolUI: {fileID: 0}
+  toolEquipSound: {fileID: 8300000, guid: 46885e453e711d347a34f86af8333bc5, type: 3}
   keyPoints:
-    RightHandTarget: {fileID: 1089401446526029045}
-    RightHandHint: {fileID: 3857206537794059734}
-    LeftHandTarget: {fileID: 7477371135425352274}
-    LeftHandHint: {fileID: 4681287239971752800}
-    ShouldersTarget: {fileID: 111427293374878925}
-  animator: {fileID: 4759434604285812370}
-  onShot:
+    <RightHandTarget>k__BackingField: {fileID: 1089401446526029045}
+    <RightHandHint>k__BackingField: {fileID: 3857206537794059734}
+    <LeftHandTarget>k__BackingField: {fileID: 7477371135425352274}
+    <LeftHandHint>k__BackingField: {fileID: 4681287239971752800}
+    <ChestTarget>k__BackingField: {fileID: 111427293374878925}
+  OnMainUse:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 4076684200109204828}
@@ -113,6 +114,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 3789517453397081463}
+        m_TargetAssemblyTypeName: RifleAudio, Assembly-CSharp
+        m_MethodName: PlayShot
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0.2
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
       - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: Gameplay.CameraSettings.CameraManager, Team1
         m_MethodName: ShakeCamera
@@ -125,6 +138,54 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  OnReload:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 3789517453397081463}
+        m_TargetAssemblyTypeName: RifleAudio, Assembly-CSharp
+        m_MethodName: PlayReload
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: UI.CooldownUI, Team1
+        m_MethodName: StartCooldown
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnSecondaryUse:
+    m_PersistentCalls:
+      m_Calls: []
+  OnAmmoChanged:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: UI.AmmoAmountUI, Team1
+        m_MethodName: UpdateAmmoText
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  config: {fileID: 11400000, guid: 563dda4c4c726294d80f0e074accedcb, type: 2}
+  shotPoint: {fileID: 3960985787802172437}
+  animator: {fileID: 4759434604285812370}
 --- !u!1773428102 &7040839071110727952
 ParentConstraint:
   m_ObjectHideFlags: 0
@@ -152,6 +213,118 @@ ParentConstraint:
   m_Sources:
   - sourceTransform: {fileID: 0}
     weight: 1
+--- !u!114 &3789517453397081463
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1755403620699033845}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74b7e4b62608de74ebb67dac9651fddb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioSource: {fileID: 5399391070473412256}
+  shotClip: {fileID: 8300000, guid: a2ad2f22e499c454ca7ec8030b40a8eb, type: 3}
+  reloadClip: {fileID: 8300000, guid: 1116d5858fd7d0b43b9bb3b084d5f3ec, type: 3}
+--- !u!82 &5399391070473412256
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1755403620699033845}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 0.217
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &2065139589110244682
 GameObject:
   m_ObjectHideFlags: 0

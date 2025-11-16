@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using Core.Shared;
 using Core.Shared.Utilities;
-
 using Gameplay.Player;
+using Gameplay.ToolsSystem.Tools.Rifle;
+using Gameplay.ToolsSystem.Tools.Whistle;
+using UI.ToolSlots;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -13,25 +15,28 @@ namespace Gameplay.ToolsSystem
     /// </summary>
     public class ToolSlotsController : MonoBehaviour
     {
-        [SerializeField] private Whistle whistle;
-        [SerializeField] private Rifle rifle;
-        [SerializeField] private ToolSlotsUIController toolSlotsUI;
+        [SerializeField, Tooltip("Reference on whistle component. (Temp solution)"), Required] 
+        private Whistle whistle;
 
-        [Space]
-        [Header("Audio")]
-        [SerializeField, Required] private AudioSource sfxSource;
+        [SerializeField, Tooltip("Reference on rifle component. (Temp solution)"), Required] 
+        private Rifle rifle;
+
+        [SerializeField, Tooltip("Reference to UI component."), Required] 
+        private ToolSlotsUIController toolSlotsUI;
+
+        [Space, Header("Audio")]
+        [SerializeField, Tooltip("Audio source for sfx clips."), Required] 
+        private AudioSource sfxSource;
 
 
-        private List<PlayerTool> _toolSlots = new List<PlayerTool>();
-        private int _currentToolIndex;
-        private int _slotsAmount;
+        private List<PlayerTool> toolSlots = new List<PlayerTool>();
+        private int currentToolIndex;
+        private int slotsAmount;
 
-        private Player.PlayerInput _input;
+        private Player.PlayerInput input;
 
-        private bool _initializedFirstSlot;
+        private bool initializedFirstSlot;
         
-
-
 
         /// <summary>
         /// Initialization method.
@@ -40,30 +45,30 @@ namespace Gameplay.ToolsSystem
         /// <param name="slotsAmount">Max amount of available slots.</param>
         public void Initialize(Player.PlayerInput input, PlayerAnimator animator, int slotsAmount)
         {
-            _input = input;
-            _slotsAmount = slotsAmount;
+            this.input = input;
+            this.slotsAmount = slotsAmount;
 
-            for (int i = 0; i < _slotsAmount; i++)
-                _toolSlots.Add(null);
+            for (int i = 0; i < this.slotsAmount; i++)
+                toolSlots.Add(null);
 
-            _currentToolIndex = -1;
+            currentToolIndex = -1;
 
 
-            _input.MainUsage.started += OnCurrentToolMainUseStarted;
-            _input.MainUsage.canceled += OnCurrentToolMainUseFinished;
+            this.input.MainUsage.started += OnCurrentToolMainUseStarted;
+            this.input.MainUsage.canceled += OnCurrentToolMainUseFinished;
 
-            _input.Reload.started += OnCurrentToolReload;
+            this.input.Reload.started += OnCurrentToolReload;
 
-            _input.SecondaryUsage.started += OnCurrentToolSecondaryUseStarted;
-            _input.SecondaryUsage.canceled += OnCurrentToolSecondaryUseFinished;
+            this.input.SecondaryUsage.started += OnCurrentToolSecondaryUseStarted;
+            this.input.SecondaryUsage.canceled += OnCurrentToolSecondaryUseFinished;
 
-            _input.SlotsScroll.started += UpdateCurrentSlot;
+            this.input.SlotsScroll.started += UpdateCurrentSlot;
 
-            _input.Slot_1.started += (obj) => SetCurrentSlotByIndex(0);
-            _input.Slot_2.started += (obj) => SetCurrentSlotByIndex(1);
-            _input.Slot_3.started += (obj) => SetCurrentSlotByIndex(2);
+            this.input.Slot_1.started += (obj) => SetCurrentSlotByIndex(0);
+            this.input.Slot_2.started += (obj) => SetCurrentSlotByIndex(1);
+            this.input.Slot_3.started += (obj) => SetCurrentSlotByIndex(2);
 
-            toolSlotsUI.Initilaize();
+            toolSlotsUI.Initialize();
 
             // test
             whistle.Initialize(animator);
@@ -73,73 +78,73 @@ namespace Gameplay.ToolsSystem
             SetNewToolToSlotByIndex(rifle, 1);
 
             SetCurrentSlotByIndex(0);
-            _initializedFirstSlot = true;
+            initializedFirstSlot = true;
         }
+        
+        
         private void UpdateCurrentSlot(InputAction.CallbackContext obj)
         {
-            int inputValue = -Mathf.RoundToInt(obj.action.ReadValue<Vector2>().y);
+            int _inputValue = -Mathf.RoundToInt(obj.action.ReadValue<Vector2>().y);
 
-            SetCurrentSlotByIndex(_currentToolIndex + inputValue);
+            SetCurrentSlotByIndex(currentToolIndex + _inputValue);
         }
+
 
         private void SetCurrentSlotByIndex(int index)
         {
-            if (index == _currentToolIndex) 
+            if (index == currentToolIndex) 
                 return;
 
-            if (_currentToolIndex >= 0 && _toolSlots[_currentToolIndex] != null)
-                _toolSlots[_currentToolIndex].HideTool();
+            if (currentToolIndex >= 0 && toolSlots[currentToolIndex] != null)
+                toolSlots[currentToolIndex].HideTool();
 
-            index = Mathf.Clamp(index, 0, _slotsAmount-1);
-            _currentToolIndex = index;
+            index = Mathf.Clamp(index, 0, slotsAmount-1);
+            currentToolIndex = index;
 
-            var newTool = _toolSlots[_currentToolIndex];
-            if (newTool != null) newTool.ShowTool();
+            PlayerTool _newTool = toolSlots[currentToolIndex];
+            if (_newTool != null) _newTool.ShowTool();
 
-            if (_initializedFirstSlot && sfxSource != null && newTool.EquipSound != null)
+            if (initializedFirstSlot && sfxSource != null && _newTool.EquipSound != null)
             {
                 if (sfxSource.isPlaying)
                     sfxSource.Stop();
 
-                sfxSource.PlayOneShot(newTool.EquipSound);
+                sfxSource.PlayOneShot(_newTool.EquipSound);
             }
 
-            toolSlotsUI.ChangeHighlightedSlot(_currentToolIndex);
+            toolSlotsUI.ChangeHighlightedSlot(currentToolIndex);
         
         }
-
-        
 
 
         private void OnCurrentToolReload(InputAction.CallbackContext obj)
         {
-            if (_toolSlots[_currentToolIndex] != null)
-                _toolSlots[_currentToolIndex].Reload();
+            if (toolSlots[currentToolIndex] != null)
+                toolSlots[currentToolIndex].Reload();
         }
 
         private void OnCurrentToolMainUseStarted(InputAction.CallbackContext obj)
         {
-            if (_toolSlots[_currentToolIndex] != null)
-                _toolSlots[_currentToolIndex].MainUsageStarted(_input.Look);
+            if (toolSlots[currentToolIndex] != null)
+                toolSlots[currentToolIndex].MainUsageStarted(input.Look);
         }
 
         private void OnCurrentToolMainUseFinished(InputAction.CallbackContext obj)
         {
-            if (_toolSlots[_currentToolIndex] != null)
-                _toolSlots[_currentToolIndex].MainUsageFinished();
+            if (toolSlots[currentToolIndex] != null)
+                toolSlots[currentToolIndex].MainUsageFinished();
         }
-
 
         private void OnCurrentToolSecondaryUseStarted(InputAction.CallbackContext obj)
         {
-            if (_toolSlots[_currentToolIndex] != null)
-                _toolSlots[_currentToolIndex].SecondaryUsageStarted(_input.Look);
+            if (toolSlots[currentToolIndex] != null)
+                toolSlots[currentToolIndex].SecondaryUsageStarted(input.Look);
         }
 
         private void OnCurrentToolSecondaryUseFinished(InputAction.CallbackContext obj)
         {
-            if (_toolSlots[_currentToolIndex] != null)
-                _toolSlots[_currentToolIndex].SecondaryUsageFinished();
+            if (toolSlots[currentToolIndex] != null)
+                toolSlots[currentToolIndex].SecondaryUsageFinished();
         }
 
 
@@ -150,25 +155,25 @@ namespace Gameplay.ToolsSystem
         /// <param name="index">Index of slot to add.</param>
         public void SetNewToolToSlotByIndex(PlayerTool toolToSet, int index)
         {
-            _toolSlots[index] = toolToSet;
+            toolSlots[index] = toolToSet;
         }
 
 
         private void OnDestroy()
         {
-            _input.MainUsage.started -= OnCurrentToolMainUseStarted;
-            _input.MainUsage.canceled -= OnCurrentToolMainUseFinished;
+            input.MainUsage.started -= OnCurrentToolMainUseStarted;
+            input.MainUsage.canceled -= OnCurrentToolMainUseFinished;
 
-            _input.Reload.canceled -= OnCurrentToolReload;
+            input.Reload.canceled -= OnCurrentToolReload;
 
-            _input.SecondaryUsage.started -= OnCurrentToolSecondaryUseStarted;
-            _input.SecondaryUsage.canceled -= OnCurrentToolSecondaryUseFinished;
+            input.SecondaryUsage.started -= OnCurrentToolSecondaryUseStarted;
+            input.SecondaryUsage.canceled -= OnCurrentToolSecondaryUseFinished;
 
-            _input.SlotsScroll.started -= UpdateCurrentSlot;
+            input.SlotsScroll.started -= UpdateCurrentSlot;
 
-            _input.Slot_1.started -= (obj) => SetCurrentSlotByIndex(0);
-            _input.Slot_2.started -= (obj) => SetCurrentSlotByIndex(1);
-            _input.Slot_3.started -= (obj) => SetCurrentSlotByIndex(2);
+            input.Slot_1.started -= (obj) => SetCurrentSlotByIndex(0);
+            input.Slot_2.started -= (obj) => SetCurrentSlotByIndex(1);
+            input.Slot_3.started -= (obj) => SetCurrentSlotByIndex(2);
         }
     }
 }

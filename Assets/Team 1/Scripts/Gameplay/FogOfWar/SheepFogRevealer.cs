@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace Gameplay.FogOfWar
 {
+    /// <summary>
+    /// Specific fog revealer for sheep only.
+    /// </summary>
     public class SheepFogRevealer : FogRevealer
     {
         private List<AnimationCurve> curvesList;

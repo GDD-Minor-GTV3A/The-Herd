@@ -1,5 +1,4 @@
 using Core.Shared;
-
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -10,27 +9,27 @@ namespace Gameplay.Player
     /// </summary>
     public class PlayerInput : MonoBehaviour
     {
-        [Tooltip("Layers of the ground for ray casting.")]
-        [SerializeField] LayerMask _groundLayers;
+        [SerializeField, Tooltip("Layers of the ground for ray casting.")]
+        LayerMask groundLayers;
 
 
-        private InputActionAsset _inputActions;
-        private Camera _mainCamera;
+        private InputActionAsset inputActions;
+        private Camera mainCamera;
 
-        private readonly Observable<Vector3> _cursorWorldPosition = new Observable<Vector3>();
+        private readonly Observable<Vector3> cursorWorldPosition = new Observable<Vector3>();
 
 
         #region InputActions
-        private InputAction _moveAction;
-        private InputAction _lookAction;
-        private InputAction _runAction;
-        private InputAction _reloadAction;
-        private InputAction _mainUsageAction;
-        private InputAction _SecondaryUsageAction;
-        private InputAction _slotsScrollAction;
-        private InputAction _slot1_Action;
-        private InputAction _slot2_Action;
-        private InputAction _slot3_Action;
+        private InputAction moveAction;
+        private InputAction lookAction;
+        private InputAction runAction;
+        private InputAction reloadAction;
+        private InputAction mainUsageAction;
+        private InputAction secondaryUsageAction;
+        private InputAction slotsScrollAction;
+        private InputAction slot1_Action;
+        private InputAction slot2_Action;
+        private InputAction slot3_Action;
         #endregion InputActions
 
 
@@ -38,7 +37,7 @@ namespace Gameplay.Player
         /// <summary>
         /// Vector2 value of movement input(WASD).
         /// </summary>
-        public Vector2 Move => _moveAction.ReadValue<Vector2>();
+        public Vector2 Move => moveAction.ReadValue<Vector2>();
 
         /// <summary>
         /// Current position of the cursor in the world.
@@ -47,42 +46,42 @@ namespace Gameplay.Player
         {
             get
             {
-                return _cursorWorldPosition;
+                return cursorWorldPosition;
             }
         }
 
         /// <summary>
         /// True when sprint button is hold.
         /// </summary>
-        public bool Run => _runAction.IsPressed();
+        public bool Run => runAction.IsPressed();
         /// <summary>
         /// Input action for reload button. Use this actions: started, performed, canceled.
         /// </summary>
-        public InputAction Reload => _reloadAction;
+        public InputAction Reload => reloadAction;
         /// <summary>
         /// Input action for main usage button(LMB). Use this actions: started, performed, canceled.
         /// </summary>
-        public InputAction MainUsage => _mainUsageAction;
+        public InputAction MainUsage => mainUsageAction;
         /// <summary>
         /// Input action for secondary usage button(RMB). Use this actions: started, performed, canceled.
         /// </summary>
-        public InputAction SecondaryUsage => _SecondaryUsageAction;
+        public InputAction SecondaryUsage => secondaryUsageAction;
         /// <summary>
         /// Input action for scrolling. Use this actions: started, performed, canceled.
         /// </summary>
-        public InputAction SlotsScroll => _slotsScrollAction;
+        public InputAction SlotsScroll => slotsScrollAction;
         /// <summary>
         /// Input action for slot 1 button. Use this actions: started, performed, canceled.
         /// </summary>
-        public InputAction Slot_1 => _slot1_Action;
+        public InputAction Slot_1 => slot1_Action;
         /// <summary>
         /// Input action for slot 2 button. Use this actions: started, performed, canceled.
         /// </summary>
-        public InputAction Slot_2 => _slot2_Action;
+        public InputAction Slot_2 => slot2_Action;
         /// <summary>
         /// Input action for slot 3 button. Use this actions: started, performed, canceled.
         /// </summary>
-        public InputAction Slot_3 => _slot3_Action;
+        public InputAction Slot_3 => slot3_Action;
 
         #endregion InputActionProps
 
@@ -93,45 +92,45 @@ namespace Gameplay.Player
         /// <param name="inputActions">Asset with input actions.</param>
         public void Initialize(InputActionAsset inputActions)
         {
-            _inputActions = inputActions;
-            _mainCamera = Camera.main;
+            this.inputActions = inputActions;
+            mainCamera = Camera.main;
 
             // Get Input Actions
-            _moveAction = _inputActions.FindActionMap("Player").FindAction("Move");
-            _lookAction = _inputActions.FindActionMap("Player").FindAction("Look");
-            _runAction = _inputActions.FindActionMap("Player").FindAction("Sprint");
-            _reloadAction = _inputActions.FindActionMap("Player").FindAction("Reload");
-            _mainUsageAction = _inputActions.FindActionMap("Player").FindAction("MainUsage");
-            _SecondaryUsageAction = _inputActions.FindActionMap("Player").FindAction("SecondaryUsage");
-            _slotsScrollAction = _inputActions.FindActionMap("Player").FindAction("SlotsScroll");
-            _slot1_Action = _inputActions.FindActionMap("Player").FindAction("Slot_1");
-            _slot2_Action = _inputActions.FindActionMap("Player").FindAction("Slot_2");
-            _slot3_Action = _inputActions.FindActionMap("Player").FindAction("Slot_3");
+            moveAction = this.inputActions.FindActionMap("Player").FindAction("Move");
+            lookAction = this.inputActions.FindActionMap("Player").FindAction("Look");
+            runAction = this.inputActions.FindActionMap("Player").FindAction("Sprint");
+            reloadAction = this.inputActions.FindActionMap("Player").FindAction("Reload");
+            mainUsageAction = this.inputActions.FindActionMap("Player").FindAction("MainUsage");
+            secondaryUsageAction = this.inputActions.FindActionMap("Player").FindAction("SecondaryUsage");
+            slotsScrollAction = this.inputActions.FindActionMap("Player").FindAction("SlotsScroll");
+            slot1_Action = this.inputActions.FindActionMap("Player").FindAction("Slot_1");
+            slot2_Action = this.inputActions.FindActionMap("Player").FindAction("Slot_2");
+            slot3_Action = this.inputActions.FindActionMap("Player").FindAction("Slot_3");
 
             // Enable input actions
-            _moveAction.Enable();
-            _lookAction.Enable();
-            _runAction.Enable();
-            _reloadAction.Enable();
-            _mainUsageAction.Enable();
-            _SecondaryUsageAction.Enable();
-            _slotsScrollAction.Enable();
-            _slot1_Action.Enable();
-            _slot2_Action.Enable();
-            _slot3_Action.Enable();
+            moveAction.Enable();
+            lookAction.Enable();
+            runAction.Enable();
+            reloadAction.Enable();
+            mainUsageAction.Enable();
+            secondaryUsageAction.Enable();
+            slotsScrollAction.Enable();
+            slot1_Action.Enable();
+            slot2_Action.Enable();
+            slot3_Action.Enable();
         }
 
 
         private void LateUpdate()
         {
-            Ray ray = _mainCamera.ScreenPointToRay(_lookAction.ReadValue<Vector2>());
+            Ray ray = mainCamera.ScreenPointToRay(lookAction.ReadValue<Vector2>());
 
             Vector3 worldCursorPosition;
 
-            Physics.Raycast(ray, out RaycastHit hitInfo, Mathf.Infinity, _groundLayers);
+            Physics.Raycast(ray, out RaycastHit hitInfo, Mathf.Infinity, groundLayers);
             worldCursorPosition = hitInfo.point;
 
-            _cursorWorldPosition.Value = worldCursorPosition;
+            cursorWorldPosition.Value = worldCursorPosition;
         }
     }
 }

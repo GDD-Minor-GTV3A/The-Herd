@@ -6,12 +6,15 @@ using UnityEngine.Events;
 namespace Core.Shared
 {
     /// <summary>
-    /// Interface for every tool that can be used by character(weapon, whistle, etc.).
+    /// Tool that can be used by character(weapon, whistle, etc.).
     /// </summary>
     public abstract class PlayerTool : MonoBehaviour
     {
+        [Header("UI")]
         [SerializeField, Tooltip("UI of this tool."), Required]
         protected GameObject toolUI;
+
+        [Header("Sound")]
         [SerializeField, Tooltip("This sound plays when this tool is equipped."), Required]
         private AudioClip toolEquipSound;
 
@@ -21,11 +24,17 @@ namespace Core.Shared
 
         [Space]
         [Header("Events")]
+        [Tooltip("Invokes when player uses main action(LMB) of the tool.")] 
         public UnityEvent OnMainUse;
+        [Tooltip("Invokes when player uses reload(R) of the tool.")]
         public UnityEvent OnReload;
+        [Tooltip("Invokes when player uses secondary action(RMB) of the tool.")]
         public UnityEvent OnSecondaryUse;
 
 
+        /// <summary>
+        /// Audio clip which has to be played, when player equips tool.
+        /// </summary>
         public AudioClip EquipSound => toolEquipSound;
 
 
@@ -52,11 +61,17 @@ namespace Core.Shared
         /// </summary>
         public abstract void SecondaryUsageFinished();
 
-
+        
+        /// <summary>
+        /// Invokes, when player removes tool.
+        /// </summary>
         public virtual void HideTool()
         {
             HideUI();
         }
+        /// <summary>
+        /// Invokes, when player equips tool.
+        /// </summary>
         public virtual void ShowTool()
         {
             ShowUI();
@@ -77,15 +92,19 @@ namespace Core.Shared
 [Serializable]
 public struct ToolAnimationKeyPoints
 {
-    [Header("Right hand")]
-    public Transform RightHandTarget;
-    public Transform RightHandHint;
+    [field: Space, Header("Right hand")]
+    [field: SerializeField,Tooltip("Used for dynamic animations of right hand.")]
+    public Transform RightHandTarget { get; private set; }
+    [field: SerializeField, Tooltip("Used to support dynamic animations of right hand.")]
+    public Transform RightHandHint { get; private set; }
 
-    [Space]
-    [Header("Left hand")]
-    public Transform LeftHandTarget;
-    public Transform LeftHandHint;
+    [field: Space, Header("Left hand")]
+    [field: SerializeField, Tooltip("Used for dynamic animations of left hand.")]
+    public Transform LeftHandTarget { get; private set; }
+    [field: SerializeField, Tooltip("Used to support dynamic animations of left hand.")]
+    public Transform LeftHandHint { get; private set; }
 
-    [Space]
-    public Transform ShouldersTarget;
+    [field: Space]
+    [field: SerializeField, Tooltip("Used for dynamic chest rotation.")]
+    public Transform ChestTarget { get; private set; }
 }

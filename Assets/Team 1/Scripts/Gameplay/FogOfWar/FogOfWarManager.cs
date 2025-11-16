@@ -9,21 +9,27 @@ using UnityEngine.Rendering.Universal;
 namespace Gameplay.FogOfWar 
 {
     /// <summary>
-    /// Main Fog Of War script. Creates all required objects, initialize revealers and update objects which are hidden if the fog.
+    /// Main Fog Of War script. Creates all required objects, initialize revealers and update objects which are hidden in the fog.
     /// </summary>
     public class FogOfWarManager : MonoBehaviour
     {
-        [SerializeField, Required, Tooltip("Player root object. Required for proper planes positioning.")] private Transform playerTransform;
+        [SerializeField, Required, Tooltip("Player root object. Required for proper planes positioning.")] 
+        private Transform playerTransform;
 
-        [Space]
-        [Header("Configs")]
-        [SerializeField, Required, Tooltip("General Fog Of War config.")] private FogOfWarConfig fogOfWarConfig;
-        [SerializeField, Required, Tooltip("Data of level.")] private LevelData levelData;
+        [Space, Header("Configs")]
+        [SerializeField, Required, Tooltip("General Fog Of War config.")] 
+        private FogOfWarConfig fogOfWarConfig;
 
-        [Space]
-        [Header("Debug")]
-        [SerializeField, Tooltip("Shows the area where Fog Of War will be visible.")] private bool drawFogAreaGizmos = false;
-        [SerializeField, Tooltip("Shows highest and lowest points of the map.")] private bool drawLevelBordersGizmos = false;
+        [SerializeField, Required, Tooltip("Data of level.")] 
+        private LevelData levelData;
+
+        [Space, Header("Debug")]
+        [SerializeField, Tooltip("Shows the area where Fog Of War will be visible.")] 
+        private bool drawFogAreaGizmos = false;
+
+        [SerializeField, Tooltip("Shows highest and lowest points of the map.")] 
+        private bool drawLevelBordersGizmos = false;
+
 
         private float fogPlaneSize = 1f;
         private uint textureResolution = 100;
@@ -79,9 +85,9 @@ namespace Gameplay.FogOfWar
             UpdateBuffers();
             SetUpComputeShader();
 
-            foreach (FogRevealer _revealer in revealers)
+            foreach (FogRevealer revealer in revealers)
             {
-                _revealer.Initialize(fogProjectionPlane.transform, revealerMaterial, obstaclesLayers);
+                revealer.Initialize(fogProjectionPlane.transform, revealerMaterial, obstaclesLayers);
             }
 
             fogOfWarConfig.OnValueChanged += UpdateValuesFromFogConfig;
@@ -123,7 +129,6 @@ namespace Gameplay.FogOfWar
             positionsData = new Vector3[hiddenObjects.Count];
             visibilityData = new uint[hiddenObjects.Count];
         }
-
 
         private void SetUpComputeShader()
         {
@@ -176,17 +181,18 @@ namespace Gameplay.FogOfWar
         private void CreateDecal()
         {
             decal = new GameObject().AddComponent<DecalProjector>();
+            decal.gameObject.name = "FogOfWarDecalProjector";
             decal.transform.parent = transform;
             decal.transform.localPosition = new Vector3(0, 0, 0);
             decal.transform.position = decal.transform.position + Vector3.up * mapHighestPoint;
             decal.transform.localRotation = Quaternion.Euler(90, 0, 0);
 
-            Vector3 size = new Vector3(mapWidth, mapLength, mapHighestPoint - mapLowestPoint + 1);
+            Vector3 _size = new Vector3(mapWidth, mapLength, mapHighestPoint - mapLowestPoint + 1);
 
-            decal.size = size;
+            decal.size = _size;
 
-            Vector3 pivot = new Vector3(0, 0, (mapHighestPoint - mapLowestPoint + 1) / 2);
-            decal.pivot = pivot;
+            Vector3 _pivot = new Vector3(0, 0, (mapHighestPoint - mapLowestPoint + 1) / 2);
+            decal.pivot = _pivot;
 
             fogMaterial.SetFloat("_Fog_Plane_Size", fogPlaneSize);
             fogMaterial.SetTexture("_Base_Map", fogTexture);
@@ -237,7 +243,6 @@ namespace Gameplay.FogOfWar
             mapWidth = levelData.MapWidth;
         }
 
-
         private void UpdateValuesFromFogConfig(FogOfWarConfig newConfig)
         {
             if (fogPlaneSize != fogOfWarConfig.FogPlaneSize)
@@ -266,9 +271,9 @@ namespace Gameplay.FogOfWar
             {
                 obstaclesLayers = fogOfWarConfig.ObstaclesLayerMask;
 
-                foreach (FogRevealer _revealer in revealers)
+                foreach (FogRevealer revealer in revealers)
                 {
-                    _revealer.UpdateObstaclesMask(obstaclesLayers);
+                    revealer.UpdateObstaclesMask(obstaclesLayers);
                 }
             }
             
@@ -283,9 +288,9 @@ namespace Gameplay.FogOfWar
             {
                 revealerMaterial = fogOfWarConfig.RevealerMaterial;
 
-                foreach (FogRevealer _revealer in revealers)
+                foreach (FogRevealer revealer in revealers)
                 {
-                    _revealer.UpdateAllMaterials(revealerMaterial);
+                    revealer.UpdateAllMaterials(revealerMaterial);
                 }
             }
 
@@ -331,11 +336,11 @@ namespace Gameplay.FogOfWar
                 mapLength = levelData.MapLength;
             }
 
-            Vector3 size = new Vector3(mapWidth, mapLength, mapHighestPoint - mapLowestPoint + 1);
-            decal.size = size;
+            Vector3 _size = new Vector3(mapWidth, mapLength, mapHighestPoint - mapLowestPoint + 1);
+            decal.size = _size;
 
-            Vector3 pivot = new Vector3(0, 0, (mapHighestPoint - mapLowestPoint + 1) / 2);
-            decal.pivot = pivot;
+            Vector3 _pivot = new Vector3(0, 0, (mapHighestPoint - mapLowestPoint + 1) / 2);
+            decal.pivot = _pivot;
         }
 
 
@@ -392,11 +397,11 @@ namespace Gameplay.FogOfWar
 
                 Gizmos.color = new Color(0f, 0f, 0f, .9f);
 
-                float height = levelData.MapHighestPoint - levelData.MapLowestPoint;
+                float _height = levelData.MapHighestPoint - levelData.MapLowestPoint;
 
-                Vector3 position = new Vector3(transform.position.x, levelData.MapLowestPoint + (height / 2), transform.position.z);
+                Vector3 _position = new Vector3(transform.position.x, levelData.MapLowestPoint + (_height / 2), transform.position.z);
 
-                Gizmos.DrawCube(position, new Vector3(levelData.MapWidth, height, levelData.MapLength));
+                Gizmos.DrawCube(_position, new Vector3(levelData.MapWidth, _height, levelData.MapLength));
 
             }
         }

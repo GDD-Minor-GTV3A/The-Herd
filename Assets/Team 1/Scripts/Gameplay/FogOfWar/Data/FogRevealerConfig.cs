@@ -10,11 +10,20 @@ namespace Gameplay.FogOfWar
     [CreateAssetMenu(fileName = "FogRevealerConfig", menuName = "Configs/Revealers/BasicFogRevealerConfig")]
     public class FogRevealerConfig : ScriptableObject
     {
-        [SerializeField, Range(10f, 360f), Tooltip("Angle of view in degrees.")] private float fov = 90f;
-        [SerializeField, Tooltip("Distance of view.")] private float viewDistance = 10f;
-        [SerializeField, Tooltip("Quality of field of view shape. Affects performance!")] private uint rayCount = 50;
-        [SerializeField, Tooltip("True if you want to update this revealer regularly, false if you don't want this revealer to be updated.")] private bool isStatic = true;
-        [SerializeField, ShowIf("isStatic", true), Tooltip("How often filed of view updates. Less value - more frequent updates. 0 - updates every frame.")] private float updateRate = 10f;
+        [SerializeField, Range(10f, 360f), Tooltip("Angle of view in degrees.")] 
+        private float fov = 90f;
+
+        [SerializeField, Tooltip("Distance of view.")] 
+        private float viewDistance = 10f;
+
+        [SerializeField, Tooltip("Quality of field of view shape. Affects performance!")] 
+        private uint rayCount = 50;
+
+        [SerializeField, Tooltip("True if you want to update this revealer regularly, false if you don't want this revealer to be updated.")] 
+        private bool isStatic = true;
+
+        [SerializeField, ShowIf("isStatic", true), Tooltip("How often filed of view updates. Less value - more frequent updates. 0 - updates every frame.")]
+        private float updateRate = 10f;
 
 
         /// <summary>

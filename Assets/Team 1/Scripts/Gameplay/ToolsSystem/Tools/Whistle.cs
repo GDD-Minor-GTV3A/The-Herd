@@ -1,32 +1,41 @@
 using Core.Events;
 using Core.Shared;
+using Core.Shared.Utilities;
 using Gameplay.Dog;
+using Gameplay.Effects;
 using Gameplay.Player;
+using UI;
 using UnityEngine;
 
-namespace Gameplay.ToolsSystem
+namespace Gameplay.ToolsSystem.Tools.Whistle
 {
     /// <summary>
     /// Tool for controlling dogs.
     /// </summary>
     public class Whistle : PlayerTool
     {
-        [SerializeField] private DogConfig dogConfig;
-        [SerializeField] private DogCommandMarker markerPrefab;
+        [SerializeField, Tooltip("Dog config for initializing bark cooldown."), Required] 
+        private DogConfig dogConfig;
+
+        [SerializeField, Tooltip("Prefab of VFX for dog move command."), Required] 
+        private DogCommandMarker markerPrefab;
 
 
-        private Observable<Vector3> _cursorWorldPosition;
+        private Observable<Vector3> cursorWorldPosition;
         private PlayerAnimator playerAnimator;
         private DogCommandMarker markerObject;
 
-
+        /// <summary>
+        /// Initialization method.
+        /// </summary>
+        /// <param name="animator">Player animator.</param>
         public void Initialize(PlayerAnimator animator)
         {
             HideUI();
             playerAnimator = animator;
 
-            CooldownUI cooldown = toolUI.GetComponentInChildren<CooldownUI>(true);
-            if (cooldown != null) cooldown.Initialize(dogConfig.BarkCooldown);
+            CooldownUI _cooldown = toolUI.GetComponentInChildren<CooldownUI>(true);
+            if (_cooldown != null) _cooldown.Initialize(dogConfig.BarkCooldown);
 
             markerObject = Instantiate(markerPrefab);
             markerObject.Initialize();
@@ -43,7 +52,6 @@ namespace Gameplay.ToolsSystem
         public override void MainUsageFinished()
         {
         }
-
         public override void MainUsageStarted(Observable<Vector3> cursorWorldPosition)
         {
             OnMainUse?.Invoke();
@@ -58,17 +66,17 @@ namespace Gameplay.ToolsSystem
 
         public override void SecondaryUsageFinished()
         {
-            _cursorWorldPosition.OnValueChanged -= SendDogMoveCommand;
-            _cursorWorldPosition = null;
+            cursorWorldPosition.OnValueChanged -= SendDogMoveCommand;
+            cursorWorldPosition = null;
         }
-
         public override void SecondaryUsageStarted(Observable<Vector3> cursorWorldPosition)
         {
             OnSecondaryUse?.Invoke();
-            _cursorWorldPosition = cursorWorldPosition;
+            this.cursorWorldPosition = cursorWorldPosition;
             SendDogMoveCommand();
-            _cursorWorldPosition.OnValueChanged += SendDogMoveCommand;
+            this.cursorWorldPosition.OnValueChanged += SendDogMoveCommand;
         }
+
 
         public override void ShowTool()
         {
@@ -78,8 +86,8 @@ namespace Gameplay.ToolsSystem
 
         private void SendDogMoveCommand()
         {
-            markerObject.StartEffect(_cursorWorldPosition.Value);
-            EventManager.Broadcast(new DogMoveCommandEvent(_cursorWorldPosition.Value));
+            markerObject.StartEffect(cursorWorldPosition.Value);
+            EventManager.Broadcast(new DogMoveCommandEvent(cursorWorldPosition.Value));
         }
 
         private void TryBark()

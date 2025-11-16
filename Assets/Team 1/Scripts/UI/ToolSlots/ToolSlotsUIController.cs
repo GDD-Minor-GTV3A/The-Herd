@@ -2,30 +2,42 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class ToolSlotsUIController : MonoBehaviour
+namespace UI.ToolSlots
 {
-    private List<ToolSlotUI> slots;
-
-    private ToolSlotUI currentHighlightedSlot;
-
-
-    public void Initilaize()
+    /// <summary>
+    /// Controls all tool slots.
+    /// </summary>
+    public class ToolSlotsUIController : MonoBehaviour
     {
-        slots = GetComponentsInChildren<ToolSlotUI>().ToList();
+        private List<ToolSlotUI> slots;
+        private ToolSlotUI currentHighlightedSlot;
 
-        for (int i = 0; i < slots.Count; i++)
+
+        /// <summary>
+        /// Initialization method.
+        /// </summary>
+        public void Initialize()
         {
-            slots[i].Initilaize(i);
+            slots = GetComponentsInChildren<ToolSlotUI>().ToList();
+
+            for (int i = 0; i < slots.Count; i++)
+            {
+                slots[i].Initialize(i);
+            }
         }
-    }
 
 
-    public void ChangeHighlightedSlot(int slotIndex)
-    {
-        if (currentHighlightedSlot != null)
-            currentHighlightedSlot.SetSlotHighlight(false);
+        /// <summary>
+        /// Change which slot is highlighted by index.
+        /// </summary>
+        /// <param name="slotIndex">Index of slot to highlight.</param>
+        public void ChangeHighlightedSlot(int slotIndex)
+        {
+            if (currentHighlightedSlot != null)
+                currentHighlightedSlot.SetSlotHighlight(false);
 
-        currentHighlightedSlot = slots[slotIndex];
-        currentHighlightedSlot.SetSlotHighlight(true);
+            currentHighlightedSlot = slots[slotIndex];
+            currentHighlightedSlot.SetSlotHighlight(true);
+        }
     }
 }

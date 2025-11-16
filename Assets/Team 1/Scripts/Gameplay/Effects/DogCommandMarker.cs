@@ -1,59 +1,79 @@
 using System.Collections;
+using Core.Shared.Utilities;
 using UnityEngine;
 
-public class DogCommandMarker : MonoBehaviour
+namespace Gameplay.Effects
 {
-    [SerializeField] private ParticleSystem _circleEffect;
-    [SerializeField] private RectTransform _markerObject;
-    [SerializeField] private float _animationDuration = 2f;
-    [SerializeField] private float _maxHeight = 5f;
-
-
-    private Coroutine _markerCoroutine;
-
-
-    public void Initialize()
+    /// <summary>
+    /// Controls visual effect for showing the position of dog move command.
+    /// </summary>
+    public class DogCommandMarker : MonoBehaviour
     {
-        _markerObject.gameObject.SetActive(false);
-        _circleEffect.gameObject.SetActive(false);
-    }
+        [SerializeField, Tooltip("Particle system of circles on the ground"), Required] 
+        private ParticleSystem circleEffect;
+
+        [SerializeField, Tooltip(""), Required] 
+        private RectTransform markerObject;
+
+        [SerializeField, Tooltip("Duration of marker jump animation.")] 
+        private float markerAnimationDuration = 1.5f;
+
+        [SerializeField, Tooltip("Max height of marker during jump animation.")] 
+        private float maxHeight = 5f;
 
 
-    public void StartEffect(Vector3 worldPosition)
-    {
-        if (_markerCoroutine != null)
-            StopCoroutine(_markerCoroutine);
-
-        if (_circleEffect.isPlaying)
-            _circleEffect.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-
-        _markerCoroutine = StartCoroutine(MarkerAnimation(worldPosition));
-    }
+        private Coroutine markerCoroutine;
 
 
-    private IEnumerator MarkerAnimation(Vector3 worldPosition)
-    {
-        transform.position = worldPosition;
-        _markerObject.localPosition = Vector3.zero;
-        _markerObject.gameObject.SetActive(true);
-
-        _circleEffect.gameObject.SetActive(true);
-        _circleEffect.Play();
-
-        float halfDuration = (_animationDuration / 2);
-
-        float t = 0;
-
-        while (t < _animationDuration)
+        /// <summary>
+        /// Initialization method.
+        /// </summary>
+        public void Initialize()
         {
-             float currentHeight = Mathf.PingPong((t / halfDuration) * _maxHeight, _maxHeight);
-            _markerObject.localPosition = new Vector3(0, currentHeight, 0);
-            t += Time.deltaTime;
-            yield return null;
+            markerObject.gameObject.SetActive(false);
+            circleEffect.gameObject.SetActive(false);
         }
 
-        _markerObject.gameObject.SetActive(false);
-        yield return null;
-        _markerCoroutine = null;
+
+        /// <summary>
+        /// Starts effect animation.
+        /// </summary>
+        /// <param name="worldPosition">New position of marker.</param>
+        public void StartEffect(Vector3 worldPosition)
+        {
+            if (markerCoroutine != null)
+                StopCoroutine(markerCoroutine);
+
+            if (circleEffect.isPlaying)
+                circleEffect.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+
+            markerCoroutine = StartCoroutine(MarkerAnimationRoutine(worldPosition));
+        }
+
+        private IEnumerator MarkerAnimationRoutine(Vector3 worldPosition)
+        {
+            transform.position = worldPosition;
+            markerObject.localPosition = Vector3.zero;
+            markerObject.gameObject.SetActive(true);
+
+            circleEffect.gameObject.SetActive(true);
+            circleEffect.Play();
+
+            float _halfDuration = (markerAnimationDuration / 2);
+
+            float _t = 0;
+
+            while (_t < markerAnimationDuration)
+            {
+                float _currentHeight = Mathf.PingPong((_t / _halfDuration) * maxHeight, maxHeight);
+                markerObject.localPosition = new Vector3(0, _currentHeight, 0);
+                _t += Time.deltaTime;
+                yield return null;
+            }
+
+            markerObject.gameObject.SetActive(false);
+            yield return null;
+            markerCoroutine = null;
+        }
     }
 }

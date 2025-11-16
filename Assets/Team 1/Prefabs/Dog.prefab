@@ -15,6 +15,8 @@ GameObject:
   - component: {fileID: 8610237918081496107}
   - component: {fileID: 3468619060094155431}
   - component: {fileID: 4577408304085083463}
+  - component: {fileID: 8274964810049798993}
+  - component: {fileID: 2438805617385776418}
   m_Layer: 0
   m_Name: Dog
   m_TagString: Untagged
@@ -73,11 +75,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 235560c2515308f48ac53cbdb6d2dd00, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerTransform: {fileID: 0}
-  _heardZone: {fileID: 0}
-  _stepsSoundManager: {fileID: 6384406999088229869}
-  _animator: {fileID: 3171391158692443822}
-  _config: {fileID: 11400000, guid: a9a53b25b4a842542b4086cfd00829cd, type: 2}
+  playerTransform: {fileID: 0}
+  herdZone: {fileID: 0}
+  stepsSoundManager: {fileID: 6384406999088229869}
+  animator: {fileID: 3171391158692443822}
+  config: {fileID: 11400000, guid: a9a53b25b4a842542b4086cfd00829cd, type: 2}
 --- !u!114 &3262632793578345549
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -132,10 +134,164 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac26ee3ddf95ea043a7fc36dcaa19464, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  drawBarkArea: 1
   onDogBark:
     m_PersistentCalls:
-      m_Calls: []
-  drawBarkArea: 0
+      m_Calls:
+      - m_Target: {fileID: 8274964810049798993}
+        m_TargetAssemblyTypeName: DogSoundManager, Assembly-CSharp
+        m_MethodName: PlayBarkSound
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: UI.CooldownUI, Team1
+        m_MethodName: StartCooldown
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: UnityEngine.Animator, UnityEngine
+        m_MethodName: SetTrigger
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: Action
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &8274964810049798993
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3018951382313821739}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b695849adbd74f94d977e18088deb909, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioSource: {fileID: 2438805617385776418}
+  bark: {fileID: 8300000, guid: 604794e3c85757148af21c0f38327c06, type: 3}
+  ambientClips:
+  - {fileID: 8300000, guid: 33e55650c38681643845f4f6f696685a, type: 3}
+  - {fileID: 8300000, guid: 552f66f252e0f434db4c6d90c3d57afe, type: 3}
+  - {fileID: 8300000, guid: cd6bdfa04da595243884c45ac0cb871d, type: 3}
+  - {fileID: 8300000, guid: e3dfb55e96a942d43ad5e219d2ebad3a, type: 3}
+  minDelay: 4
+  maxDelay: 10
+--- !u!82 &2438805617385776418
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3018951382313821739}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 355428252071530209, guid: 62d417deb6376ba4794f2c75909ee160, type: 2}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 0.218
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &7967640244434156149
 GameObject:
   m_ObjectHideFlags: 0
@@ -885,6 +1041,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a4dc9eb49b692f468828843d1434853, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _walkingSounds:
+  walkingSounds:
   - {fileID: 8300000, guid: bd176cc25e113e64e8d886ebc10245d0, type: 3}
-  _footstepSource: {fileID: 6137930248348829207}
+  footstepSource: {fileID: 6137930248348829207}

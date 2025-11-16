@@ -1,5 +1,8 @@
 using UnityEngine;
 
+/// <summary>
+/// Rotation object towards camera without y axis. Mainly used for UI.
+/// </summary>
 public class RotationTowardsCamera : MonoBehaviour
 {
     private Camera _mainCamera;
