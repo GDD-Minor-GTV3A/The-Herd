@@ -1,18 +1,21 @@
+using Core.Shared.Utilities;
 using UnityEngine;
 
 namespace Gameplay.Audio 
 {
+    /// <summary>
+    /// Manages rifle's sounds playing.
+    /// </summary>
     public class RifleSoundManager : MonoBehaviour
     {
-        [SerializeField, Tooltip("Audio source of rifle.")] 
+        [SerializeField, Tooltip("Audio source of rifle."), Required] 
         private AudioSource audioSource;
-        [SerializeField] 
-        private AudioClip shotClip;
-        [SerializeField] 
-        private AudioClip reloadClip;
 
-        [SerializeField]
-        private Sprite sprite;
+        [SerializeField, Tooltip("Audio clip of shot sound."), Required] 
+        private AudioClip shotClip;
+
+        [SerializeField, Tooltip("Audio clip of reload sound."), Required] 
+        private AudioClip reloadClip;
 
 
         /// <summary>

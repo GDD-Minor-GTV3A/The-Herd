@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace Gameplay.Audio
 {
+    /// <summary>
+    /// Manages damage sounds playing.
+    /// </summary>
     public class DamageSoundManager : MonoBehaviour
     {
 

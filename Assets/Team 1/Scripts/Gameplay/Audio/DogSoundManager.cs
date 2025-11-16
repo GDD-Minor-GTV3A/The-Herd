@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace Gameplay.Audio
 {
+    /// <summary>
+    /// Manages dog's sounds playing.
+    /// </summary>
     public class DogSoundManager : MonoBehaviour
     {
         [SerializeField, Tooltip("Audio source."), Required] 
