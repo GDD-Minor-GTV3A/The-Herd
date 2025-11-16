@@ -2,7 +2,7 @@ using Core.Shared;
 
 using UnityEngine;
 
-namespace AI.Drekavac
+namespace Team_7.Scripts.AI.Drekavac
 {
     /// <summary>
     ///     Handles the animation states of an enemy.

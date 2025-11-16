@@ -19,7 +19,7 @@ namespace Gameplay.Player
 
         public override void OnStart()
         {
-            _animator.SetWalking(false);
+            _animator.SetAnimationRotation(true);
         }
 
         public override void OnStop()
@@ -33,8 +33,11 @@ namespace Gameplay.Player
 
             _playerMovement.ApplyGravity();
             Vector2 playerInput = _manager.Input.Move;
-            _manager.Rotation.Rotate(playerInput, _manager.Input.Look.Value);
-        }
+            //_manager.Rotation.Rotate(playerInput, _manager.Input.Look.Value);
 
+            _animator.RotateCharacterBody(_manager.Input.Look.Value);
+
+            _animator.Walking(Vector2.zero);
+        }
     }
 }

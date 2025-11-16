@@ -1,6 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+
+using Core.Events;
+
 using UnityEngine;
 
 
@@ -12,7 +15,7 @@ namespace Gameplay.FogOfWar
     public class FogRevealer : MonoBehaviour
     {
         [Serializable]
-        private class Revealer
+        protected class Revealer
         {
             public FogRevealerConfig Config;
 
@@ -22,11 +25,17 @@ namespace Gameplay.FogOfWar
         }
 
 
-        [SerializeField, Tooltip("Data for every revealer for this object.")] private List<Revealer> revealers;
-        [SerializeField, Tooltip("Origin point of revealer. If not assigned transform of object will be taken.")] private Transform origin;
+        [SerializeField, Tooltip("Data for every revealer for this object.")] protected List<Revealer> revealers;
+        [SerializeField, Tooltip("Origin point of revealer. If not assigned transform of object will be taken.")] protected Transform origin;
 
 
         private LayerMask obstaclesLayers;
+
+
+        public virtual void Initialize(Transform fogPlane, Material meshMaterial, LayerMask obstaclesLayers)
+        {
+            CreateFovMeshes(fogPlane, meshMaterial, obstaclesLayers);
+        }
 
 
         /// <summary>
@@ -35,7 +44,7 @@ namespace Gameplay.FogOfWar
         /// <param name="fogPlane">Transform of projection plan of the fog.</param>
         /// <param name="meshMaterial">Material for revealers.</param>
         /// <param name="obstaclesLayers">Layer mask of objects, which blocks the view.</param>
-        public void CreateFovMeshes(Transform fogPlane, Material meshMaterial, LayerMask obstaclesLayers)
+        private void CreateFovMeshes(Transform fogPlane, Material meshMaterial, LayerMask obstaclesLayers)
         {
             if (origin == null)
                 origin = transform;
@@ -44,25 +53,29 @@ namespace Gameplay.FogOfWar
 
             for (int i = 0; i < revealers.Count; i++)
             {
-                Mesh _newMesh = new Mesh();
-
-                GameObject _newFovMeshObject = new GameObject();
-                _newFovMeshObject.name = "FovMesh";
-                _newFovMeshObject.transform.position = new Vector3(origin.position.x, fogPlane.transform.position.y + 1, origin.position.z);
-                _newFovMeshObject.transform.parent = fogPlane.transform.parent;
-                _newFovMeshObject.layer = LayerMask.NameToLayer("FogOfWarProjection");
-                _newFovMeshObject.AddComponent<MeshFilter>().mesh = _newMesh;
-
-
-
-                revealers[i].Renderer = _newFovMeshObject.AddComponent<MeshRenderer>();
-                revealers[i].Mesh = _newMesh;
-                UpdateMesh(i);
-                UpdateRevealerMaterial(i, meshMaterial);
-
-                if (!revealers[i].Config.IsStatic)
-                    StartCoroutine(UpdateMeshCor(revealers[i].Config.UpdateRate, i));
+                CreateNewMesh(i, fogPlane, meshMaterial);
             }
+        }
+
+        protected virtual void CreateNewMesh(int revealerIndex, Transform fogPlane, Material meshMaterial)
+        {
+            Mesh _newMesh = new Mesh();
+
+            GameObject _newFovMeshObject = new GameObject();
+            _newFovMeshObject.name = "FovMesh";
+            _newFovMeshObject.transform.position = new Vector3(origin.position.x, fogPlane.transform.position.y + 2, origin.position.z);
+            _newFovMeshObject.transform.parent = fogPlane.transform.parent;
+            _newFovMeshObject.layer = LayerMask.NameToLayer("FogOfWarProjection");
+            _newFovMeshObject.AddComponent<MeshFilter>().mesh = _newMesh;
+
+
+            revealers[revealerIndex].Renderer = _newFovMeshObject.AddComponent<MeshRenderer>();
+            revealers[revealerIndex].Mesh = _newMesh;
+            UpdateMesh(revealerIndex);
+            UpdateRevealerMaterial(revealerIndex, meshMaterial);
+
+            if (!revealers[revealerIndex].Config.IsStatic)
+                StartCoroutine(UpdateMeshCor(revealers[revealerIndex].Config.UpdateRate, revealerIndex));
         }
 
 
@@ -75,15 +88,14 @@ namespace Gameplay.FogOfWar
                 revealers[i].Renderer.transform.position = new Vector3(origin.position.x, revealers[i].Renderer.transform.position.y, origin.position.z);
 
                 Vector3 _forward = origin.forward;
-                _forward = _forward.normalized;
                 float _startAngle = Mathf.Atan2(_forward.z, _forward.x) * Mathf.Rad2Deg;
-                _startAngle += revealers[i].Config.FOV;
+                _startAngle += GetRevealerFOV(i);
 
                 if (_startAngle < 0) _startAngle += 360;
 
-                revealers[i].StartingAngle = _startAngle - revealers[i].Config.FOV / 2f;
+                revealers[i].StartingAngle = _startAngle - GetRevealerFOV(i) / 2f;
 
-                revealers[i].Renderer.material.SetVector("_RevealerCenter", revealers[i].Renderer.transform.position);
+                revealers[i].Renderer.material.SetVector("_RevealerCenter", origin.position);
                 revealers[i].Renderer.material.SetVector("_RevealerForward", origin.forward);
             }
         }
@@ -91,8 +103,8 @@ namespace Gameplay.FogOfWar
 
         private void UpdateMesh(int meshIndex)
         {
-            float _fov = revealers[meshIndex].Config.FOV;
-            float _viewDistance = revealers[meshIndex].Config.ViewDistance;
+            float _fov = GetRevealerFOV(meshIndex);
+            float _viewDistance = GetRevealerDistance(meshIndex);
             int _rayCount = (int)revealers[meshIndex].Config.RayCount;
 
             float _angle = revealers[meshIndex].StartingAngle;
@@ -112,8 +124,10 @@ namespace Gameplay.FogOfWar
                 float _angleRad = _angle * (Mathf.PI / 180f);
                 Vector3 _rayDirection = new Vector3(Mathf.Cos(_angleRad), 0, Mathf.Sin(_angleRad));
                 Vector3 _vertex;
+
                 if (Physics.Raycast(origin.position, _rayDirection, out RaycastHit hit, _viewDistance, obstaclesLayers))
                 {
+
                     Vector3 _localHitPoint = revealers[meshIndex].Renderer.transform.InverseTransformPoint(hit.point);
                     _vertex = new Vector3(_localHitPoint.x, _meshOrigin.y, _localHitPoint.z);
                 }
@@ -141,6 +155,17 @@ namespace Gameplay.FogOfWar
         }
 
 
+        protected virtual float GetRevealerFOV(int index)
+        {
+            return revealers[index].Config.FOV;
+        }
+        
+        protected virtual float GetRevealerDistance(int index)
+        {
+            return revealers[index].Config.ViewDistance;
+        }
+
+
         /// <summary>
         /// Updates obstacles layer mask for revealers.
         /// </summary>
@@ -158,10 +183,10 @@ namespace Gameplay.FogOfWar
 
             revealers[index].Renderer.material = revealerMaterial;
 
-            revealers[index].Renderer.material.SetFloat("_FOVAngle", revealers[index].Config.FOV * 0.5f * Mathf.Deg2Rad);
-            revealers[index].Renderer.material.SetFloat("_ViewDistance", revealers[index].Config.ViewDistance);
+            revealers[index].Renderer.material.SetFloat("_FOVAngle", GetRevealerFOV(index) * 0.5f * Mathf.Deg2Rad);
+            revealers[index].Renderer.material.SetFloat("_ViewDistance", GetRevealerDistance(index));
             revealers[index].Renderer.material.SetFloat("_FadeWidth", 10f);
-            revealers[index].Renderer.material.SetFloat("_EdgeFadeWidth", (revealers[index].Config.FOV == 360f) ? 0f : .5f);
+            revealers[index].Renderer.material.SetFloat("_EdgeFadeWidth", (GetRevealerFOV(index) == 360f) ? 0f : (GetRevealerFOV(index) / 250));
         }
 
 
@@ -188,7 +213,7 @@ namespace Gameplay.FogOfWar
             }
         }
 
-        private void OnDestroy()
+        protected virtual void OnDestroy()
         {
             StopAllCoroutines();
         }

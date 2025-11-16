@@ -1,24 +1,28 @@
+using Gameplay.HealthSystem;
+
 using UnityEngine;
 
-namespace AI.Phantom
+namespace Team_7.Scripts.AI.Phantom
 {
     public class PhantomProjectile : MonoBehaviour
     {
         private Vector3 _maxProjectileScale;
         private float _projectileSpeed;
         private float _projectileRange;
+        private int _projectileDamage;
         private float _chargeDuration;
         private float _chargeStart;
         private Vector3 _launchDirection;
         private Vector3 _launchLocation;
         private bool _launched;
 
-        public void Init(float chargeDuration, float projectileSpeed, Vector3 maxProjectileScale, float projectileRange)
+        public void Init(float chargeDuration, float projectileSpeed, Vector3 maxProjectileScale, float projectileRange, int projectileDamage)
         {
             _projectileSpeed = projectileSpeed;
             _projectileRange = projectileRange;
             _maxProjectileScale = maxProjectileScale;
             _chargeDuration = chargeDuration;
+            _projectileDamage = projectileDamage;
             _chargeStart= Time.time;
         }
 
@@ -43,9 +47,11 @@ namespace AI.Phantom
         {
             if (!other.gameObject.CompareTag("Player"))
                 return;
-            ////////////////////////////////////////////////////////
-            //TODO, make the projectile deal damage here.
-            ////////////////////////////////////////////////////////
+
+            if (other.gameObject.TryGetComponent(out IDamageable _damageable))
+            {
+                _damageable.TakeDamage(_projectileDamage);
+            }
             
             Destroy(gameObject);
         }

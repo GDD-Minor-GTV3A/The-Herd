@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace Core
+namespace Team_7.Scripts.Core
 {
     /// <summary>
     ///     Handles the logic for spawning enemies.

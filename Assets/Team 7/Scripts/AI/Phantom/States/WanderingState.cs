@@ -1,9 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
-using Phantom;
-using Core;
 
-namespace AI.Phantom.States
+namespace Team_7.Scripts.AI.Phantom.States
 {
     public class WanderingState : PhantomState
     {

@@ -1,6 +1,7 @@
 using UnityEngine;
 
-namespace AI.Drekavac
+#nullable enable // Chris: This needs to be added for nullable values to work. Otherwise it will show a warning
+namespace Team_7.Scripts.AI.Drekavac
 {
     /// <summary>
     ///     Holds all the parameters that a "Drekavac" type enemy will need to function.
@@ -14,6 +15,7 @@ namespace AI.Drekavac
         public float sprintSpeed = 15f;
         public float dragSpeed = 1.2f;
         public float circleSpeed = 7f;
+        public float bigChargeSpeed = 20;
 
         [Header("Behavior Settings")]
         public float directionSwitchInterval = 5f;
