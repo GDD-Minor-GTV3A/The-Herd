@@ -95,7 +95,7 @@ class Args(Namespace):
                     yield f"--{i.replace('_', '-')}"
                     yield str(val)
                 case _:
-                    logger.warning("Unused setting type/value: %s=%r", i, val)
+                    logger.warning("Unused setting type or value: %s=%r", i, val)
 
 
 @dataclass
