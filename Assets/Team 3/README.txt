@@ -10,7 +10,7 @@ Snow:
 The SnowEffect Prefab is updated, hopefully just merging branches will update the already placed VFX with the new version of the Snow.
 
 Fog: 
-There is a FogEffect Prefab that needs to be attatched to the Player as a child.
+There is a FogEffect Prefab that needs to be attached to the Player as a child.
 
 PostProcessing: 
 There is a Global Volume Prefab that needs to be added in the Hierarchy of the level. Make sure to enable PostProcessing in the Inspector of the Main Camera.
