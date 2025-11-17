@@ -79,6 +79,7 @@ class Args(Namespace):
     tag: SemVer | None = None # Custom tag to use for the release
     dist_dir: Path = BUILD_DIR # Directory to zip for the release
     zip_file: Path = ZIP_FILE # Zip file to create for the release
+    log: str = "INFO" # Log level, e.g. DEBUG, INFO, WARNING, ERROR
 
     def generate_setting_flags(self) -> Generator[str]:
         """Generate command line flags from settings as a list of tokens."""
@@ -93,7 +94,7 @@ class Args(Namespace):
                     yield f"--{i.replace('_', '-')}"
                     yield str(val)
                 case _:
-                    logger.debug("Unused setting type/value: %s=%r", i, val)
+                    logger.warning("Unused setting type/value: %s=%r", i, val)
 
 
 parser = ArgumentParser(description="Create a new GH release.")
@@ -107,7 +108,7 @@ for arg, typ in Args.__annotations__.items():
         case Path():
             parser.add_argument(f"--{arg.replace('_', '-')}", type=Path, default=getattr(Args, arg))
         case _:
-            logger.debug("Unknown argument type: %s", typ)
+            logger.warning("Unknown argument type: %s", typ)
 args: Args = parser.parse_args(namespace=Args())
 
 
@@ -134,12 +135,20 @@ class SemVer:
         return SemVer(self.major, self.minor + 1, 0)
 
 
+def log_command(command: list[str], stdout: bytes, stderr: bytes) -> None:
+    """Log a command's output."""
+    cmd_msg = " ".join(command)
+    stdout_msg = stdout.decode().strip()
+    stderr_msg = stderr.decode().strip()
+    logger.debug("%s: %s %s", cmd_msg, stdout_msg, stderr_msg)
+
 async def zip_dist() -> None:
     """Zip the dist folder into a single zip file for GH releases."""
     logger.info("Zipping files from %s to %s", BUILD_DIR, ZIP_FILE)
     with zipfile.ZipFile(ZIP_FILE, "w") as zf:
         for file in BUILD_DIR.glob("**/*"):
             if "DoNotShip" in file.name:
+                logger.debug("Skipping DoNotShip file: %s", file)
                 continue
             zf.write(file, file.relative_to(BUILD_DIR))
             logger.debug("Added file to zip: %s", file)
@@ -147,12 +156,14 @@ async def zip_dist() -> None:
 
 async def get_tag() -> SemVer:
     """Get the current git tag."""
+    command = ["git", "describe", "--tags", "--abbrev=0"]
     proc = await asyncio.create_subprocess_exec(
-        *["git", "describe", "--tags", "--abbrev=0"],
+        *command,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
     )
     stdout, stderr = await proc.communicate()
+    log_command(command, stdout, stderr)
     if proc.returncode != 0:
         msg = f"Failed to get git tag: {stderr.decode()}"
         raise RuntimeError(msg)
@@ -174,6 +185,7 @@ async def create_release() -> None:
         stderr=asyncio.subprocess.PIPE,
     )
     stdout, stderr = await proc.communicate()
+    log_command(command, stdout, stderr)
     if proc.returncode != 0:
         msg = f"Failed to create release: {stderr.decode()}"
         raise RuntimeError(msg)
@@ -194,14 +206,15 @@ async def set_defaults() -> None:
 
 async def test_gh_cli() -> None:
     """Test if GH CLI is installed and authenticated."""
+    command = ["gh", "auth", "status"]
     proc = await asyncio.create_subprocess_exec(
-        *["gh", "auth", "status"],
+        *command,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
     )
-    _, stderr = await proc.communicate()
+    stdout, stderr = await proc.communicate()
+    log_command(command, stdout, stderr)
     if proc.returncode != 0:
-        logger.debug("GH CLI auth status stderr: %s", stderr.decode())
         msg = "GH CLI is not installed or authenticated. Install and authenticate it: https://cli.github.com/"
         raise RuntimeError(msg)
     logger.debug("GH CLI is installed and authenticated.")
@@ -209,6 +222,7 @@ async def test_gh_cli() -> None:
 
 async def main() -> None:
     """Entry point."""
+    logger.setLevel(args.log.upper() or INFO)
     await asyncio.gather(
         zip_dist(),
         set_defaults(),
