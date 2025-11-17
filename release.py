@@ -80,6 +80,7 @@ class Args(Namespace):
     dist_dir: Path = BUILD_DIR # Directory to zip for the release
     zip_file: Path = ZIP_FILE # Zip file to create for the release
     log: str = "INFO" # Log level, e.g. DEBUG, INFO, WARNING, ERROR
+    dry_run: bool = False # If true, do not create the release
 
     def generate_setting_flags(self) -> Generator[str]:
         """Generate command line flags from settings as a list of tokens."""
@@ -134,6 +135,23 @@ class SemVer:
         """Bump the minor version."""
         return SemVer(self.major, self.minor + 1, 0)
 
+async def run_command(command: list[str]) -> tuple[bytes, bytes]:
+    """Run a command asynchronously."""
+    if args.dry_run:
+        logger.info("Dry run: would run command: %s", *command)
+        return b"", b""
+
+    proc = await asyncio.create_subprocess_exec(
+        *command,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    stdout, stderr = await proc.communicate()
+    log_command(command, stdout, stderr)
+    if proc.returncode != 0:
+        msg = f"Failed to run {command}: {stderr.decode()}"
+        raise RuntimeError(msg)
+    return stdout, stderr
 
 def log_command(command: list[str], stdout: bytes, stderr: bytes) -> None:
     """Log a command's output."""
@@ -147,7 +165,7 @@ async def zip_dist() -> None:
     logger.info("Zipping files from %s to %s", BUILD_DIR, ZIP_FILE)
     with zipfile.ZipFile(ZIP_FILE, "w") as zf:
         for file in BUILD_DIR.glob("**/*"):
-            if "DoNotShip" in file.name:
+            if "DoNotShip" in str(file):
                 logger.debug("Skipping DoNotShip file: %s", file)
                 continue
             zf.write(file, file.relative_to(BUILD_DIR))
@@ -157,38 +175,25 @@ async def zip_dist() -> None:
 async def get_tag() -> SemVer:
     """Get the current git tag."""
     command = ["git", "describe", "--tags", "--abbrev=0"]
-    proc = await asyncio.create_subprocess_exec(
-        *command,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-    stdout, stderr = await proc.communicate()
-    log_command(command, stdout, stderr)
-    if proc.returncode != 0:
-        msg = f"Failed to get git tag: {stderr.decode()}"
-        raise RuntimeError(msg)
-    logger.info("Current tag: %s", stdout.decode().strip())
-    return SemVer.from_str(stdout.decode().strip())
+    stdout, _ = await run_command(command)
+    version = stdout.decode().strip()
+
+    if not version:
+        return SemVer(0, 0, 0)
+
+    logger.info("Current tag: %s", version)
+    return SemVer.from_str(version)
 
 
 async def create_release() -> None:
     """Create a GH release."""
     # Build argument list to avoid shell quoting/globbing issues
+    logger.info("Uploading release %s.", args.tag)
+
     command: list[str] = f"gh release create {args.tag} {args.zip_file}".split()
     command += args.generate_setting_flags()
 
-    logger.debug("Creating release with command: %s", command)
-    logger.info("Uploading release %s.", args.tag)
-    proc = await asyncio.create_subprocess_exec(
-        *command,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-    stdout, stderr = await proc.communicate()
-    log_command(command, stdout, stderr)
-    if proc.returncode != 0:
-        msg = f"Failed to create release: {stderr.decode()}"
-        raise RuntimeError(msg)
+    stdout, _ = await run_command(command)
     logger.info("Release created successfully: %s", stdout.decode())
 
 
@@ -207,16 +212,11 @@ async def set_defaults() -> None:
 async def test_gh_cli() -> None:
     """Test if GH CLI is installed and authenticated."""
     command = ["gh", "auth", "status"]
-    proc = await asyncio.create_subprocess_exec(
-        *command,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-    stdout, stderr = await proc.communicate()
-    log_command(command, stdout, stderr)
-    if proc.returncode != 0:
+    try:
+        _, _ = await run_command(command)
+    except RuntimeError as e:
         msg = "GH CLI is not installed or authenticated. Install and authenticate it: https://cli.github.com/"
-        raise RuntimeError(msg)
+        raise RuntimeError(msg) from e
     logger.debug("GH CLI is installed and authenticated.")
 
 
@@ -226,6 +226,7 @@ async def main() -> None:
     await asyncio.gather(
         zip_dist(),
         set_defaults(),
+        test_gh_cli(),
     )
     await create_release()
 
