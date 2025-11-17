@@ -10,7 +10,7 @@ public class ShamanDialogueTrigger : MonoBehaviour
     private void Start()
     {
         if (_interText != null)
-            _interText.enabled = false; // start hidden
+            _interText.enabled = false;
     }
 
     void Update()
@@ -28,7 +28,7 @@ public class ShamanDialogueTrigger : MonoBehaviour
         {
             playerInRange = true;
             if (_interText != null)
-                _interText.enabled = true; // show text
+                _interText.enabled = true; 
         }
     }
 
@@ -38,7 +38,7 @@ public class ShamanDialogueTrigger : MonoBehaviour
         {
             playerInRange = false;
             if (_interText != null)
-                _interText.enabled = false; // hide text
+                _interText.enabled = false; 
         }
     }
     

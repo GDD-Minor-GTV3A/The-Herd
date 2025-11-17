@@ -8,7 +8,7 @@ public class ShamanDialogueManager : MonoBehaviour
     [Header("UI References")]
     public GameObject dialoguePanel;
     public TMP_Text dialogueText;
-    public TMP_Text speakerNameText;   // For showing speaker names
+    public TMP_Text speakerNameText; 
     public GameObject choiceButtons;
     public Image portraitFrame;
 
@@ -22,7 +22,7 @@ public class ShamanDialogueManager : MonoBehaviour
     [System.Serializable]
     public class DialogueLine
     {
-        public string speaker;   // "npc" or "player"
+        public string speaker;  
         public string text;
         public bool hasChoices;
     }
@@ -67,25 +67,23 @@ public class ShamanDialogueManager : MonoBehaviour
 
         if (line.speaker == "Player")
         {
-            // Player is speaking
             speakerNameText.text = "Player";
             portraitFrame.sprite = playerSprite;
         }
         else
         {
-            // Shaman is speaking
             speakerNameText.text = "Shaman";
             portraitFrame.sprite = shamanSprite;  
         }
 
-// Show or hide choice buttons
+
         choiceButtons.SetActive(line.hasChoices);
     }
 
     public void NextLine()
     {
         if (lines[index].hasChoices)
-            return; // wait for button click
+            return;
 
         index++;
         ShowLine();
