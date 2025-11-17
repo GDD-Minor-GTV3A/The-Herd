@@ -47,9 +47,55 @@ namespace Core.AI.Sheep.Personality
 
         public virtual Vector3 GetGrazeTarget(SheepStateManager sheep, PersonalityBehaviorContext context)
         {
-            float baseRadius = sheep.Archetype?.IdleWanderRadius ?? 1.0f;
-            Vector2 rand = Random.insideUnitCircle * baseRadius;
-            return sheep.transform.position + new Vector3(rand.x, 0f, rand.y);
+            // How far apart we want grazing spots to be
+            float baseRadius   = sheep.Archetype?.IdleWanderRadius ?? 1.0f;
+            float minSpacing   = baseRadius * 0.75f;          // tweak in inspector by changing IdleWanderRadius
+            float minSpacingSq = minSpacing * minSpacing;
+
+            // We now graze *inside the player square*, not just around current position
+            Vector3 center = context.PlayerPosition;
+            Vector3 half   = context.PlayerHalfExtents;       // X and Z extents of the herd square
+
+            var neighbours = sheep.Neighbours;                // already used in FlockingUtility
+
+            // Try several random candidates and pick the first that isn't too close to other sheep
+            const int MAX_ATTEMPTS = 8;
+            for (int attempt = 0; attempt < MAX_ATTEMPTS; attempt++)
+            {
+                // Random point inside player square
+                float x = Random.Range(-half.x, half.x);
+                float z = Random.Range(-half.z, half.z);
+                Vector3 candidate = center + new Vector3(x, 0f, z);
+
+                bool tooClose = false;
+
+                if (neighbours != null)
+                {
+                    for (int i = 0; i < neighbours.Count; i++)
+                    {
+                        Transform n = neighbours[i];
+                        if (n == null) continue;
+
+                        Vector3 diff = n.position - candidate;
+                        diff.y = 0f;
+
+                        if (diff.sqrMagnitude < minSpacingSq)
+                        {
+                            tooClose = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!tooClose)
+                {
+                    return candidate;
+                }
+            }
+
+            // Fallback: if all attempts are crowded, just do the old local wander
+            Vector2 randLocal = Random.insideUnitCircle * baseRadius;
+            return sheep.transform.position + new Vector3(randLocal.x, 0f, randLocal.y);
         }
 
         public virtual Vector3 GetWalkAwayTarget(SheepStateManager sheep, PersonalityBehaviorContext context)
