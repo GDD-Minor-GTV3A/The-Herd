@@ -188,6 +188,21 @@ async def get_tag() -> SemVer:
     return SemVer.from_str(version)
 
 
+async def create_tag() -> None:
+    """Create a git tag for the release."""
+    logger.info("Creating git tag %s.", args.tag)
+
+    command = ["git", "tag", str(args.tag)]
+    await run_command(command)
+
+async def push_tag() -> None:
+    """Push the created tag to origin."""
+    logger.info("Pushing git tag %s to origin.", args.tag)
+
+    command = ["git", "push", "origin", str(args.tag)]
+    await run_command(command)
+    logger.info("Tag %s created and pushed successfully.", args.tag)
+
 async def create_release() -> None:
     """Create a GH release."""
     # Build argument list to avoid shell quoting/globbing issues
@@ -231,6 +246,8 @@ async def main() -> None:
         set_defaults(),
         test_gh_cli(),
     )
+    await create_tag()
+    await push_tag()
     await create_release()
 
 
