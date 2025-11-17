@@ -5,17 +5,54 @@ public class SlidingDoor : MonoBehaviour
 {
     [SerializeField] private float slideHeight = 5f;
     [SerializeField] private float slideSpeed = 2f;
-    
+    private Light doorLight;
+
     private Vector3 startPosition;
     private bool isSliding = false;
+    private bool isLocked = true;
+    private bool isOpen = false;
+
+    private void Awake()
+    {
+        doorLight = GetComponentInChildren<Light>();
+
+        TurnLightOff();
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            if (!isLocked && !isOpen)
+            {
+                Open();
+                TurnLightOff();
+            }
+        }
+    }
+
+    public void Unlock()
+    {
+        isLocked = false;
+        TurnLightOn();
+    }
+
+    public void Lock()
+    {
+        isLocked = true;
+        TurnLightOff();
+    }
 
     public void Open()
     {
+        if (isOpen) return;
         if (isSliding) return;
 
         startPosition = transform.position;
 
         StartCoroutine(SlideDoor());
+
+        isOpen = true;
     }
 
     private IEnumerator SlideDoor()
@@ -52,5 +89,21 @@ public class SlidingDoor : MonoBehaviour
         
         transform.position = startPosition;
         isSliding = false;
+    }
+
+    public void TurnLightOn()
+    {
+        if (doorLight != null)
+        {
+            doorLight.enabled = true;
+        }
+    }
+
+    public void TurnLightOff()
+    {
+        if (doorLight != null)
+        {
+            doorLight.enabled = false;
+        }
     }
 }

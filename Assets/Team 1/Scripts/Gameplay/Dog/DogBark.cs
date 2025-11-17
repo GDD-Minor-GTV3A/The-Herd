@@ -4,22 +4,35 @@ using UnityEngine.Events;
 
 namespace Gameplay.Dog
 {
+    /// <summary>
+    /// Handles logic of dog barking.
+    /// </summary>
     [RequireComponent(typeof(Dog))]
     public class DogBark : MonoBehaviour
     {
-        [SerializeField] private UnityEvent onDogBark;
-
         [Header("Debug")]
-        [SerializeField] private bool drawBarkArea = false;
+        [SerializeField, Tooltip("Turns on and of debug visuals.")] 
+        private bool drawBarkArea = false;
 
-        private DogConfig _config;
+        /// <summary>
+        /// Invokes when dog barks.
+        /// </summary>
+        public UnityEvent onDogBark;
 
-        private float _lastBarkTime;
 
+        private DogConfig config;
+        private float lastBarkTime;
+
+
+        /// <summary>
+        /// Initialization method.
+        /// </summary>
+        /// <param name="config">Config of the dog.</param>
         public void Initialize(DogConfig config)
         {
-            _config = config;
+            this.config = config;
         }
+
 
         private void OnEnable()
         {
@@ -31,35 +44,38 @@ namespace Gameplay.Dog
             EventManager.RemoveListener<DogBarkEvent>(OnBarkCommand);
         }
 
+
         private void OnBarkCommand(DogBarkEvent evt)
         {
             TryBark();
         }
 
+        /// <summary>
+        /// If possible to bark, scares all scarables around the dog.
+        /// </summary>
         public void TryBark()
         {
-            if (Time.time - _lastBarkTime < _config.BarkCooldown)
+            if (Time.time - lastBarkTime < config.BarkCooldown)
                 return;
 
-            _lastBarkTime = Time.time;
+            lastBarkTime = Time.time;
 
             onDogBark?.Invoke(); // trigger animation/sound via UnityEvent
 
+            Collider[] _hits = Physics.OverlapSphere(transform.position, config.MaxBarkDistance, config.ScareableMask);
 
-            Collider[] hits = Physics.OverlapSphere(transform.position, _config.MaxBarkDistance, _config.ScareableMask);
-
-            foreach (Collider hit in hits)
+            foreach (Collider hit in _hits)
             {
-                Vector3 toTarget = (hit.transform.position - transform.position).normalized;
+                Vector3 _toTarget = (hit.transform.position - transform.position).normalized;
 
-                float angle = Vector3.Angle(transform.forward, toTarget);
-                if (angle <= _config.BarkAngle * 0.5f || _config.BarkAngle >= 360f)
+                float _angle = Vector3.Angle(transform.forward, _toTarget);
+                if (_angle <= config.BarkAngle * 0.5f || config.BarkAngle >= 360f)
                 {
                     if (hit.TryGetComponent(out IScareable scareable))
                     {
-                        float distance = Vector3.Distance(transform.position, hit.transform.position);
-                        float intensity = Mathf.Clamp01(1f - (distance / _config.MaxBarkDistance));
-                        scareable.OnScared(transform.position, intensity, ScareType.DogBark);
+                        float _distance = Vector3.Distance(transform.position, hit.transform.position);
+                        float _intensity = Mathf.Clamp01(1f - (_distance / config.MaxBarkDistance));
+                        scareable.OnScared(transform.position, _intensity, ScareType.DogBark);
                     }
                 }
             }
@@ -68,14 +84,15 @@ namespace Gameplay.Dog
                 DrawDebugBarkZone();
         }
 
+
         private void DrawDebugBarkZone()
         {
-            Vector3 leftLimit = Quaternion.Euler(0, -_config.BarkAngle * 0.5f, 0) * transform.forward;
-            Vector3 rightLimit = Quaternion.Euler(0, _config.BarkAngle * 0.5f, 0) * transform.forward;
+            Vector3 _leftLimit = Quaternion.Euler(0, -config.BarkAngle * 0.5f, 0) * transform.forward;
+            Vector3 _rightLimit = Quaternion.Euler(0, config.BarkAngle * 0.5f, 0) * transform.forward;
 
-            Debug.DrawLine(transform.position, transform.position + leftLimit * _config.MaxBarkDistance, Color.yellow, 1f);
-            Debug.DrawLine(transform.position, transform.position + rightLimit * _config.MaxBarkDistance, Color.yellow, 1f);
-            Debug.DrawLine(transform.position, transform.position + transform.forward * _config.MaxBarkDistance, Color.cyan, 1f);
+            Debug.DrawLine(transform.position, transform.position + _leftLimit * config.MaxBarkDistance, Color.yellow, 1f);
+            Debug.DrawLine(transform.position, transform.position + _rightLimit * config.MaxBarkDistance, Color.yellow, 1f);
+            Debug.DrawLine(transform.position, transform.position + transform.forward * config.MaxBarkDistance, Color.cyan, 1f);
         }
     }
 }
