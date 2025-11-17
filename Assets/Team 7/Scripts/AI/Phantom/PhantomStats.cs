@@ -60,6 +60,8 @@ namespace Team_7.Scripts.AI.Phantom
         public float projectileSpeed = 15f;
         [Tooltip("How far the projectile travels before it gets deleted.")]
         public float projectileRange = 50f;
+        [Tooltip("How strong the homing effect is")]
+        public float homingStrength = 1.5f;
         
         [Header("Audio Settings")] 
         public AudioClip? screechSound;

@@ -147,7 +147,7 @@ namespace Team_7.Scripts.AI.Phantom
         public PhantomProjectile StartCharging()
         {
             _chargingProjectile = Instantiate(stats.projectile, projectileSpawn.transform.position, transform.rotation, transform);
-            _chargingProjectile.Init(stats.chargeDuration, stats.projectileSpeed, stats.maxProjectileScale, stats.projectileRange, stats.damage);
+            _chargingProjectile.Init(stats.chargeDuration, stats.projectileSpeed, stats.maxProjectileScale, stats.projectileRange, stats.damage, _playerObject, stats.homingStrength);
             _audioController.PlayClip(stats.projectileChargeSound);
             
             return _chargingProjectile;
