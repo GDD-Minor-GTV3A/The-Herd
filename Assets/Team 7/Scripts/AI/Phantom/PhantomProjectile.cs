@@ -1,4 +1,5 @@
 using Gameplay.HealthSystem;
+using Gameplay.Player;
 
 using UnityEngine;
 
@@ -45,15 +46,11 @@ namespace Team_7.Scripts.AI.Phantom
 
         private void OnTriggerEnter(Collider other)
         {
-            if (!other.gameObject.CompareTag("Player"))
-                return;
-
-            if (other.gameObject.TryGetComponent(out IDamageable _damageable))
+            if (other.gameObject.TryGetComponent(out Player damageable))
             {
-                _damageable.TakeDamage(_projectileDamage);
+                damageable.TakeDamage(_projectileDamage);
+                Destroy(gameObject);
             }
-            
-            Destroy(gameObject);
         }
 
         public bool IsLaunched()
