@@ -25,7 +25,8 @@ namespace Core.AI.Sheep.Config
         [Header("Sounds")]
         [Tooltip("Sound clips for the bleat sound.")] [SerializeField]
         public AudioClip[] BleatSounds;
-
+        public AudioClip JoinHerdSound;
+        public AudioClip LeaveHerdSound;
         public AudioClip DeathSound;
 
         [Header("Grazing interval in seconds")]

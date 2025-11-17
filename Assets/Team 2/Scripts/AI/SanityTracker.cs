@@ -39,6 +39,9 @@ namespace Core.AI.Sheep
         [SerializeField]
         [Tooltip("TextMeshPro component for debug display")]
         private TextMeshProUGUI _debugText;
+        
+        [Header("Audio")] [SerializeField] private AudioClip _sanityAddSound;
+        [SerializeField] private AudioClip _sanityRemoveSound;
 
         private int _sanityPoints;
         private int _maxSanityPoints;
@@ -135,6 +138,16 @@ namespace Core.AI.Sheep
             {
                 // Spawn a sheep (doesn't count towards sanity)
                 SpawnSheep();
+                
+                var clip = _sanityAddSound;
+                if (clip && SheepSoundManager.Instance)
+                {
+                    SheepSoundManager.Instance.PlaySoundClip(
+                        clip,
+                        _playerTransform,
+                        1.0f,
+                        Random.Range(0.9f, 1.1f));
+                }
             }
 
             UpdateSanity();
@@ -157,6 +170,16 @@ namespace Core.AI.Sheep
             {
                 // Remove furthest sheep (TODO: sheep should flee instead of instant removal)
                 RemoveFurthestSheep();
+                
+                var clip = _sanityRemoveSound;
+                if (clip && SheepSoundManager.Instance)
+                {
+                    SheepSoundManager.Instance.PlaySoundClip(
+                        clip,
+                        _playerTransform,
+                        1.0f,
+                        Random.Range(0.9f, 1.1f));
+                }
             }
 
             UpdateSanity();

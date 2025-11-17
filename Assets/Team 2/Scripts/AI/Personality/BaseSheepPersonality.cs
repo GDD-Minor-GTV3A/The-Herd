@@ -223,12 +223,30 @@ namespace Core.AI.Sheep.Personality
 
         public virtual void OnSeparatedFromHerd(SheepStateManager sheep, PersonalityBehaviorContext context)
         {
-            // Not handled by default
+            sheep.PlayLeaveHerdVfx();
+            var clip = sheep.Archetype?.LeaveHerdSound;
+            if (clip && SheepSoundManager.Instance)
+            {
+                SheepSoundManager.Instance.PlaySoundClip(
+                    clip,
+                    sheep.transform,
+                    1.0f,
+                    Random.Range(0.95f, 1.05f));
+            }
         }
 
         public virtual void OnRejoinedHerd(SheepStateManager sheep, PersonalityBehaviorContext context)
         {
-            // Not handled by default
+            sheep.PlayJoinHerdVfx();
+            var clip = sheep.Archetype?.JoinHerdSound;
+            if (clip && SheepSoundManager.Instance)
+            {
+                SheepSoundManager.Instance.PlaySoundClip(
+                    clip,
+                    sheep.transform,
+                    1.0f,
+                    Random.Range(0.95f, 1.05f));
+            }
         }
 
         public virtual void OnDeath(SheepStateManager sheep, PersonalityBehaviorContext context)

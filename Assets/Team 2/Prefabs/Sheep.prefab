@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 3547320230723746160}
   - component: {fileID: 8004071377219064652}
   - component: {fileID: 9089501618729050697}
+  - component: {fileID: 855214617170984871}
   m_Layer: 0
   m_Name: Sheep
   m_TagString: Sheep
@@ -73,7 +74,7 @@ MonoBehaviour:
   _config: {fileID: 11400000, guid: a315586506ad64147acec4d4f83e8d2d, type: 2}
   _archetype: {fileID: 11400000, guid: af609ab8455ff234482080e93f959104, type: 2}
   _animation: {fileID: 4010757028322601433}
-  _sheepSoundDriver: {fileID: 0}
+  _sheepSoundDriver: {fileID: 855214617170984871}
   _neighbours: []
   _threatMemory: 1.25
   _startAsStraggler: 0
@@ -117,6 +118,19 @@ MonoBehaviour:
   enemyMask:
     serializedVersion: 2
     m_Bits: 256
+--- !u!114 &855214617170984871
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4607321907588713866}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66c01baaf74c0964eaddf595bfe90c84, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _walkingSound: {fileID: 8300000, guid: 491095ee20a38634eb6f3d2ee4f12df4, type: 3}
 --- !u!1001 &7202839196276731856
 PrefabInstance:
   m_ObjectHideFlags: 0
