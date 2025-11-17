@@ -232,6 +232,10 @@ namespace Team_7.Scripts.AI.Phantom
             }
         }
 
+        /// <summary>
+        ///     Spawns a certain amount of fake clones.
+        /// </summary>
+        /// <param name="amount">The amount of clones to spawn</param>
         public void SpawnClones(int amount)
         {
             for (int i = 0; i < amount; i++)
@@ -244,6 +248,9 @@ namespace Team_7.Scripts.AI.Phantom
             _lastCloneSpawn = Time.time;
         }
 
+        /// <summary>
+        ///     Destroy all clones created by the enemy.
+        /// </summary>
         public void DestroyClones()
         {
             _clones.RemoveAll(clone => clone == null);

@@ -54,7 +54,6 @@ namespace Team_7.Scripts.AI.Phantom
                 }
             }
 
-            
             transform.position += _launchDirection * (_projectileSpeed * Time.deltaTime);
             
             // Destroy the projectile once it has travelled it's max distance
@@ -77,6 +76,9 @@ namespace Team_7.Scripts.AI.Phantom
             return _launched;
         }
 
+        /// <summary>
+        ///     Launches the projectile that is currently being charged towards the aimed location.
+        /// </summary>
         public void Launch()
         {
             _launchDirection = transform.parent.forward.normalized;
