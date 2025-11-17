@@ -98,21 +98,6 @@ class Args(Namespace):
                     logger.warning("Unused setting type/value: %s=%r", i, val)
 
 
-parser = ArgumentParser(description="Create a new GH release.")
-for arg, typ in Args.__annotations__.items():
-    match typ:
-        case bool():
-            parser.add_argument(f"--{arg.replace('_', '-')}", action="store_true")
-            parser.add_argument(f"--no-{arg.replace('_', '-')}", action="store_false", dest=arg)
-        case str():
-            parser.add_argument(f"--{arg.replace('_', '-')}", type=str, default=getattr(Args, arg))
-        case Path():
-            parser.add_argument(f"--{arg.replace('_', '-')}", type=Path, default=getattr(Args, arg))
-        case _:
-            logger.warning("Unknown argument type: %s", typ)
-args: Args = parser.parse_args(namespace=Args())
-
-
 @dataclass
 class SemVer:
     """Semantic Versioning representation."""
@@ -135,10 +120,28 @@ class SemVer:
         """Bump the minor version."""
         return SemVer(self.major, self.minor + 1, 0)
 
+
+parser = ArgumentParser(description="Create a new GH release.")
+for arg, typ in Args.__annotations__.items():
+    default = getattr(Args, arg)
+    if "str" in typ:
+        parser.add_argument(f"--{arg.replace('_', '-')}", type=str, default=default)
+    elif "bool" in typ:
+        parser.add_argument(f"--{arg.replace('_', '-')}", action="store_true")
+        parser.add_argument(f"--no-{arg.replace('_', '-')}", action="store_false", dest=arg)
+    elif "Path" in typ:
+        parser.add_argument(f"--{arg.replace('_', '-')}", type=Path, default=default)
+    elif "SemVer" in typ:
+        parser.add_argument(f"--{arg.replace('_', '-')}", type=SemVer.from_str, default=default)
+    else:
+        logger.warning("Unknown argument type: %s", typ)
+args: Args = parser.parse_args(namespace=Args())
+
+
 async def run_command(command: list[str]) -> tuple[bytes, bytes]:
     """Run a command asynchronously."""
     if args.dry_run:
-        logger.info("Dry run: would run command: %s", *command)
+        logger.info("Dry run: would run command: %s", command)
         return b"", b""
 
     proc = await asyncio.create_subprocess_exec(
