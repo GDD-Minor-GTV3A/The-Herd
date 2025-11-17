@@ -1,68 +1,49 @@
 using UnityEngine;
-using System.IO;
 
 /// <summary>
-/// SaveSystem is responsible for actually saving and loading the game to/from a file.
-/// 
-/// It collects data from all registered Save Modules (via SaveRegistry),
-/// writes it to a JSON file, and can also read a file to restore the saved data.
+/// TEMPLATE SAVE MODULE
+/// ---------------------
+/// Copy this file and rename the class for your own system.
+/// Implement ISaveModule to allow the SaveSystem to save/load your data.
 /// 
 /// Key points:
-/// - You do NOT put this on a GameObject; it’s a static utility class.
-/// - It works with all modules registered in SaveRegistry.
-/// - You call SaveGame(path) or LoadGame(path) when you want to save/load.
+/// - Each module must have a unique ModuleID
+/// - CaptureState() returns all the data you want to save
+/// - RestoreState() restores the data when loading
+/// - Do NOT put this on a GameObject
+/// - Do NOT modify SaveSystem.cs
 /// </summary>
-public static class SaveSystem
+public class TemplateSaveModule : ISaveModule
 {
-    /// <summary>
-    /// Saves the current game state to a file.
-    /// </summary>
-    public static void SaveGame(string filePath)
+    // Unique ID for this module
+    public string ModuleID => "TemplateModule";
+
+    // Called when saving: return all data you want to save
+    public object CaptureState()
     {
-        // Create a new SaveFile container to hold all module data
-        SaveFile saveFile = new SaveFile();
-
-        // Ask every registered module for its data
-        foreach (var module in SaveRegistry.Modules.Values)
+        // Example: return a simple data structure
+        return new TemplateState
         {
-            saveFile.data[module.ModuleID] = module.CaptureState();
-        }
-
-        // Convert the SaveFile to JSON text
-        string json = JsonUtility.ToJson(saveFile, prettyPrint: true);
-
-        // Write the JSON to a file
-        File.WriteAllText(filePath, json);
-
-        Debug.Log($"Game saved to {filePath}");
+            exampleNumber = 0,
+            exampleText = "Hello"
+        };
     }
 
-    /// <summary>
-    /// Loads a saved game from a file and restores all module states.
-    /// </summary>
-    public static void LoadGame(string filePath)
+    // Called when loading: restore data from saved object
+    public void RestoreState(object stateObj)
     {
-        if (!File.Exists(filePath))
-        {
-            Debug.LogWarning($"No save file found at {filePath}");
-            return;
-        }
+        var state = stateObj as TemplateState;
+        if (state == null) return;
 
-        // Read the JSON from the file
-        string json = File.ReadAllText(filePath);
+        // Restore your data here
+        Debug.Log($"Restored exampleNumber: {state.exampleNumber}, exampleText: {state.exampleText}");
+    }
 
-        // Convert JSON back into a SaveFile object
-        SaveFile saveFile = JsonUtility.FromJson<SaveFile>(json);
-
-        // Give each module its own saved data
-        foreach (var kvp in saveFile.data)
-        {
-            if (SaveRegistry.Modules.TryGetValue(kvp.Key, out var module))
-            {
-                module.RestoreState(kvp.Value);
-            }
-        }
-
-        Debug.Log($"Game loaded from {filePath}");
+    // Example of a serializable state class
+    [System.Serializable]
+    public class TemplateState
+    {
+        public int exampleNumber;
+        public string exampleText;
     }
 }
