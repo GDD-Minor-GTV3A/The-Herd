@@ -32,6 +32,7 @@ public class SheepSoundDriver : MonoBehaviour
 
     public bool TryPlayWalkSound(Transform sheepTransform)
     {
+        if (SheepSoundManager.Instance == null) return false;
         if (_nextMomentWalkSound > Time.time && _walkingSound == null) return false;
 
         SheepSoundManager.Instance.PlaySoundClip(_walkingSound, sheepTransform, FOOTSTEPS_VOLUME, Random.Range(LOWEST_FOOTSTEPS_PITCH, HEIGHEST_FOOTSTEPS_PITCH));
@@ -43,6 +44,7 @@ public class SheepSoundDriver : MonoBehaviour
 
     public bool TryPlayBleatSound(Transform sheepTransform, SheepArchetype sheepArchetype)
     {
+        if (SheepSoundManager.Instance == null) return false;
         if (_nextMomentBleatSound > Time.time && sheepArchetype != null) return false;
         AudioClip bleatSound = sheepArchetype.BleatSounds[Random.Range(0, sheepArchetype.BleatSounds.Length)];
         if (bleatSound == null) return false;

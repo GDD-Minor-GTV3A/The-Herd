@@ -20,6 +20,8 @@ namespace Core.AI.Sheep.Config
         [SerializeField] private float _steerClamp = 2.5f;
         [SerializeField] private float _walkAwayFromHerdTicks = 2f; // This is a test timing and is open to change
         [SerializeField] private float _maxLostDistanceFromHerd = 10f; // This is a test distance and is open to change
+        [SerializeField] private float _playerAvoidRadius = 1.5f;
+        [SerializeField] private float _playerAvoidWeight = 1.5f;
 
 
 
@@ -33,5 +35,7 @@ namespace Core.AI.Sheep.Config
         public float SteerClamp => _steerClamp;
         public float WalkAwayFromHerdTicks => _walkAwayFromHerdTicks;
         public float MaxLostDistanceFromHerd => _maxLostDistanceFromHerd;
+        public float PlayerAvoidRadius => _playerAvoidRadius;
+        public float PlayerAvoidWeight => _playerAvoidWeight;
     }
 }
