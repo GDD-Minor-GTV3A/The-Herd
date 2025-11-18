@@ -7,8 +7,14 @@ using UnityEngine;
 
 namespace Gameplay.Effects 
 {
+    /// <summary>
+    /// Handles visual effect of taking damage.
+    /// </summary>
     public class DamageEffect : MonoBehaviour
     {
+        /// <summary>
+        /// Covering for List to properly use it with showif attribute.
+        /// </summary>
         [Serializable]
         private class ShowableList<T> 
         { 
@@ -17,13 +23,15 @@ namespace Gameplay.Effects
 
 
 
-
         [SerializeField, Tooltip("Color of object, when it takes damage.")] 
         private Color damageColor = Color.red;
+
         [SerializeField, Tooltip("Takes all renderers on object and it's childs. To make it work add this component on root object.")] 
         private bool autoFindMeshRenderers = false;
+        
         [SerializeField, ShowIf("autoFindMeshRenderers"), Tooltip("Include inactive renderers in list.")] 
         private bool includeInactive = false;
+        
         [SerializeField, ShowIf("autoFindMeshRenderers", true), Tooltip("All MeshRenderers which will change color.")]
         private ShowableList<Renderer> meshRenderers;
 
@@ -32,6 +40,9 @@ namespace Gameplay.Effects
         private Coroutine blinkCoroutine;
 
 
+        /// <summary>
+        /// Initialization method.
+        /// </summary>
         public void Initialize()
         {
             if (autoFindMeshRenderers)
@@ -51,6 +62,11 @@ namespace Gameplay.Effects
         }
 
 
+        /// <summary>
+        /// Plays animation of change object color for some time. Animation separated on 3 parts, each takes the same amount of time(1/3 of full duration). 
+        ///1. Fade-in; 2. Object full of color; 3.Fade-out.
+        /// </summary>
+        /// <param name="duration">Duration of full animation.</param>
         public void Blink(float duration)
         {
             if (blinkCoroutine != null)

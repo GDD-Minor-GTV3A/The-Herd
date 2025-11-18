@@ -7,7 +7,7 @@
 [![Blender](https://img.shields.io/badge/blender-EA7600?style=flat&logo=blender&logoColor=white)](https://www.blender.org/)
 [![Adobe](https://img.shields.io/badge/adobe-ED2224?style=flat&logo=adobe&logoColor=white)](https://www.adobe.com/)
 
-This project is made with Unity in `Unity 6000.0.58f1`.
+This project is made with Unity in `Unity 6000.0.62f1`.
 
 A top down horror game where you are a Shepherd herding sheep across the mountains during the old Yugoslavia. The sheep, your dog and you go through fields and villages while traveling the mountain. As you go the people and world around you becomes more and more cryptid. Your goal is to find a place to settle and avoid the war currently happening in your country.
 

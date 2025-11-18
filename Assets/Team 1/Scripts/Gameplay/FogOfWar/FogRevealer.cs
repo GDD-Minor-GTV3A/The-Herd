@@ -1,11 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-
-using Core.Events;
-
 using UnityEngine;
-
 
 namespace Gameplay.FogOfWar
 {
@@ -14,36 +10,59 @@ namespace Gameplay.FogOfWar
     /// </summary>
     public class FogRevealer : MonoBehaviour
     {
+        /// <summary>
+        /// Contains all information about revealer.
+        /// </summary>
         [Serializable]
         protected class Revealer
         {
+            /// <summary>
+            /// Base config of Fog of War.
+            /// </summary>
             public FogRevealerConfig Config;
 
-            [HideInInspector] public MeshRenderer Renderer;
-            [HideInInspector] public float StartingAngle = 0;
-            [HideInInspector] public Mesh Mesh;
+            /// <summary>
+            /// Mesh renderer of revealer.
+            /// </summary>
+            [HideInInspector] 
+            public MeshRenderer Renderer;
+
+            /// <summary>
+            /// Represents start angle of the mesh.
+            /// </summary>
+            [HideInInspector] 
+            public float StartingAngle = 0;
+
+            /// <summary>
+            /// Mesh which is used by revealer.
+            /// </summary>
+            [HideInInspector] 
+            public Mesh Mesh;
         }
 
 
-        [SerializeField, Tooltip("Data for every revealer for this object.")] protected List<Revealer> revealers;
-        [SerializeField, Tooltip("Origin point of revealer. If not assigned transform of object will be taken.")] protected Transform origin;
+        [SerializeField, Tooltip("Data for every revealer for this object.")] 
+        protected List<Revealer> revealers;
+
+        [SerializeField, Tooltip("Origin point of revealer. If not assigned transform of object will be taken.")] 
+        protected Transform origin;
 
 
         private LayerMask obstaclesLayers;
 
 
+        /// <summary>
+        /// Initialization method.
+        /// </summary>
+        /// <param name="fogPlane">Transform of projection plan of the fog.</param>
+        /// <param name="meshMaterial">Material for revealers.</param>
+        /// <param name="obstaclesLayers">Layer mask of objects, which blocks the view.</param>
         public virtual void Initialize(Transform fogPlane, Material meshMaterial, LayerMask obstaclesLayers)
         {
             CreateFovMeshes(fogPlane, meshMaterial, obstaclesLayers);
         }
 
 
-        /// <summary>
-        /// Initializes the mesh for revealer.
-        /// </summary>
-        /// <param name="fogPlane">Transform of projection plan of the fog.</param>
-        /// <param name="meshMaterial">Material for revealers.</param>
-        /// <param name="obstaclesLayers">Layer mask of objects, which blocks the view.</param>
         private void CreateFovMeshes(Transform fogPlane, Material meshMaterial, LayerMask obstaclesLayers)
         {
             if (origin == null)
@@ -128,7 +147,7 @@ namespace Gameplay.FogOfWar
                 if (Physics.Raycast(origin.position, _rayDirection, out RaycastHit hit, _viewDistance, obstaclesLayers))
                 {
 
-                    Vector3 _localHitPoint = revealers[meshIndex].Renderer.transform.InverseTransformPoint(hit.point);
+                    Vector3 _localHitPoint = revealers[meshIndex].Renderer.transform.InverseTransformPoint(hit.point + _rayDirection * 3);
                     _vertex = new Vector3(_localHitPoint.x, _meshOrigin.y, _localHitPoint.z);
                 }
                 else
@@ -196,9 +215,9 @@ namespace Gameplay.FogOfWar
         /// <param name="revealerMaterial">New material.</param>
         public void UpdateAllMaterials(Material revealerMaterial)
         {
-            for(int _i = 0; _i< revealers.Count; _i++)
+            for(int i = 0; i< revealers.Count; i++)
             {
-                UpdateRevealerMaterial(_i, revealerMaterial);
+                UpdateRevealerMaterial(i, revealerMaterial);
             }
         }
 
@@ -212,6 +231,7 @@ namespace Gameplay.FogOfWar
                 UpdateMesh(meshIndex);
             }
         }
+
 
         protected virtual void OnDestroy()
         {
