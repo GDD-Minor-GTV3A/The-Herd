@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from release.log import logger
-from release.paths import BUILD_DIR, BUILD_PROFILE, EXE, ROOT, UNITY, ZIP_FILE
+from release.paths import BUILD_DIR, ROOT, UNITY, UNITY_LOG, ZIP_FILE
 from release.version import SemVer
 
 if TYPE_CHECKING:
@@ -89,11 +89,9 @@ class UnityArgs(Namespace):
 
     # Unity executable settings. matches https://docs.unity3d.com/Manual/PlayerCommandLineArguments.html
     unityPath: Path = UNITY
-    activeBuildProfile: Path = BUILD_PROFILE
-    build: Path = EXE
     buildTarget: str = "standalonewindows64"
     projectPath: Path = ROOT
-    logFile: str = "-"
+    logFile: Path = UNITY_LOG
     skipMissingProjectId: bool = True
     skipMissingUpid: bool = True
     batchmode: bool = True
@@ -102,9 +100,11 @@ class UnityArgs(Namespace):
     def build_command(self) -> list[str]:
         """Generate the command line to run unity with the given arguments."""
         command = [str(self.unityPath)]
-        for arg, val in self.__dict__.items():
-            if arg not in self.__annotations__:
+        for arg in self.__annotations__:
+            if arg == "unityPath":
                 continue
+
+            val = getattr(self, arg)
             flag = f"-{arg[0].lower()}{arg[1:]}"
             match val:
                 case True:
