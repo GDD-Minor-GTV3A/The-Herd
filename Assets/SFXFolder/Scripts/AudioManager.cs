@@ -14,10 +14,12 @@ public class AudioManager : MonoBehaviour
     [Header("Audio Clips")]
     public AudioClip[] sfxClips;
     public AudioClip windClip;
+    public AudioClip IntroMusic;
 
     [Header("Settings")]
     [Range(0f, 1f)]
     public float windVolume = 0.5f;
+    public float IntroVolume = 0.5f;
 
     void Awake()
     {
@@ -37,9 +39,17 @@ public class AudioManager : MonoBehaviour
     {
         if (windClip != null && musicSource != null)
         {
-            musicSource.clip = windClip;
-            musicSource.volume = windVolume;
-            musicSource.loop = true;
+            sfxSource.clip = windClip;
+            sfxSource.volume = windVolume;
+            sfxSource.loop = true;
+            sfxSource.Play();
+        }
+
+        if (IntroMusic != null && musicSource != null)
+        {
+            musicSource.clip = IntroMusic;
+            musicSource.volume = IntroVolume;
+            musicSource.loop = false;
             musicSource.Play();
         }
 
