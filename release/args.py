@@ -38,14 +38,17 @@ class Namespace(BaseNamespace):
 class Args(Namespace):
     """Additional settings for release script."""
 
+    # Control flags, on what to do during the release process.
+    compile: bool = False # If true, first compile the project using Unity.exe.
+    create_tag: bool = False # If true, create a git tag for the release
+    upload_release: bool = False # If true, upload the release to GH releases
+
+    # Release settings.
     tag: SemVer | str = "v0.0.0" # Custom tag to use for the release
     dist_dir: Path = BUILD_DIR # Directory to zip for the release
     zip_file: Path = ZIP_FILE # Zip file to create for the release
     log: str = "INFO" # Log level, e.g. DEBUG, INFO, WARNING, ERROR
     dry_run: bool = False # If true, do not create the release
-    compile: bool = False # If true, first compile the project using Unity.exe.
-    create_tag: bool = True # If true, create a git tag for the release
-    upload_release: bool = True # If true, upload the release to GH releases
 
 
 class GithubArgs(Namespace):
