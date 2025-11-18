@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using Core.Shared.StateMachine;
 
+using Unity.Properties;
+
 using Random = UnityEngine.Random;
 
 namespace Core.AI.Sheep.Personality
@@ -30,7 +32,7 @@ namespace Core.AI.Sheep.Personality
         public virtual Vector3 GetFollowTarget(SheepStateManager sheep, PersonalityBehaviorContext context)
         {
             float baseDistance = sheep.Archetype?.FollowDistance ?? DEFAULT_FOLLOW_DISTANCE;
-            float want = Mathf.Min(0.5f, baseDistance);
+            float want = baseDistance;
 
             Vector3 dir = (context.PlayerPosition - sheep.transform.position);
             dir.y = 0f;
@@ -45,9 +47,55 @@ namespace Core.AI.Sheep.Personality
 
         public virtual Vector3 GetGrazeTarget(SheepStateManager sheep, PersonalityBehaviorContext context)
         {
-            float baseRadius = sheep.Archetype?.IdleWanderRadius ?? 1.0f;
-            Vector2 rand = Random.insideUnitCircle * baseRadius;
-            return sheep.transform.position + new Vector3(rand.x, 0f, rand.y);
+            // How far apart we want grazing spots to be
+            float baseRadius   = sheep.Archetype?.IdleWanderRadius ?? 1.0f;
+            float minSpacing   = baseRadius * 0.75f;          // tweak in inspector by changing IdleWanderRadius
+            float minSpacingSq = minSpacing * minSpacing;
+
+            // We now graze *inside the player square*, not just around current position
+            Vector3 center = context.PlayerPosition;
+            Vector3 half   = context.PlayerHalfExtents;       // X and Z extents of the herd square
+
+            var neighbours = sheep.Neighbours;                // already used in FlockingUtility
+
+            // Try several random candidates and pick the first that isn't too close to other sheep
+            const int MAX_ATTEMPTS = 8;
+            for (int attempt = 0; attempt < MAX_ATTEMPTS; attempt++)
+            {
+                // Random point inside player square
+                float x = Random.Range(-half.x, half.x);
+                float z = Random.Range(-half.z, half.z);
+                Vector3 candidate = center + new Vector3(x, 0f, z);
+
+                bool tooClose = false;
+
+                if (neighbours != null)
+                {
+                    for (int i = 0; i < neighbours.Count; i++)
+                    {
+                        Transform n = neighbours[i];
+                        if (n == null) continue;
+
+                        Vector3 diff = n.position - candidate;
+                        diff.y = 0f;
+
+                        if (diff.sqrMagnitude < minSpacingSq)
+                        {
+                            tooClose = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!tooClose)
+                {
+                    return candidate;
+                }
+            }
+
+            // Fallback: if all attempts are crowded, just do the old local wander
+            Vector2 randLocal = Random.insideUnitCircle * baseRadius;
+            return sheep.transform.position + new Vector3(randLocal.x, 0f, randLocal.y);
         }
 
         public virtual Vector3 GetWalkAwayTarget(SheepStateManager sheep, PersonalityBehaviorContext context)
@@ -68,7 +116,39 @@ namespace Core.AI.Sheep.Personality
         public virtual void SetDestinationWithHerding(Vector3 destination, SheepStateManager sheep, PersonalityBehaviorContext context)
         {
             Vector3 goal = context.HasThreat && context.Threats.Count > 0
-                ? ComputeEscapeDestination(sheep, context) : destination;
+                ? ComputeEscapeDestination(sheep, context)
+                : destination;
+            
+            Vector3 playerPos = context.PlayerPosition;
+            playerPos.y = 0f;
+
+            float avoidRadius = sheep.Config?.PlayerAvoidRadius ?? 1.5f;
+            float avoidRadiusSqr = avoidRadius * avoidRadius;
+
+            Vector3 goalFlat = goal;
+            goalFlat.y = 0f;
+            
+            Vector3 fromPlayerToGoal = goalFlat - playerPos;
+            float sqrDistanceToPlayer = fromPlayerToGoal.sqrMagnitude;
+
+            if (sqrDistanceToPlayer < avoidRadiusSqr)
+            {
+                if (sqrDistanceToPlayer < 0.0001f)
+                {
+                    fromPlayerToGoal = sheep.transform.position - playerPos;
+                    fromPlayerToGoal.y = 0f;
+
+                    if (fromPlayerToGoal.sqrMagnitude < 0.0001f)
+                    {
+                        Vector2 rand = UnityEngine.Random.insideUnitCircle.normalized;
+                        fromPlayerToGoal = new Vector3(rand.x, 0f, rand.y);
+                    }
+                }
+                
+                fromPlayerToGoal.Normalize();
+                goal = playerPos + fromPlayerToGoal * avoidRadius;
+            }
+
             Vector3 desired = goal - sheep.transform.position;
             desired.y = 0f;
 
@@ -77,7 +157,7 @@ namespace Core.AI.Sheep.Personality
             float alignW = sheep.Config?.AlignmentWeight ?? 0.6f;
             float clamp = sheep.Config?.SteerClamp ?? 2.5f;
 
-            Vector3 steer = FlockingUtility.Steering(
+            Vector3 flockSteer = FlockingUtility.Steering(
                 sheep.transform,
                 sheep.Neighbours,
                 sepDist,
@@ -86,24 +166,40 @@ namespace Core.AI.Sheep.Personality
                 clamp
             );
 
-            Vector3 final = sheep.transform.position + desired + steer;
+            Vector3 repulsion = Vector3.zero;
+            Vector3 fromPlayerToSheep = sheep.transform.position - playerPos;
+            fromPlayerToSheep.y = 0f;
+            
+            float distToPlayer = fromPlayerToSheep.magnitude;
+
+            if (distToPlayer < avoidRadius && distToPlayer > 0.001f)
+            {
+                float t = 1f - (distToPlayer / avoidRadius);
+                float repulsionWeight = sheep.Config?.PlayerAvoidWeight ?? 1.5f;
+                Vector3 dir = fromPlayerToSheep / distToPlayer;
+                repulsion = dir * (t * repulsionWeight);
+            }
+            
+            Vector3 final = sheep.transform.position + desired + flockSteer + repulsion;
 
             if (sheep.CanControlAgent())
             {
                 float baseSpeed = sheep.Config?.BaseSpeed ?? 2.2f;
-                bool isFLeeing = context.HasThreat;
+                bool isFleeing = context.HasThreat;
                 
-                sheep.Agent.speed = isFLeeing ? baseSpeed * 1.5f : baseSpeed;
+                sheep.Agent.speed = isFleeing ? baseSpeed * 1.5f : baseSpeed;
                 sheep.Agent.SetDestination(final);
 
-                if (isFLeeing)
+                if (isFleeing)
                 {
                     Vector3 look = final - sheep.transform.position;
                     look.y = 0f;
                     if (look.sqrMagnitude > 0.0001f)
                     {
                         var q = Quaternion.LookRotation(look);
-                        sheep.transform.rotation = Quaternion.Slerp(sheep.transform.rotation, q, Time.deltaTime * 10f);
+                        sheep.transform.rotation = Quaternion.Slerp(sheep.transform.rotation, 
+                            q,
+                            Time.deltaTime * 10f);
                     }
                 }
             }
@@ -173,12 +269,30 @@ namespace Core.AI.Sheep.Personality
 
         public virtual void OnSeparatedFromHerd(SheepStateManager sheep, PersonalityBehaviorContext context)
         {
-            // Not handled by default
+            sheep.PlayLeaveHerdVfx();
+            var clip = sheep.Archetype?.LeaveHerdSound;
+            if (clip && SheepSoundManager.Instance)
+            {
+                SheepSoundManager.Instance.PlaySoundClip(
+                    clip,
+                    sheep.transform,
+                    1.0f,
+                    Random.Range(0.95f, 1.05f));
+            }
         }
 
         public virtual void OnRejoinedHerd(SheepStateManager sheep, PersonalityBehaviorContext context)
         {
-            // Not handled by default
+            sheep.PlayJoinHerdVfx();
+            var clip = sheep.Archetype?.JoinHerdSound;
+            if (clip && SheepSoundManager.Instance)
+            {
+                SheepSoundManager.Instance.PlaySoundClip(
+                    clip,
+                    sheep.transform,
+                    1.0f,
+                    Random.Range(0.95f, 1.05f));
+            }
         }
 
         public virtual void OnDeath(SheepStateManager sheep, PersonalityBehaviorContext context)

@@ -15,6 +15,7 @@ namespace Core.AI.Sheep.Config
         [SerializeField] private float _idleWanderRadius = 1.0f;
         [SerializeField] private float _followDistance = 1.8f;
         [SerializeField] private float _gettingLostChance = 0.005f;
+        [SerializeField] private float _minDistanceFromPlayer = 2f;
 
         [Header("Animation Overrides")]
         [SerializeField] private AnimatorOverrideController _animationOverrides;
@@ -24,7 +25,8 @@ namespace Core.AI.Sheep.Config
         [Header("Sounds")]
         [Tooltip("Sound clips for the bleat sound.")] [SerializeField]
         public AudioClip[] BleatSounds;
-
+        public AudioClip JoinHerdSound;
+        public AudioClip LeaveHerdSound;
         public AudioClip DeathSound;
 
         [Header("Grazing interval in seconds")]
@@ -43,7 +45,7 @@ namespace Core.AI.Sheep.Config
         public float IdleWanderRadius => _idleWanderRadius;
         public float FollowDistance => _followDistance;
         public float GettingLostChance => _gettingLostChance;
-
+        public float MinDistanceFromPlayer => _minDistanceFromPlayer;
         public float GrazeIntervalMin => _grazeIntervalMin;
         public float GrazeIntervalMax => _grazeIntervalMax;
 
