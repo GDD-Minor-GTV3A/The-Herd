@@ -20,6 +20,18 @@ Requirements:
 USAGE:
     python release.py [options]
     python release.py --help
+
+Full release process example, using default values. Minimal required flags:
+    python ./release.py --compile --create-tag --upload-release
+
+Only compile:
+    python ./release.py --compile
+
+Only create and push tag:
+    python ./release.py --create-tag
+
+Only upload release (make sure game is already built and tag is created):
+    python ./release.py --upload-release
 """
 
 import asyncio
