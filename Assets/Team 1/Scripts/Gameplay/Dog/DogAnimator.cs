@@ -8,14 +8,14 @@ namespace Gameplay.Dog
     /// </summary>
     public class DogAnimator : AnimatorController
     {
-        private const string  WalkingParam = "Walk";
+        private float minSpeed;
+        private float maxSpeed;
+
+        private readonly float minAnimationSpeed = .5f;
+        private readonly float maxAnimationSpeed = 2f;
+
+        private const string WalkingParam = "Walk";
         private const string WalkSpeedParam = "WalkSpeed";
-
-        private float _minSpeed;
-        private float _maxSpeed;
-
-        private readonly float _minAnimationSpeed = .5f;
-        private readonly float _maxAnimationSpeed = 2f;
 
 
         /// <param name="animator">Animator of the dog.</param>
@@ -41,15 +41,15 @@ namespace Gameplay.Dog
         /// <param name="currentSpeed">Current walking speed of the dog.</param>
         public void CalculateWalkingSpeedMultiplier(float currentSpeed)
         {
-            float animSpeed = Mathf.Lerp(_minAnimationSpeed,_maxAnimationSpeed,Mathf.InverseLerp(_minSpeed, _maxSpeed, currentSpeed));
-            SetWakingAnimationSpeedMulti(animSpeed);
+            float _animationSpeed = Mathf.Lerp(minAnimationSpeed,maxAnimationSpeed,Mathf.InverseLerp(minSpeed, maxSpeed, currentSpeed));
+            SetWakingAnimationSpeedMulti(_animationSpeed);
         }
 
 
         /// <summary>
         /// Sets walking animation speed multiplier.
         /// </summary>
-        /// <param name="multiplier">New vaue for multiplier.</param>
+        /// <param name="multiplier">New value for multiplier.</param>
         public void SetWakingAnimationSpeedMulti(float multiplier)
         {
             _animator.SetFloat(WalkSpeedParam, multiplier);
@@ -62,8 +62,8 @@ namespace Gameplay.Dog
         /// <param name="config">Config of the dog.</param>
         public void UpdateAnimationValues(DogConfig config)
         {
-            _minSpeed = config.MinSpeed;
-            _maxSpeed = config.MaxSpeed;
+            minSpeed = config.MinSpeed;
+            maxSpeed = config.MaxSpeed;
         }
     }
 }

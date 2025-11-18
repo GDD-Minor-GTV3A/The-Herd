@@ -1,52 +1,53 @@
 ﻿using Core.AI.Sheep;
-
 using UnityEngine;
 
 namespace Gameplay.Dog
 {
+    /// <summary>
+    /// Dog moves to the target sheep.
+    /// </summary>
     public class DogMoveToSheep : DogState
     {
-        private SheepStateManager _targetSheep;
+        private SheepStateManager targetSheep;
 
 
         public DogMoveToSheep(DogStateManager manager) : base(manager)
         {
         }
 
+
         public override void OnStart()
         {
-            _manager.CurrentCommandTarget.OnValueChanged += OnTargetChanged;
+            manager.CurrentCommandTarget.OnValueChanged += OnTargetChanged;
 
-
-            _targetSheep = _manager.HeardZone.GetFreeSheep();
+            targetSheep = manager.HerdZone.GetFreeSheep();
         }
 
         public override void OnStop()
         {
-            _manager.CurrentCommandTarget.OnValueChanged -= OnTargetChanged;
+            manager.CurrentCommandTarget.OnValueChanged -= OnTargetChanged;
 
-            _targetSheep = null;
+            targetSheep = null;
         }
 
         public override void OnUpdate()
         {
-            if (Vector3.Distance(_manager.transform.position, _targetSheep.transform.position) <= 3f)
+            if (Vector3.Distance(manager.transform.position, targetSheep.transform.position) <= 3f)
             {
-                _manager.HeardZone.HeardSheep(_targetSheep);
+                manager.HerdZone.HeardSheep(targetSheep);
 
-                _manager.SetState<DogIdle>();
+                manager.SetState<DogIdle>();
 
                 return;
             }
 
-
-            _manager.MovementController.MoveTo(_targetSheep.transform.position);
+            manager.MovementController.MoveTo(targetSheep.transform.position);
         }
 
 
         private void OnTargetChanged()
         {
-            _manager.SetState<DogMove>();
+            manager.SetState<DogMove>();
         }
     }
 }

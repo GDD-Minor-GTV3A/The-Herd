@@ -2,33 +2,34 @@ using UnityEngine;
 using System.Collections.Generic;
 using Core.AI.Sheep;
 
-// Note: Uncomment the following lines to enable this functionality. This can only be done without compilation errors after the branch is merged with Team 2 latest version
-
 namespace Gameplay.Dog
 {
+    /// <summary>
+    /// Handles logic of zone where player can add sheep to herd.
+    /// </summary>
     [RequireComponent(typeof(Collider))]
     public class HerdZone : MonoBehaviour
     {
         [Header("Herding Settings")]
-        [SerializeField] private bool joinIfOutside = true;
-        [SerializeField] private float graceAfterJoin = 3f;
-        [SerializeField] private string sheepTag = "Sheep";
+        [SerializeField, Tooltip("Time when sheep can not be lost after adding to herd.")] 
+        private float graceAfterJoin = 3f;
+
+        [SerializeField, Tooltip("Tag which is used to find a sheep.")] 
+        private string sheepTag = "Sheep";
 
 
         private List<SheepStateManager> freeSheep = new();
 
 
+        /// <summary>
+        /// Initialization method.
+        /// </summary>
         public void Initialize()
         {
-            Reset();
-        }
-
-
-        private void Reset()
-        {
-            var _collider = GetComponent<Collider>();
+            Collider _collider = GetComponent<Collider>();
             _collider.isTrigger = true;
         }
+
 
         private void OnTriggerEnter(Collider other)
         {
@@ -36,7 +37,7 @@ namespace Gameplay.Dog
             if (_sheep == null)
                 return;
 
-            if (!joinIfOutside || _sheep.IsCurrentlyOutsideHerd())
+            if (_sheep.IsCurrentlyOutsideHerd())
             {
                 freeSheep.Add(_sheep);
             }
@@ -49,7 +50,7 @@ namespace Gameplay.Dog
             if (_sheep == null)
                 return;
 
-            if (!joinIfOutside || _sheep.IsCurrentlyOutsideHerd())
+            if (_sheep.IsCurrentlyOutsideHerd())
                 freeSheep.Remove(_sheep);
         }
 
@@ -63,6 +64,10 @@ namespace Gameplay.Dog
         }
 
 
+        /// <summary>
+        /// Returns first available sheep not in herd.
+        /// </summary>
+        /// <returns>First free sheep.</returns>
         public SheepStateManager GetFreeSheep()
         {
             if (freeSheep.Count == 0)
@@ -72,6 +77,10 @@ namespace Gameplay.Dog
         }
 
 
+        /// <summary>
+        /// Adds sheep to herd.
+        /// </summary>
+        /// <param name="sheepToHeard">Sheep to add to herd.</param>
         public void HeardSheep(SheepStateManager sheepToHeard)
         {
             if (freeSheep.Contains(sheepToHeard))
@@ -84,6 +93,10 @@ namespace Gameplay.Dog
         }
 
 
+        /// <summary>
+        /// Returns bool which says if there are any available free sheep.
+        /// </summary>
+        /// <returns>Are there any available sheep.</returns>
         public bool IsFreeSheepToHeard()
         {
             return freeSheep.Count != 0;
