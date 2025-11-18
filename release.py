@@ -5,13 +5,15 @@ Skips the debug information in dist/*DoNotShip
 Builds a zip out of dist/* as an artifact to publish to GH releases.
 
 see documentation for arguments: https://cli.github.com/manual/gh_release_create
-additionally --tag, --dist-dir and --zip-file are supported to override the default paths.
+additionally --tag, --log, --dist-dir and --zip-file are supported to override the default settings.
+use --dry-run to test the script without actually creating a release.
 
 prepend with `no` to set boolean flags to false.
     example: `--no-latest`
 
-Make sure you have the GH CLI installed and authenticated:
-    https://cli.github.com/
+Requirements:
+    Make sure you have python 3.14 or higher installed. (Lower version may work, but are not tested)
+    Make sure you have the GH CLI installed and authenticated: https://cli.github.com/
 
 USAGE:
     python release.py [options]
@@ -22,7 +24,7 @@ from __future__ import annotations
 
 import asyncio
 import zipfile
-from argparse import ArgumentParser, Namespace
+from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, Namespace
 from dataclasses import dataclass
 from logging import INFO, StreamHandler, getLogger
 from pathlib import Path
@@ -73,10 +75,10 @@ class Args(Namespace):
     prerelease: bool = False
     target: str = "main"
     title: str | None = None
-    verify_tag: bool = False
+    verify_tag: bool = True
 
     # Additional settings
-    tag: SemVer | None = None # Custom tag to use for the release
+    tag: SemVer | str = "v0.0.0" # Custom tag to use for the release
     dist_dir: Path = BUILD_DIR # Directory to zip for the release
     zip_file: Path = ZIP_FILE # Zip file to create for the release
     log: str = "INFO" # Log level, e.g. DEBUG, INFO, WARNING, ERROR
@@ -121,18 +123,18 @@ class SemVer:
         return SemVer(self.major, self.minor + 1, 0)
 
 
-parser = ArgumentParser(description="Create a new GH release.")
+parser = ArgumentParser(description="Create a new GH release.", formatter_class=ArgumentDefaultsHelpFormatter)
 for arg, typ in Args.__annotations__.items():
     default = getattr(Args, arg)
     if "str" in typ:
-        parser.add_argument(f"--{arg.replace('_', '-')}", type=str, default=default)
+        parser.add_argument(f"--{arg.replace('_', '-')}", type=str, default=default, help="(str)")
     elif "bool" in typ:
-        parser.add_argument(f"--{arg.replace('_', '-')}", action="store_true")
-        parser.add_argument(f"--no-{arg.replace('_', '-')}", action="store_false", dest=arg)
+        parser.add_argument(f"--{arg.replace('_', '-')}", action="store_true", dest=arg, help="(bool)")
+        parser.add_argument(f"--no-{arg.replace('_', '-')}", action="store_false", dest=arg, help="(bool)")
     elif "Path" in typ:
-        parser.add_argument(f"--{arg.replace('_', '-')}", type=Path, default=default)
+        parser.add_argument(f"--{arg.replace('_', '-')}", type=Path, default=default, help="(Path)")
     elif "SemVer" in typ:
-        parser.add_argument(f"--{arg.replace('_', '-')}", type=SemVer.from_str, default=default)
+        parser.add_argument(f"--{arg.replace('_', '-')}", type=SemVer.from_str, default=default, help="(SemVer)")
     else:
         logger.warning("Unknown argument type: %s", typ)
 args: Args = parser.parse_args(namespace=Args())
@@ -221,7 +223,7 @@ async def set_defaults() -> None:
     tag = tag.bump_minor()
 
     # Set default title and notes if not provided
-    args.tag = args.tag or tag
+    args.tag = args.tag if args.tag != "v0.0.0" else tag
     args.title = args.title or f"Release {tag}"
     args.notes = args.notes or f"Automated release of version {tag}."
     logger.info("Successfully set up context for release.")
