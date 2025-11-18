@@ -133,13 +133,12 @@ namespace Core.AI.Sheep
             {
                 _stateManager.Agent.isStopped = false;
                 //_stateManager.Animation.SetState((int)SheepAnimState.Walk);
-                if (SheepSoundManager.Instance)
-                {
-                    SheepSoundManager.Instance.PlaySoundClip(_stateManager.Archetype.DeathSound,
-                        _stateManager.gameObject.transform,
-                        100f,
-                        Random.Range(0.9f, 1.8f));
-                }
+                
+                SheepSoundManager.PlaySoundClip(_stateManager.Archetype.DeathSound,
+                    _stateManager.SoundDriver,
+                    100f,
+                    Random.Range(0.9f, 1.8f));
+                
             }
         }
 
@@ -212,13 +211,12 @@ namespace Core.AI.Sheep
         public void OnStart()
         {
             _stateManager.DisableBehavior();
-            if (SheepSoundManager.Instance)
-            {
-                SheepSoundManager.Instance.PlaySoundClip(_stateManager.Archetype.DeathSound, 
-                    _stateManager.gameObject.transform,
-                    100.0f,
-                    Random.Range(0.9f, 1.8f));
-            }
+            
+            SheepSoundManager.PlaySoundClip(_stateManager.Archetype.DeathSound, 
+                _stateManager.SoundDriver,
+                100.0f,
+                Random.Range(0.9f, 1.8f));
+            
             //possible ragdoll setup in here in the next sprint
         }
 

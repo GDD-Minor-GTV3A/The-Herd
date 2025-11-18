@@ -2,28 +2,45 @@ using UnityEngine;
 
 public class SheepSoundManager : MonoBehaviour
 {
-    public static SheepSoundManager Instance;
-    [Tooltip("Source object for sounds of sheep.")]
-    [SerializeField] private AudioSource _audioSource;
+    private static SheepSoundManager _instance;
 
     private void Awake()
     {
-        if (Instance == null)
-            Instance = this;
+        _instance = this;
     }
 
-    public void PlaySoundClip(AudioClip clip, Transform soundTransform)
+    public static void PlaySoundClip(AudioClip clip, AudioSource audioSource)
     {
-        PlaySoundClip(clip, soundTransform, Random.Range(0.02f, 0.2f), Random.Range(0.8f, 1.2f));
+        _instance?.PlaySoundClipInternal(clip, audioSource, Random.Range(0.02f, 0.2f), Random.Range(0.8f, 1.2f));
     }
 
-    public void PlaySoundClip(AudioClip clip, Transform soundTransform, float volume, float pitch)
+    public static void PlaySoundClip(AudioClip clip, AudioSource audioSource, float volume, float pitch)
     {
-        _audioSource = Instantiate(_audioSource, soundTransform.position, Quaternion.identity);
+        _instance?.PlaySoundClipInternal(clip, audioSource, volume, pitch);
+    }
 
-        _audioSource.clip = clip;
-        _audioSource.volume = volume;
-        _audioSource.pitch = pitch;
-        _audioSource.Play();
+    public static void PlaySoundClip(AudioClip clip, SheepSoundDriver soundDriver)
+    {
+        _instance?.PlaySoundClipInternal(clip, soundDriver.AudioSource, Random.Range(0.02f, 0.2f), Random.Range(0.8f, 1.2f));
+    }
+
+    public static void PlaySoundClip(AudioClip clip, SheepSoundDriver soundDriver, float volume, float pitch)
+    {
+        _instance?.PlaySoundClipInternal(clip, soundDriver.AudioSource, volume, pitch);
+    }
+
+    private void PlaySoundClipInternal(AudioClip clip, AudioSource audioSource, float volume, float pitch)
+    {
+        if (audioSource == null)
+        {
+            Debug.LogWarning("[SheepSoundManager] No AudioSource found."); 
+            return;
+        }
+
+        audioSource.clip = clip;
+        audioSource.volume = volume;
+        audioSource.pitch = pitch;
+
+        audioSource.Play();
     }
 }
