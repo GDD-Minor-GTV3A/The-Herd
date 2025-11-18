@@ -1664,6 +1664,57 @@ Transform:
   m_Children: []
   m_Father: {fileID: 770345679}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &677949802
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 677949804}
+  - component: {fileID: 677949803}
+  m_Layer: 0
+  m_Name: SanityTracker
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &677949803
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 677949802}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b850b0730321e746bb9163021484692, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _sheepPrefab: {fileID: 4607321907588713866, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
+  _playerTransform: {fileID: 2100177133}
+  _spawnDistance: 15
+  _showDebug: 0
+  _debugText: {fileID: 0}
+  _sanityAddSound: {fileID: 0}
+  _sanityRemoveSound: {fileID: 0}
+--- !u!4 &677949804
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 677949802}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.37613773, y: -1.5296025, z: 3.0916917}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &679406623
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5344,3 +5395,4 @@ SceneRoots:
   - {fileID: 680565410}
   - {fileID: 770345679}
   - {fileID: 1038802061}
+  - {fileID: 677949804}
