@@ -13,7 +13,10 @@ USAGE:
     python release.py [options]
     python release.py --help
 
-Full release process example, using default values. Minimal required flags:
+Examples:
+Examples are shown to be as minimal as possible, only including the necessary flags.
+
+Full release process (all steps):
     python ./release.py --compile --create-tag --upload-release
 
 Only compile:
