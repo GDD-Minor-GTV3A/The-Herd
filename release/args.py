@@ -1,73 +1,197 @@
 """Argument parsing for release script."""
 from __future__ import annotations
 
-from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
-from argparse import Namespace as BaseNamespace
+from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, Namespace
+from enum import Enum
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Generic, TypeVar
 
 from release.log import logger
 from release.paths import BUILD_DIR, ROOT, UNITY, UNITY_LOG, ZIP_FILE
 from release.version import SemVer
 
 if TYPE_CHECKING:
-    from collections.abc import Generator
+    from collections.abc import Callable, Generator
 
 parser = ArgumentParser(description="Create a new GH release.", formatter_class=ArgumentDefaultsHelpFormatter)
 
-class Namespace(BaseNamespace):
-    """Base class for argument namespaces."""
+class ArgumentActions(Enum):
+    """Possible argument actions."""
 
-    def __init_subclass__(cls) -> None:
-        """Automatically add arguments based on annotations."""
-        for arg, typ in cls.__annotations__.items():
-            default = getattr(cls, arg)
-            if "str" in typ:
-                parser.add_argument(f"--{arg.replace('_', '-')}", type=str, default=default, help="(str)")
-            elif "bool" in typ:
-                parser.add_argument(f"--{arg.replace('_', '-')}", action="store_true", dest=arg, help="(bool)")
-                parser.add_argument(f"--no-{arg.replace('_', '-')}", action="store_false", dest=arg, help="(bool)")
-            elif "Path" in typ:
-                parser.add_argument(f"--{arg.replace('_', '-')}", type=Path, default=default, help="(Path)")
-            elif "SemVer" in typ:
-                parser.add_argument(f"--{arg.replace('_', '-')}", type=SemVer.from_str, default=default, help="(SemVer)")
-            else:
-                logger.warning("Unknown argument type: %s", typ)
+    STORE = "store"
+    STORE_TRUE = "store_true"
+    STORE_FALSE = "store_false"
+    STORE_BOOL = "store_bool" # Custom action to store bools
+    STORE_CONST = "store_const"
+    APPEND = "append"
+    APPEND_CONST = "append_const"
+    EXTEND = "extend"
+    COUNT = "count"
+    HELP = "help"
+    VERSION = "version"
+
+T = TypeVar("T")
+
+class Argument(Generic[T]):
+    """Helper to define arguments with argparse."""
+
+    def __init__(
+        self,
+        type_: Callable[..., T] = str,
+        action: ArgumentActions = ArgumentActions.STORE,
+        default: object | None = None,
+        help: str = "",  # noqa: A002
+    ) -> None:
+        """Initialize argument."""
+        self.action = action
+        self.type = type_
+        self.default = default
+        self.help = help
+
+        if self.action is ArgumentActions.STORE_BOOL:
+            self.type = bool # This requires `pyright: ignore` in __get__ :(
+
+    def __set_name__(self, owner: type, name: str) -> None:
+        """Set the name of the attribute to the name of the descriptor."""
+        self.setup_parser_argument(name)
+        self.name = name
+        self.private_name = f"__{name}"
+
+    def __get__(self, obj: object, obj_type: object) -> T:
+        """Get the value of the attribute."""
+        return getattr(obj, self.private_name)
+
+    def __set__(self, obj: object, value: T) -> None:
+        """Set the value of the attribute."""
+        setattr(obj, self.private_name, value)
+
+    def setup_parser_argument(self, name: str) -> None:
+        """Set up the argument in the parser."""
+        help_ = f"{self.help} - {self.type.__name__}" if self.help else f"{self.type.__name__}"
+        if self.action is ArgumentActions.STORE_BOOL:
+            parser.add_argument(
+                f"--{name.replace('_', '-')}",
+                action="store_true",
+                dest=name,
+                help=help_,
+            )
+            parser.add_argument(
+                f"--no-{name.replace('_', '-')}",
+                action="store_false",
+                dest=name,
+                help="",
+            )
+        else:
+            parser.add_argument(
+                f"--{name.replace('_', '-')}",
+                type=self.type,
+                action=self.action.value,
+                default=self.default,
+                help=help_,
+            )
 
 
 class Args(Namespace):
     """Additional settings for release script."""
 
     # Control flags, on what to do during the release process.
-    compile: bool = False # If true, first compile the project using Unity.exe.
-    create_tag: bool = False # If true, create a git tag for the release
-    upload_release: bool = False # If true, upload the release to GH releases
+    compile = Argument(
+        action=ArgumentActions.STORE_BOOL,
+        default=False,
+        help="Compile the project using Unity.exe.",
+    )
+    create_tag = Argument(
+        action=ArgumentActions.STORE_BOOL,
+        default=False,
+        help="Create a git tag for the release.",
+    )
+    upload_release = Argument(
+        action=ArgumentActions.STORE_BOOL,
+        default=False,
+        help="Upload the release to GH releases.",
+    )
+    dry_run = Argument(
+        action=ArgumentActions.STORE_BOOL,
+        default=False,
+        help="If true, only show what would have happened, without actually running anything.",
+    )
 
     # Release settings.
-    tag: SemVer | str = "v0.0.0" # Custom tag to use for the release
-    dist_dir: Path = BUILD_DIR # Directory to zip for the release
-    zip_file: Path = ZIP_FILE # Zip file to create for the release
-    log: str = "INFO" # Log level, e.g. DEBUG, INFO, WARNING, ERROR
-    dry_run: bool = False # If true, do not create the release
+    tag = Argument[SemVer](
+        SemVer,
+        default=SemVer(0, 0, 0),
+        help="The git tag to create for the release.",
+    )
+    dist_dir = Argument(
+        Path,
+        default=BUILD_DIR,
+        help="Directory containing build artifacts to include in the release.",
+    )
+    zip_file = Argument(
+        Path,
+        default=ZIP_FILE,
+        help="Path to the zip file to create for the release.",
+    )
+    log = Argument(
+        default="INFO",
+        help="The log LEVEL to use for the release script.",
+    )
+
 
 
 class GithubArgs(Namespace):
     """Command line context."""
 
     # GitHub CLI release settings. matches https://cli.github.com/manual/gh_release_create.
-    discussion_category: str | None = None
-    draft: bool = True
-    fail_on_no_commits: bool = True
-    generate_notes: bool = True
-    latest: bool = True
-    notes: str | None = None
-    notes_file: Path | None = None
-    notes_from_tag: bool = False
-    notes_start_tag: str | None = None
-    prerelease: bool = False
-    target: str = "main"
-    title: str | None = None
-    verify_tag: bool = True
+    discussion_category = Argument(
+        default=None,
+        help="Discussion category for the release notes.",
+    )
+    draft = Argument(
+        action=ArgumentActions.STORE_BOOL,
+        help="Mark the release as a draft.",
+    )
+    fail_on_no_commits = Argument(
+        action=ArgumentActions.STORE_BOOL,
+        help="Fail if there are no new commits since the last release.",
+    )
+    generate_notes = Argument(
+        action=ArgumentActions.STORE_BOOL,
+        help="Generate release notes automatically.",
+    )
+    latest = Argument(
+        action=ArgumentActions.STORE_BOOL,
+        help="Mark the release as the latest release. Mark as false to explicitly NOT set as latest",
+    )
+    notes = Argument[str | None](
+        help="Additional notes for the release.",
+    )
+    notes_file = Argument[Path | None](
+        Path,
+        default=None,
+        help="Read release notes from file (use '-' to read from standard input).",
+    )
+    notes_from_tag = Argument(
+        action=ArgumentActions.STORE_BOOL,
+        help="Fetch notes from the tag annotation or message of commit associated with tag.",
+    )
+    notes_start_tag = Argument[str | None](
+        help="Tag to use as the starting point for generating release notes",
+    )
+    prerelease = Argument(
+        action=ArgumentActions.STORE_BOOL,
+        help="Mark the release as a prerelease.",
+    )
+    target = Argument(
+        help="Target branch or full commit SHA (default [main branch])",
+    )
+    title = Argument[str | None](
+        help="Title for the release.",
+    )
+    verify_tag = Argument(
+        action=ArgumentActions.STORE_BOOL,
+        help="Verify the tag exists on remote. Abort if it does not.",
+    )
 
     def generate_setting_flags(self) -> Generator[str]:
         """Generate command line flags from settings as a list of tokens."""
@@ -88,14 +212,41 @@ class UnityArgs(Namespace):
     """Arguments for the unity exe."""
 
     # Unity executable settings. matches https://docs.unity3d.com/Manual/PlayerCommandLineArguments.html
-    unityPath: Path = UNITY
-    buildTarget: str = "standalonewindows64"
-    projectPath: Path = ROOT
-    logFile: Path = UNITY_LOG
-    skipMissingProjectId: bool = True
-    skipMissingUpid: bool = True
-    batchmode: bool = True
-    quit: bool = True
+    unityPath = Argument(
+        Path,
+        default=UNITY,
+        help="Path to the Unity executable.",
+    )
+    buildTarget: Argument = Argument(
+        default="standalonewindows64",
+        help="Build target platform.",
+    )
+    projectPath: Argument = Argument(
+        Path,
+        default=ROOT,
+        help="Path to the Unity project.",
+    )
+    logFile: Argument = Argument(
+        Path,
+        default=UNITY_LOG,
+        help="Path to the Unity log file.",
+    )
+    skipMissingProjectId: Argument = Argument(
+        action=ArgumentActions.STORE_BOOL,
+        help="Skip missing project ID.",
+    )
+    skipMissingUpid: Argument = Argument(
+        action=ArgumentActions.STORE_BOOL,
+        help="Skip missing UPID.",
+    )
+    batchmode: Argument = Argument(
+        action=ArgumentActions.STORE_BOOL,
+        help="Run Unity in batch mode.",
+    )
+    quit: Argument = Argument(
+        action=ArgumentActions.STORE_BOOL,
+        help="Quit Unity after executing commands.",
+    )
 
     def build_command(self) -> list[str]:
         """Generate the command line to run unity with the given arguments."""
@@ -131,7 +282,7 @@ async def set_defaults() -> None:
     tag = tag.bump_minor()
 
     # Set default title and notes if not provided
-    args.tag = args.tag if args.tag != "v0.0.0" else tag
+    args.tag = args.tag if args.tag != SemVer(0,0,0) else tag
     github_args.title = github_args.title or f"Release {tag}"
     github_args.notes = github_args.notes or f"Automated release of version {tag}."
     logger.info("Successfully set up context for release.")
