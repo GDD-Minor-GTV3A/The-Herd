@@ -77,6 +77,8 @@ namespace Core.AI.Sheep
         public NavMeshAgent Agent => _agent;
 
         public SheepAnimationDriver Animation => _animation;
+        
+        public bool IsStraggler => _startAsStraggler;
 
         /// <summary>
         /// Exposed config and archetype
@@ -367,6 +369,7 @@ namespace Core.AI.Sheep
 
         public void SummonToHerd(float? graceSeconds = null, bool clearThreats = true)
         {
+            Debug.Log("Event");
             _startAsStraggler = false;
 
             // apply grace so it doesn't immediately get lost again
