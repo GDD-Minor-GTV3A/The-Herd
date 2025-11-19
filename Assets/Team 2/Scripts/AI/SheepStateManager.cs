@@ -78,7 +78,7 @@ namespace Core.AI.Sheep
 
         public SheepAnimationDriver Animation => _animation;
         public SheepSoundDriver SoundDriver => _sheepSoundDriver;
-
+        public bool IsStraggler => _startAsStraggler;
         /// <summary>
         /// Exposed config and archetype
         /// </summary>
