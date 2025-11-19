@@ -129,7 +129,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 855214617170984871, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
       propertyPath: _sheepSoundManager
-      value:
+      value: 
       objectReference: {fileID: 4601520492687418460}
     - target: {fileID: 2914724886780533430, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
       propertyPath: m_LocalPosition.x
@@ -262,7 +262,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b06847e149b594747bf0f4daf19ee3c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _player: {fileID: 1738240099}
+  _player: {fileID: 870009066}
   _halfExtents: {x: 8, y: 8}
   _interval: 0.2
 --- !u!4 &507231978
@@ -411,7 +411,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 855214617170984871, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
       propertyPath: _sheepSoundManager
-      value:
+      value: 
       objectReference: {fileID: 4601520492687418460}
     - target: {fileID: 2914724886780533430, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
       propertyPath: m_LocalPosition.x
@@ -504,7 +504,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 855214617170984871, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
       propertyPath: _sheepSoundManager
-      value:
+      value: 
       objectReference: {fileID: 4601520492687418460}
     - target: {fileID: 2914724886780533430, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
       propertyPath: m_LocalPosition.x
@@ -695,6 +695,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 743169970}
   m_CullTransparentMesh: 1
+--- !u!4 &870009066 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5830238604603834298, guid: e9688c71f438a824db99b17c2fba1703, type: 3}
+  m_PrefabInstance: {fileID: 1808793587}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &890484514
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -709,7 +714,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 366954846902213099, guid: 949b4c49ab05bbb4abde14eee43ce17a, type: 3}
       propertyPath: near clip plane
-      value: 0.01
+      value: 0.001
+      objectReference: {fileID: 0}
+    - target: {fileID: 366954846902213099, guid: 949b4c49ab05bbb4abde14eee43ce17a, type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 4599
       objectReference: {fileID: 0}
     - target: {fileID: 1669028158844492960, guid: 949b4c49ab05bbb4abde14eee43ce17a, type: 3}
       propertyPath: m_Name
@@ -766,10 +775,10 @@ PrefabInstance:
     - target: {fileID: 4250296351205117005, guid: 949b4c49ab05bbb4abde14eee43ce17a, type: 3}
       propertyPath: config
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 11400000, guid: bd39778ff4806f24da88d75c510b625d, type: 2}
     - target: {fileID: 4250296351205117005, guid: 949b4c49ab05bbb4abde14eee43ce17a, type: 3}
       propertyPath: playerTransform
-      value:
+      value: 
       objectReference: {fileID: 1738240099}
     - target: {fileID: 5225013092262314578, guid: 949b4c49ab05bbb4abde14eee43ce17a, type: 3}
       propertyPath: m_Enabled
@@ -781,27 +790,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7926520535867894510, guid: 949b4c49ab05bbb4abde14eee43ce17a, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 12.8207
+      value: 17.363194
       objectReference: {fileID: 0}
     - target: {fileID: 7926520535867894510, guid: 949b4c49ab05bbb4abde14eee43ce17a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 18.70558
+      value: 27.880085
       objectReference: {fileID: 0}
     - target: {fileID: 7926520535867894510, guid: 949b4c49ab05bbb4abde14eee43ce17a, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 19.433502
+      value: 14.89101
       objectReference: {fileID: 0}
     - target: {fileID: 8830772661620207635, guid: 949b4c49ab05bbb4abde14eee43ce17a, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 12.8207
+      value: 17.363194
       objectReference: {fileID: 0}
     - target: {fileID: 8830772661620207635, guid: 949b4c49ab05bbb4abde14eee43ce17a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 18.70558
+      value: 27.880085
       objectReference: {fileID: 0}
     - target: {fileID: 8830772661620207635, guid: 949b4c49ab05bbb4abde14eee43ce17a, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 19.433502
+      value: 14.89101
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1118,7 +1127,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 855214617170984871, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
       propertyPath: _sheepSoundManager
-      value:
+      value: 
       objectReference: {fileID: 4601520492687418460}
     - target: {fileID: 913774882570054291, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
       propertyPath: m_Layer
@@ -2943,7 +2952,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 855214617170984871, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
       propertyPath: _sheepSoundManager
-      value:
+      value: 
       objectReference: {fileID: 4601520492687418460}
     - target: {fileID: 2914724886780533430, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3012,8 +3021,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 66c01baaf74c0964eaddf595bfe90c84, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   _walkingSound: {fileID: 0}
   AudioSource: {fileID: 0}
 --- !u!1001 &1614009620
@@ -3026,7 +3035,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 855214617170984871, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
       propertyPath: _sheepSoundManager
-      value:
+      value: 
       objectReference: {fileID: 4601520492687418460}
     - target: {fileID: 2914724886780533430, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3090,7 +3099,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 855214617170984871, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
       propertyPath: _sheepSoundManager
-      value:
+      value: 
       objectReference: {fileID: 4601520492687418460}
     - target: {fileID: 2914724886780533430, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3187,7 +3196,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2534532970623172728, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
       propertyPath: hpBar
-      value:
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 2534532970623172728, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
       propertyPath: m_Enabled
@@ -3195,11 +3204,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2534532970623172728, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
       propertyPath: vignetteEffect
-      value:
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 2534532970623172728, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
       propertyPath: OnDamageTaken.m_PersistentCalls.m_Calls.Array.data[2].m_Target
-      value:
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 2887478365997709221, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
       propertyPath: m_Layer
@@ -3275,19 +3284,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5609012314165025320, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
       propertyPath: 'slotUIRoots.Array.data[0]'
-      value:
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 5609012314165025320, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
       propertyPath: 'slotUIRoots.Array.data[1]'
-      value:
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 5609012314165025320, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
       propertyPath: 'weaponSlotsUIRoots.Array.data[0]'
-      value:
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 5609012314165025320, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
       propertyPath: 'weaponSlotsUIRoots.Array.data[1]'
-      value:
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 5773493068899863313, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
       propertyPath: m_Layer
@@ -3765,8 +3774,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5b850b0730321e746bb9163021484692, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   _sheepPrefab: {fileID: 4607321907588713866, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
   _playerTransform: {fileID: 1738240099}
   _spawnDistance: 15
@@ -3840,8 +3849,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ccb2ec80a7409f540aa8dac7838ecfa6, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
