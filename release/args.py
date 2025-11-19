@@ -247,6 +247,10 @@ class UnityArgs(Namespace):
         action=ArgumentActions.STORE_BOOL,
         help="Quit Unity after executing commands.",
     )
+    executeMethod: Argument = Argument(
+        default="CommandLineBuild.BuildGame",
+        help="Method to execute after launching Unity.",
+    )
 
     def build_command(self) -> list[str]:
         """Generate the command line to run unity with the given arguments."""

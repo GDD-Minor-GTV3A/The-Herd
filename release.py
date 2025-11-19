@@ -47,6 +47,7 @@ from release import tags
 from release.args import args, set_defaults, unity_args
 from release.cli import test_gh_cli
 from release.log import logger
+from release.paths import ensure_paths
 from release.unity import build_project
 from release.upload import upload_release
 from release.zip import zip_dist
@@ -57,6 +58,7 @@ async def setup_environment() -> None:
     await asyncio.gather(
         set_defaults(),
         test_gh_cli(),
+        ensure_paths(),
     )
 
 async def main() -> None:
