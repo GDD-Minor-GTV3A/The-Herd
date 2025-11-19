@@ -6,7 +6,7 @@ and upload a new release to GitHub with the build as an artifact.
 If marked as latest, the release will be marked as the latest release on GitHub.
 
 Requirements:
-    Make sure you have python 3.14 or higher installed. (Lower version may work, but are not tested)
+    Make sure you have python 3.11 or higher installed. (Lower version may not work)
     Make sure you have the GH CLI installed and authenticated: https://cli.github.com/
 
 USAGE:
@@ -42,7 +42,6 @@ prepend with `no` to set boolean flags to false.
 """
 
 import asyncio
-from logging import INFO
 
 from release import tags
 from release.args import args, set_defaults, unity_args
@@ -62,7 +61,7 @@ async def setup_environment() -> None:
 
 async def main() -> None:
     """Entry point."""
-    logger.setLevel(args.log.upper() or INFO)
+    logger.setLevel(args.log.upper())
     await setup_environment()
     if args.compile:
         await build_project(unity_args)
