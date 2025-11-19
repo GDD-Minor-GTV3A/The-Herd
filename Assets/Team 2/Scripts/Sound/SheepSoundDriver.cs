@@ -29,27 +29,29 @@ public class SheepSoundDriver : MonoBehaviour
 
     [Tooltip("Sound clip for the walking sound.")]
     [SerializeField] private AudioClip _walkingSound;
+    
+    [Tooltip("Source object for sounds of the sheep.")]
+    [SerializeField] public AudioSource AudioSource;
+    
 
-    public bool TryPlayWalkSound(Transform sheepTransform)
+    public bool TryPlayWalkSound()
     {
-        if (SheepSoundManager.Instance == null) return false;
         if (_nextMomentWalkSound > Time.time && _walkingSound == null) return false;
 
-        SheepSoundManager.Instance.PlaySoundClip(_walkingSound, sheepTransform, FOOTSTEPS_VOLUME, Random.Range(LOWEST_FOOTSTEPS_PITCH, HEIGHEST_FOOTSTEPS_PITCH));
+        SheepSoundManager.PlaySoundClip(_walkingSound, AudioSource, FOOTSTEPS_VOLUME, Random.Range(LOWEST_FOOTSTEPS_PITCH, HEIGHEST_FOOTSTEPS_PITCH));
 
         _nextMomentWalkSound = Time.time + Random.Range(MIN_TIME_BETWEEN_FOOTSTEPS, MAX_TIME_BETWEEN_FOOTSTEPS);
         return true;
     }
 
 
-    public bool TryPlayBleatSound(Transform sheepTransform, SheepArchetype sheepArchetype)
+    public bool TryPlayBleatSound(SheepArchetype sheepArchetype)
     {
-        if (SheepSoundManager.Instance == null) return false;
         if (_nextMomentBleatSound > Time.time && sheepArchetype != null) return false;
         AudioClip bleatSound = sheepArchetype.BleatSounds[Random.Range(0, sheepArchetype.BleatSounds.Length)];
         if (bleatSound == null) return false;
 
-        SheepSoundManager.Instance.PlaySoundClip(bleatSound, sheepTransform, BLEATS_VOLUME, Random.Range(LOWEST_FOOTSTEPS_PITCH, HEIGHEST_FOOTSTEPS_PITCH));
+        SheepSoundManager.PlaySoundClip(bleatSound, AudioSource, BLEATS_VOLUME, Random.Range(LOWEST_FOOTSTEPS_PITCH, HEIGHEST_FOOTSTEPS_PITCH));
 
         _nextMomentBleatSound = Time.time + Random.Range(MIN_TIME_BETWEEN_BLEATS, MAX_TIME_BETWEEN_BLEATS);
         return true;
