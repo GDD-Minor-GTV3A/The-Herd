@@ -1,17 +1,9 @@
 #usr/bin/env python3
 """Create a new build, release and tags.
 
-Tags current commit and publishing it to GH releases.
-
-Skips the debug information in dist/*DoNotShip
-Builds a zip out of dist/* as an artifact to publish to GH releases.
-
-see documentation for arguments: https://cli.github.com/manual/gh_release_create
-additionally --tag, --log, --dist-dir and --zip-file are supported to override the default settings.
-use --dry-run to test the script without actually creating a release.
-
-prepend with `no` to set boolean flags to false.
-    example: `--no-latest`
+Create a new build of the project using Unity, create a new git tag and push it,
+and upload a new release to GitHub with the build as an artifact.
+If marked as latest, the release will be marked as the latest release on GitHub.
 
 Requirements:
     Make sure you have python 3.14 or higher installed. (Lower version may work, but are not tested)
@@ -32,6 +24,18 @@ Only create and push tag:
 
 Only upload release (make sure game is already built and tag is created):
     python ./release.py --upload-release
+
+Notes:
+Skips the debug information in dist/*DoNotShip
+Builds a zip out of dist/* as an artifact to publish to GH releases.
+
+see documentation for arguments: https://cli.github.com/manual/gh_release_create
+additionally --tag, --log, --dist-dir and --zip-file are supported to override the default settings.
+use --dry-run to test the script without actually creating a release.
+
+prepend with `no` to set boolean flags to false.
+    example: `--no-latest`
+
 """
 
 import asyncio
