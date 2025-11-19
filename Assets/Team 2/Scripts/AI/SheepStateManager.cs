@@ -43,7 +43,11 @@ namespace Core.AI.Sheep
         [SerializeField]
         [Tooltip("All herd members")]
         private List<Transform> _neighbours = new List<Transform>();
-
+        
+        [Header("VFX")] [SerializeField] private GameObject _joinHerdVFXPrefab;
+        [SerializeField] private GameObject _leaveHerdVFXPrefab;
+        [SerializeField] private Vector3 _vfxOffset = new Vector3(0f, 0.3f, 0f);
+        
         private readonly Dictionary<Transform, float> _threats = new();
         private readonly Dictionary<Transform, float> _threatRadius = new();
         [SerializeField] private float _threatMemory = 1.25f;
@@ -176,7 +180,41 @@ namespace Core.AI.Sheep
         {
             _neighbours = neighbours ?? new List<Transform>();
         }
+        
+        
+        public void PlayJoinHerdVfx()
+        {
+            SpawnVFX(_joinHerdVFXPrefab);
+        }
 
+        public void PlayLeaveHerdVfx()
+        {
+            SpawnVFX(_leaveHerdVFXPrefab);
+        }
+
+        private void SpawnVFX(GameObject prefab)
+        {
+            if (!prefab) return;
+
+            var vfx = Instantiate(
+                prefab,
+                transform.position + _vfxOffset,
+                Quaternion.identity);
+            
+            vfx.transform.SetParent(transform, true);
+
+            if (vfx.TryGetComponent<ParticleSystem>(out var ps))
+            {
+                var main = ps.main;
+                float lifetime = main.duration + main.startLifetimeMultiplier;
+                Destroy(vfx, lifetime);
+            }
+            else
+            {
+                Destroy(vfx, 2f);
+            }
+        }
+        
         private void OnPlayerSquareChanged(PlayerSquareChangedEvent e)
         {
             _playerCenter = e.Center;
@@ -270,7 +308,7 @@ namespace Core.AI.Sheep
             if (CanControlAgent())
             {
                 Agent.autoRepath = true;
-                Agent.acceleration = Mathf.Max(Agent.acceleration, (Config?.BaseSpeed ?? 2.2f) * 6f);
+                Agent.acceleration = Mathf.Max(Agent.acceleration, (Config?.BaseSpeed ?? 2.2f));
                 Agent.angularSpeed = Mathf.Max(Agent.angularSpeed, 1080f);
                 Agent.obstacleAvoidanceType = ObstacleAvoidanceType.HighQualityObstacleAvoidance;
             }
@@ -422,7 +460,7 @@ namespace Core.AI.Sheep
             if (_behaviorContext.HasThreat && !_hadThreatLastFrame)
                 StartPanicLoop();
             else if (!_behaviorContext.HasThreat && _hadThreatLastFrame)
-                StartPanicLoop();
+                StopPanicLoop();
 
             _hadThreatLastFrame = _behaviorContext.HasThreat;
         }
