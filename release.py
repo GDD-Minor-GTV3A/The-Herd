@@ -6,7 +6,7 @@ and upload a new release to GitHub with the build as an artifact.
 If marked as latest, the release will be marked as the latest release on GitHub.
 
 Requirements:
-    Make sure you have python 3.11 or higher installed. (Lower version may not work)
+    Make sure you have python 3.14 or higher installed. (Lower version may not work)
     Make sure you have the GH CLI installed and authenticated: https://cli.github.com/
 
 USAGE:
