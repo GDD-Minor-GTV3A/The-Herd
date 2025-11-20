@@ -7,6 +7,10 @@ ZIP_FILE = ROOT / "the-herd.zip"
 UNITY = Path("C:/Program Files/Unity/Hub/Editor/6000.0.62f1/Editor/Unity.exe")
 UNITY_LOG = ROOT / "unity_build.log"
 
+async def check_paths() -> None:
+    """Check if all necessary paths exist."""
+    if not UNITY.exists():
+        raise FileNotFoundError(f"Unity executable not found at {UNITY}. Set the correct path using --unityPath")
 
 async def ensure_paths() -> None:
     """Ensure necessary paths exist."""
