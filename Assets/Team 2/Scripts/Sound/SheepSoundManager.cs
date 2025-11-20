@@ -19,7 +19,8 @@ public class SheepSoundManager : MonoBehaviour
 
     public void PlaySoundClip(AudioClip clip, Transform soundTransform, float volume, float pitch)
     {
-        _audioSource = Instantiate(_audioSource, soundTransform.position, Quaternion.identity);
+        // Why is this a thing??
+        //_audioSource = Instantiate(_audioSource, soundTransform.position, Quaternion.identity);
 
         _audioSource.clip = clip;
         _audioSource.volume = volume;
