@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+
 using UnityEngine;
 
 public enum EnemyState
@@ -17,8 +18,8 @@ public class Monster1AI : MonoBehaviour
 
     [Header("Detection Settings")]
     public float detectionRange = 15f;
-    public float stalkCooldown = 2f;
-    public float timeToVanish = 3f;
+    public float stalkCooldown = 1f;
+    public float timeToVanish = 0.3f;
     public float playerTooFarDistance = 20f;
 
     private EnemyState previousState;
@@ -27,7 +28,13 @@ public class Monster1AI : MonoBehaviour
     private NEWInCameraDetector cameraDetector;
 
     [Header("Animator")]
+    [SerializeField] private DetectSheep sheepDetector;
+    private bool _isAttackingSheep = false;
+    [SerializeField] private string sheepAttackBoolName = "Attack";
+    [SerializeField] private float sheepLoseDelay = 0.5f;
+    private float _sheepLostTimer = 0f;
     [SerializeField] private Animator animator;
+   
     private bool isTeleporting;
 
     // Double-event guard (animation may fire twice)
@@ -59,7 +66,11 @@ public class Monster1AI : MonoBehaviour
     public bool requireOutOfPlayerView = true;
     public bool requireOutOfMonsterFOV = false;
 
-    void Start()
+    [Header("Teleport Cooldown")]
+    [SerializeField] private float teleportCooldown = 2f;
+    private float teleportCooldownTimer = 0f;
+
+    private void Start()
     {
         animator = GetComponent<Animator>();
         fieldOfView = GetComponent<FieldOfView>();
@@ -69,7 +80,9 @@ public class Monster1AI : MonoBehaviour
         {
             audioSource = GetComponent<AudioSource>();
             if (audioSource == null)
+            {
                 Debug.LogWarning("[Monster1AI] No AudioSource found! Sounds will be skipped safely.");
+            }
         }
 
         allNodes = FindObjectsOfType<Node>();
@@ -93,7 +106,7 @@ public class Monster1AI : MonoBehaviour
         previousState = currentState;
     }
 
-    void Update()
+    private void Update()
     {
         if (previousState != currentState)
         {
@@ -102,6 +115,11 @@ public class Monster1AI : MonoBehaviour
         }
 
         idleTimer += Time.deltaTime;
+
+        if (teleportCooldownTimer > 0f)
+        {
+            teleportCooldownTimer -= Time.deltaTime;
+        }
 
         switch (currentState)
         {
@@ -113,16 +131,17 @@ public class Monster1AI : MonoBehaviour
                 break;
         }
 
-        // Safety teleport if idle too long
+       
         if (idleTimer >= idleTeleportDelay && !isTeleporting)
         {
             Debug.Log("[Monster1AI] Idle teleport triggered (timeout).");
             TryTeleport(excludeNode: currentNode);
             idleTimer = 0f;
         }
+        HandleSheepAttack();
     }
 
-    void IdleBehavior()
+    private void IdleBehavior()
     {
         if (player != null && Vector3.Distance(player.position, transform.position) < detectionRange)
         {
@@ -130,7 +149,7 @@ public class Monster1AI : MonoBehaviour
         }
     }
 
-    void StalkingBehavior()
+    private void StalkingBehavior()
     {
         stalkTimer -= Time.deltaTime;
 
@@ -160,12 +179,59 @@ public class Monster1AI : MonoBehaviour
             stalkTimer = stalkCooldown;
         }
     }
+    private void HandleSheepAttack()
+    {
+        if (sheepDetector == null)
+            return;
 
+        bool sheepInRange = sheepDetector.visibleTargets.Count > 0;
+
+        if (sheepInRange)
+        {
+            _sheepLostTimer = 0f;
+
+            if (!_isAttackingSheep)
+            {
+                _isAttackingSheep = true;
+                animator.SetBool(sheepAttackBoolName, true);
+                Debug.Log("[Monster1AI] Sheep detected -> start attack.");
+            }
+        }
+        else
+        {
+            if (_isAttackingSheep)
+            {
+                _sheepLostTimer += Time.deltaTime;
+
+                if (_sheepLostTimer >= sheepLoseDelay)
+                {
+                    _isAttackingSheep = false;
+                    animator.SetBool(sheepAttackBoolName, false);
+                    Debug.Log("[Monster1AI] Sheep gone -> stop attack.");
+                }
+            }
+            else
+            {
+                _sheepLostTimer = 0f;
+            }
+        }
+    }
+
+    public void FreezePose()
+    {
+       
+        animator.Play("Attack_Scarecrow", 0, 1f);
+        Debug.Log("Monster forced to final attack frame.");
+    }
     // ===== Teleport selection =====
 
-    void TryTeleport(Node excludeNode)
+    private void TryTeleport(Node excludeNode)
     {
-        if (isTeleporting) return; // block repeat
+        // hard guards – no double / spam teleports
+        if (isTeleporting || teleportCooldownTimer > 0f || nextTeleportTarget != null)
+        {
+            return;
+        }
 
         if (allNodes == null || allNodes.Length == 0)
         {
@@ -187,7 +253,7 @@ public class Monster1AI : MonoBehaviour
         }
     }
 
-    Node PickBestNode(Node excludeNode)
+    private Node PickBestNode(Node excludeNode)
     {
         Camera cam = (cameraDetector != null) ? cameraDetector.cam : Camera.main;
 
@@ -261,7 +327,7 @@ public class Monster1AI : MonoBehaviour
     }
 
     // Camera visibility check for a world point
-    bool IsPointVisibleToCamera(Vector3 worldPos, Camera cam)
+    private bool IsPointVisibleToCamera(Vector3 worldPos, Camera cam)
     {
         if (cam == null) return false;
 
@@ -297,13 +363,14 @@ public class Monster1AI : MonoBehaviour
         }
 
         Debug.Log("[Monster1AI] Teleport animation triggered.");
-        yield return new WaitForSeconds(0.13f); // small wait to sync with animation timing
 
-        isTeleporting = false; // we still wait for event to move
+        // No isTeleporting reset here – we wait for OnTeleportMoment
+        yield return null;
+
         idleTimer = 0f;
     }
 
-    // Called by animation event (ensure there is only ONE event on the Teleport clip)
+    // Called by animation event (ensure there is only ONE event on the Teleport/Vanish clip)
     public void OnTeleportMoment()
     {
         if (teleportEventConsumed)
@@ -333,6 +400,15 @@ public class Monster1AI : MonoBehaviour
         {
             Debug.LogWarning("[Monster1AI] TeleportMoment called but no target set!");
         }
+
+        // teleport finished – unlock future teleports and start cooldown
+        isTeleporting = false;
+        teleportCooldownTimer = teleportCooldown;
+        nextTeleportTarget = null;
+
+        // reset stalking/visible timers so logic doesn't instantly re-request teleport
+        visibleTimer = 0f;
+        stalkTimer = stalkCooldown;
     }
 
     private void OnStateChanged(EnemyState oldState, EnemyState newState)
@@ -365,7 +441,7 @@ public class Monster1AI : MonoBehaviour
     }
 
     // === Node Helpers ===
-    Node GetClosestNode(Vector3 pos)
+    private Node GetClosestNode(Vector3 pos)
     {
         Node closest = null;
         float minDist = Mathf.Infinity;
