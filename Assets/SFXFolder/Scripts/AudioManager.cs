@@ -90,6 +90,11 @@ public class AudioManager : MonoBehaviour
         box.PlayOneShot(sfxClips[clipIndex], volume);
     }
 
+    public void PlayFadeOut()
+    {
+        StartCoroutine(FadeOutMusic(5f));
+    }
+
     public IEnumerator FadeOutMusic(float duration)
     {
         float startVolume = musicSource.volume;
@@ -100,14 +105,10 @@ public class AudioManager : MonoBehaviour
             time += Time.deltaTime;
             musicSource.volume = Mathf.Lerp(startVolume, 0f, time / duration);
             yield return null;
+            Debug.Log("Fade out begins");
         }
 
         musicSource.volume = 0f;
         musicSource.Stop();
-    }
-
-    public void PlayFadeOut()
-    {
-        StartCoroutine(FadeOutMusic(2f));
     }
 }
