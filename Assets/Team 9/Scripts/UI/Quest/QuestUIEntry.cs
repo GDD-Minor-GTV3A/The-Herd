@@ -83,6 +83,8 @@ public class QuestUIEntry : MonoBehaviour
                 _objectiveTexts[obj.ObjectiveID] = text;
             }
         }
+        
+        this.gameObject.SetActive(false);
     }
     
 
