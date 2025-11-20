@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class AudioManager : MonoBehaviour
 {
@@ -9,7 +10,7 @@ public class AudioManager : MonoBehaviour
     public AudioSource sfxSource;
 
     [Header("3D Sound Boxes")]
-    public AudioSource[] soundBoxes; // Assign these in Inspector, place them in the scene
+    public AudioSource[] soundBoxes; 
 
     [Header("Audio Clips")]
     public AudioClip[] sfxClips;
@@ -20,6 +21,8 @@ public class AudioManager : MonoBehaviour
     [Range(0f, 1f)]
     public float windVolume = 0.5f;
     public float IntroVolume = 0.5f;
+
+    public GameObject EndTrigger;
 
     void Awake()
     {
@@ -85,5 +88,26 @@ public class AudioManager : MonoBehaviour
         if (box == null) return;
 
         box.PlayOneShot(sfxClips[clipIndex], volume);
+    }
+
+    public IEnumerator FadeOutMusic(float duration)
+    {
+        float startVolume = musicSource.volume;
+        float time = 0f;
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+            musicSource.volume = Mathf.Lerp(startVolume, 0f, time / duration);
+            yield return null;
+        }
+
+        musicSource.volume = 0f;
+        musicSource.Stop();
+    }
+
+    public void PlayFadeOut()
+    {
+        StartCoroutine(FadeOutMusic(2f));
     }
 }
