@@ -59,7 +59,7 @@ namespace Core.AI.Sheep
 
         public void OnStart()
         {
-            ScheduleNextGraze();
+            _nextGrazeAt = Time.time + Random.Range(0f, 0.8f);
             if(_stateManager.Agent !=  null && _stateManager?.Animation != null && _stateManager.CanControlAgent())
             {
                 _stateManager.Agent.isStopped = false;
