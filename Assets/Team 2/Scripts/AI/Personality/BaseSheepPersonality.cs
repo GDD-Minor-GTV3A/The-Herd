@@ -247,6 +247,16 @@ namespace Core.AI.Sheep.Personality
             return proposedState;
         }
 
+        public bool CanBePetted(string currentSceneName)
+        {
+            /*if (currentSceneName.Equals("Village", System.StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }*/
+            return true;
+            //return false;
+        }
+
         #endregion
 
 

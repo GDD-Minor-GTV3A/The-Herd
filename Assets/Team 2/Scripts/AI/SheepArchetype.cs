@@ -39,6 +39,9 @@ namespace Core.AI.Sheep.Config
         [SerializeField]
         private PersonalityType _personalityType = PersonalityType.Normal;
 
+        [Header("Interaction")] [SerializeField]
+        public AudioClip PettingSound;
+
         //Getters
         public int MaxHealth => _maxHealth;
         public float Skittishness => _skittishness;

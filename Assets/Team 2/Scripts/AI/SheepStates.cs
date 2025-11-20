@@ -2,6 +2,10 @@ using UnityEngine;
 using Core.Shared.StateMachine;
 using UnityEngine.AI;
 using System.Collections.Generic;
+
+using Core.AI.Sheep.Event;
+using Core.Events;
+
 namespace Core.AI.Sheep
 {
     /// <summary>
@@ -200,6 +204,64 @@ namespace Core.AI.Sheep
         }
     }
 
+    public sealed class SheepPettingState : IState
+    {
+        private readonly SheepStateManager _stateManager;
+        private bool _isPettingComplete = false;
+
+        public SheepPettingState(SheepStateManager context)
+        {
+            _stateManager = context;
+        }
+
+        public void OnStart()
+        {
+            _isPettingComplete = false;
+
+            if (_stateManager.CanControlAgent())
+            {
+                _stateManager.Agent.isStopped = true;
+                _stateManager.Agent.velocity = Vector3.zero;
+            }
+            
+            //Animation hook
+
+            if (_stateManager.Archetype != null && _stateManager.Archetype.PettingSound != null)
+            {
+                SheepSoundManager.Instance.PlaySoundClip(
+                    _stateManager.Archetype.PettingSound,
+                    _stateManager.transform,
+                    1.0f,
+                    Random.Range(0.9f, 1.05f));
+            }
+            
+            EventManager.Broadcast(new ShowFlashbackEvent(
+                _stateManager.FlashbackImage,
+                OnFlashbackClosed));
+        }
+
+        public void OnUpdate()
+        {
+            if (_isPettingComplete)
+            {
+                _stateManager.SetState<SheepGrazeState>();
+            }
+        }
+
+        public void OnStop()
+        {
+            if (_stateManager.CanControlAgent())
+            {
+                _stateManager.Agent.isStopped = false;
+            }
+        }
+
+        private void OnFlashbackClosed()
+        {
+            _isPettingComplete = true;
+        }
+    }
+    
     public class SheepDieState : IState
     {
         private readonly SheepStateManager _stateManager;
