@@ -15,7 +15,7 @@ namespace Core.AI.Sheep
     public class SanityTracker : MonoBehaviour
     {
         private const int POINTS_PER_SHEEP = 16;
-        private const int STARTING_POINTS = 100;
+        private const int STARTING_POINTS = 96;
         private const int STARTING_SHEEP_COUNT = 6;
 
         [Header("Spawning")]
@@ -122,23 +122,22 @@ namespace Core.AI.Sheep
         /// <summary>
         /// Internal method to add sanity points
         /// </summary>
-        private void AddSanityPointsInternal(int points, bool allowSheepSpawn = true)
+        private void AddSanityPointsInternal(int points)
         {
             int oldPoints = _sanityPoints;
 
             // Add points and increase max
+            if (_sanityPoints == _maxSanityPoints) _maxSanityPoints += points;
             _sanityPoints += points;
-            _maxSanityPoints += points;
-
-            // Check if we crossed the spawn threshold
+            
             int oldThreshold = oldPoints / POINTS_PER_SHEEP;
             int newThreshold = _sanityPoints / POINTS_PER_SHEEP;
 
-            if (allowSheepSpawn && newThreshold > oldThreshold)
+            if (newThreshold > oldThreshold)
             {
                 // Spawn a sheep (doesn't count towards sanity)
                 SpawnSheep();
-                
+
                 var clip = _sanityAddSound;
                 if (clip && SheepSoundManager.Instance)
                 {
@@ -156,21 +155,21 @@ namespace Core.AI.Sheep
         /// <summary>
         /// Internal method to remove sanity points
         /// </summary>
-        private void RemoveSanityPointsInternal(int points, bool allowSheepSpawn = true)
+        private void RemoveSanityPointsInternal(int points)
         {
             int oldPoints = _sanityPoints;
-            
+
             _sanityPoints = Mathf.Max(0, _sanityPoints - points);
+            
+            // only changes when losing a full sheep's worth
+            int oldThreshold = oldPoints > 0 ? Mathf.CeilToInt((float)oldPoints / POINTS_PER_SHEEP) : 0;
+            int newThreshold = _sanityPoints > 0 ? Mathf.CeilToInt((float)_sanityPoints / POINTS_PER_SHEEP) : 0;
 
-            // Check if we crossed the removal threshold
-            int oldThreshold = oldPoints / POINTS_PER_SHEEP;
-            int newThreshold = _sanityPoints / POINTS_PER_SHEEP;
-
-            if (allowSheepSpawn && newThreshold < oldThreshold && _sanityPoints > 0)
+            if (newThreshold < oldThreshold && _sanityPoints > 0)
             {
                 // Remove furthest sheep (TODO: sheep should flee instead of instant removal)
                 RemoveFurthestSheep();
-                
+
                 var clip = _sanityRemoveSound;
                 if (clip && SheepSoundManager.Instance)
                 {
