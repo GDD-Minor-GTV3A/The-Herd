@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Generator
 
 parser = ArgumentParser(description="Create a new GH release.", formatter_class=ArgumentDefaultsHelpFormatter)
+NULL_SEMVER = SemVer(0,0,0)
 
 class ArgumentActions(Enum):
     """Possible argument actions."""
@@ -117,9 +118,9 @@ class Args(Namespace):
     )
 
     # Release settings.
-    tag = Argument[SemVer](
-        SemVer,
-        default=SemVer(0, 0, 0),
+    tag = Argument[str](
+        str,
+        default=NULL_SEMVER,
         help="The git tag to create for the release.",
     )
     dist_dir = Argument(
@@ -286,7 +287,7 @@ async def set_defaults() -> None:
     tag = tag.bump_minor()
 
     # Set default title and notes if not provided
-    args.tag = args.tag if args.tag != SemVer(0,0,0) else tag
+    args.tag = args.tag if args.tag != str(NULL_SEMVER) else str(tag)
     github_args.title = github_args.title or f"Release {tag}"
     github_args.notes = github_args.notes or f"Automated release of version {tag}."
     logger.info("Successfully set up context for release.")

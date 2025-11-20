@@ -27,6 +27,8 @@ class SemVer:
 
     def __eq__(self, other: object) -> bool:
         """Check equality."""
+        if isinstance(other, str):
+            other = SemVer.from_str(other)
         if not isinstance(other, SemVer):
             return NotImplemented
         return (self.major, self.minor, self.patch) == (other.major, other.minor, other.patch)
