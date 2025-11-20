@@ -26,7 +26,35 @@ public class QuestLogUI : MonoBehaviour
     private readonly Dictionary<string, QuestUIEntry> _questEntries = new();
 
     private bool _activeState = false;
+
+    public static QuestLogUI Instance { get; private set; }
     
+    public void Initialize()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        transform.SetParent(null);
+        DontDestroyOnLoad(gameObject);
+        
+    }
+
+    private void Awake()
+    {
+        Initialize();
+    }
+
+    private void Start()
+    {
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+
     /// <summary>
     /// Subscribes to quest-related events when this component is enabled.
     /// </summary>
@@ -84,14 +112,21 @@ public class QuestLogUI : MonoBehaviour
     /// <param name="evt">The event data containing the ID of the completed quest.</param>
     private void OnQuestCompletedEvent(QuestCompletedEvent evt)
     {
+        Debug.Log("UI COMPLETE CALLED");
         if (!_questEntries.ContainsKey(evt.QuestID))
         {
             Debug.LogWarning($"Quest entry for {evt.QuestID} does not exist!");
             return;
         }
 
+        Debug.Log($"{evt.QuestID} has been found");
+
         var questUiEntry = _questEntries[evt.QuestID];
         questUiEntry.MarkCompleted();
+        
+        //Maybe rework this for new log
+        Destroy(_questEntries[evt.QuestID].gameObject);
+        _questEntries.Remove(evt.QuestID);
     }
 
     private void Update()

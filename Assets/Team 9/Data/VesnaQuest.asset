@@ -17,18 +17,23 @@ MonoBehaviour:
   _questDescription: Bring back Vesnas Bracelet
   _stages:
   - _stageID: 000
-    _stageDescription: Go to the Forest Spot
+    _stageDescription: A new location
     _objectives:
-    - objectiveID: LOCATION_001
-      objectiveDescription: Go to the location
+    - objectiveID: LOCATION_010
+      objectiveDescription: Enter Level 2
       type: 2
       requiredAmount: 1
       currentAmount: 0
     _isParallel: 0
   - _stageID: 001
-    _stageDescription: Pick up Vesnas Bracelet
+    _stageDescription: Find Vesnas Bracelet
     _objectives:
-    - objectiveID: ITEM_001
+    - objectiveID: LOCATION_011
+      objectiveDescription: Go to the last known place
+      type: 0
+      requiredAmount: 1
+      currentAmount: 0
+    - objectiveID: ITEM_010
       objectiveDescription: Collect Bracelet
       type: 0
       requiredAmount: 1

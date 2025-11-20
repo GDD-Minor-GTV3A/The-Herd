@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class AudioManager : MonoBehaviour
 {
@@ -9,15 +10,19 @@ public class AudioManager : MonoBehaviour
     public AudioSource sfxSource;
 
     [Header("3D Sound Boxes")]
-    public AudioSource[] soundBoxes; // Assign these in Inspector, place them in the scene
+    public AudioSource[] soundBoxes; 
 
     [Header("Audio Clips")]
     public AudioClip[] sfxClips;
     public AudioClip windClip;
+    public AudioClip IntroMusic;
 
     [Header("Settings")]
     [Range(0f, 1f)]
     public float windVolume = 0.5f;
+    public float IntroVolume = 0.5f;
+
+    public GameObject EndTrigger;
 
     void Awake()
     {
@@ -37,9 +42,17 @@ public class AudioManager : MonoBehaviour
     {
         if (windClip != null && musicSource != null)
         {
-            musicSource.clip = windClip;
-            musicSource.volume = windVolume;
-            musicSource.loop = true;
+            sfxSource.clip = windClip;
+            sfxSource.volume = windVolume;
+            sfxSource.loop = true;
+            sfxSource.Play();
+        }
+
+        if (IntroMusic != null && musicSource != null)
+        {
+            musicSource.clip = IntroMusic;
+            musicSource.volume = IntroVolume;
+            musicSource.loop = false;
             musicSource.Play();
         }
 
@@ -75,5 +88,27 @@ public class AudioManager : MonoBehaviour
         if (box == null) return;
 
         box.PlayOneShot(sfxClips[clipIndex], volume);
+    }
+
+    public void PlayFadeOut()
+    {
+        StartCoroutine(FadeOutMusic(5f));
+    }
+
+    public IEnumerator FadeOutMusic(float duration)
+    {
+        float startVolume = musicSource.volume;
+        float time = 0f;
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+            musicSource.volume = Mathf.Lerp(startVolume, 0f, time / duration);
+            yield return null;
+            Debug.Log("Fade out begins");
+        }
+
+        musicSource.volume = 0f;
+        musicSource.Stop();
     }
 }
