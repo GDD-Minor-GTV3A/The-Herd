@@ -13,21 +13,33 @@ MonoBehaviour:
   m_Name: VesnaQuest
   m_EditorClassIdentifier: 
   _questID: QUEST_001
-  _questName: Vesna's Quest
-  _questDescription: Find Something in Level 2
-  _objectives:
-  - ObjectiveID: LOCATION_001
-    ObjectiveDescription: DESCRIPTION_001
-    Type: 2
-    RequiredAmount: 1
-    CurrentAmount: 0
-  - ObjectiveID: ITEM_001
-    ObjectiveDescription: GET ITEM ...
-    Type: 0
-    RequiredAmount: 1
-    CurrentAmount: 0
-  - ObjectiveID: NPC_VESNA
-    ObjectiveDescription: Talk to Vesna
-    Type: 3
-    RequiredAmount: 1
-    CurrentAmount: 0
+  _questName: Vesnas Quest
+  _questDescription: Bring back Vesnas Bracelet
+  _stages:
+  - _stageID: 000
+    _stageDescription: Go to the Forest Spot
+    _objectives:
+    - objectiveID: LOCATION_001
+      objectiveDescription: Go to the location
+      type: 2
+      requiredAmount: 1
+      currentAmount: 0
+    _isParallel: 0
+  - _stageID: 001
+    _stageDescription: Pick up Vesnas Bracelet
+    _objectives:
+    - objectiveID: ITEM_001
+      objectiveDescription: Collect Bracelet
+      type: 0
+      requiredAmount: 1
+      currentAmount: 0
+    _isParallel: 0
+  - _stageID: 002
+    _stageDescription: Bring back the Bracelet
+    _objectives:
+    - objectiveID: NPC_VESNA
+      objectiveDescription: Talk to Vesna
+      type: 3
+      requiredAmount: 1
+      currentAmount: 0
+    _isParallel: 0

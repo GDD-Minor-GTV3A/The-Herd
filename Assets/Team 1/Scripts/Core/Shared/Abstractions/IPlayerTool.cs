@@ -1,3 +1,5 @@
+using System;
+
 using UnityEngine;
 
 namespace Core.Shared
@@ -21,6 +23,7 @@ namespace Core.Shared
         /// </summary>
         public abstract void Reload();
 
+        public abstract void TryBark();
         /// <summary>
         /// Called when RMB pressed.
         /// </summary>
@@ -29,5 +32,25 @@ namespace Core.Shared
         /// Called when RMB released.
         /// </summary>
         public abstract void SecondaryUsageFinished();
+
+
+        public abstract void HideTool();
+        public abstract void ShowTool();
     }
+}
+
+[Serializable]
+public struct ToolAnimationKeyPoints
+{
+    [Header("Right hand")]
+    public Transform RightHandTarget;
+    public Transform RightHandHint;
+
+    [Space]
+    [Header("Left hand")]
+    public Transform LeftHandTarget;
+    public Transform LeftHandHint;
+
+    [Space]
+    public Transform ShouldersTarget;
 }

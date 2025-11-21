@@ -1,7 +1,6 @@
+using UnityEngine;
 using Core.AI.Sheep.Personality;
 using Core.AI.Sheep.Personality.Types;
-
-using UnityEngine;
 
 namespace Core.AI.Sheep.Config
 {
@@ -11,6 +10,7 @@ namespace Core.AI.Sheep.Config
     [CreateAssetMenu(fileName = "SheepArchetype", menuName = "Scriptable Objects/SheepArchetype")]
     public class SheepArchetype : ScriptableObject
     {
+        [SerializeField] private int _maxHealth = 100;
         [SerializeField] private float _skittishness = 0.0f;
         [SerializeField] private float _idleWanderRadius = 1.0f;
         [SerializeField] private float _followDistance = 1.8f;
@@ -19,6 +19,13 @@ namespace Core.AI.Sheep.Config
         [Header("Animation Overrides")]
         [SerializeField] private AnimatorOverrideController _animationOverrides;
         //[SerializeField] private int _idleVariantCount = 2;
+
+
+        [Header("Sounds")]
+        [Tooltip("Sound clips for the bleat sound.")] [SerializeField]
+        public AudioClip[] BleatSounds;
+
+        public AudioClip DeathSound;
 
         [Header("Grazing interval in seconds")]
         [SerializeField]
@@ -31,6 +38,7 @@ namespace Core.AI.Sheep.Config
         private PersonalityType _personalityType = PersonalityType.Normal;
 
         //Getters
+        public int MaxHealth => _maxHealth;
         public float Skittishness => _skittishness;
         public float IdleWanderRadius => _idleWanderRadius;
         public float FollowDistance => _followDistance;
@@ -40,10 +48,10 @@ namespace Core.AI.Sheep.Config
         public float GrazeIntervalMax => _grazeIntervalMax;
 
         public AnimatorOverrideController AnimationOverrides => _animationOverrides;
-
+        
         //public int IdleVariantCount => Mathf.Max(1, _idleVariantCount);
         public PersonalityType PersonalityType => _personalityType;
-
+        
         public ISheepPersonality CreatePersonality(SheepStateManager sheep)
         {
             return _personalityType switch

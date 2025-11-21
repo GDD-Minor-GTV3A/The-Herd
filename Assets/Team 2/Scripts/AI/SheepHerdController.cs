@@ -1,8 +1,6 @@
-using System.Collections;
-
-using Core.Events;
-
 using UnityEngine;
+using Core.Events;
+using System.Collections;
 
 namespace Core.AI.Sheep
 {
@@ -35,7 +33,7 @@ namespace Core.AI.Sheep
 
         private void OnDisable()
         {
-            if (_tickCoroutine != null)
+            if(_tickCoroutine != null )
             {
                 StopCoroutine(_tickCoroutine);
                 _tickCoroutine = null;

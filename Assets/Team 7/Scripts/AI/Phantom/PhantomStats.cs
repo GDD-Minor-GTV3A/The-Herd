@@ -1,15 +1,21 @@
-using AI.Phantom;
-
 using UnityEngine;
+using UnityEngine.Serialization;
 
-namespace Phantom
+#nullable enable // Chris: This needs to be added for nullable values to work. Otherwise it will show a warning
+namespace Team_7.Scripts.AI.Phantom
 {
     [CreateAssetMenu(fileName = "PhantomStats", menuName = "Scriptable Objects/PhantomStats")]
     public class PhantomStats : ScriptableObject
     {
         [Header("Health/Respawn Settings")] 
         [Tooltip("The amount of times the enemy can respawn")]
-        public float health = 3;
+        public int health = 3;
+        [Tooltip("The amount of clones the phantom spawns whenever it appears")]
+        public int initialCloneAmount = 4;
+        [Tooltip("The amount of seconds between spawning a new clone while in the shooting state")]
+        public float cloneSpawnDelay = 5;
+        [FormerlySerializedAs("clone")] [Tooltip("The clone prefab")]
+        public PhantomFake? fake; // Chris: Made this nullable to avoid a warning. You can delete this comment once its fixed.
         [Tooltip("How long the player should continuously look at the enemy before it loses 1 health.")]
         public float lookDuration = 2;
         [Tooltip("The minimum distance from it's previous location the enemy will respawn at.")]
@@ -41,14 +47,20 @@ namespace Phantom
 
         [Header("Projectile Settings")] 
         [Tooltip("The projectile prefab")]
-        public PhantomProjectile projectile;
+        public PhantomProjectile? projectile; // Chris: Made this nullable to avoid a warning. You can delete this comment once its fixed.
         [Tooltip("The scale of the projectile after it is fully charged")]
         public Vector3 maxProjectileScale = new (0.35f, 0.35f, 0.35f);
         [Tooltip("The amount of damage the projectile does to the player whenever it hits.")]
-        public float damage = 10;
+        public int damage = 10;
         [Tooltip("The speed of the projectile.")]
         public float projectileSpeed = 15f;
         [Tooltip("How far the projectile travels before it gets deleted.")]
         public float projectileRange = 50f;
+        
+        [Header("Audio Settings")] 
+        public AudioClip? screechSound;
+        public AudioClip? projectileChargeSound;
+        public AudioClip? projectileShootSound;
+        public AudioClip? whooshSound;
     }
 }

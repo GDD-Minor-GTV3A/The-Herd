@@ -1,32 +1,61 @@
+using Core.Shared.Utilities;
+
+using Gameplay.Effects;
 using Gameplay.HealthSystem;
 using Gameplay.ToolsSystem;
 
+using UI.Effects;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
-namespace Gameplay.Player
+namespace Gameplay.Player 
 {
     /// <summary>
     /// Base player script.
     /// </summary>
-    [RequireComponent(typeof(PlayerMovement), typeof(PlayerRotation), typeof(PlayerStateManager))]
+    [RequireComponent(typeof(PlayerMovement), typeof(PlayerStateManager))]
     [RequireComponent(typeof(PlayerInput), typeof(ToolSlotsController), typeof(CharacterController))]
-    public class Player : MonoBehaviour
+    public class Player : MonoBehaviour, IDamageable, IHealable, IKillable
     {
+        [Header("Animations")]
         [Tooltip("Animator of the player.")]
-        [SerializeField] private Animator _animator;
+        [SerializeField] private Animator animator;
+        [SerializeField] private PlayerAnimationConstraints animationConstrains;
+
+        [Space]
+        [Header("Effects")]
+        [Tooltip("Reference to damage effect component.")]
+        [SerializeField, Required] private DamageEffect dmgEffect;
+        [Tooltip("Reference to player vignette effect component.")]
+        [SerializeField, Required] private PlayerVignetteEffect vignetteEffect;
+
+        [Space]
+        [Header("UI")]
+        [SerializeField, Required] private HPBar hpBar;
+
+        [Space]
         [Tooltip("Manager of step sounds.")]
-        [SerializeField] private StepsSoundManager _stepsSoundManager;
+        [SerializeField] private StepsSoundManager stepsSoundManager;
         [Tooltip("Reference to input actions map.")]
-        [SerializeField] private InputActionAsset _inputActions;
+        [SerializeField] private InputActionAsset inputActions;
         [Tooltip("Reference to player config.")]
-        [SerializeField] private PlayerConfig _config;
+        [SerializeField] private PlayerConfig config;
 
 
         private PlayerMovement _movementController;
-        private PlayerRotation _rotationController;
         private Health _health;
 
+        [Space]
+        [Header("Events")]
+        public UnityEvent OnDamageTaken;
+        public UnityEvent OnHealed;
+        public UnityEvent OnDied;
+
+
+        public UnityEvent DamageEvent { get => OnDamageTaken; set => OnDamageTaken = value; }
+        public UnityEvent HealEvent { get => OnHealed; set => OnHealed = value; }
+        public UnityEvent DeathEvent { get => OnDied; set => OnDied = value; }
 
 
         // for test, needs to be moved to bootstrap
@@ -40,55 +69,47 @@ namespace Gameplay.Player
         /// </summary>
         public void Initialize()
         {
+            Vector3 forward = Camera.main.transform.forward;
+
+            forward.y = 0f;
+
+            forward.Normalize();
+
+            transform.forward = forward;
+
+
             _movementController = GetComponent<PlayerMovement>();
-            _rotationController = GetComponent<PlayerRotation>();
             PlayerStateManager stateManager = GetComponent<PlayerStateManager>();
             PlayerInput playerInput = GetComponent<PlayerInput>();
             ToolSlotsController slotsController = GetComponent<ToolSlotsController>();
 
-            playerInput.Initialize(_inputActions);
+            playerInput.Initialize(inputActions);
 
-            slotsController.Initialize(playerInput, 2);
 
             CharacterController characterController = GetComponent<CharacterController>();
-            _movementController.Initialize(characterController, _config);
+            _movementController.Initialize(characterController, config);
 
-            _rotationController.Initialize(_config.RotationSpeed);
 
-            _stepsSoundManager.Initialize();
-            PlayerAnimator animator = new PlayerAnimator(_animator);
-            stateManager.Initialize(playerInput, _movementController, animator, _rotationController);
+            stepsSoundManager.Initialize();
+            PlayerAnimator playerAnimator = new PlayerAnimator(animator, transform, animationConstrains);
+            stateManager.Initialize(playerInput, _movementController, playerAnimator);
 
             // Init health
             _health = new Health(
-                _config.MaxHealth,
-                _config.CurrentHealth,
-                _config.CanTakeDamage,
-                _config.CanBeHealed,
-                _config.CanDie
+                config.MaxHealth,
+                config.CurrentHealth,
+                config.CanTakeDamage,
+                config.CanBeHealed,
+                config.CanDie
             );
-            _health.OnHealthChanged += HandleHealthChanged;
-            _health.OnDeath += HandleDeath;
+            config.OnValueChanged += UpdateConfigValues;
 
-            _config.OnValueChanged += UpdateConfigValues;
-
+            slotsController.Initialize(playerInput, playerAnimator, 2);
+            
+            dmgEffect.Initialize();
+            vignetteEffect.Initialize();
+            hpBar.Initialize(_health);
         }
-        private void HandleHealthChanged(float current, float max)
-        {
-            Debug.Log($"Player health updated: {current}/{max}");
-        }
-
-        private void HandleDeath()
-        {
-            Debug.Log("Player died!");
-            _movementController.enabled = false;
-            _rotationController.enabled = false;
-            _animator.SetTrigger("Die");
-        }
-
-        // Gameplay entry points
-        public void TakeDamage(float amount) => _health.TakeDamage(amount);
-        public void Heal(float amount) => _health.Heal(amount);
 
 
         /// <summary>
@@ -98,13 +119,36 @@ namespace Gameplay.Player
         private void UpdateConfigValues(PlayerConfig config)
         {
             _movementController.UpdateValues(config);
-            _rotationController.UpdateRotationSpeed(config.RotationSpeed);
         }
 
 
         private void OnDestroy()
         {
-            _config.OnValueChanged -= UpdateConfigValues;
+            config.OnValueChanged -= UpdateConfigValues;
+        }
+
+
+        public void TakeDamage(float damage)
+        {
+            if (!_health.CanTakeDamage && damage <= 0) return;
+            _health.ChangeCurrentHealth(-damage);
+            OnDamageTaken?.Invoke();
+
+            if (_health.CurrentHealth == 0)
+                Die();
+        }
+
+        public void Heal(float amount)
+        {
+            if (!_health.CanBeHealed && amount <= 0) return;
+            _health.ChangeCurrentHealth(amount);
+            OnHealed?.Invoke();
+        }
+
+        public void Die()
+        {
+            OnDied?.Invoke();
+            Debug.Log("Died!");
         }
     }
 }
