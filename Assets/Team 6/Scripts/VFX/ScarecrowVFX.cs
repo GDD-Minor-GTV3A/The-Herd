@@ -20,10 +20,10 @@ public class ScarecrowVFX : MonoBehaviour
 
     Material _instanceMat;
     Color _originalEmissionColor;
-    bool _isPlaying;
+   [SerializeField] private bool _isPlaying = false;
     int _emissionColorID;
 
-    void Awake()
+    void Start()
     {
         if (headRenderer == null) headRenderer = GetComponent<Renderer>();
 
@@ -47,15 +47,20 @@ public class ScarecrowVFX : MonoBehaviour
         }
     }
 
-    public void TriggerVFX()
+
+
+  void Update()
     {
-        if (_isPlaying) return;
-        StartCoroutine(PlayVFX());
+        if (_isPlaying = true) {
+            StartCoroutine(PlayVFX());
+            Debug.Log("StartedVFX");
+        }
+      
     }
 
     IEnumerator PlayVFX()
     {
-        _isPlaying = true;
+        Debug.Log("IsPlaying");
 
         if (burstParticles != null) burstParticles.Play();
         if (pointLight != null) pointLight.intensity = lightIntensity;
