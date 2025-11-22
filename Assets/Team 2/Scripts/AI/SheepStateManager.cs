@@ -86,11 +86,12 @@ namespace Core.AI.Sheep
         public Sprite FlashbackImage => _flashbackImage;
 
         /// <summary>
-        /// Exposed config and archetype
+        /// Exposed config and archetype and sound driver
         /// </summary>
         public SheepConfig Config => _config;
         public SheepArchetype Archetype => _archetype;
         public ISheepPersonality Personality => _personality;
+        public SheepSoundDriver SoundDriver => _sheepSoundDriver;
 
         /// <summary>
         /// Read-only list of neighbouring sheep

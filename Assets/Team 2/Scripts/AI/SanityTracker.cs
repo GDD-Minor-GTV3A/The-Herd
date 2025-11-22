@@ -139,13 +139,10 @@ namespace Core.AI.Sheep
                 SpawnSheep();
 
                 var clip = _sanityAddSound;
-                if (clip && SheepSoundManager.Instance)
+                if (clip)
                 {
-                    SheepSoundManager.Instance.PlaySoundClip(
-                        clip,
-                        _playerTransform,
-                        1.0f,
-                        Random.Range(0.9f, 1.1f));
+                    float pitch = Random.Range(0.9f, 1.05f);
+                    // Waiting for sound manager to roll out
                 }
             }
 
@@ -171,13 +168,9 @@ namespace Core.AI.Sheep
                 RemoveFurthestSheep();
 
                 var clip = _sanityRemoveSound;
-                if (clip && SheepSoundManager.Instance)
+                if (clip)
                 {
-                    SheepSoundManager.Instance.PlaySoundClip(
-                        clip,
-                        _playerTransform,
-                        1.0f,
-                        Random.Range(0.9f, 1.1f));
+                    //Waiting for sound manager
                 }
             }
 

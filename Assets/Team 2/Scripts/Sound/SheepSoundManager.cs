@@ -12,19 +12,20 @@ public class SheepSoundManager : MonoBehaviour
             Instance = this;
     }
 
-    public void PlaySoundClip(AudioClip clip, Transform soundTransform)
+    public void PlaySoundClip(AudioClip clip, AudioSource source)
     {
-        PlaySoundClip(clip, soundTransform, Random.Range(0.02f, 0.2f), Random.Range(0.8f, 1.2f));
+        PlaySoundClip(clip, source, Random.Range(0.02f, 0.2f), Random.Range(0.8f, 1.2f));
     }
 
-    public void PlaySoundClip(AudioClip clip, Transform soundTransform, float volume, float pitch)
+    public void PlaySoundClip(AudioClip clip, AudioSource source, float volume, float pitch)
     {
         // Why is this a thing??
         //_audioSource = Instantiate(_audioSource, soundTransform.position, Quaternion.identity);
-
-        _audioSource.clip = clip;
-        _audioSource.volume = volume;
-        _audioSource.pitch = pitch;
-        _audioSource.Play();
+        if (source == null || clip == null) return;
+        
+        source.clip = clip;
+        source.volume = volume;
+        source.pitch = pitch;
+        source.Play();
     }
 }

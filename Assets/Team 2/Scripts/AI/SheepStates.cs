@@ -137,12 +137,13 @@ namespace Core.AI.Sheep
             {
                 _stateManager.Agent.isStopped = false;
                 //_stateManager.Animation.SetState((int)SheepAnimState.Walk);
-                if (SheepSoundManager.Instance)
+                if (_stateManager.Archetype != null && _stateManager.Archetype.DeathSound != null)
                 {
-                    SheepSoundManager.Instance.PlaySoundClip(_stateManager.Archetype.DeathSound,
-                        _stateManager.gameObject.transform,
-                        100f,
-                        Random.Range(0.9f, 1.8f));
+                    float pitch = Random.Range(0.9f, 1.05f);
+                    _stateManager.SoundDriver.PlayMiscSound(
+                        _stateManager.Archetype.DeathSound,
+                        1.0f,
+                        pitch);
                 }
             }
         }
@@ -228,11 +229,11 @@ namespace Core.AI.Sheep
 
             if (_stateManager.Archetype != null && _stateManager.Archetype.PettingSound != null)
             {
-                SheepSoundManager.Instance.PlaySoundClip(
+                float pitch = Random.Range(0.9f, 1.05f);
+                _stateManager.SoundDriver.PlayMiscSound(
                     _stateManager.Archetype.PettingSound,
-                    _stateManager.transform,
                     1.0f,
-                    Random.Range(0.9f, 1.05f));
+                    pitch);
             }
             
             EventManager.Broadcast(new ShowFlashbackEvent(
@@ -274,12 +275,13 @@ namespace Core.AI.Sheep
         public void OnStart()
         {
             _stateManager.DisableBehavior();
-            if (SheepSoundManager.Instance)
+            if (_stateManager.Archetype != null && _stateManager.Archetype.DeathSound != null)
             {
-                SheepSoundManager.Instance.PlaySoundClip(_stateManager.Archetype.DeathSound, 
-                    _stateManager.gameObject.transform,
-                    100.0f,
-                    Random.Range(0.9f, 1.8f));
+                float pitch = Random.Range(0.9f, 1.05f);
+                _stateManager.SoundDriver.PlayMiscSound(
+                    _stateManager.Archetype.DeathSound,
+                    1.0f,
+                    pitch);
             }
             //possible ragdoll setup in here in the next sprint
         }
