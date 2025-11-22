@@ -22,6 +22,10 @@ Attach to GameObject, assign sheep prefab and player transform in inspector.
 Keybinds: Tab (select sheep), F (freeze), T (threat), K (kill sheep), J (spawn sheep), H (help)
 Use this to test SheepDeathEvent, SheepJoinEvent, and SanityChangeEvent integration.
 
+        --- Sanity Tracker ---
+Place the SanityTracker.cs in an empty game object and attach all the required options,
+this will make it so that all sanity related events get fired. You can find these in Scripts/Event/SheepEvents.cs
+
         --- Audio ---
 Place the SheepSoundManager.cs on any empty game object and also attach an audio source component to it.
 Also put spatial blend on audio source fully to 3D.

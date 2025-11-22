@@ -9,6 +9,7 @@ using Core.AI.Sheep.Config;
 using Core.AI.Sheep.Event;
 using Core.AI.Sheep.Personality;
 using UnityEngine.AI;
+using UnityEngine.SceneManagement;
 
 using Random = UnityEngine.Random;
 
@@ -43,7 +44,13 @@ namespace Core.AI.Sheep
         [SerializeField]
         [Tooltip("All herd members")]
         private List<Transform> _neighbours = new List<Transform>();
+        
+        [Header("VFX")] [SerializeField] private GameObject _joinHerdVFXPrefab;
+        [SerializeField] private GameObject _leaveHerdVFXPrefab;
+        [SerializeField] private Vector3 _vfxOffset = new Vector3(0f, 0.3f, 0f);
 
+        [Header("Petting")] [SerializeField] private Sprite _flashbackImage;
+        
         private readonly Dictionary<Transform, float> _threats = new();
         private readonly Dictionary<Transform, float> _threatRadius = new();
         [SerializeField] private float _threatMemory = 1.25f;
@@ -73,13 +80,18 @@ namespace Core.AI.Sheep
         public NavMeshAgent Agent => _agent;
 
         public SheepAnimationDriver Animation => _animation;
+        
+        public bool IsStraggler => _startAsStraggler;
+        
+        public Sprite FlashbackImage => _flashbackImage;
 
         /// <summary>
-        /// Exposed config and archetype
+        /// Exposed config and archetype and sound driver
         /// </summary>
         public SheepConfig Config => _config;
         public SheepArchetype Archetype => _archetype;
         public ISheepPersonality Personality => _personality;
+        public SheepSoundDriver SoundDriver => _sheepSoundDriver;
 
         /// <summary>
         /// Read-only list of neighbouring sheep
@@ -134,6 +146,7 @@ namespace Core.AI.Sheep
         {
             EventManager.AddListener<PlayerSquareChangedEvent>(OnPlayerSquareChanged);
             EventManager.AddListener<PlayerSquareTickEvent>(OnPlayerSquareTick);
+            EventManager.AddListener<RequestPetSheepEvent>(OnPetRequested);
 
             if (_tickCoroutine == null)
             {
@@ -149,7 +162,8 @@ namespace Core.AI.Sheep
         {
             EventManager.RemoveListener<PlayerSquareChangedEvent>(OnPlayerSquareChanged);
             EventManager.RemoveListener<PlayerSquareTickEvent>(OnPlayerSquareTick);
-
+            EventManager.RemoveListener<RequestPetSheepEvent>(OnPetRequested);
+            
             if(_tickCoroutine != null)
             {
                 StopCoroutine(_tickCoroutine);
@@ -165,6 +179,7 @@ namespace Core.AI.Sheep
                 {typeof(SheepGrazeState), new SheepGrazeState(this)},
                 {typeof(SheepWalkAwayFromHerdState), new SheepWalkAwayFromHerdState(this)},
                 {typeof(SheepFreezeState), new SheepFreezeState(this)},
+                {typeof(SheepPettingState), new SheepPettingState(this)},
                 {typeof(SheepDieState), new SheepDieState(this)},
             };
         }
@@ -176,7 +191,41 @@ namespace Core.AI.Sheep
         {
             _neighbours = neighbours ?? new List<Transform>();
         }
+        
+        
+        public void PlayJoinHerdVfx()
+        {
+            SpawnVFX(_joinHerdVFXPrefab);
+        }
 
+        public void PlayLeaveHerdVfx()
+        {
+            SpawnVFX(_leaveHerdVFXPrefab);
+        }
+
+        private void SpawnVFX(GameObject prefab)
+        {
+            if (!prefab) return;
+
+            var vfx = Instantiate(
+                prefab,
+                transform.position + _vfxOffset,
+                Quaternion.identity);
+            
+            vfx.transform.SetParent(transform, true);
+
+            if (vfx.TryGetComponent<ParticleSystem>(out var ps))
+            {
+                var main = ps.main;
+                float lifetime = main.duration + main.startLifetimeMultiplier;
+                Destroy(vfx, lifetime);
+            }
+            else
+            {
+                Destroy(vfx, 2f);
+            }
+        }
+        
         private void OnPlayerSquareChanged(PlayerSquareChangedEvent e)
         {
             _playerCenter = e.Center;
@@ -270,7 +319,7 @@ namespace Core.AI.Sheep
             if (CanControlAgent())
             {
                 Agent.autoRepath = true;
-                Agent.acceleration = Mathf.Max(Agent.acceleration, (Config?.BaseSpeed ?? 2.2f) * 6f);
+                Agent.acceleration = Mathf.Max(Agent.acceleration, (Config?.BaseSpeed ?? 2.2f));
                 Agent.angularSpeed = Mathf.Max(Agent.angularSpeed, 1080f);
                 Agent.obstacleAvoidanceType = ObstacleAvoidanceType.HighQualityObstacleAvoidance;
             }
@@ -317,6 +366,21 @@ namespace Core.AI.Sheep
             _panicLoop = null;
         }
 
+        private void OnPetRequested(RequestPetSheepEvent evt)
+        {
+            if (evt.TargetSheep != this) return;
+
+            if (_currentState is SheepDieState || _currentState is SheepWalkAwayFromHerdState) return;
+            
+            string currentScene = SceneManager.GetActiveScene().name;
+            if (_personality != null && !_personality.CanBePetted(currentScene))
+            {
+                Debug.Log($"{name} can't be petted in {currentScene}");
+                return;
+            }
+            
+            SetState<SheepPettingState>();
+        }
         private void ScheduleNextWalkAwayFromHerd()
         {
             _nextWalkingAwayFromHerdAt = Time.time + _config?.WalkAwayFromHerdTicks ?? DEFAULT_WALK_AWAY_FROM_HERD_TICKS;
@@ -329,6 +393,7 @@ namespace Core.AI.Sheep
 
         public void SummonToHerd(float? graceSeconds = null, bool clearThreats = true)
         {
+            Debug.Log("Event");
             _startAsStraggler = false;
 
             // apply grace so it doesn't immediately get lost again
@@ -422,7 +487,7 @@ namespace Core.AI.Sheep
             if (_behaviorContext.HasThreat && !_hadThreatLastFrame)
                 StartPanicLoop();
             else if (!_behaviorContext.HasThreat && _hadThreatLastFrame)
-                StartPanicLoop();
+                StopPanicLoop();
 
             _hadThreatLastFrame = _behaviorContext.HasThreat;
         }
