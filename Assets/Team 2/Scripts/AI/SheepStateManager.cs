@@ -65,6 +65,8 @@ namespace Core.AI.Sheep
 
         private Vector3 _playerCenter;
         private Vector3 _playerHalfExtents;
+        private static readonly List<SheepStateManager> _allSheep = new();
+        
 
         // Personality system
         private ISheepPersonality _personality;
@@ -96,6 +98,8 @@ namespace Core.AI.Sheep
         /// <summary>
         /// Read-only list of neighbouring sheep
         /// </summary>
+
+        public static IReadOnlyList<SheepStateManager> AllSheep => _allSheep;
         public IReadOnlyList<Transform> Neighbours => _neighbours;
 
         public void MarkAsStraggler() => _startAsStraggler = true;
@@ -130,13 +134,21 @@ namespace Core.AI.Sheep
 
         private void OnEnable()
         {
+            if (!_allSheep.Contains(this))
+                _allSheep.Add(this);
             EnableBehavior();
             SetState<SheepGrazeState>();
         }
 
         private void OnDisable()
         {
+            _allSheep.Remove(this);
             DisableBehavior();
+        }
+
+        private void OnDestroy()
+        {
+            _allSheep.Remove(this);
         }
 
         /// <summary>
@@ -191,7 +203,25 @@ namespace Core.AI.Sheep
         {
             _neighbours = neighbours ?? new List<Transform>();
         }
-        
+
+        private void RefreshNeighbours()
+        {
+            _neighbours.Clear();
+
+            float radius = _config.NeighborRadius;
+            float r2 = radius * radius;
+            
+            Vector3 p = transform.position;
+
+            foreach (var s in _allSheep)
+            {
+                if (s == this || !s.isActiveAndEnabled)
+                    continue;
+                
+                if ((s.transform.position - p).sqrMagnitude <= r2)
+                    _neighbours.Add(s.transform);
+            }
+        }
         
         public void PlayJoinHerdVfx()
         {
@@ -265,6 +295,7 @@ namespace Core.AI.Sheep
 
             while(true)
             {
+                RefreshNeighbours();
                 // Update behavior context for personality
                 UpdateBehaviorContext();
 

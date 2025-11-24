@@ -247,7 +247,7 @@ namespace Core.AI.Sheep.Personality
             return proposedState;
         }
 
-        public bool CanBePetted(string currentSceneName)
+        public virtual bool CanBePetted(string currentSceneName)
         {
             /*if (currentSceneName.Equals("Village", System.StringComparison.OrdinalIgnoreCase))
             {

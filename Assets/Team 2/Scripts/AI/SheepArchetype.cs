@@ -66,6 +66,10 @@ namespace Core.AI.Sheep.Config
                 PersonalityType.Energetic => new EnergeticPersonality(sheep),
                 PersonalityType.Nervous => new NervousPersonality(sheep),
                 PersonalityType.Stubborn => new StubbornPersonality(sheep),
+                PersonalityType.Sonja => new SonjaPersonality(sheep),
+                PersonalityType.Andela => new AndelaPersonality(sheep),
+                PersonalityType.Ivana => new IvanaPersonality(sheep),
+                PersonalityType.Nino => new NinoPersonality(sheep),
                 _ => new NormalPersonality(sheep)
             };
         }
@@ -80,6 +84,10 @@ namespace Core.AI.Sheep.Config
         Lazy,
         Energetic,
         Nervous,
-        Stubborn
+        Stubborn,
+        Sonja,
+        Andela,
+        Nino,
+        Ivana
     }
 }
