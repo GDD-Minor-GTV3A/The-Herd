@@ -1,4 +1,5 @@
 using System.Collections;
+
 using UnityEngine;
 
 public class ScarecrowVFX : MonoBehaviour
@@ -18,14 +19,16 @@ public class ScarecrowVFX : MonoBehaviour
     public float vfxDuration = 2f;
     public float fadeDuration = 0.8f;
 
-    Material _instanceMat;
-    Color _originalEmissionColor;
-   [SerializeField] private bool _isPlaying = false;
-    int _emissionColorID;
+    private Material _instanceMat;
+    private Color _originalEmissionColor;
+    private int _emissionColorID;
 
-    void Start()
+    private Coroutine _vfxRoutine;
+
+    private void Start()
     {
-        if (headRenderer == null) headRenderer = GetComponent<Renderer>();
+        if (headRenderer == null)
+            headRenderer = GetComponent<Renderer>();
 
         if (headRenderer != null)
         {
@@ -48,22 +51,30 @@ public class ScarecrowVFX : MonoBehaviour
     }
 
 
-
-  void Update()
+    public void TriggerVFX()
     {
-        if (_isPlaying = true) {
-            StartCoroutine(PlayVFX());
-            Debug.Log("StartedVFX");
-        }
-      
+        if (!gameObject.activeInHierarchy)
+            return;
+
+        // restart if already playing
+        if (_vfxRoutine != null)
+            StopCoroutine(_vfxRoutine);
+
+        _vfxRoutine = StartCoroutine(PlayVFX());
     }
 
-    IEnumerator PlayVFX()
+    private IEnumerator PlayVFX()
     {
-        Debug.Log("IsPlaying");
+        Debug.Log("[ScarecrowVFX] START");
 
-        if (burstParticles != null) burstParticles.Play();
-        if (pointLight != null) pointLight.intensity = lightIntensity;
+        if (burstParticles != null)
+        {
+            burstParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            burstParticles.Play();
+        }
+
+        if (pointLight != null)
+            pointLight.intensity = lightIntensity;
 
         if (_instanceMat != null && _instanceMat.HasProperty(_emissionColorID))
         {
@@ -74,7 +85,10 @@ public class ScarecrowVFX : MonoBehaviour
         yield return new WaitForSeconds(vfxDuration - fadeDuration);
 
         float t = 0f;
-        Color start = _instanceMat.GetColor(_emissionColorID);
+        Color start = _instanceMat != null
+            ? _instanceMat.GetColor(_emissionColorID)
+            : _originalEmissionColor;
+
         while (t < fadeDuration)
         {
             t += Time.deltaTime;
@@ -92,10 +106,13 @@ public class ScarecrowVFX : MonoBehaviour
             yield return null;
         }
 
-        if (pointLight != null) pointLight.intensity = 0f;
+        if (pointLight != null)
+            pointLight.intensity = 0f;
+
         if (_instanceMat != null)
             _instanceMat.SetColor(_emissionColorID, _originalEmissionColor);
 
-        _isPlaying = false;
+        _vfxRoutine = null;
+        Debug.Log("[ScarecrowVFX] END");
     }
 }
