@@ -3,6 +3,7 @@ using UnityEngine;
 public class PickUpRelic : MonoBehaviour
 {
     [SerializeField] private SlidingDoor[] doorsToOpen;
+    [SerializeField] private bool DestroyObjectAfterPickup;
 
     void OnTriggerEnter(Collider other)
     {
@@ -20,6 +21,8 @@ public class PickUpRelic : MonoBehaviour
             {
                 door.Unlock();
             }
+
+            if (!DestroyObjectAfterPickup) return;
 
             Destroy(gameObject); // Remove the relic from the scene
         }
