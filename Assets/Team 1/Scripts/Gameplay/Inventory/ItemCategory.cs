@@ -7,5 +7,7 @@ public enum ItemCategory
     Legwear,
     Boots,
     Trinket,
-    Active
+    Active,
+    Scroll,
+    ReviveTotem
 }

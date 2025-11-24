@@ -34,7 +34,7 @@ public class InventoryItemUI : MonoBehaviour, IPointerClickHandler, IBeginDragHa
         if (item == null) return;
 
         // Right click: use if active, else quick equip
-        if (item.isActiveItem)
+        if (item.category == ItemCategory.Active)
         {
             PlayerInventory.Instance.UseActiveItem(item);
         }
@@ -44,7 +44,7 @@ public class InventoryItemUI : MonoBehaviour, IPointerClickHandler, IBeginDragHa
         }
     }
 
-    // ----- Drag & Drop (simple) -----
+    // ----- Drag & Drop -----
     public void OnBeginDrag(PointerEventData eventData)
     {
         if (item == null) return;
@@ -71,7 +71,6 @@ public class InventoryItemUI : MonoBehaviour, IPointerClickHandler, IBeginDragHa
             var other = r.gameObject.GetComponent<InventoryItemUI>();
             if (other != null && other != this)
             {
-                // swap items between slots (simple swap logic)
                 SwapWith(other);
                 return;
             }
@@ -84,19 +83,16 @@ public class InventoryItemUI : MonoBehaviour, IPointerClickHandler, IBeginDragHa
 
     private void SwapWith(InventoryItemUI other)
     {
-        // If either is wearable slot (parent name indicates slot), treat accordingly.
-        // Basic behaviour: swap inventory items between parents in the runtime model.
-        var myParentName = originalParent.name.ToLower();
-        var otherParentName = other.transform.parent.name.ToLower();
+        var inv = PlayerInventory.Instance;
 
-        // For simplicity: operate on PlayerInventory.data lists/slots.
+        // Inventory grid swap
+        bool thisInGrid = originalParent.name.ToLower().Contains("grid");
+        bool otherInGrid = other.transform.parent.name.ToLower().Contains("grid");
 
-        // If both are inventory grid slots: swap positions in data.items
-        if (originalParent.name.Contains("ItemsGrid") && other.transform.parent.name.Contains("ItemsGrid"))
+        if (thisInGrid && otherInGrid)
         {
-            var inv = PlayerInventory.Instance;
-            int a = inv.data.items.IndexOf(item);
-            int b = inv.data.items.IndexOf(other.item);
+            int a = inv.data.items.FindIndex(s => s.item == item);
+            int b = inv.data.items.FindIndex(s => s.item == other.item);
             if (a >= 0 && b >= 0)
             {
                 var tmp = inv.data.items[a];
@@ -107,18 +103,14 @@ public class InventoryItemUI : MonoBehaviour, IPointerClickHandler, IBeginDragHa
         }
         else
         {
-            // Generic: if other is a wearable slot (wearablesParent), then equip/unequip logic:
-            // If other is an equip slot (has item and belongs to wearables): perform quick-equip
-            // We'll implement simple fallback: if this.item is equipable to the other slot, swap via Equip/Unequip.
-            // Quick solution: unequip other.item (put into inventory) then equip this.item
-            if (other.item != null) PlayerInventory.Instance.AddItem(other.item);
-            PlayerInventory.Instance.Equip(item);
-            // remove original from inventory list
-            PlayerInventory.Instance.RemoveItem(item);
+            // Equip/unequip swap
+            if (other.item != null)
+                inv.AddItem(other.item); // put existing into inventory
+            inv.Equip(item);
         }
 
-        // ui refresh
-        PlayerInventory.Instance.RaiseInventoryChanged();
-        PlayerInventory.Instance.RaiseEquipmentChanged();
+        // Refresh UI
+        inv.RaiseInventoryChanged();
+        inv.RaiseEquipmentChanged();
     }
 }

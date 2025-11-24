@@ -126,7 +126,7 @@ public class InventoryUI : MonoBehaviour
 
         foreach (var item in inv.data.items)
             if (item != null)
-                inventoryItems.Add(item);
+                inventoryItems.Add(item.item);
 
         foreach (var tr in inv.data.trinkets)
             if (tr != null)

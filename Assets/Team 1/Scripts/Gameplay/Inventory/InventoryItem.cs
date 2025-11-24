@@ -17,11 +17,6 @@ public class InventoryItem : ScriptableObject
     public int bonusDamage;
     public int bonusSpeed;
 
-    [Header("Active Settings")]
-    public bool isActiveItem;
-    [ShowIf("isActiveItem")]
-    public int activeUses = 1;
-
     [Header("Save")]
     [Tooltip("Auto-generated unique ID used for saving. Keep hidden.")]
     [SerializeField] private string guid;

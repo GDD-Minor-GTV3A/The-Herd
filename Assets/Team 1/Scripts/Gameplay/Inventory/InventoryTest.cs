@@ -28,23 +28,10 @@ public class InventoryTest : MonoBehaviour
             PrintInventory();
 
         if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            if (inv.data.items.Count > 0)
-            {
-                inv.Equip(inv.data.items[0]);
-                Debug.Log($"Equipped: {inv.data.items[0].itemName}");
-            }
-        }
+            EquipRandomWearable();
 
         if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            var active = inv.data.items.Find(i => i.isActiveItem);
-            if (active != null)
-            {
-                inv.UseActiveItem(active);
-                Debug.Log($"Used: {active.itemName}, remaining uses: {active.activeUses}");
-            }
-        }
+            UseRandomActiveItem();
 
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
@@ -61,10 +48,61 @@ public class InventoryTest : MonoBehaviour
             }
         }
 
-        // --- Add persistent test items to inventory when pressing "S" ---
+        if (Input.GetKeyDown(KeyCode.Alpha5))
+            EquipRandomTrinket();
+
         if (Input.GetKeyDown(KeyCode.S))
-        {
             AddPersistentTestItems();
+    }
+
+    private void EquipRandomWearable()
+    {
+        var equipableItems = inv.data.items.FindAll(s =>
+            s.item.category == ItemCategory.Headgear ||
+            s.item.category == ItemCategory.Chestwear ||
+            s.item.category == ItemCategory.Legwear ||
+            s.item.category == ItemCategory.Boots
+        );
+
+        if (equipableItems.Count > 0)
+        {
+            var randomIndex = Random.Range(0, equipableItems.Count);
+            var toEquip = equipableItems[randomIndex].item;
+
+            inv.Equip(toEquip);
+            Debug.Log($"Equipped random wearable: {toEquip.itemName}");
+        }
+        else
+        {
+            Debug.Log("No wearable items available to equip.");
+        }
+    }
+
+    private void EquipRandomTrinket()
+    {
+        var trinketItems = inv.data.items.FindAll(s => s.item.category == ItemCategory.Trinket);
+
+        if (trinketItems.Count > 0)
+        {
+            var randomIndex = Random.Range(0, trinketItems.Count);
+            var toEquip = trinketItems[randomIndex].item;
+
+            inv.Equip(toEquip);
+            Debug.Log($"Equipped random trinket: {toEquip.itemName}");
+        }
+        else
+        {
+            Debug.Log("No trinkets available to equip.");
+        }
+    }
+
+    private void UseRandomActiveItem()
+    {
+        var activeStack = inv.data.items.Find(s => s.item.category == ItemCategory.Active);
+        if (activeStack != null)
+        {
+            inv.UseActiveItem(activeStack.item);
+            Debug.Log($"Used: {activeStack.item.itemName}, remaining uses: {inv.GetUses(activeStack.item)}");
         }
     }
 
@@ -78,22 +116,15 @@ public class InventoryTest : MonoBehaviour
 
         foreach (var item in testItems)
         {
-            if (!inv.data.items.Contains(item))
+            bool alreadyExists = inv.data.items.Exists(s => s.item == item);
+
+            // Allow multiple copies for Active, Scroll, and ReviveTotem
+            if (!alreadyExists || item.category == ItemCategory.Active ||
+                item.category == ItemCategory.Scroll ||
+                item.category == ItemCategory.ReviveTotem)
             {
-                // Active items: ensure positive activeUses
-                if (item.isActiveItem && item.activeUses <= 0)
-                {
-                    item.activeUses = Random.Range(1, 5); // or a default positive value
-                }
-
-                // Non-active items: set to -1
-                if (!item.isActiveItem)
-                {
-                    item.activeUses = -1;
-                }
-
                 inv.AddItem(item);
-                Debug.Log($"Added persistent item: {item.itemName} | Active: {item.isActiveItem} | ActiveUses: {item.activeUses} | GUID: {item.GUID}");
+                Debug.Log($"Added persistent item: {item.itemName} | Category: {item.category} | GUID: {item.GUID}");
             }
         }
 
@@ -104,10 +135,10 @@ public class InventoryTest : MonoBehaviour
     private void PrintInventory()
     {
         Debug.Log("=== Inventory ===");
-        foreach (var item in inv.data.items)
+        foreach (var stack in inv.data.items)
         {
-            int uses = item.isActiveItem ? item.activeUses : -1; // Ensure display matches save convention
-            Debug.Log($"Item: {item.itemName} | Category: {item.category} | Active: {item.isActiveItem} | ActiveUses: {uses} | GUID: {item.GUID}");
+            int uses = stack.item.category == ItemCategory.Active ? stack.uses : -1;
+            Debug.Log($"Item: {stack.item.itemName} | Category: {stack.item.category} | Uses: {uses} | GUID: {stack.item.GUID}");
         }
 
         Debug.Log(inv.GetEquippedSummary());
