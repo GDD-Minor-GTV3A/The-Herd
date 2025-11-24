@@ -1,4 +1,6 @@
+using Core.Events;
 using Core.Shared;
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -7,7 +9,7 @@ namespace Gameplay.Player
     /// <summary>
     /// Handles all input from the player.
     /// </summary>
-    public class PlayerInput : MonoBehaviour
+    public class PlayerInput : MonoBehaviour, IPausable
     {
         [SerializeField, Tooltip("Layers of the ground for ray casting.")]
         LayerMask groundLayers;
@@ -15,6 +17,7 @@ namespace Gameplay.Player
 
         private InputActionAsset inputActions;
         private Camera mainCamera;
+        private bool isPaused;
 
         private readonly Observable<Vector3> cursorWorldPosition = new Observable<Vector3>();
 
@@ -107,7 +110,44 @@ namespace Gameplay.Player
             slot2_Action = this.inputActions.FindActionMap("Player").FindAction("Slot_2");
             slot3_Action = this.inputActions.FindActionMap("Player").FindAction("Slot_3");
 
+            EventManager.Broadcast(new RegisterNewPausableEvent(this));
+
             // Enable input actions
+            Resume();
+        }
+
+
+        private void LateUpdate()
+        {
+            if (isPaused) return;
+            Ray ray = mainCamera.ScreenPointToRay(lookAction.ReadValue<Vector2>());
+
+            Vector3 worldCursorPosition;
+
+            Physics.Raycast(ray, out RaycastHit hitInfo, Mathf.Infinity, groundLayers);
+            worldCursorPosition = hitInfo.point;
+
+            cursorWorldPosition.Value = worldCursorPosition;
+        }
+
+        public void Pause()
+        {
+            moveAction.Disable();
+            lookAction.Disable();
+            runAction.Disable();
+            reloadAction.Disable();
+            mainUsageAction.Disable();
+            secondaryUsageAction.Disable();
+            slotsScrollAction.Disable();
+            slot1_Action.Disable();
+            slot2_Action.Disable();
+            slot3_Action.Disable();
+
+            isPaused = true;
+        }
+
+        public void Resume()
+        {
             moveAction.Enable();
             lookAction.Enable();
             runAction.Enable();
@@ -118,19 +158,8 @@ namespace Gameplay.Player
             slot1_Action.Enable();
             slot2_Action.Enable();
             slot3_Action.Enable();
-        }
 
-
-        private void LateUpdate()
-        {
-            Ray ray = mainCamera.ScreenPointToRay(lookAction.ReadValue<Vector2>());
-
-            Vector3 worldCursorPosition;
-
-            Physics.Raycast(ray, out RaycastHit hitInfo, Mathf.Infinity, groundLayers);
-            worldCursorPosition = hitInfo.point;
-
-            cursorWorldPosition.Value = worldCursorPosition;
+            isPaused = false;
         }
     }
 }

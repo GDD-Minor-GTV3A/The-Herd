@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6358818757933592589}
   m_Layer: 0
-  m_Name: -------Player&Dog&Camera_SetUp-------
+  m_Name: -------Player&Dog&Camera_DefaultSetUp-------
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -32,8 +32,70 @@ Transform:
   - {fileID: 6657839625199107346}
   - {fileID: 405590637181702614}
   - {fileID: 1058942138564864114}
+  - {fileID: 1568221641690190022}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &5566487533015619117
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1568221641690190022}
+  - component: {fileID: 8547051540565435095}
+  - component: {fileID: 476462210069437422}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1568221641690190022
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5566487533015619117}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6358818757933592589}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8547051540565435095
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5566487533015619117}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4124346c0c2eb246b725795662dd583, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 4990170528780177765}
+  dog: {fileID: 831174997664632223}
+  pauseManager: {fileID: 476462210069437422}
+  fogOfWar: {fileID: 0}
+--- !u!114 &476462210069437422
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5566487533015619117}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbe113730819be841a4bcb24b0f4ca3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &904184227584344744
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -107,6 +169,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e9688c71f438a824db99b17c2fba1703, type: 3}
+--- !u!114 &831174997664632223 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 505708836935536439, guid: e9688c71f438a824db99b17c2fba1703, type: 3}
+  m_PrefabInstance: {fileID: 904184227584344744}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 235560c2515308f48ac53cbdb6d2dd00, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &6657839625199107346 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5830238604603834298, guid: e9688c71f438a824db99b17c2fba1703, type: 3}
@@ -1011,6 +1084,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7191174862489174219, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
   m_PrefabInstance: {fileID: 7380517872504819997}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &4990170528780177765 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2534532970623172728, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
+  m_PrefabInstance: {fileID: 7380517872504819997}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 980b5fc3111f5174aacacca00fd5a98c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &7379636088920328359 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1519569137932730, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
