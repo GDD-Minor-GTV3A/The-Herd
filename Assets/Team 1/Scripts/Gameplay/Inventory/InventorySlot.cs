@@ -1,16 +1,17 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
 /// <summary>
 /// Represents a drop target slot for inventory or equipment items.
-/// Enforces category rules and swaps items if equipment slot already has an item.
+/// Enforces category rules and swaps items if the slot already has an item.
+/// Refreshes InventoryUI after placement or swap.
 /// </summary>
 public class InventorySlot : MonoBehaviour, IDropHandler
 {
     [Header("Slot Configuration")]
     public bool isEquipmentSlot = false;
     public bool isTrinketSlot = false;
-    public ItemCategory slotCategory;
+    public ItemCategory slotCategory; // Only relevant for equipment slots
 
     public void OnDrop(PointerEventData eventData)
     {
@@ -19,7 +20,7 @@ public class InventorySlot : MonoBehaviour, IDropHandler
         InventoryItemSlot draggedItem = eventData.pointerDrag.GetComponent<InventoryItemSlot>();
         if (draggedItem == null || draggedItem.item == null) return;
 
-        // Check category rules
+        // Prevent dropping non-matching items into equipment/trinket slots
         if (isEquipmentSlot && draggedItem.item.category != slotCategory)
         {
             Debug.Log("Wrong category for this equipment slot!");
@@ -32,7 +33,7 @@ public class InventorySlot : MonoBehaviour, IDropHandler
             return;
         }
 
-        // Target slot visual
+        // Get the visual InventoryItemSlot child for this slot
         InventoryItemSlot slotItem = GetComponentInChildren<InventoryItemSlot>();
         if (slotItem == null)
         {
@@ -40,13 +41,15 @@ public class InventorySlot : MonoBehaviour, IDropHandler
             return;
         }
 
-        // SWAP logic for equipment/trinkets
+        bool successfulPlacement = false;
+
+        // Equipment / Trinket slot logic (swap if needed)
         if (isEquipmentSlot || isTrinketSlot)
         {
-            InventoryItem oldItem = slotItem.item;  // the item currently in the slot
+            InventoryItem oldItem = slotItem.item;           // current item in slot
             Transform oldParent = draggedItem.originalParent; // where dragged item came from
 
-            // Move dragged item into target slot
+            // Place new item in the target slot
             slotItem.InitializeItem(draggedItem.item);
             draggedItem.image.transform.SetParent(slotItem.transform, false);
             draggedItem.image.transform.localPosition = Vector3.zero;
@@ -54,7 +57,7 @@ public class InventorySlot : MonoBehaviour, IDropHandler
             // Equip the new item
             PlayerInventory.Instance.Equip(slotItem.item);
 
-            // Put old item back into original slot
+            // If there was an old item, return it to the original slot
             if (oldItem != null)
             {
                 draggedItem.InitializeItem(oldItem);
@@ -63,13 +66,15 @@ public class InventorySlot : MonoBehaviour, IDropHandler
             }
             else
             {
-                // Clear dragged slot if there was no previous item
+                // Clear dragged slot if nothing was there
                 draggedItem.InitializeItem(null);
             }
+
+            successfulPlacement = true;
         }
         else
         {
-            // Regular inventory slots
+            // Regular inventory slot logic (no swap)
             if (slotItem.item != null)
             {
                 Debug.Log("Slot already has an item!");
@@ -80,6 +85,14 @@ public class InventorySlot : MonoBehaviour, IDropHandler
             draggedItem.image.transform.SetParent(slotItem.transform, false);
             draggedItem.image.transform.localPosition = Vector3.zero;
             draggedItem.InitializeItem(null);
+
+            successfulPlacement = true;
+        }
+
+        // Refresh inventory UI once if placement/swap succeeded
+        if (successfulPlacement && InventoryUI.Instance != null)
+        {
+            InventoryUI.Instance.RefreshInventoryGrid();
         }
     }
 }

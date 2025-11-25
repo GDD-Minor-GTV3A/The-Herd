@@ -27,9 +27,18 @@ public class InventoryUI : MonoBehaviour
 
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject); // Only one instance allowed
+            return;
+        }
+        Instance = this;
+
         if (rootPanel != null)
             rootPanel.SetActive(false);
     }
+
+    public static InventoryUI Instance { get; private set; }
 
     private void OnEnable()
     {
@@ -99,10 +108,14 @@ public class InventoryUI : MonoBehaviour
             if (stack?.item != null) inventoryItems.Add(stack.item);
 
         int totalItems = inventoryItems.Count;
-        int neededRows = Mathf.CeilToInt(totalItems / (float)itemsPerRow);
+        int totalRows = Mathf.CeilToInt(totalItems / (float)itemsPerRow);
+
+        // Optional: always have at least, say, 5 rows visible
+        int minRows = 5;
+        totalRows = Mathf.Max(totalRows, minRows);
 
         // Instantiate rows if needed
-        while (contentParent.childCount < neededRows)
+        while (contentParent.childCount < totalRows)
             Instantiate(rowPrefab, contentParent);
 
         int itemIndex = 0;
@@ -110,7 +123,7 @@ public class InventoryUI : MonoBehaviour
         for (int row = 0; row < contentParent.childCount; row++)
         {
             Transform rowT = contentParent.GetChild(row);
-            rowT.gameObject.SetActive(row < neededRows);
+            rowT.gameObject.SetActive(true); // always visible
 
             for (int col = 0; col < itemsPerRow; col++)
             {
@@ -130,6 +143,7 @@ public class InventoryUI : MonoBehaviour
             }
         }
     }
+
 
     #endregion
 }
