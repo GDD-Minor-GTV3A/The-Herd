@@ -323,11 +323,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 770345679}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!137 &81197524 stripped
-SkinnedMeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 7674838592801339137, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
-  m_PrefabInstance: {fileID: 965960286}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &91579532
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -677,11 +672,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9bfdc30a98070e543ab8937fce26a586, type: 3}
---- !u!137 &233999026 stripped
-SkinnedMeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 7674838592801339137, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
-  m_PrefabInstance: {fileID: 1509006984}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &235613728
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -857,7 +847,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7714255d71fddbd47b2a8dc7a0f1f1fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetRenderer: {fileID: 278936094}
+  targetRenderer: {fileID: 0}
 --- !u!54 &276615975
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -885,11 +875,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!137 &278936094 stripped
-SkinnedMeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 7674838592801339137, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
-  m_PrefabInstance: {fileID: 276615970}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &279796509 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3654070896614733457, guid: 1f8c7c8100a58a8439ef6ef267558492, type: 3}
@@ -1414,7 +1399,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7714255d71fddbd47b2a8dc7a0f1f1fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetRenderer: {fileID: 2063563176}
+  targetRenderer: {fileID: 0}
 --- !u!54 &551326905
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1683,11 +1668,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ee96b7d971449dd48914796f68ef2816, type: 3}
---- !u!137 &623553929 stripped
-SkinnedMeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 7674838592801339137, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
-  m_PrefabInstance: {fileID: 2048757574}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &623850938
 GameObject:
   m_ObjectHideFlags: 0
@@ -2816,7 +2796,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7714255d71fddbd47b2a8dc7a0f1f1fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetRenderer: {fileID: 81197524}
+  targetRenderer: {fileID: 0}
 --- !u!54 &965960291
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -3253,11 +3233,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fafd86a764e6de04988141f2e18b7bef, type: 3}
---- !u!137 &1132756397 stripped
-SkinnedMeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 7674838592801339137, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
-  m_PrefabInstance: {fileID: 1333812559}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1139991034 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 4d1713cf670b1e847bba07b5781c6075, type: 3}
@@ -3571,7 +3546,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7714255d71fddbd47b2a8dc7a0f1f1fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetRenderer: {fileID: 1132756397}
+  targetRenderer: {fileID: 0}
 --- !u!54 &1333812564
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -3961,7 +3936,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7714255d71fddbd47b2a8dc7a0f1f1fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetRenderer: {fileID: 233999026}
+  targetRenderer: {fileID: 0}
 --- !u!54 &1509006989
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -4786,7 +4761,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2322101386113416344, guid: 949b4c49ab05bbb4abde14eee43ce17a, type: 3}
       propertyPath: Lens.NearClipPlane
-      value: 0.01
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2322101386113416344, guid: 949b4c49ab05bbb4abde14eee43ce17a, type: 3}
       propertyPath: Target.TrackingTarget
@@ -6074,7 +6049,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7714255d71fddbd47b2a8dc7a0f1f1fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetRenderer: {fileID: 623553929}
+  targetRenderer: {fileID: 0}
 --- !u!54 &2048757579
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -6102,11 +6077,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!137 &2063563176 stripped
-SkinnedMeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 7674838592801339137, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
-  m_PrefabInstance: {fileID: 551326900}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2087577023
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6379,7 +6349,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7940098435907933061, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 21.352905
+      value: 21.352936
       objectReference: {fileID: 0}
     - target: {fileID: 8132242121706772801, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
