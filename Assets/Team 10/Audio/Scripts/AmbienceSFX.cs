@@ -3,7 +3,6 @@ using UnityEngine;
 public class AmbienceSFX : MonoBehaviour
 {
     public AudioSource Sample1;
-    public AudioSource Sample2;
 
     public float minDelay = 6f;
     public float maxDelay = 10f;
@@ -26,16 +25,34 @@ public class AmbienceSFX : MonoBehaviour
             float initialWait = Random.Range(minDelay, maxDelay);
             yield return new WaitForSeconds(initialWait);
 
-            Sample1.pitch = Random.Range(0.85f, 1.15f);
-            Sample1.panStereo = Random.Range(-1f, 1f);
-            Sample1.Play();
+            int loopCount = Random.Range(3, 7); 
+            float pitch = Random.Range(0.85f, 1.15f);
+            float pan = Random.Range(-1f, 1f);
+
+            Sample1.pitch = pitch;
+            Sample1.panStereo = pan;
+
+            for (int i = 0; i < loopCount; i++)
+            {
+                Sample1.Play();
+                yield return new WaitForSeconds(0.5f);
+            }
 
             float reactionWait = Random.Range(reactionMin, reactionMax);
             yield return new WaitForSeconds(reactionWait);
 
-            Sample2.pitch = Random.Range(0.85f, 1.15f);
-            Sample2.panStereo = Random.Range(-1f, 1f);
-            Sample2.Play();
+            loopCount = Random.Range(2, 6);
+            pitch = Random.Range(0.85f, 1.15f);
+            pan = Random.Range(-1f, 1f);
+
+            Sample1.pitch = pitch;
+            Sample1.panStereo = pan;
+
+            for (int i = 0; i < loopCount; i++)
+            {
+                Sample1.Play();
+                yield return new WaitForSeconds(0.5f);
+            }
 
             float loopWait = Random.Range(loopMin, loopMax);
             yield return new WaitForSeconds(loopWait);
