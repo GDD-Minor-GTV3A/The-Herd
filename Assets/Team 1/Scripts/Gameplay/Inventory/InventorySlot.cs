@@ -3,15 +3,14 @@ using UnityEngine.EventSystems;
 
 /// <summary>
 /// Represents a drop target slot for inventory or equipment items.
-/// Enforces category rules and prevents overwriting existing items.
-/// Works with InventoryItemSlot.
+/// Enforces category rules and swaps items if equipment slot already has an item.
 /// </summary>
 public class InventorySlot : MonoBehaviour, IDropHandler
 {
     [Header("Slot Configuration")]
-    public bool isEquipmentSlot = false;    // true for head/chest/legs/boots
-    public bool isTrinketSlot = false;      // true for trinket slots
-    public ItemCategory slotCategory;       // Relevant only if isEquipmentSlot
+    public bool isEquipmentSlot = false;
+    public bool isTrinketSlot = false;
+    public ItemCategory slotCategory;
 
     public void OnDrop(PointerEventData eventData)
     {
@@ -20,7 +19,7 @@ public class InventorySlot : MonoBehaviour, IDropHandler
         InventoryItemSlot draggedItem = eventData.pointerDrag.GetComponent<InventoryItemSlot>();
         if (draggedItem == null || draggedItem.item == null) return;
 
-        // Check if drop is valid
+        // Check category rules
         if (isEquipmentSlot && draggedItem.item.category != slotCategory)
         {
             Debug.Log("Wrong category for this equipment slot!");
@@ -33,12 +32,7 @@ public class InventorySlot : MonoBehaviour, IDropHandler
             return;
         }
 
-        if (!isEquipmentSlot && !isTrinketSlot)
-        {
-            // Regular inventory slots can accept anything
-        }
-
-        // Find the InventoryItemSlot child in this slot (the slot visual)
+        // Target slot visual
         InventoryItemSlot slotItem = GetComponentInChildren<InventoryItemSlot>();
         if (slotItem == null)
         {
@@ -46,27 +40,46 @@ public class InventorySlot : MonoBehaviour, IDropHandler
             return;
         }
 
-        // Prevent overwriting existing item
-        if (slotItem.item != null)
-        {
-            Debug.Log("Slot already has an item!");
-            return;
-        }
-
-        // Assign item to slot visually
-        slotItem.InitializeItem(draggedItem.item);
-
-        // Move the icon to the slot
-        draggedItem.image.transform.SetParent(slotItem.transform, false);
-        draggedItem.image.transform.localPosition = Vector3.zero;
-
-        // Update dragged item's original parent
-        draggedItem.originalParent = slotItem.transform;
-
-        // Equip if relevant
+        // SWAP logic for equipment/trinkets
         if (isEquipmentSlot || isTrinketSlot)
         {
-            PlayerInventory.Instance.Equip(draggedItem.item);
+            InventoryItem oldItem = slotItem.item;  // the item currently in the slot
+            Transform oldParent = draggedItem.originalParent; // where dragged item came from
+
+            // Move dragged item into target slot
+            slotItem.InitializeItem(draggedItem.item);
+            draggedItem.image.transform.SetParent(slotItem.transform, false);
+            draggedItem.image.transform.localPosition = Vector3.zero;
+
+            // Equip the new item
+            PlayerInventory.Instance.Equip(slotItem.item);
+
+            // Put old item back into original slot
+            if (oldItem != null)
+            {
+                draggedItem.InitializeItem(oldItem);
+                draggedItem.image.transform.SetParent(oldParent, false);
+                draggedItem.image.transform.localPosition = Vector3.zero;
+            }
+            else
+            {
+                // Clear dragged slot if there was no previous item
+                draggedItem.InitializeItem(null);
+            }
+        }
+        else
+        {
+            // Regular inventory slots
+            if (slotItem.item != null)
+            {
+                Debug.Log("Slot already has an item!");
+                return;
+            }
+
+            slotItem.InitializeItem(draggedItem.item);
+            draggedItem.image.transform.SetParent(slotItem.transform, false);
+            draggedItem.image.transform.localPosition = Vector3.zero;
+            draggedItem.InitializeItem(null);
         }
     }
 }

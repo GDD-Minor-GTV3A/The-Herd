@@ -5,9 +5,12 @@ using UnityEngine.UI;
 public class InventoryItemSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     [Header("UI References")]
-    public Image image;                        // <-- The Icon child
+    public Image image;                        // Icon child
     [SerializeField] private Transform dragCanvas;
     [SerializeField, HideInInspector] public InventoryItem item;
+
+    [Header("Settings")]
+    public bool draggable = true;              // Set to false for equipment/trinket slots
 
     public Transform originalParent;
     private int originalSiblingIndex;
@@ -16,17 +19,16 @@ public class InventoryItemSlot : MonoBehaviour, IBeginDragHandler, IDragHandler,
     public void InitializeItem(InventoryItem newItem)
     {
         this.item = newItem;
-        if (newItem != null)
+        if (image != null)
         {
-            this.image.sprite = item.icon;
-            this.image.enabled = true;
+            image.sprite = item?.icon;
+            image.enabled = item != null;
         }
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        if (image == null || image.sprite == null)
-            return;
+        if (!draggable || image == null || image.sprite == null) return;
 
         originalParent = image.transform.parent;
         originalSiblingIndex = image.transform.GetSiblingIndex();
@@ -34,7 +36,6 @@ public class InventoryItemSlot : MonoBehaviour, IBeginDragHandler, IDragHandler,
         RectTransform rt = (RectTransform)image.transform;
         originalSizeDelta = rt.sizeDelta;
 
-        // Move to drag canvas
         image.transform.SetParent(dragCanvas, false);
         image.transform.SetAsLastSibling();
         image.raycastTarget = false;
@@ -44,25 +45,22 @@ public class InventoryItemSlot : MonoBehaviour, IBeginDragHandler, IDragHandler,
 
     public void OnDrag(PointerEventData eventData)
     {
+        if (!draggable || image == null) return;
         ((RectTransform)image.transform).position = eventData.position;
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        if (image == null)
-            return;
+        if (!draggable || image == null) return;
 
         // Restore to slot
         image.transform.SetParent(originalParent, false);
         image.transform.SetSiblingIndex(originalSiblingIndex);
         image.raycastTarget = true;
 
-        // FIX: Layout Group messes up position → force reset
         RectTransform rt = (RectTransform)image.transform;
         rt.anchoredPosition = Vector2.zero;
         rt.localPosition = Vector3.zero;
-
-        // FIX: Restore size broken by LayoutGroup
         rt.sizeDelta = originalSizeDelta;
     }
 }
