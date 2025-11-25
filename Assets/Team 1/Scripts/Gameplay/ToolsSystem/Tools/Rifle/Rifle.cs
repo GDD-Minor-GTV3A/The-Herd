@@ -89,6 +89,14 @@ namespace Gameplay.ToolsSystem.Tools.Rifle
             }
             HideUI();
             HideTool();
+            EventManager.AddListener<AddBulletsToRifleEvent>(AddFreeBullets);
+        }
+
+
+        private void AddFreeBullets(AddBulletsToRifleEvent evt)
+        {
+            freeAmmo += (uint)evt.Amount;
+            OnAmmoChanged?.Invoke(currentMagazineAmmo, freeAmmo);
         }
 
 
@@ -192,7 +200,12 @@ namespace Gameplay.ToolsSystem.Tools.Rifle
             else
                 ammoToLoad = (uint)magazineCapacity;
 
+            EventManager.Broadcast(new SpawnNewBulletCollectableEvent(transform.position, shotPoint.forward, currentMagazineAmmo));
+            
             currentMagazineAmmo = 0;
+
+
+
             OnAmmoChanged?.Invoke(currentMagazineAmmo, freeAmmo);
 
             canFire = false;

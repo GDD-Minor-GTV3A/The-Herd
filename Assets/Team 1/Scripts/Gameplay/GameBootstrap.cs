@@ -1,3 +1,4 @@
+using Gameplay.Collectables;
 using Gameplay.FogOfWar;
 
 using UnityEngine;
@@ -18,6 +19,9 @@ namespace Gameplay
         [SerializeField]
         private FogOfWarManager fogOfWar;
 
+        [SerializeField]
+        private CollectablesManager collectablesManager;
+
 
         private void Start()
         {
@@ -32,6 +36,9 @@ namespace Gameplay
 
             if (fogOfWar != null)
                 fogOfWar.Initialize();
+
+            if (collectablesManager != null)
+                collectablesManager.Initialize();
         }
     }
 }
