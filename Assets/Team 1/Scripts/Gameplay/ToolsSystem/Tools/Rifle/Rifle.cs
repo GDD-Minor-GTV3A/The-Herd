@@ -1,16 +1,11 @@
 ﻿using System.Collections;
-
 using Core.Events;
 using Core.Shared;
-
+using CustomEditor.Attributes;
 using Gameplay.Player;
-
 using UI;
-
 using UnityEngine;
 using UnityEngine.Events;
-
-using static UnityEditor.Graphs.GraphGUI;
 
 namespace Gameplay.ToolsSystem.Tools.Rifle
 {
@@ -19,12 +14,7 @@ namespace Gameplay.ToolsSystem.Tools.Rifle
     /// </summary>
     public class Rifle : PlayerTool
     {
-        /// <summary>
-        /// Invokes when current ammo amount changed;
-        /// </summary>
-        public UnityEvent<int> OnAmmoChanged;
-
-        [Space, Header("Configuration")]
+        [Header("Configuration")]
         [SerializeField, Tooltip("Rifle config asset.")]
         private RifleConfig config;
 
@@ -34,22 +24,37 @@ namespace Gameplay.ToolsSystem.Tools.Rifle
         [SerializeField, Tooltip("Animator component of the rifle.")] 
         private Animator animator;
 
+        
+
 
         // --- Runtime State ---
-        private int currentAmmo;
+        private uint freeAmmo;
+        private int currentMagazineAmmo;
+        private int magazineCapacity;
         private bool isBoltClosed = true;
         private bool canFire = true;
         private bool isCycling = false;
         private bool isReloading = false;
+        private bool isAiming = false;
 
         private PlayerAnimator playerAnimator;
         private BulletPool bulletPool;
 
 
-        public int CurrentAmmo => currentAmmo;
-       
+        /// <summary>
+        /// Invokes when current ammo amount changed;
+        /// </summary>
+        public UnityEvent<int, uint> OnAmmoChanged;
 
 
+        public int CurrentAmmo => currentMagazineAmmo;
+
+
+        [Space, Header("Debug")]
+        [SerializeField, Tooltip("Show fire spread conus. Shot point and config has to be assigned.")]
+        private bool showFireSpread;
+        [SerializeField, ShowIf("showFireSpread"), Range(10f, 500f)]
+        private float fireSpreadLinesLength = 10;
 
 
         /// <summary>
@@ -64,13 +69,18 @@ namespace Gameplay.ToolsSystem.Tools.Rifle
                 return;
             }
 
+            isAiming = false;
+
 
             // Initialize the bullet pool using values from config
             bulletPool = new BulletPool(config.BulletPrefab, config.Damage, initialCapacity: 0, maxSize: config.MaxPoolSize);
 
             playerAnimator = animator;
-            currentAmmo = config.MaxAmmo;
-            OnAmmoChanged?.Invoke(currentAmmo);
+            magazineCapacity = config.MaxAmmo;
+            currentMagazineAmmo = magazineCapacity;
+            freeAmmo = config.InitialFreeAmmo;
+
+            OnAmmoChanged?.Invoke(currentMagazineAmmo, freeAmmo);
 
              CooldownUI _cooldown = toolUI.GetComponentInChildren<CooldownUI>(true);
             if (_cooldown != null)
@@ -84,7 +94,7 @@ namespace Gameplay.ToolsSystem.Tools.Rifle
 
         public override void MainUsageStarted(Observable<Vector3> cursorWorldPosition)
         {
-            if (!canFire || isCycling || !isBoltClosed || currentAmmo <= 0) return;
+            if (!canFire || isCycling || !isBoltClosed || currentMagazineAmmo <= 0) return;
             Fire();
         }
         public override void MainUsageFinished() { }
@@ -95,26 +105,41 @@ namespace Gameplay.ToolsSystem.Tools.Rifle
             EventManager.Broadcast(new ZoomCameraEvent(20));
             EventManager.Broadcast(new ChangeConePlayerRevealerFOVEvent(-50));
             EventManager.Broadcast(new ChangeConePlayerRevealerDistnaceEvent(50));
+            isAiming = true;
         }
         public override void SecondaryUsageFinished()
         {
             EventManager.Broadcast(new ZoomCameraEvent(-20));
             EventManager.Broadcast(new ChangeConePlayerRevealerFOVEvent(50));
             EventManager.Broadcast(new ChangeConePlayerRevealerDistnaceEvent(-50));
+            isAiming = false;
         }
 
 
         private void Fire()
         {
-            if (currentAmmo <= 0 || isReloading || !canFire) return;
+            if (!config.IsInfiniteMagazine && (currentMagazineAmmo <= 0 || isReloading || !canFire)) return;
 
-            currentAmmo--;
-            OnAmmoChanged?.Invoke(currentAmmo);
+            if (!config.IsInfiniteMagazine)
+            {
+                currentMagazineAmmo--;
+                OnAmmoChanged?.Invoke(currentMagazineAmmo, freeAmmo);
+            }
+
             canFire = false;
 
             Bullet _bullet = bulletPool.Get();
             _bullet.transform.SetPositionAndRotation(shotPoint.position, shotPoint.rotation);
-            _bullet.Shoot(shotPoint.forward);
+
+            Vector3 bulletDirection = shotPoint.forward;
+
+            if (!isAiming)
+            {
+                float halfAngle = config.SpreadAngle / 2;
+                bulletDirection = Quaternion.AngleAxis(Random.Range(-halfAngle, halfAngle), shotPoint.up) * bulletDirection;
+            }
+
+            _bullet.Shoot(bulletDirection);
 
             OnMainUse?.Invoke();
             animator.SetTrigger("BoltCycle");
@@ -132,7 +157,7 @@ namespace Gameplay.ToolsSystem.Tools.Rifle
             yield return new WaitForSeconds(_step); // open bolt
             yield return new WaitForSeconds(_step); // eject round
 
-            if (currentAmmo <= 0)
+            if (currentMagazineAmmo <= 0)
             {
                 isCycling = false;
                 isBoltClosed = true;
@@ -150,13 +175,25 @@ namespace Gameplay.ToolsSystem.Tools.Rifle
 
         public override void Reload()
         {
-            if (!isCycling && !isReloading)
+            if (!isCycling && !isReloading && !config.IsInfiniteMagazine)
                 StartCoroutine(ReloadRoutine());
         }
 
         private IEnumerator ReloadRoutine()
         {
-            if (currentAmmo == config.MaxAmmo) yield break;
+            if (currentMagazineAmmo == magazineCapacity) yield break;
+            if (freeAmmo == 0 && !config.IsInfiniteAmmo) yield break;
+
+
+            uint ammoToLoad;
+
+            if (!config.IsInfiniteAmmo)
+                ammoToLoad = (uint)Mathf.Clamp((int)freeAmmo, 0, magazineCapacity);
+            else
+                ammoToLoad = (uint)magazineCapacity;
+
+            currentMagazineAmmo = 0;
+            OnAmmoChanged?.Invoke(currentMagazineAmmo, freeAmmo);
 
             canFire = false;
             isReloading = true;
@@ -168,8 +205,11 @@ namespace Gameplay.ToolsSystem.Tools.Rifle
 
             yield return new WaitForSeconds(config.ReloadTime);
 
-            currentAmmo = config.MaxAmmo;
-            OnAmmoChanged?.Invoke(currentAmmo);
+            if (!config.IsInfiniteAmmo)
+                freeAmmo -= ammoToLoad;
+
+            currentMagazineAmmo = (int)ammoToLoad;
+            OnAmmoChanged?.Invoke(currentMagazineAmmo, freeAmmo);
             isBoltClosed = true;
             canFire = true;
             isReloading = false;
@@ -195,6 +235,33 @@ namespace Gameplay.ToolsSystem.Tools.Rifle
             playerAnimator.GetTool(keyPoints);
             animator.SetFloat("BoltCycleSpeed", 1 / config.BoltCycleTime);
             animator.SetFloat("ReloadSpeed", 1 / config.ReloadTime);
+        }
+
+
+        public void AddBullets(uint bulletsAmount)
+        {
+            freeAmmo += bulletsAmount;
+        }
+
+
+        private void OnDrawGizmos()
+        {
+            if (showFireSpread && config != null && shotPoint != null)
+            {
+
+                float halfAngle = config.SpreadAngle / 2;
+
+                Vector3 leftEdge = Quaternion.AngleAxis(-halfAngle, shotPoint.up) * shotPoint.forward;
+                Vector3 rightEdge = Quaternion.AngleAxis(halfAngle, shotPoint.up) * shotPoint.forward;
+
+                leftEdge *= fireSpreadLinesLength;
+                rightEdge *= fireSpreadLinesLength;
+
+                Gizmos.color = Color.red;
+                Gizmos.DrawRay(shotPoint.position, leftEdge);
+                Gizmos.DrawRay(shotPoint.position, rightEdge);
+            }
+
         }
     }
 }
