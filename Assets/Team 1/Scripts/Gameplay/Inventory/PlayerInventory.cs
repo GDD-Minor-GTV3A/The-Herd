@@ -1,55 +1,90 @@
 ﻿using System;
-using UnityEngine;
 using System.Collections.Generic;
 
+using UnityEngine;
+
+/// <summary>
+/// Singleton manager for the player's inventory.
+/// Handles items, equipment, trinkets, and currency (scrolls & revive totems).
+/// Supports adding/removing, equipping/unequipping, and persistent save/load.
+/// </summary>
 public class PlayerInventory : MonoBehaviour
 {
+    // -------------------------
+    // Singleton
+    // -------------------------
     public static PlayerInventory Instance { get; private set; }
 
-    [Header("Runtime Data")]
-    public InventoryData data = new InventoryData();
+    [Header("Inventory Data")]
+    public InventoryData data = new();       // Core inventory data
+    public int maxTrinkets = 3;              // Maximum number of equipped trinkets
 
-    [Header("Settings")]
-    public int maxTrinkets = 3;
-
+    // Events to notify UI or systems of changes
     public event Action OnInventoryChanged;
     public event Action OnEquipmentChanged;
 
+    // -------------------------
+    // Unity Lifecycle
+    // -------------------------
     private void Awake()
     {
-        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        // Ensure singleton pattern
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         Instance = this;
         DontDestroyOnLoad(gameObject);
     }
 
     private void Start()
     {
+        // Load inventory from persistent storage on game start
         InventorySaveManager.Load(this);
-        OnInventoryChanged?.Invoke();
-        OnEquipmentChanged?.Invoke();
+        RaiseInventoryChanged();
+        RaiseEquipmentChanged();
     }
 
     private void OnApplicationQuit()
     {
+        // Save inventory before exiting the game
         InventorySaveManager.Save(this);
     }
 
-    // =======================
-    // CURRENCY
-    // =======================
-    public void AddScroll(int amount) { data.scrolls += amount; OnInventoryChanged?.Invoke(); }
+    // -------------------------
+    // Currency Management
+    // -------------------------
+    public void AddScroll(int amount) => ChangeScroll(amount);
+
     public bool SpendScroll(int amount)
     {
-        if (data.scrolls < amount) return false;
-        data.scrolls -= amount;
-        OnInventoryChanged?.Invoke();
+        if (data.scrolls < amount) return false; // Not enough scrolls
+        ChangeScroll(-amount);
         return true;
     }
-    public void AddReviveTotem(int amount) { data.reviveTotems += amount; OnInventoryChanged?.Invoke(); }
 
-    // =======================
-    // ITEM MANAGEMENT
-    // =======================
+    public void AddReviveTotem(int amount) => ChangeReviveTotem(amount);
+
+    private void ChangeScroll(int amount)
+    {
+        data.scrolls = Mathf.Max(0, data.scrolls + amount); // Prevent negative
+        RaiseInventoryChanged();
+    }
+
+    private void ChangeReviveTotem(int amount)
+    {
+        data.reviveTotems = Mathf.Max(0, data.reviveTotems + amount); // Prevent negative
+        RaiseInventoryChanged();
+    }
+
+    // -------------------------
+    // Item Management
+    // -------------------------
+    /// <summary>
+    /// Adds an item to inventory, handling stacks, currency, or equippable items.
+    /// </summary>
     public void AddItem(InventoryItem item)
     {
         if (item == null) return;
@@ -57,29 +92,21 @@ public class PlayerInventory : MonoBehaviour
         switch (item.category)
         {
             case ItemCategory.Active:
-                var existing = data.items.Find(s => s.item == item);
-                if (existing != null)
-                    existing.uses++;
-                else
-                    data.items.Add(new InventoryStack(item, 1));
+                var stack = data.items.Find(s => s.item == item);
+                if (stack != null) stack.uses++;
+                else data.items.Add(new InventoryStack(item, 1));
                 break;
-
-            case ItemCategory.Scroll:
-                AddScroll(1);
-                break;
-
-            case ItemCategory.ReviveTotem:
-                AddReviveTotem(1);
-                break;
-
-            default: // wearable / trinket / etc
-                data.items.Add(new InventoryStack(item, 1));
-                break;
+            case ItemCategory.Scroll: AddScroll(1); break;
+            case ItemCategory.ReviveTotem: AddReviveTotem(1); break;
+            default: data.items.Add(new InventoryStack(item, 1)); break;
         }
 
-        OnInventoryChanged?.Invoke();
+        RaiseInventoryChanged();
     }
 
+    /// <summary>
+    /// Removes an item from inventory, reducing stacks or currency as appropriate.
+    /// </summary>
     public void RemoveItem(InventoryItem item)
     {
         if (item == null) return;
@@ -90,122 +117,115 @@ public class PlayerInventory : MonoBehaviour
                 var stack = data.items.Find(s => s.item == item);
                 if (stack == null) return;
                 stack.uses--;
-                if (stack.uses <= 0)
-                    data.items.Remove(stack);
+                if (stack.uses <= 0) data.items.Remove(stack);
                 break;
-
             case ItemCategory.Scroll:
                 if (data.scrolls > 0) data.scrolls--;
                 break;
-
             case ItemCategory.ReviveTotem:
                 if (data.reviveTotems > 0) data.reviveTotems--;
                 break;
-
-            default: // wearable / trinket
+            default:
                 var wstack = data.items.Find(s => s.item == item);
                 if (wstack != null) data.items.Remove(wstack);
                 break;
         }
 
-        OnInventoryChanged?.Invoke();
+        RaiseInventoryChanged();
     }
 
+    /// <summary>
+    /// Uses an active item, decreasing its stack count.
+    /// </summary>
     public void UseActiveItem(InventoryItem item)
     {
-        if (item == null || item.category != ItemCategory.Active) return;
-
-        Debug.Log($"Used: {item.itemName}");
+        if (item?.category != ItemCategory.Active) return;
+        Debug.Log($"Used {item.itemName}");
         RemoveItem(item);
     }
 
-    // =======================
-    // EQUIP / UNEQUIP
-    // =======================
+    // -------------------------
+    // Equip/Unequip
+    // -------------------------
+    /// <summary>
+    /// Equip an item to the appropriate slot or trinket list.
+    /// Automatically removes it from inventory.
+    /// </summary>
     public void Equip(InventoryItem item)
     {
         if (item == null) return;
 
         switch (item.category)
         {
-            case ItemCategory.Headgear:
-                if (data.headgear != null) AddItem(data.headgear);
-                data.headgear = item;
-                break;
-
-            case ItemCategory.Chestwear:
-                if (data.chestwear != null) AddItem(data.chestwear);
-                data.chestwear = item;
-                break;
-
-            case ItemCategory.Legwear:
-                if (data.legwear != null) AddItem(data.legwear);
-                data.legwear = item;
-                break;
-
-            case ItemCategory.Boots:
-                if (data.boots != null) AddItem(data.boots);
-                data.boots = item;
-                break;
-
-            case ItemCategory.Trinket:
-                if (data.trinkets.Count < maxTrinkets)
-                {
-                    data.trinkets.Add(item);
-                }
-                else
-                {
-                    // Randomly choose a slot to replace
-                    int randomIndex = UnityEngine.Random.Range(0, data.trinkets.Count);
-                    var replaced = data.trinkets[randomIndex];
-
-                    // Return the replaced trinket to inventory
-                    AddItem(replaced);
-
-                    // Replace with new trinket
-                    data.trinkets[randomIndex] = item;
-                }
-                break;
-
+            case ItemCategory.Headgear: Replace(ref data.headgear, item); break;
+            case ItemCategory.Chestwear: Replace(ref data.chestwear, item); break;
+            case ItemCategory.Legwear: Replace(ref data.legwear, item); break;
+            case ItemCategory.Boots: Replace(ref data.boots, item); break;
+            case ItemCategory.Trinket: EquipTrinket(item); break;
             default:
-                Debug.LogWarning("Equip() called on non-equip item.");
+                Debug.LogWarning("Trying to equip non-equippable item");
                 return;
         }
 
         RemoveItem(item);
-        OnEquipmentChanged?.Invoke();
-        OnInventoryChanged?.Invoke();
+        RaiseEquipmentChanged();
+        RaiseInventoryChanged();
     }
 
+    /// <summary>
+    /// Helper to replace a wearable slot while returning the old item to inventory.
+    /// </summary>
+    private void Replace(ref InventoryItem slot, InventoryItem newItem)
+    {
+        if (slot != null) AddItem(slot);
+        slot = newItem;
+    }
+
+    /// <summary>
+    /// Equip a trinket; replaces a random one if maxTrinkets reached.
+    /// </summary>
+    private void EquipTrinket(InventoryItem item)
+    {
+        if (data.trinkets.Count < maxTrinkets) data.trinkets.Add(item);
+        else
+        {
+            int idx = UnityEngine.Random.Range(0, data.trinkets.Count);
+            AddItem(data.trinkets[idx]); // return old trinket to inventory
+            data.trinkets[idx] = item;
+        }
+    }
+
+    /// <summary>
+    /// Unequip an item, returning it to inventory.
+    /// </summary>
     public void Unequip(InventoryItem item)
     {
         if (item == null) return;
 
         if (data.headgear == item) data.headgear = null;
-        if (data.chestwear == item) data.chestwear = null;
-        if (data.legwear == item) data.legwear = null;
-        if (data.boots == item) data.boots = null;
-        if (data.trinkets.Contains(item)) data.trinkets.Remove(item);
+        else if (data.chestwear == item) data.chestwear = null;
+        else if (data.legwear == item) data.legwear = null;
+        else if (data.boots == item) data.boots = null;
+        else if (data.trinkets.Contains(item)) data.trinkets.Remove(item);
 
         AddItem(item);
-        OnEquipmentChanged?.Invoke();
-        OnInventoryChanged?.Invoke();
+        RaiseEquipmentChanged();
+        RaiseInventoryChanged();
     }
 
-    public int GetUses(InventoryItem item)
-    {
-        if (item == null) return 0;
+    // -------------------------
+    // Helpers / Utilities
+    // -------------------------
+    /// <summary>Returns remaining uses of an active item.</summary>
+    public int GetUses(InventoryItem item) => data.items.Find(s => s.item == item)?.uses ?? 0;
 
-        InventoryStack stack = data.items.Find(s => s.item == item);
-        return stack != null ? stack.uses : 0;
-    }
-
-    // Helper
-    public string GetEquippedSummary()
-    {
-        return $"Head:{data.headgear?.itemName} Chest:{data.chestwear?.itemName} Legs:{data.legwear?.itemName} Boots:{data.boots?.itemName} Trinkets:{data.trinkets.Count}";
-    }
-
+    /// <summary>Raise inventory change event.</summary>
     public void RaiseInventoryChanged() => OnInventoryChanged?.Invoke();
+
+    /// <summary>Raise equipment change event.</summary>
     public void RaiseEquipmentChanged() => OnEquipmentChanged?.Invoke();
+
+    /// <summary>Quick summary of currently equipped items and trinkets count.</summary>
+    public string GetEquippedSummary() =>
+        $"Head:{data.headgear?.itemName} Chest:{data.chestwear?.itemName} Legs:{data.legwear?.itemName} Boots:{data.boots?.itemName} Trinkets:{data.trinkets.Count}";
 }

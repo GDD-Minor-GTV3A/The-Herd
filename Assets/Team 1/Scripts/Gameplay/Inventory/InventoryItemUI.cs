@@ -1,116 +1,189 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-using System;
 
+/// <summary>
+/// UI representation of a single inventory item or equipment slot.
+/// Handles display of item icons, placeholder visuals, click interactions, and drag-and-drop functionality.
+/// </summary>
 [RequireComponent(typeof(CanvasGroup))]
 public class InventoryItemUI : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    public Image iconImage;
-    public InventoryItem item;
+    [Header("Item Data")]
+    public InventoryItem item;          // The item represented by this UI slot
+    public Image iconImage;             // Image component displaying the item's icon
 
-    private Transform originalParent;
-    private CanvasGroup group;
+    [Header("Slot Info (optional)")]
+    public bool isEquipmentSlot = false; // True if this UI slot represents equipment/trinkets
+    public ItemCategory slotCategory;    // Category of equipment this slot represents
+
+    // Private references
+    private CanvasGroup cg;
     private RectTransform rect;
-    private Canvas rootCanvas;
+    private Transform originalParent;   // Store original parent for drag revert
+    private Canvas rootCanvas;          // Top-level canvas reference for dragging
 
     private void Awake()
     {
-        group = GetComponent<CanvasGroup>();
+        cg = GetComponent<CanvasGroup>();
         rect = GetComponent<RectTransform>();
         rootCanvas = GetComponentInParent<Canvas>();
     }
 
-    public void SetItem(InventoryItem newItem)
+    /// <summary>
+    /// Updates this slot's item and visual representation.
+    /// </summary>
+    /// <param name="newItem">The new item to display</param>
+    /// <param name="placeholder">Optional placeholder sprite when item is null</param>
+    public void SetItem(InventoryItem newItem, Sprite placeholder = null)
     {
         item = newItem;
-        iconImage.sprite = item ? item.icon : null;
-        iconImage.enabled = item != null;
+
+        if (iconImage != null)
+        {
+            if (item != null)
+                iconImage.sprite = item.icon;
+            else if (placeholder != null)
+                iconImage.sprite = placeholder;
+
+            iconImage.enabled = true; // Always show the slot
+        }
     }
 
+    /// <summary>
+    /// Handles right-click usage or equipping of the item.
+    /// </summary>
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (eventData.button != PointerEventData.InputButton.Right) return;
-        if (item == null) return;
+        if (item == null || eventData.button != PointerEventData.InputButton.Right) return;
 
-        // Right click: use if active, else quick equip
         if (item.category == ItemCategory.Active)
-        {
             PlayerInventory.Instance.UseActiveItem(item);
-        }
         else
-        {
             PlayerInventory.Instance.Equip(item);
-        }
     }
 
-    // ----- Drag & Drop -----
+    #region Drag & Drop
+
+    /// <summary>
+    /// Called when dragging starts.
+    /// Temporarily moves the slot to the root canvas and disables raycasts.
+    /// </summary>
     public void OnBeginDrag(PointerEventData eventData)
     {
         if (item == null) return;
+
         originalParent = transform.parent;
-        transform.SetParent(rootCanvas.transform, true);
-        group.blocksRaycasts = false;
+        transform.SetParent(rootCanvas.transform, true); // Drag above all UI
+        cg.blocksRaycasts = false;
     }
 
+    /// <summary>
+    /// Moves the slot with the pointer during dragging.
+    /// </summary>
     public void OnDrag(PointerEventData eventData)
     {
         if (item == null) return;
         rect.position = eventData.position;
     }
 
+    /// <summary>
+    /// Ends dragging. Checks for a valid target to swap items or reverts to original position.
+    /// </summary>
     public void OnEndDrag(PointerEventData eventData)
     {
-        group.blocksRaycasts = true;
+        cg.blocksRaycasts = true;
 
-        // Check what's under pointer
+        // Detect UI elements under pointer
         var results = new System.Collections.Generic.List<RaycastResult>();
         EventSystem.current.RaycastAll(eventData, results);
+
         foreach (var r in results)
         {
-            var other = r.gameObject.GetComponent<InventoryItemUI>();
-            if (other != null && other != this)
+            var targetUI = r.gameObject.GetComponent<InventoryItemUI>();
+            if (targetUI != null && targetUI != this)
             {
-                SwapWith(other);
+                HandleSwap(targetUI); // Swap items if valid target
                 return;
             }
         }
 
-        // revert
+        // No valid target: revert to original parent and position
         transform.SetParent(originalParent, true);
         rect.localPosition = Vector3.zero;
     }
 
-    private void SwapWith(InventoryItemUI other)
+    /// <summary>
+    /// Handles swapping of items between two inventory slots.
+    /// Handles all combinations of inventory vs equipment slots.
+    /// </summary>
+    private void HandleSwap(InventoryItemUI target)
     {
         var inv = PlayerInventory.Instance;
 
-        // Inventory grid swap
-        bool thisInGrid = originalParent.name.ToLower().Contains("grid");
-        bool otherInGrid = other.transform.parent.name.ToLower().Contains("grid");
+        // -------- Equipment -> Inventory --------
+        if (isEquipmentSlot && !target.isEquipmentSlot)
+        {
+            inv.Unequip(item);
 
-        if (thisInGrid && otherInGrid)
-        {
-            int a = inv.data.items.FindIndex(s => s.item == item);
-            int b = inv.data.items.FindIndex(s => s.item == other.item);
-            if (a >= 0 && b >= 0)
-            {
-                var tmp = inv.data.items[a];
-                inv.data.items[a] = inv.data.items[b];
-                inv.data.items[b] = tmp;
-                inv.RaiseInventoryChanged();
-            }
+            if (target.item != null)
+                inv.Equip(target.item);
+
+            var tmp = target.item;
+            target.SetItem(item);
+            SetItem(tmp);
         }
-        else
+        // -------- Inventory -> Equipment --------
+        else if (!isEquipmentSlot && target.isEquipmentSlot)
         {
-            // Equip/unequip swap
-            if (other.item != null)
-                inv.AddItem(other.item); // put existing into inventory
             inv.Equip(item);
+
+            if (target.item != null)
+                inv.AddItem(target.item);
+
+            var tmp = target.item;
+            target.SetItem(item);
+            SetItem(tmp);
+        }
+        // -------- Inventory -> Inventory --------
+        else if (!isEquipmentSlot && !target.isEquipmentSlot)
+        {
+            int idxA = inv.data.items.FindIndex(s => s.item == item);
+            int idxB = inv.data.items.FindIndex(s => s.item == target.item);
+            if (idxA >= 0 && idxB >= 0)
+            {
+                var tmp = inv.data.items[idxA];
+                inv.data.items[idxA] = inv.data.items[idxB];
+                inv.data.items[idxB] = tmp;
+            }
+
+            var tmpItem = target.item;
+            target.SetItem(item);
+            SetItem(tmpItem);
+        }
+        // -------- Equipment -> Equipment --------
+        else if (isEquipmentSlot && target.isEquipmentSlot)
+        {
+            if (item != null) inv.Unequip(item);
+            if (target.item != null) inv.Unequip(target.item);
+
+            if (item != null) inv.Equip(item);
+            if (target.item != null) inv.Equip(target.item);
+
+            var tmpItem = target.item;
+            target.SetItem(item);
+            SetItem(tmpItem);
         }
 
-        // Refresh UI
+        // Notify inventory and equipment listeners
         inv.RaiseInventoryChanged();
         inv.RaiseEquipmentChanged();
+
+        // Reset both slots to original positions
+        transform.SetParent(originalParent, true);
+        rect.localPosition = Vector3.zero;
+        target.rect.localPosition = Vector3.zero;
     }
+
+    #endregion
 }
