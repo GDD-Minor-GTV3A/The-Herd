@@ -16,6 +16,9 @@ namespace Gameplay.Player
 
 
         private InputActionAsset inputActions;
+
+        private InputActionMap _currentMap;
+        private InputActionMap _secondaryMap;
         private Camera mainCamera;
         private bool isPaused;
 
@@ -97,20 +100,26 @@ namespace Gameplay.Player
         {
             this.inputActions = inputActions;
             mainCamera = Camera.main;
+            _currentMap = this.inputActions.FindActionMap("Player");
+            _secondaryMap = this.inputActions.FindActionMap("UI");
+
 
             // Get Input Actions
-            moveAction = this.inputActions.FindActionMap("Player").FindAction("Move");
-            lookAction = this.inputActions.FindActionMap("Player").FindAction("Look");
-            runAction = this.inputActions.FindActionMap("Player").FindAction("Sprint");
-            reloadAction = this.inputActions.FindActionMap("Player").FindAction("Reload");
-            mainUsageAction = this.inputActions.FindActionMap("Player").FindAction("MainUsage");
-            secondaryUsageAction = this.inputActions.FindActionMap("Player").FindAction("SecondaryUsage");
-            slotsScrollAction = this.inputActions.FindActionMap("Player").FindAction("SlotsScroll");
-            slot1_Action = this.inputActions.FindActionMap("Player").FindAction("Slot_1");
-            slot2_Action = this.inputActions.FindActionMap("Player").FindAction("Slot_2");
-            slot3_Action = this.inputActions.FindActionMap("Player").FindAction("Slot_3");
+            moveAction = _currentMap.FindAction("Move");
+            lookAction = _currentMap.FindAction("Look");
+            runAction = _currentMap.FindAction("Sprint");
+            reloadAction = _currentMap.FindAction("Reload");
+            mainUsageAction = _currentMap.FindAction("MainUsage");
+            secondaryUsageAction = _currentMap.FindAction("SecondaryUsage");
+            slotsScrollAction = _currentMap.FindAction("SlotsScroll");
+            slot1_Action = _currentMap.FindAction("Slot_1");
+            slot2_Action = _currentMap.FindAction("Slot_2");
+            slot3_Action = _currentMap.FindAction("Slot_3");
+
 
             EventManager.Broadcast(new RegisterNewPausableEvent(this));
+
+            _currentMap.Enable();
 
             // Enable input actions
             Resume();
@@ -132,34 +141,26 @@ namespace Gameplay.Player
 
         public void Pause()
         {
-            moveAction.Disable();
-            lookAction.Disable();
-            runAction.Disable();
-            reloadAction.Disable();
-            mainUsageAction.Disable();
-            secondaryUsageAction.Disable();
-            slotsScrollAction.Disable();
-            slot1_Action.Disable();
-            slot2_Action.Disable();
-            slot3_Action.Disable();
+            _currentMap.Disable();
+
 
             isPaused = true;
         }
 
         public void Resume()
         {
-            moveAction.Enable();
-            lookAction.Enable();
-            runAction.Enable();
-            reloadAction.Enable();
-            mainUsageAction.Enable();
-            secondaryUsageAction.Enable();
-            slotsScrollAction.Enable();
-            slot1_Action.Enable();
-            slot2_Action.Enable();
-            slot3_Action.Enable();
+            _currentMap.Enable();
 
             isPaused = false;
+        }
+
+
+        public void SwitchControlMap()
+        {
+            (_currentMap, _secondaryMap) = (_secondaryMap, _currentMap);
+
+            _currentMap.Enable();
+            _secondaryMap.Disable();
         }
     }
 }
