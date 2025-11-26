@@ -37,8 +37,12 @@ namespace Core.AI.Sheep.Personality
         /// Allow personality to override state transitions
         /// </summary>
         Type GetNextState(Type currentState, Type proposedState, SheepStateManager sheep, PersonalityBehaviorContext context);
-        
 
+        /// <summary>
+        /// Determine if that personality allows petting in the current scene
+        /// </summary>
+        bool CanBePetted(string currentSceneName);
+        
         /// <summary>
         /// Called when sheep detects a threat/enemy
         /// </summary>

@@ -54,7 +54,7 @@ namespace Core.AI.Sheep
 
             if (speed >= _runThreshold && Time.time >= nextJumpTime && !IsInJump())
             {
-
+                Debug.Log("Jump");
                 _animator.SetTrigger(_jumpHash);
                 ScheduleNextJump();
             }

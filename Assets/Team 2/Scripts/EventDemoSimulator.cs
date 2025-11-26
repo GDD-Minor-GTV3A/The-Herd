@@ -109,6 +109,10 @@ namespace Core.AI.Sheep
                     case KeyCode.J:
                         SpawnSheep();
                         break;
+                    case KeyCode.P:
+                        TriggerPetSheep();
+                        break;
+                        
 
                     // Sanity Control
                     case KeyCode.Equals:
@@ -300,6 +304,20 @@ namespace Core.AI.Sheep
             }
         }
 
+        private void TriggerPetSheep()
+        {
+            if (_selectedSheep == null)
+            {
+                DisplayEventFeedback("<color=red> No sheep selected</color>\nPress Tab to select a sheep");
+                return;
+            }
+            
+            EventManager.Broadcast(new RequestPetSheepEvent(_selectedSheep));
+            
+            DisplayEventFeedback($"<color=#00FF00FF>Petting request</color>\nSheep: {_selectedSheep.name}");
+            Debug.Log($"[EventDemo] Petting requested for {_selectedSheep.name}");
+        }
+
         #endregion
 
         #region Sanity Control
@@ -332,6 +350,7 @@ namespace Core.AI.Sheep
 <color=yellow>T</color> - Threat Detected
 <color=yellow>K</color> - Kill Sheep (Death Event)
 <color=yellow>J</color> - Spawn Sheep (Join Event)
+<color=yellow>P</color> - Pet Sheep (RequestPetSheepEvent)
 
 <b><color=#00FFFFFF>SANITY CONTROL</color></b>
 <color=yellow>+</color> - Increase Sanity Points

@@ -2,45 +2,30 @@ using UnityEngine;
 
 public class SheepSoundManager : MonoBehaviour
 {
-    private static SheepSoundManager _instance;
+    public static SheepSoundManager Instance;
+    [Tooltip("Source object for sounds of sheep.")]
+    [SerializeField] private AudioSource _audioSource;
 
     private void Awake()
     {
-        _instance = this;
+        if (Instance == null)
+            Instance = this;
     }
 
-    public static void PlaySoundClip(AudioClip clip, AudioSource audioSource)
+    public void PlaySoundClip(AudioClip clip, AudioSource source)
     {
-        _instance?.PlaySoundClipInternal(clip, audioSource, Random.Range(0.02f, 0.2f), Random.Range(0.8f, 1.2f));
+        PlaySoundClip(clip, source, Random.Range(0.02f, 0.2f), Random.Range(0.8f, 1.2f));
     }
 
-    public static void PlaySoundClip(AudioClip clip, AudioSource audioSource, float volume, float pitch)
+    public void PlaySoundClip(AudioClip clip, AudioSource source, float volume, float pitch)
     {
-        _instance?.PlaySoundClipInternal(clip, audioSource, volume, pitch);
-    }
-
-    public static void PlaySoundClip(AudioClip clip, SheepSoundDriver soundDriver)
-    {
-        _instance?.PlaySoundClipInternal(clip, soundDriver.AudioSource, Random.Range(0.02f, 0.2f), Random.Range(0.8f, 1.2f));
-    }
-
-    public static void PlaySoundClip(AudioClip clip, SheepSoundDriver soundDriver, float volume, float pitch)
-    {
-        _instance?.PlaySoundClipInternal(clip, soundDriver.AudioSource, volume, pitch);
-    }
-
-    private void PlaySoundClipInternal(AudioClip clip, AudioSource audioSource, float volume, float pitch)
-    {
-        if (audioSource == null)
-        {
-            Debug.LogWarning("[SheepSoundManager] No AudioSource found."); 
-            return;
-        }
-
-        audioSource.clip = clip;
-        audioSource.volume = volume;
-        audioSource.pitch = pitch;
-
-        audioSource.Play();
+        // Why is this a thing??
+        //_audioSource = Instantiate(_audioSource, soundTransform.position, Quaternion.identity);
+        if (source == null || clip == null) return;
+        
+        source.clip = clip;
+        source.volume = volume;
+        source.pitch = pitch;
+        source.Play();
     }
 }
