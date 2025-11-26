@@ -184,7 +184,8 @@ class GithubArgs(Namespace):
         help="Mark the release as a prerelease.",
     )
     target = Argument(
-        help="Target branch or full commit SHA (default [main branch])",
+        default="main",
+        help="Target branch or full commit SHA",
     )
     title = Argument[str | None](
         help="Title for the release.",
