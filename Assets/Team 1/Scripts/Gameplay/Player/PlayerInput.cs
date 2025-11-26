@@ -1,4 +1,6 @@
+using Core.Events;
 using Core.Shared;
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -7,14 +9,18 @@ namespace Gameplay.Player
     /// <summary>
     /// Handles all input from the player.
     /// </summary>
-    public class PlayerInput : MonoBehaviour
+    public class PlayerInput : MonoBehaviour, IPausable
     {
         [SerializeField, Tooltip("Layers of the ground for ray casting.")]
         LayerMask groundLayers;
 
 
         private InputActionAsset inputActions;
+
+        private InputActionMap _currentMap;
+        private InputActionMap _secondaryMap;
         private Camera mainCamera;
+        private bool isPaused;
 
         private readonly Observable<Vector3> cursorWorldPosition = new Observable<Vector3>();
 
@@ -94,35 +100,35 @@ namespace Gameplay.Player
         {
             this.inputActions = inputActions;
             mainCamera = Camera.main;
+            _currentMap = this.inputActions.FindActionMap("Player");
+            _secondaryMap = this.inputActions.FindActionMap("UI");
+
 
             // Get Input Actions
-            moveAction = this.inputActions.FindActionMap("Player").FindAction("Move");
-            lookAction = this.inputActions.FindActionMap("Player").FindAction("Look");
-            runAction = this.inputActions.FindActionMap("Player").FindAction("Sprint");
-            reloadAction = this.inputActions.FindActionMap("Player").FindAction("Reload");
-            mainUsageAction = this.inputActions.FindActionMap("Player").FindAction("MainUsage");
-            secondaryUsageAction = this.inputActions.FindActionMap("Player").FindAction("SecondaryUsage");
-            slotsScrollAction = this.inputActions.FindActionMap("Player").FindAction("SlotsScroll");
-            slot1_Action = this.inputActions.FindActionMap("Player").FindAction("Slot_1");
-            slot2_Action = this.inputActions.FindActionMap("Player").FindAction("Slot_2");
-            slot3_Action = this.inputActions.FindActionMap("Player").FindAction("Slot_3");
+            moveAction = _currentMap.FindAction("Move");
+            lookAction = _currentMap.FindAction("Look");
+            runAction = _currentMap.FindAction("Sprint");
+            reloadAction = _currentMap.FindAction("Reload");
+            mainUsageAction = _currentMap.FindAction("MainUsage");
+            secondaryUsageAction = _currentMap.FindAction("SecondaryUsage");
+            slotsScrollAction = _currentMap.FindAction("SlotsScroll");
+            slot1_Action = _currentMap.FindAction("Slot_1");
+            slot2_Action = _currentMap.FindAction("Slot_2");
+            slot3_Action = _currentMap.FindAction("Slot_3");
+
+
+            EventManager.Broadcast(new RegisterNewPausableEvent(this));
+
+            _currentMap.Enable();
 
             // Enable input actions
-            moveAction.Enable();
-            lookAction.Enable();
-            runAction.Enable();
-            reloadAction.Enable();
-            mainUsageAction.Enable();
-            secondaryUsageAction.Enable();
-            slotsScrollAction.Enable();
-            slot1_Action.Enable();
-            slot2_Action.Enable();
-            slot3_Action.Enable();
+            Resume();
         }
 
 
         private void LateUpdate()
         {
+            if (isPaused) return;
             Ray ray = mainCamera.ScreenPointToRay(lookAction.ReadValue<Vector2>());
 
             Vector3 worldCursorPosition;
@@ -131,6 +137,30 @@ namespace Gameplay.Player
             worldCursorPosition = hitInfo.point;
 
             cursorWorldPosition.Value = worldCursorPosition;
+        }
+
+        public void Pause()
+        {
+            _currentMap.Disable();
+
+
+            isPaused = true;
+        }
+
+        public void Resume()
+        {
+            _currentMap.Enable();
+
+            isPaused = false;
+        }
+
+
+        public void SwitchControlMap()
+        {
+            (_currentMap, _secondaryMap) = (_secondaryMap, _currentMap);
+
+            _currentMap.Enable();
+            _secondaryMap.Disable();
         }
     }
 }

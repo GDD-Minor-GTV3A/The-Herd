@@ -60,13 +60,6 @@ namespace Gameplay.Dog
         }
 
 
-        // for test, needs to be moved to bootstrap
-        void Start()
-        {
-            Initialize();
-        }
-
-
         private void OnDestroy()
         {
             config.OnValueChanged -= UpdateValues;

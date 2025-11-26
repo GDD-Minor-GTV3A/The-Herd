@@ -1,3 +1,4 @@
+using Core.Events;
 using Core.Shared;
 using UnityEngine;
 
@@ -6,8 +7,10 @@ namespace Gameplay.Dog
     /// <summary>
     /// Handles animations logic for the dog.
     /// </summary>
-    public class DogAnimator : AnimatorController
+    public class DogAnimator : AnimatorController, IPausable
     {
+        private bool isWalking;
+
         private float minSpeed;
         private float maxSpeed;
 
@@ -23,6 +26,8 @@ namespace Gameplay.Dog
         public DogAnimator(Animator animator, DogConfig config) : base(animator)
         {
             UpdateAnimationValues(config);
+
+            EventManager.Broadcast(new RegisterNewPausableEvent(this));
         }
 
 
@@ -31,6 +36,7 @@ namespace Gameplay.Dog
         /// </summary>
         public void SetWalking(bool isWalking)
         {
+            this.isWalking = isWalking; 
             _animator.SetBool(WalkingParam, isWalking);
         }
 
@@ -64,6 +70,16 @@ namespace Gameplay.Dog
         {
             minSpeed = config.MinSpeed;
             maxSpeed = config.MaxSpeed;
+        }
+
+        public void Pause()
+        {
+            _animator.SetBool(WalkingParam, false);
+        }
+
+        public void Resume()
+        {
+            _animator.SetBool(WalkingParam, isWalking);
         }
     }
 }
