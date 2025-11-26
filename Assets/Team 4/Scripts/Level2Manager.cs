@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 using UnityEngine;
 
 public class LevelManagerLevel2 : MonoBehaviour
@@ -5,8 +8,11 @@ public class LevelManagerLevel2 : MonoBehaviour
     public static LevelManagerLevel2 Instance { get; private set; }
     private bool ForestQuestComplete = false;
     private bool FrontDoorReturn = false;
+    private List<GameObject> SpawnedSheep = new List<GameObject>();
 
     [SerializeField] private SlidingDoor EntranceDoor, MazeDoor, ForestDoor;
+    [SerializeField] private GameObject SheepPrefab;
+    [SerializeField] private int SheepCount;
 
     /// <summary>
     /// Create instance of level manager
@@ -30,6 +36,12 @@ public class LevelManagerLevel2 : MonoBehaviour
     public void EnterLevel()
     {
         Debug.Log("Level 2 entered");
+
+        // Spawn sheep in the level
+        for (int i = 0; i < SheepCount; i++)
+        {
+            SpawnSheep();
+        }
     }
 
     /// <summary>
@@ -82,4 +94,14 @@ public class LevelManagerLevel2 : MonoBehaviour
         EntranceDoor.Open();
     }
     
+    /// <summary>
+    /// Spawn sheep at default location or at given location
+    /// </summary>
+    public void SpawnSheep(Vector3? position = null)
+    {
+        Vector3 spawnPosition = position ?? new Vector3(891, 0, 548);
+        GameObject sheep = Instantiate(SheepPrefab, spawnPosition, Quaternion.identity);
+        sheep.transform.localScale *= 3;
+        SpawnedSheep.Add(sheep);
+    }
 }

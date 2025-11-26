@@ -1767,7 +1767,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetTag: Player
-  oneTimeUse: 1
+  oneTimeUse: 0
   onTriggerEnter:
     m_PersistentCalls:
       m_Calls:
@@ -15039,75 +15039,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8bbed39fa89d7b6418e11a4a4619445b, type: 3}
---- !u!1001 &1143276983
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 2914724886780533430, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 2914724886780533430, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 2914724886780533430, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 2914724886780533430, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 891
-      objectReference: {fileID: 0}
-    - target: {fileID: 2914724886780533430, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2914724886780533430, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 548.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 2914724886780533430, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2914724886780533430, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2914724886780533430, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2914724886780533430, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2914724886780533430, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2914724886780533430, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2914724886780533430, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4607321907588713866, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
-      propertyPath: m_Name
-      value: Sheep
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
 --- !u!1 &1157637675
 GameObject:
   m_ObjectHideFlags: 0
@@ -23440,6 +23371,8 @@ MonoBehaviour:
   EntranceDoor: {fileID: 1061994745}
   MazeDoor: {fileID: 1133875262}
   ForestDoor: {fileID: 1466278967}
+  SheepPrefab: {fileID: 4607321907588713866, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
+  SheepCount: 3
 --- !u!4 &2080836228
 Transform:
   m_ObjectHideFlags: 0
@@ -24235,7 +24168,6 @@ SceneRoots:
   - {fileID: 2036102830}
   - {fileID: 340618638}
   - {fileID: 79366783}
-  - {fileID: 1143276983}
   - {fileID: 577201592}
   - {fileID: 1191198832}
   - {fileID: 2000604662}
