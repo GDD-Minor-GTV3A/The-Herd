@@ -272,11 +272,11 @@ namespace Core.AI.Sheep.Personality
         {
             sheep.PlayLeaveHerdVfx();
             var clip = sheep.Archetype?.LeaveHerdSound;
-            if (clip && SheepSoundManager.Instance)
+            if (clip)
             {
-                SheepSoundManager.Instance.PlaySoundClip(
+                SheepSoundManager.PlaySoundClip(
                     clip,
-                    sheep.transform,
+                    sheep.SoundDriver,
                     1.0f,
                     Random.Range(0.95f, 1.05f));
             }
@@ -286,11 +286,11 @@ namespace Core.AI.Sheep.Personality
         {
             sheep.PlayJoinHerdVfx();
             var clip = sheep.Archetype?.JoinHerdSound;
-            if (clip && SheepSoundManager.Instance)
+            if (clip)
             {
-                SheepSoundManager.Instance.PlaySoundClip(
+                SheepSoundManager.PlaySoundClip(
                     clip,
-                    sheep.transform,
+                    sheep.SoundDriver,
                     1.0f,
                     Random.Range(0.95f, 1.05f));
             }
