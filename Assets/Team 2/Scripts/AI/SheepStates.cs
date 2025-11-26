@@ -133,9 +133,8 @@ namespace Core.AI.Sheep
             {
                 _stateManager.Agent.isStopped = false;
                 //_stateManager.Animation.SetState((int)SheepAnimState.Walk);
-                
-                SheepSoundManager.PlaySoundClip(_stateManager.Archetype.DeathSound,
-                    _stateManager.SoundDriver,
+                _stateManager.SoundDriver.ForcePlayBleatSound(
+                    _stateManager.Archetype.DeathSound,
                     100f,
                     Random.Range(0.9f, 1.8f));
                 
@@ -211,10 +210,9 @@ namespace Core.AI.Sheep
         public void OnStart()
         {
             _stateManager.DisableBehavior();
-            
-            SheepSoundManager.PlaySoundClip(_stateManager.Archetype.DeathSound, 
-                _stateManager.SoundDriver,
-                100.0f,
+            _stateManager.SoundDriver.ForcePlayBleatSound(
+                _stateManager.Archetype.DeathSound,
+                100f,
                 Random.Range(0.9f, 1.8f));
             
             //possible ragdoll setup in here in the next sprint

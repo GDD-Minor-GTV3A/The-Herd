@@ -142,9 +142,8 @@ namespace Core.AI.Sheep
                 var clip = _sanityAddSound;
                 if (clip && sheep != null)
                 {
-                    SheepSoundManager.PlaySoundClip(
+                    sheep.SoundDriver.ForcePlayBleatSound(
                         clip,
-                        sheep.SoundDriver,
                         1.0f,
                         Random.Range(0.9f, 1.1f));
                 }
@@ -174,9 +173,8 @@ namespace Core.AI.Sheep
                 var clip = _sanityRemoveSound;
                 if (clip && removedSheep != null)
                 {
-                    SheepSoundManager.PlaySoundClip(
+                    removedSheep.SoundDriver.ForcePlayBleatSound(
                         clip,
-                        removedSheep.SoundDriver,
                         1.0f,
                         Random.Range(0.9f, 1.1f));
                 }
