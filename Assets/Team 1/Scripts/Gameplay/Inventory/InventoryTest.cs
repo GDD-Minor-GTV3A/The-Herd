@@ -59,7 +59,7 @@ public class InventoryTest : MonoBehaviour
         // Spend one scroll
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            if (inv.SpendScroll(1)) Debug.Log("Used 1 scroll");
+            if (inv.UseScrolls(1)) Debug.Log("Used 1 scroll");
         }
 
         // Use one revive totem
@@ -100,7 +100,7 @@ public class InventoryTest : MonoBehaviour
         {
             var randomIndex = Random.Range(0, equipableItems.Count);
             var toEquip = equipableItems[randomIndex].item;
-            inv.Equip(toEquip);
+            inv.UseItem(toEquip);
             Debug.Log($"Equipped random wearable: {toEquip.itemName}");
         }
         else
@@ -120,7 +120,7 @@ public class InventoryTest : MonoBehaviour
         {
             var randomIndex = Random.Range(0, trinketItems.Count);
             var toEquip = trinketItems[randomIndex].item;
-            inv.Equip(toEquip);
+            inv.UseItem(toEquip);
             Debug.Log($"Equipped random trinket: {toEquip.itemName}");
         }
         else
@@ -137,7 +137,7 @@ public class InventoryTest : MonoBehaviour
         var activeStack = inv.data.items.Find(s => s.item.category == ItemCategory.Active);
         if (activeStack != null)
         {
-            inv.UseActiveItem(activeStack.item);
+            inv.UseItem(activeStack.item);
             Debug.Log($"Used: {activeStack.item.itemName}, remaining uses: {inv.GetUses(activeStack.item)}");
         }
     }

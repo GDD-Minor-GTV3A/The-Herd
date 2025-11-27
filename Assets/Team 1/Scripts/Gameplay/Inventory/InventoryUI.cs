@@ -64,19 +64,9 @@ public class InventoryUI : MonoBehaviour
         rootPanel.SetActive(!rootPanel.activeSelf);
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.I))
-        {
-            ToggleOpen();
-            RefreshWearables();
-            RefreshInventoryGrid();
-        }
-    }
-
     #region Wearables + Trinkets
 
-    private void RefreshWearables()
+    public void RefreshWearables()
     {
         if (PlayerInventory.Instance?.data == null) return;
         var data = PlayerInventory.Instance.data;
@@ -143,7 +133,5 @@ public class InventoryUI : MonoBehaviour
             }
         }
     }
-
-
     #endregion
 }

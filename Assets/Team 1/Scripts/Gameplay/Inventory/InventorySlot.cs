@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using CustomEditor.Attributes;
+
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 /// <summary>
@@ -11,6 +13,8 @@ public class InventorySlot : MonoBehaviour, IDropHandler
     [Header("Slot Configuration")]
     public bool isEquipmentSlot = false;
     public bool isTrinketSlot = false;
+    [ShowIf("isTrinketSlot")]
+    public int slotNumber = 0;
     public ItemCategory slotCategory; // Only relevant for equipment slots
 
     public void OnDrop(PointerEventData eventData)
@@ -55,7 +59,7 @@ public class InventorySlot : MonoBehaviour, IDropHandler
             draggedItem.image.transform.localPosition = Vector3.zero;
 
             // Equip the new item
-            PlayerInventory.Instance.Equip(slotItem.item);
+            PlayerInventory.Instance.UseItem(slotItem.item, slotNumber);
 
             // If there was an old item, return it to the original slot
             if (oldItem != null)

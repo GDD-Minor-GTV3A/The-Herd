@@ -2,11 +2,12 @@
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class InventoryItemSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class InventoryItemSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerClickHandler
 {
     [Header("UI References")]
     public Image image;                        // Icon child
     [SerializeField] private Transform dragCanvas;
+
     [SerializeField, HideInInspector] public InventoryItem item;
 
     [Header("Settings")]
@@ -62,5 +63,30 @@ public class InventoryItemSlot : MonoBehaviour, IBeginDragHandler, IDragHandler,
         rt.anchoredPosition = Vector2.zero;
         rt.localPosition = Vector3.zero;
         rt.sizeDelta = originalSizeDelta;
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (eventData.button == PointerEventData.InputButton.Right && item != null)
+        {
+            TryAutoEquip();
+        }
+    }
+
+    private void TryAutoEquip()
+    {
+
+        if (item == null) return;
+
+        if (!PlayerInventory.Instance.UseItem(item))
+        {
+            Debug.Log($"No valid equipment slot for {item.name}"); return;
+        }
+
+        Debug.Log($"Equipped {item.name} via right-click!");
+
+        // Refresh UI
+        InventoryUI.Instance.RefreshWearables();
+        InventoryUI.Instance.RefreshInventoryGrid();
     }
 }
