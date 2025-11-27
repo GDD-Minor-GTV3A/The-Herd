@@ -18993,7 +18993,7 @@ Transform:
   m_GameObject: {fileID: 289832968}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -25.609985, y: 1.199997, z: 179.59998}
+  m_LocalPosition: {x: -18.36, y: 2.1, z: 189.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -19027,7 +19027,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 289832968}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -26409,7 +26409,7 @@ Transform:
   m_GameObject: {fileID: 476719560}
   serializedVersion: 2
   m_LocalRotation: {x: -0.037901666, y: 0.93815005, z: -0.036863465, w: 0.34216812}
-  m_LocalPosition: {x: -140.2, y: 40.1, z: -89.6}
+  m_LocalPosition: {x: -149.1, y: 39, z: -97.1}
   m_LocalScale: {x: 1.5, y: 10.46, z: 64}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -33003,6 +33003,63 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 9139559937203706467, guid: 6aae77e858b77da46bb9da1de6775ea9, type: 3}
+--- !u!1001 &651011628
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 7e56cf402bfc5df4991f5ff3f93d4f8b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1603.63
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 7e56cf402bfc5df4991f5ff3f93d4f8b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 146.1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 7e56cf402bfc5df4991f5ff3f93d4f8b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 1256.96
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 7e56cf402bfc5df4991f5ff3f93d4f8b, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 7e56cf402bfc5df4991f5ff3f93d4f8b, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 7e56cf402bfc5df4991f5ff3f93d4f8b, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 7e56cf402bfc5df4991f5ff3f93d4f8b, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 7e56cf402bfc5df4991f5ff3f93d4f8b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 7e56cf402bfc5df4991f5ff3f93d4f8b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 7e56cf402bfc5df4991f5ff3f93d4f8b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 7e56cf402bfc5df4991f5ff3f93d4f8b, type: 3}
+      propertyPath: m_Name
+      value: Candle
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 7e56cf402bfc5df4991f5ff3f93d4f8b, type: 3}
 --- !u!1 &651670272 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8211473141408223658, guid: 6aae77e858b77da46bb9da1de6775ea9, type: 3}
@@ -39146,6 +39203,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   doorsToOpen:
   - {fileID: 1155260885}
+  DestroyObjectAfterPickup: 0
 --- !u!1 &797596589 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2225377170525966744, guid: 6aae77e858b77da46bb9da1de6775ea9, type: 3}
@@ -39963,7 +40021,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   clipIndex: 2
   boxIndex: 2
-  volume: 0.3
+  volume: 2
 --- !u!65 &820201598
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -55341,6 +55399,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   doorsToOpen:
   - {fileID: 979515656}
+  DestroyObjectAfterPickup: 0
 --- !u!1 &1214248515 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -5856264746516266336, guid: 6aae77e858b77da46bb9da1de6775ea9, type: 3}
@@ -74234,7 +74293,7 @@ Transform:
   m_GameObject: {fileID: 1732623651}
   serializedVersion: 2
   m_LocalRotation: {x: -0.037901666, y: 0.93815005, z: -0.036863465, w: 0.34216812}
-  m_LocalPosition: {x: -220, y: 35, z: -156.8}
+  m_LocalPosition: {x: -220.12, y: 37.58, z: -157.05}
   m_LocalScale: {x: 1.5, y: 10.46, z: 64}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -74249,7 +74308,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1732623651}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e541bd988eaf83a42a97e57f9e7e9ef3, type: 3}
+  m_Script: {fileID: 11500000, guid: f5ebbb56fef566948b31472d15d7d54b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1732929601 stripped
@@ -83402,7 +83461,7 @@ Transform:
   m_GameObject: {fileID: 1944811732}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 19.49, y: 93.35, z: 172.56}
+  m_LocalPosition: {x: 26.74, y: 94.25001, z: 182.06}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -85874,6 +85933,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   doorsToOpen:
   - {fileID: 102101436}
+  DestroyObjectAfterPickup: 0
 --- !u!1 &2004402261 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -593283688590131274, guid: 6aae77e858b77da46bb9da1de6775ea9, type: 3}
@@ -86040,7 +86100,7 @@ Transform:
   m_GameObject: {fileID: 2005462695}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -46.3, y: 93.39, z: 62.7}
+  m_LocalPosition: {x: -86.8, y: 86.7, z: 97.8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -91276,15 +91336,15 @@ MonoBehaviour:
   - {fileID: 8300000, guid: e8a776c61d77f21448dcb2af2ea7db1d, type: 3}
   - {fileID: 8300000, guid: 080328becd4602f478e0048a58f6ebe1, type: 3}
   - {fileID: 8300000, guid: 86ad809f74bbb2b4bbfb0e0140b9c7fc, type: 3}
-  - {fileID: 8300000, guid: c7c30847603b896459fc6c0c537beba3, type: 3}
+  - {fileID: 8300000, guid: d9d7abde3f68d094d93c15f01a9aa58b, type: 3}
   - {fileID: 8300000, guid: 4482224ee5a927a4ea69f89060a688f7, type: 3}
   - {fileID: 8300000, guid: a3d30be30b8ca834986278cf4411585b, type: 3}
   windClip: {fileID: 8300000, guid: e51a83e7a829fae4196d81059cee4b1c, type: 3}
   IntroMusic: {fileID: 8300000, guid: f6a9a4c4e12823d4494099aee46413a4, type: 3}
   Candle: {fileID: 8300000, guid: ce24def4c4a449d42909be837dc30836, type: 3}
-  windVolume: 0
-  IntroVolume: 0
-  CandleVolume: 2
+  windVolume: 0.02
+  IntroVolume: 0.05
+  CandleVolume: 10
   EndTrigger: {fileID: 1732623651}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
@@ -91313,3 +91373,4 @@ SceneRoots:
   - {fileID: 792683613}
   - {fileID: 387354944}
   - {fileID: 894530016}
+  - {fileID: 651011628}

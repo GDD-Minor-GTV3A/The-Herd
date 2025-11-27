@@ -8,7 +8,9 @@ public class AudioManager : MonoBehaviour
     [Header("Audio Sources")]
     public AudioSource musicSource;
     public AudioSource sfxSource;
+    public AudioSource TorchSfx;
     public AudioSource sfxSource2;
+
 
     [Header("3D Sound Boxes")]
     public AudioSource[] soundBoxes; 
@@ -18,12 +20,14 @@ public class AudioManager : MonoBehaviour
     public AudioClip windClip;
     public AudioClip IntroMusic;
     public AudioClip Candle;
+    public AudioClip Torch;
 
     [Header("Settings")]
     [Range(0f, 1f)]
     public float windVolume = 0.5f;
     public float IntroVolume = 0.5f;
     public float CandleVolume = 2f;
+    public float TorchVolume = 2f;
 
     public GameObject EndTrigger;
 
@@ -57,6 +61,14 @@ public class AudioManager : MonoBehaviour
             musicSource.volume = IntroVolume;
             musicSource.loop = false;
             musicSource.Play();
+        }
+
+        if (Torch != null && TorchSfx != null)
+        {
+            TorchSfx.clip = Torch;
+            TorchSfx.volume = TorchVolume;
+            TorchSfx.loop = true;
+            TorchSfx.Play();
         }
 
         if (Candle != null && sfxSource2 != null)
