@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Core.Shared.Utilities;
 using UnityEngine;
 
 namespace Gameplay
@@ -10,10 +11,10 @@ namespace Gameplay
     {
         ///Use SerializeField instead of public(public == bad)
         ///Use Tooltips for SerializeFiled
-        [Tooltip("Sound clips for steps sounds.")]
-        [SerializeField] private List<AudioClip> _walkingSounds; /// for private use _camelCase naming, for public PascalCase
-        [Tooltip("Sound source for steps.")]
-        [SerializeField] private AudioSource _footstepSource;
+        [SerializeField, Tooltip("Sound clips for steps sounds.")]
+        private List<AudioClip> walkingSounds; /// for private use camelCase naming, for public PascalCase
+        [SerializeField, Tooltip("Sound source for steps."), Required]
+        private AudioSource footstepSource;
 
 
         /// <summary>
@@ -21,19 +22,19 @@ namespace Gameplay
         /// </summary>
         public void Initialize() /// we dont use Start() and Awake(), instead use Initialize()
         {
-            if (_footstepSource == null)
-                _footstepSource = GetComponent<AudioSource>();
+            if (footstepSource == null)
+                footstepSource = GetComponent<AudioSource>();
         }
 
 
         private void PlayStepSound()
         {
             AudioClip clip;
-            clip = _walkingSounds[Random.Range(0, _walkingSounds.Count)];
-            _footstepSource.clip = clip;
-            _footstepSource.volume = Random.Range(0.02f, 0.05f);
-            _footstepSource.pitch = Random.Range(0.8f, 1.2f);
-            _footstepSource.Play();
+            clip = walkingSounds[Random.Range(0, walkingSounds.Count)];
+            footstepSource.clip = clip;
+            footstepSource.volume = Random.Range(0.02f, 0.05f);
+            footstepSource.pitch = Random.Range(0.8f, 1.2f);
+            footstepSource.Play();
         }
     }
 }

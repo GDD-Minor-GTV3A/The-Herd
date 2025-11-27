@@ -5,26 +5,41 @@ using UnityEngine.Events;
 namespace Gameplay.CameraSettings
 {
     /// <summary>
-    /// Config for camera.
+    /// Config for camera. Can be unique for each level.
     /// </summary>
     [CreateAssetMenu(fileName = "CameraConfig", menuName = "Configs/CameraConfig")]
     public class CameraConfig : ScriptableObject
     {
         [Header("Camera settings")]
-        [SerializeField, Tooltip("Camera type.")] private CameraType cameraType;
-        [SerializeField, Tooltip("Distance from camera to the player.")] private float defaultCameraDistance = 30;
-        [SerializeField, ShowIf("ShowFOV"), Tooltip("FOV of perspective camera.")] private float FOV = 40;
-        [SerializeField, Tooltip("Objects before this plane will not be rendered.")] private float nearClipPlane = 0;
-        [SerializeField, Tooltip("Objects after this plane will not be rendered.")] private float farClipPlane = 1000;
-        [SerializeField, Tooltip("Layers to render on main camera.")] private LayerMask renderLayers;
-        [SerializeField, Tooltip("Position of camera.")] private Vector3 cameraAngles = new Vector3(30, 0 ,0);
+        [SerializeField, Tooltip("Camera type.")] 
+        private CameraType cameraType;
+
+        [SerializeField, Tooltip("Distance from camera to the player.")] 
+        private float defaultCameraDistance = 30;
+
+        [SerializeField, ShowIf("ShowFOV"), Tooltip("FOV of perspective camera.")] 
+        private float FOV = 40;
+
+        [SerializeField, Tooltip("Objects before this plane will not be rendered.")] 
+        private float nearClipPlane = 1;
+
+        [SerializeField, Tooltip("Objects after this plane will not be rendered.")] 
+        private float farClipPlane = 1000;
+
+        [SerializeField, Tooltip("Layers to render on main camera.")] 
+        private LayerMask renderLayers;
+
+        [SerializeField, Tooltip("Position of camera.")] 
+        private Vector3 cameraAngles = new Vector3(30, 0 ,0);
+        
+        [Space, Header("Dead Zone")]
+        [SerializeField, Tooltip("Sizes of dead zone.")] 
+        private Vector2 size = new Vector2(0.1f, 0.15f);
 
 
-        [Space]
-        [Header("Dead Zone")]
-        [SerializeField, Tooltip("Sizes of dead zone.")] private Vector2 size = new Vector2(0.1f, 0.15f);
-
-
+        /// <summary>
+        /// Used for showif attribute.
+        /// </summary>
         private bool ShowFOV => cameraType == CameraType.Perspective;
 
 
@@ -54,7 +69,7 @@ namespace Gameplay.CameraSettings
         public LayerMask RenderLayers => renderLayers;
 
         /// <summary>
-        /// Camera type.
+        /// Sizes of dead zone.
         /// </summary>
         public Vector2 DeadZoneSize => size;
         /// <summary>
@@ -63,9 +78,8 @@ namespace Gameplay.CameraSettings
         public Vector3 CameraAngles => cameraAngles;
 
 
-
         /// <summary>
-        /// Sizes of dead zone.
+        /// Invokes when any value is changed in Inspector.
         /// </summary>
         public event UnityAction<CameraConfig> OnValueChanged;
 
@@ -75,8 +89,8 @@ namespace Gameplay.CameraSettings
             if (nearClipPlane > farClipPlane)
                 nearClipPlane = farClipPlane;
 
-            if (cameraType == CameraType.Perspective && nearClipPlane <= 0)
-                nearClipPlane = 0.001f;
+            if (cameraType == CameraType.Perspective && nearClipPlane <= 1)
+                nearClipPlane = 1f;
                 
 
 

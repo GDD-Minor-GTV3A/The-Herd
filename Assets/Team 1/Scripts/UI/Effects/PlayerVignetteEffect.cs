@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace UI.Effects 
 {
+    /// <summary>
+    /// Handles logic of custom vignette made for getting damage effect.
+    /// </summary>
     public class PlayerVignetteEffect : MonoBehaviour
     {
         [SerializeField, Tooltip("CanvasGroup of vignette. If not assigned, script will try to find one on the object.")] 
@@ -12,6 +15,9 @@ namespace UI.Effects
         private Coroutine showCoroutine;
 
 
+        /// <summary>
+        /// Initialization method.
+        /// </summary>
         public void Initialize()
         {
             if (canvasGroup == null && !TryGetComponent<CanvasGroup>(out canvasGroup))
@@ -23,6 +29,11 @@ namespace UI.Effects
         }
 
 
+        /// <summary>
+        /// Show vignette for specific duration.Animation separated on 3 parts, each takes the same amount of time(1/3 of full duration). 
+        ///1. Fade-in; 2. Vignette full visible; 3.Fade-out.
+        /// </summary>
+        /// <param name="duration">Duration of full animation.</param>
         public void ShowVignette(float duration)
         {
             if (canvasGroup == null)
