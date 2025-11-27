@@ -96,7 +96,7 @@ class Args(Namespace):
     """Additional settings for release script."""
 
     # Control flags, on what to do during the release process.
-    unity = Argument(
+    run_unity = Argument(
         action=ArgumentActions.STORE_BOOL,
         default=False,
         help="Run Unity.exe with the given arguments UnityArgs.",

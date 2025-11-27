@@ -17,10 +17,10 @@ Examples:
 Examples are shown to be as minimal as possible, only including the necessary flags.
 
 Full release process (all steps):
-    python ./release.py --unity --create-tag --upload-release
+    python ./release.py --run-unity --create-tag --upload-release
 
 Only unity (Defaults to compiling and building the project.):
-    python ./release.py --unity
+    python ./release.py --run-unity
 
 Only create and push tag:
     python ./release.py --create-tag
