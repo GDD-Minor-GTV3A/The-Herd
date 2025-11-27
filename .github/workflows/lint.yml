@@ -87,7 +87,7 @@ jobs:
 
       - name: Generate solution/project files
         run: |
-          uv run ./release.py --compile --executeMethod CommandLineBuild.GenerateSLN --batchmode --quit
+          uv run ./release.py --compile --executeMethod CommandLineBuild.GenerateSLN --batchmode --quit --unityPath "$env:UNITY_EXE"
 
       - name: Check code formatting
         run: dotnet format ./The-Herd.sln --verify-no-changes
