@@ -1,0 +1,90 @@
+name: C# Code Formatting
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main, "Team#**"]
+  workflow_dispatch:
+
+jobs:
+  unity-windows:
+    name: Install Unity and run Unity.exe
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Get Unity version and revision
+        shell: pwsh
+        run: |
+          $txt = Get-Content ProjectSettings/ProjectVersion.txt -Raw
+          if ($txt -match 'm_EditorVersion:\s*(.+)') { $version = $matches[1].Trim() } else { Write-Error 'Could not parse m_EditorVersion'; exit 1 }
+          if ($txt -match 'm_EditorVersionWithRevision:.*\((.+)\)') { $rev = $matches[1].Trim() } else { Write-Error 'Could not parse revision'; exit 1 }
+          Write-Host "Detected Unity $version ($rev)"
+          Add-Content -Path $env:GITHUB_ENV -Value "UNITY_VERSION=$version"
+          Add-Content -Path $env:GITHUB_ENV -Value "UNITY_REVISION=$rev"
+
+      - name: Restore Unity installer cache
+        uses: actions/cache@v4
+        with:
+          path: unity-cache
+          key: unity-installer-${{ runner.os }}-${{ hashFiles('ProjectSettings/ProjectVersion.txt') }}
+          restore-keys: unity-installer-${{ runner.os }}-
+
+      - name: Download Unity installer (if missing)
+        shell: pwsh
+        run: |
+          $cacheDir = Join-Path $env:GITHUB_WORKSPACE 'unity-cache'
+          New-Item -ItemType Directory -Force -Path $cacheDir | Out-Null
+          $installer = Join-Path $cacheDir 'UnitySetup64.exe'
+          if (-Not (Test-Path $installer)) {
+            $urls = @(
+              "https://download.unity3d.com/download_unity/$env:UNITY_REVISION/Windows64EditorInstaller/UnitySetup64.exe",
+              "https://download.unity3d.com/download_unity/$env:UNITY_REVISION/Windows64Editor/UnitySetup64.exe"
+            )
+            foreach ($u in $urls) {
+              Write-Host "Trying $u"
+              try {
+                Invoke-WebRequest -Uri $u -OutFile $installer -UseBasicParsing -ErrorAction Stop
+                break
+              } catch {
+                Write-Host "Failed: $_"
+              }
+            }
+            if (-Not (Test-Path $installer)) { Write-Error 'Could not download Unity installer from known URLs'; exit 1 }
+          } else { Write-Host 'Installer already present in cache.' }
+
+      - name: Install Unity silently
+        shell: pwsh
+        run: |
+          $installer = Join-Path $env:GITHUB_WORKSPACE 'unity-cache\UnitySetup64.exe'
+          if (-Not (Test-Path $installer)) { Write-Error 'Installer missing, cannot install'; exit 1 }
+          Write-Host "Running installer $installer"
+          Start-Process -FilePath $installer -ArgumentList '/S' -Wait -NoNewWindow
+
+      - name: Locate Unity.exe
+        shell: pwsh
+        run: |
+          $paths = @('C:\Program Files','C:\Program Files (x86)')
+          $found = $null
+          foreach ($p in $paths) {
+            $found = Get-ChildItem -Path $p -Filter Unity.exe -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+            if ($found) { break }
+          }
+          if (-not $found) { Write-Error 'Unity.exe not found after installation'; exit 1 }
+          Write-Host "Found Unity at: $($found.FullName)"
+          Add-Content -Path $env:GITHUB_ENV -Value "UNITY_EXE=$($found.FullName)"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.12"
+
+      - name: Generate solution/project files
+        run: |
+          uv run ./release.py --compile --executeMethod CommandLineBuild.GenerateSLN --batchmode --quit
+
+      - name: Check code formatting
+        run: uvx dotnet format ./The-Herd.sln --verify-no-changes

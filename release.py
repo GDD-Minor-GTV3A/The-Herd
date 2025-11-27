@@ -28,6 +28,9 @@ Only create and push tag:
 Only upload release (make sure game is already built and tag is created):
     python ./release.py --upload-release
 
+Only generate solution/project files: (for use in CI)
+    python ./release.py --compile --executeMethod CommandLineBuild.GenerateSLN
+
 Notes:
 Skips the debug information in dist/*DoNotShip
 Builds a zip out of dist/* as an artifact to publish to GH releases.
@@ -48,7 +51,7 @@ from release.args import args, set_defaults, unity_args
 from release.cli import test_gh_cli
 from release.log import logger
 from release.paths import check_paths, ensure_paths
-from release.unity import build_project
+from release.unity import run_unity
 from release.upload import upload_release
 from release.zip import zip_dist
 
@@ -59,7 +62,7 @@ async def setup_environment() -> None:
         set_defaults(),
         test_gh_cli(),
         ensure_paths(),
-        check_paths()
+        check_paths(),
     )
 
 async def main() -> None:
@@ -67,7 +70,7 @@ async def main() -> None:
     logger.setLevel(args.log.upper())
     await setup_environment()
     if args.compile:
-        await build_project(unity_args)
+        await run_unity(unity_args)
     if args.create_tag:
         await tags.create()
         await tags.push()

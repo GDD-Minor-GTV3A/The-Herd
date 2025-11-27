@@ -1,13 +1,18 @@
-using UnityEditor;
-using UnityEditor.Build.Reporting;
 using System;
 using System.IO;
 using System.Linq;
 
+using UnityEditor;
+using UnityEditor.Build.Reporting;
+
 public static class CommandLineBuild
 {
+    // Opens the project, generating project files.
+    public static void GenerateSLN() {}
+
     public static void BuildGame()
     {
+        // OpenCSharpProject();
         string[] args = Environment.GetCommandLineArgs();
 
         string buildTargetArg = GetArg(args, "-buildTarget") ?? GetArg(args, "-buildtarget") ?? GetArg(args, "-build-target");

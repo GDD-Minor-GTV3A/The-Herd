@@ -4,7 +4,7 @@ from release.cli import run_command
 from release.log import logger
 
 
-async def build_project(args: UnityArgs) -> None:
-    """Build the project using Unity.exe with the given build profile."""
-    logger.info("Building project with Unity. This may take a while...")
+async def run_unity(args: UnityArgs) -> None:
+    """Run Unity.exe with the given arguments."""
+    logger.info("Running Unity. This may take a while...")
     await run_command(args.build_command())
