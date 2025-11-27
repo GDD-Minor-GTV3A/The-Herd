@@ -90,8 +90,7 @@ public class LevelManagerLevel2 : MonoBehaviour
     public void FinishedForestQuest()
     {
         ForestQuestComplete = true;
-        FrontDoorReturn = true;
-        EntranceDoor.Open();
+        MazeDoor.Open();
     }
     
     /// <summary>
