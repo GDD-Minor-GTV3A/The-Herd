@@ -41,6 +41,8 @@ public class DialogueTrigger : MonoBehaviour
     /// <param name="other"></param>
     private void OnTriggerStay(Collider other)
     {
+        if (!other.CompareTag(PLAYER_TAG)) return;
+        Debug.Log($"Inside trigger: {gameObject.name}");
         if (DialogueManager.GetInstance().IsDialoguePlaying)
         {
             if (!_interText) return;
@@ -69,7 +71,7 @@ public class DialogueTrigger : MonoBehaviour
     {
         if (other.CompareTag(PLAYER_TAG))
         {
-            Debug.Log("Press E to Start Conversation");
+            Debug.Log("NPC_TRIGGER: EXIT");
             if (!_interText) return;
             _interText.enabled = false;
         }

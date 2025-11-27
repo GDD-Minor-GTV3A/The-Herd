@@ -160,9 +160,8 @@ public class QuestManager : MonoBehaviour
     /// </returns>
     public QuestProgress GetQuestProgressByID(string questID)
     {
-        var questProg = _activeQuests.Find(q => q.Quest.QuestID == questID)
+        return _activeQuests.Find(q => q.Quest.QuestID == questID)
             ?? _completedQuests.Find(q => q.Quest.QuestID == questID);
-        return questProg;
     }
 
     
