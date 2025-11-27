@@ -82,9 +82,12 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v5.0.1
+
       - name: Generate solution/project files
         run: |
           uv run ./release.py --compile --executeMethod CommandLineBuild.GenerateSLN --batchmode --quit
 
       - name: Check code formatting
-        run: uvx dotnet format ./The-Herd.sln --verify-no-changes
+        run: dotnet format ./The-Herd.sln --verify-no-changes
