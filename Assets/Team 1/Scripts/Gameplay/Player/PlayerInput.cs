@@ -36,6 +36,7 @@ namespace Gameplay.Player
         private InputAction slot1_Action;
         private InputAction slot2_Action;
         private InputAction slot3_Action;
+        private InputAction Map;
         #endregion InputActions
 
 
@@ -89,6 +90,8 @@ namespace Gameplay.Player
         /// </summary>
         public InputAction Slot_3 => slot3_Action;
 
+        public InputAction MapToggle => Map;
+
         #endregion InputActionProps
 
 
@@ -115,6 +118,7 @@ namespace Gameplay.Player
             slot1_Action = _currentMap.FindAction("Slot_1");
             slot2_Action = _currentMap.FindAction("Slot_2");
             slot3_Action = _currentMap.FindAction("Slot_3");
+            Map = _currentMap.FindAction("MapToggle");
 
 
             EventManager.Broadcast(new RegisterNewPausableEvent(this));

@@ -80,10 +80,12 @@
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\States\DogState.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Audio\StepsSoundManager.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\ViewObstacle.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\Map\MapRevealController.cs" />
     <Compile Include="Assets\Team 1\Scripts\UI\ToolSlots\ToolSlotUI.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\States\DogMove.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\StepsSoundManager.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Audio\DamageSoundManager.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\Map\MapRenderer.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\PlayerAnimator.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\SheepFogRevealer.cs" />
     <Compile Include="Assets\Team 1\Scripts\Core\Shared\Abstractions\GenericPool.cs" />
@@ -102,14 +104,17 @@
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\Player.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\DogBark.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\HerdZone.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\Map\LockedZone.cs" />
     <Compile Include="Assets\Team 1\Scripts\Core\Shared\Abstractions\PlayerTool.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\PlayerStateManager.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\PauseManager.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Camera\CameraConfig.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\Map\MapData.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\Data\FogOfWarConfig.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\DogAnimator.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\HiddenInFog.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\States\PlayerRunning.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\Map\FadeInOnEnable.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\HealthSystem\Health.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Audio\RifleSoundManager.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\DogMovementController.cs" />
@@ -117,6 +122,7 @@
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\DogConfig.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\ToolsSystem\ToolSlotsController.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Audio\SurfaceDetector.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\Map\POIReveal.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\ToolsSystem\Tools\Rifle\BulletPool.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Audio\DogSoundManager.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\DogStateManager.cs" />
@@ -127,6 +133,7 @@
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\PlayerConfig.cs" />
     <Compile Include="Assets\Team 1\Scripts\UI\RotationTowardsCamera.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\States\DogMoveToSheep.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\Map\MapToggle.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\ToolsSystem\Tools\Rifle\Bullet.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -612,10 +619,6 @@
     </Reference>
     <Reference Include="UnityEditor.WindowsStandalone.Extensions">
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.0.62f1\Editor\Data\PlaybackEngines\WindowsStandaloneSupport\UnityEditor.WindowsStandalone.Extensions.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEditor.UWP.Extensions">
-      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.0.62f1\Editor\Data\PlaybackEngines\MetroSupport\UnityEditor.UWP.Extensions.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEditor.Android.Extensions">

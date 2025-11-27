@@ -1,9 +1,13 @@
 using Core.Shared.Utilities;
+
 using Gameplay.Effects;
 using Gameplay.HealthSystem;
+using Gameplay.Map;
 using Gameplay.ToolsSystem;
+
 using UI;
 using UI.Effects;
+
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
@@ -42,9 +46,11 @@ namespace Gameplay.Player
         [SerializeField, Tooltip("Reference to input actions map.")]
         private InputActionAsset inputActions;
 
+        [SerializeField, Tooltip("Toggles map.")]
+        private MapToggle mapToggle;
+
         [SerializeField, Tooltip("Reference to player config.")]
         private PlayerConfig config;
-
 
         [field: Space, Header("Events")]
         [field: SerializeField, Tooltip("Invokes when player gets damage.")]
@@ -102,6 +108,7 @@ namespace Gameplay.Player
             dmgEffect.Initialize();
             vignetteEffect.Initialize();
             hpBar.Initialize(health);
+            mapToggle.Initialize(_playerInput);
         }
 
 
