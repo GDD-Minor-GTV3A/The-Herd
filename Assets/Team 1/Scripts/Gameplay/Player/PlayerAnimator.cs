@@ -163,7 +163,7 @@ namespace Gameplay.Player
 
             if (keyPoints.ChestTarget != null)
             {
-                animationConstrains.ChestAim.weight = 1;
+                animationConstrains.ChestAim.weight = .6f;
 
                 shouldersCoroutine = player.StartCoroutine(ShouldersRoutine(keyPoints.ChestTarget));
             }

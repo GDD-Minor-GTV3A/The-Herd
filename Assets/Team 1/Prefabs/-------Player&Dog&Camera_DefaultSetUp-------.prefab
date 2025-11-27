@@ -46,6 +46,7 @@ GameObject:
   - component: {fileID: 1568221641690190022}
   - component: {fileID: 8547051540565435095}
   - component: {fileID: 476462210069437422}
+  - component: {fileID: 3109019806990524593}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -84,6 +85,7 @@ MonoBehaviour:
   dog: {fileID: 831174997664632223}
   pauseManager: {fileID: 476462210069437422}
   fogOfWar: {fileID: 0}
+  collectablesManager: {fileID: 3109019806990524593}
 --- !u!114 &476462210069437422
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -96,6 +98,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbe113730819be841a4bcb24b0f4ca3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &3109019806990524593
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5566487533015619117}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: edd92b458886f934b8a71d1b5526ae99, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bulletCollectablePrefab: {fileID: 1969887145658194451, guid: c73aaed3006c1d64487f45d24dd8f29c, type: 3}
 --- !u!1001 &904184227584344744
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -198,6 +213,10 @@ PrefabInstance:
       value: Cameras_SetUp
       objectReference: {fileID: 0}
     - target: {fileID: 2322101386113416344, guid: 949b4c49ab05bbb4abde14eee43ce17a, type: 3}
+      propertyPath: Lens.FieldOfView
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 2322101386113416344, guid: 949b4c49ab05bbb4abde14eee43ce17a, type: 3}
       propertyPath: Target.TrackingTarget
       value: 
       objectReference: {fileID: 405590637181702614}
@@ -245,6 +264,14 @@ PrefabInstance:
       propertyPath: playerTransform
       value: 
       objectReference: {fileID: 405590637181702614}
+    - target: {fileID: 8830772661620207635, guid: 949b4c49ab05bbb4abde14eee43ce17a, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.3394444
+      objectReference: {fileID: 0}
+    - target: {fileID: 8830772661620207635, guid: 949b4c49ab05bbb4abde14eee43ce17a, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.17670357
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
