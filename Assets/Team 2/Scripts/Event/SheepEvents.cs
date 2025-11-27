@@ -17,6 +17,90 @@ namespace Core.AI.Sheep.Event
     }
 
     /// <summary>
+    /// Type of damage dealt to the sheep might have different effects or interpretation
+    /// </summary>
+    public enum SheepDamageType
+    {
+        Basic,
+        Scarecrow,
+        Enemy1Shooting,
+        Drekavac,
+        DeathCircle,
+        Other
+    }
+
+    /// <summary>
+    /// Used by any damage source for sheep
+    /// </summary>
+    public sealed class SheepDamageEvent : GameEvent
+    {
+        public SheepStateManager Target { get; }
+        public float Amount { get; }
+        public Vector3 HitPoint { get; }
+        public SheepDamageType DamageType { get; }
+        public GameObject Source { get; }
+
+        public SheepDamageEvent(
+            SheepStateManager target,
+            float amount,
+            Vector3 hitPoint,
+            SheepDamageType damageType = SheepDamageType.Basic,
+            GameObject source = null)
+        {
+            Target = target;
+            Amount = amount;
+            HitPoint = hitPoint;
+            DamageType = damageType;
+            Source = source;
+        }
+    }
+
+    /// <summary>
+    /// Fired by the sheep after the damage was dealt but before sheep dies for any feedback
+    /// </summary>
+    public sealed class SheepDamagedEvent : GameEvent
+    {
+        public SheepStateManager Sheep { get; }
+        public int OldHealth { get; }
+        public int NewHealth { get; }
+        public int MaxHealth { get; }
+        public float NormalizedHealth => MaxHealth > 0 ? (float)NewHealth / MaxHealth : 0f;
+
+        public SheepDamagedEvent(
+            SheepStateManager sheep,
+            int oldHealth,
+            int newHealth,
+            int maxHealth)
+        {
+            Sheep = sheep;
+            OldHealth = oldHealth;
+            NewHealth = newHealth;
+            MaxHealth = maxHealth;
+        }
+    }
+    
+    /// <summary>
+    /// Fired when health of the sheep changed possibly for UI
+    /// </summary>
+    public sealed class SheepHealthChangedEvent : GameEvent
+    {
+        public SheepStateManager Sheep { get; }
+        public int CurrentHealth { get; }
+        public int MaxHealth { get; }
+        public float Normalized => MaxHealth > 0 ? (float)CurrentHealth / MaxHealth : 0f;
+
+        public SheepHealthChangedEvent(
+            SheepStateManager sheep,
+            int currentHealth,
+            int maxHealth)
+        {
+            Sheep = sheep;
+            CurrentHealth = currentHealth;
+            MaxHealth = maxHealth;
+        }
+    }
+
+    /// <summary>
     /// Called when a sheep dies
     /// </summary>
     public class SheepDeathEvent : GameEvent
@@ -37,6 +121,16 @@ namespace Core.AI.Sheep.Event
         public SheepStateManager Sheep { get; }
 
         public SheepJoinEvent(SheepStateManager sheep)
+        {
+            Sheep = sheep;
+        }
+    }
+
+    public class SheepLeaveHerdEvent : GameEvent
+    {
+        public SheepStateManager Sheep { get; }
+
+        public SheepLeaveHerdEvent(SheepStateManager sheep)
         {
             Sheep = sheep;
         }
