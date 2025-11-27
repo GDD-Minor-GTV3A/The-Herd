@@ -1,5 +1,7 @@
 using System;
 
+using Gameplay.Player;
+
 namespace Gameplay.HealthSystem
 {
     /// <summary>
@@ -16,6 +18,9 @@ namespace Gameplay.HealthSystem
 
 
         // Events (replace UnityEvent with C# events)
+        /// <summary>
+        /// Invokes when health changed.
+        /// </summary>
         public event Action<float, float> OnHealthChanged; // (current, max)
 
 
@@ -27,13 +32,9 @@ namespace Gameplay.HealthSystem
         public bool CanDie { get => canDie; set => canDie = value; }
 
 
-        public Health(float maxHealth = 100f, float currentHealth = 100f, bool canTakeDamage = true, bool canBeHealed = true, bool canDie = true)
+        public Health(PlayerConfig config)
         {
-            this.maxHealth = maxHealth;
-            this.currentHealth = this.maxHealth;
-            this.canTakeDamage = canTakeDamage;
-            this.canBeHealed = canBeHealed;
-            this.canDie = canDie;
+            UpdateValuesFromConfig(config);
         }
 
 
@@ -62,12 +63,26 @@ namespace Gameplay.HealthSystem
         }
 
 
+        /// <summary>
+        /// For dealing damage of healing.
+        /// </summary>
+        /// <param name="value"></param>
         public void ChangeCurrentHealth(float value)
         {
             currentHealth += value;
             currentHealth = Math.Clamp(currentHealth, 0, maxHealth);
 
             OnHealthChanged?.Invoke(currentHealth, maxHealth);
+        }
+
+
+        public void UpdateValuesFromConfig(PlayerConfig config)
+        {
+            maxHealth = config.MaxHealth;
+            currentHealth = config.CurrentHealth;
+            canTakeDamage = config.CanTakeDamage;
+            canDie = config.CanDie;
+            canBeHealed = config.CanBeHealed;
         }
     }
 }

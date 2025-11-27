@@ -5,17 +5,66 @@ public class SlidingDoor : MonoBehaviour
 {
     [SerializeField] private float slideHeight = 5f;
     [SerializeField] private float slideSpeed = 2f;
-    
+    [SerializeField] private bool closingDoor = false;
+    private Light doorLight;
+
     private Vector3 startPosition;
     private bool isSliding = false;
+    private bool isLocked = true;
+    private bool isOpen = false;
+
+    private void Awake()
+    {
+        doorLight = GetComponentInChildren<Light>();
+
+        TurnLightOff();
+
+        if (closingDoor)
+        {
+            Open();
+        }
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            // Door should open only if unlocked when player enters trigger
+            if (!isLocked && !isOpen && !closingDoor)
+            {
+                Open();
+                TurnLightOff();
+            }
+            // Door should just close when player enters trigger
+            if (closingDoor && isOpen)
+            {
+                Close();
+            }
+        }
+    }
+
+    public void Unlock()
+    {
+        isLocked = false;
+        TurnLightOn();
+    }
+
+    public void Lock()
+    {
+        isLocked = true;
+        TurnLightOff();
+    }
 
     public void Open()
     {
+        if (isOpen) return;
         if (isSliding) return;
 
         startPosition = transform.position;
 
         StartCoroutine(SlideDoor());
+
+        isOpen = true;
     }
 
     private IEnumerator SlideDoor()
@@ -52,5 +101,21 @@ public class SlidingDoor : MonoBehaviour
         
         transform.position = startPosition;
         isSliding = false;
+    }
+
+    public void TurnLightOn()
+    {
+        if (doorLight != null)
+        {
+            doorLight.enabled = true;
+        }
+    }
+
+    public void TurnLightOff()
+    {
+        if (doorLight != null)
+        {
+            doorLight.enabled = false;
+        }
     }
 }

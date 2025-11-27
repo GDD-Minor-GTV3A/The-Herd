@@ -1,4 +1,3 @@
-using System.Reflection;
 using UnityEngine;
 
 namespace Gameplay.FogOfWar 
@@ -40,14 +39,22 @@ namespace Gameplay.FogOfWar
                 System.Type _type = _collider.GetType();
                 Collider _newCollider = _obstacleObject.AddComponent(_type) as Collider;
 
-                BindingFlags _flags = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public;
 
-                foreach (FieldInfo _field in _type.GetFields(_flags))
+                if (_collider is MeshCollider meshCollider)
                 {
-                    _field.SetValue(_newCollider, _field.GetValue(_collider));
+                    MeshCollider newMesh = (MeshCollider)_newCollider;
+                    newMesh.sharedMesh = meshCollider.sharedMesh;
+                    newMesh.convex = true;
                 }
 
-                _collider.isTrigger = true;
+                if (_collider is BoxCollider boxCollider)
+                {
+                    BoxCollider newBox = (BoxCollider)_newCollider;
+                    newBox.center = boxCollider.center;
+                    newBox.size = boxCollider.size;
+                }
+
+                _newCollider.isTrigger = true;
             }
         }
     }

@@ -1,5 +1,4 @@
 ﻿using Core.Events;
-using UnityEngine;
 
 namespace Gameplay.Dog
 {
@@ -8,15 +7,8 @@ namespace Gameplay.Dog
     /// </summary>
     public class DogMove : DogState
     {
-        private readonly DogMovementController _dogMovement;
-        private readonly DogAnimator _animator;
-
-
-
         public DogMove(DogStateManager manager) : base(manager)
         {
-            _dogMovement = _manager.MovementController as DogMovementController;
-            _animator = _manager.AnimatorController as DogAnimator;
         }
 
 
@@ -24,39 +16,39 @@ namespace Gameplay.Dog
         {
             UpdateTarget();
 
-            _animator.SetWalking(true);
-            _animator.SetWakingAnimationSpeedMulti(1f);
+            animator.SetWalking(true);
+            animator.SetWakingAnimationSpeedMulti(1f);
 
-            _manager.CurrentCommandTarget.OnValueChanged += UpdateTarget;
+            manager.CurrentCommandTarget.OnValueChanged += UpdateTarget;
 
             EventManager.AddListener<DogFollowCommandEvent>(OnDogFollowCommand);
         }
 
         public override void OnStop()
         {
-            _manager.CurrentCommandTarget.OnValueChanged -= UpdateTarget;
+            manager.CurrentCommandTarget.OnValueChanged -= UpdateTarget;
 
             EventManager.RemoveListener<DogFollowCommandEvent>(OnDogFollowCommand);
         }
 
         public override void OnUpdate()
         {
-            if (!_dogMovement.IsMoving)
+            if (!movement.IsMoving)
             {
-                _manager.SetState<DogIdle>();
+                manager.SetState<DogIdle>();
             }
         }
 
 
         private void UpdateTarget()
         {
-            _dogMovement.MoveTo(_manager.CurrentCommandTarget.Value);
+            movement.MoveTo(manager.CurrentCommandTarget.Value);
         }
 
 
         private void OnDogFollowCommand(DogFollowCommandEvent evt)
         {
-            _manager.SetState<DogFollowPlayer>();
+            manager.SetState<DogFollowPlayer>();
         }
     }
 }
