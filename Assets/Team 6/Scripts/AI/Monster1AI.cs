@@ -18,7 +18,7 @@ public class Monster1AI : MonoBehaviour
 
     [Header("Detection Settings")]
     public float detectionRange = 15f;
-    public float stalkCooldown = 1f;
+    public float stalkCooldown = 0.1f;
     public float timeToVanish = 0.1f;
     public float playerTooFarDistance = 20f;
 

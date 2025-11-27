@@ -1,119 +1,72 @@
 using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
+
 namespace Game.Scripts.Gameplay.Amalgamation
-{ 
- 
+{
+    /// <summary>
+    /// Your line-attack weapon. No AI decisions. The state machine tells it when to fire.
+    /// </summary>
     public class AmalgamationAttack : MonoBehaviour
     {
-        #region Serialized Fields
-
         [Header("References")]
-        [SerializeField]
-        private Transform _player;
-
-        [SerializeField]
-        private NavMeshAgent _agent;
-
-        [SerializeField]
-        private Transform _firePoint;
-
-        [SerializeField]
-        private GameObject _bulletPrefab;
-
-        [Header("Chase Settings")]
-        [SerializeField]
-        private float _chaseRange = 20f;
-
-        [SerializeField]
-        private float _attackRange = 10f;
-
-        [SerializeField]
-        private float _rotationSpeed = 8f;
+        [SerializeField] private Transform _firePoint;
+        [SerializeField] private GameObject _bulletPrefab;
 
         [Header("Attack Settings")]
-        [SerializeField]
-        private float _attackCooldown = 3f;
+        [SerializeField] private float _attackCooldown = 3f;
+        [SerializeField] private float _telegraphTime = 1f;
+        [SerializeField] private int _bulletsInLine = 8;
+        [SerializeField] private float _bulletSpacing = 1f;
+        [SerializeField] private float _indicatorLength = 15f;
+        [SerializeField] private float _rotationSpeed = 8f;
 
-        [SerializeField]
-        private float _telegraphTime = 1f;
-
-        [SerializeField]
-        private int _bulletsInLine = 8;
-
-        [SerializeField]
-        private float _bulletSpacing = 1f;
-
-        [SerializeField]
-        private float _indicatorLength = 15f;
-
-        #endregion
-
-
-        #region Private Fields
+        // Filled by SecondAttack
+        private Transform _player;
+        private NavMeshAgent _agent;
 
         private bool _isAttacking;
         private float _nextAttackTime;
 
-        #endregion
+        public bool IsAttacking => _isAttacking;
+        public bool IsOnCooldown => Time.time < _nextAttackTime;
 
-
-        #region Unity Methods
-
-        private void Update()
+        public void Initialize(Transform player, NavMeshAgent agent)
         {
-            if (_player == null || _agent == null)
-            {
-                return;
-            }
-
-            if (_isAttacking)
-            {
-                return;
-            }
-
-            float distanceToPlayer = Vector3.Distance(transform.position, _player.position);
-
-            if (distanceToPlayer > _chaseRange)
-            {
-                _agent.isStopped = true;
-                return;
-            }
-
-            _agent.isStopped = false;
-            _agent.SetDestination(_player.position);
-
-            if (distanceToPlayer <= _attackRange && Time.time >= _nextAttackTime)
-            {
-                StartCoroutine(LineAttackCoroutine());
-            }
+            _player = player;
+            _agent = agent;
         }
 
-        #endregion
-
-
-        #region Public Methods
-
-       
-        public void SetPlayerTarget(Transform playerTransform)
+        public bool CanStartAttack()
         {
-            _player = playerTransform;
+            return !_isAttacking && Time.time >= _nextAttackTime;
         }
 
-        #endregion
+        /// <summary>
+        /// Called by the attack state (through AmalgamationSecondAttack).
+        /// runner is the state machine MonoBehaviour.
+        /// </summary>
+        public Coroutine StartAttack(MonoBehaviour runner)
+        {
+            if (!CanStartAttack())
+                return null;
 
+            return runner.StartCoroutine(AttackRoutine());
+        }
 
-        #region Private Methods
-
-        private IEnumerator LineAttackCoroutine()
+        private IEnumerator AttackRoutine()
         {
             _isAttacking = true;
-            _agent.isStopped = true;
-            _agent.velocity = Vector3.zero;
+
+            if (_agent != null)
+            {
+                _agent.isStopped = true;
+                _agent.velocity = Vector3.zero;
+            }
 
             float elapsed = 0f;
 
-        
+            // Telegraph: aim + debug ray
             while (elapsed < _telegraphTime)
             {
                 AimAtPlayer();
@@ -131,63 +84,52 @@ namespace Game.Scripts.Gameplay.Amalgamation
                 yield return null;
             }
 
+            // Fire the actual line
             FireBulletLine();
 
             _nextAttackTime = Time.time + _attackCooldown;
             _isAttacking = false;
-            _agent.isStopped = false;
-        }
 
+            if (_agent != null)
+            {
+                _agent.isStopped = false;
+            }
+        }
 
         private void AimAtPlayer()
         {
             if (_player == null)
-            {
                 return;
-            }
 
-            Vector3 direction = _player.position - transform.position;
-            direction.y = 0f;
+            Vector3 dir = _player.position - transform.position;
+            dir.y = 0f;
 
-            if (direction.sqrMagnitude < 0.001f)
-            {
+            if (dir.sqrMagnitude < 0.001f)
                 return;
-            }
 
-            Quaternion targetRotation = Quaternion.LookRotation(direction);
+            Quaternion targetRot = Quaternion.LookRotation(dir);
             transform.rotation = Quaternion.Slerp(
                 transform.rotation,
-                targetRotation,
+                targetRot,
                 _rotationSpeed * Time.deltaTime
             );
         }
 
-
         private void FireBulletLine()
         {
             if (_bulletPrefab == null || _firePoint == null || _bulletsInLine <= 0)
-            {
                 return;
-            }
 
             Vector3 right = _firePoint.right;
-
-           
             float halfIndex = (_bulletsInLine - 1) * 0.5f;
 
             for (int i = 0; i < _bulletsInLine; i++)
             {
                 float offset = (i - halfIndex) * _bulletSpacing;
-                Vector3 spawnPosition = _firePoint.position + right * offset;
+                Vector3 spawnPos = _firePoint.position + right * offset;
 
-                Instantiate(
-                    _bulletPrefab,
-                    spawnPosition,
-                    _firePoint.rotation
-                );
+                Instantiate(_bulletPrefab, spawnPos, _firePoint.rotation);
             }
         }
-
-        #endregion
     }
 }
