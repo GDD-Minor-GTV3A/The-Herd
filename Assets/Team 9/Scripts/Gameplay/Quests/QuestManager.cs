@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -34,10 +35,12 @@ public class QuestManager : MonoBehaviour
         }
 
         Instance = this;
+        
+        transform.SetParent(null);
         DontDestroyOnLoad(gameObject);
     }
-
     
+
     /// <summary>
     /// Adding event listeners
     /// </summary>
@@ -244,7 +247,7 @@ public class QuestManager : MonoBehaviour
         
         _activeQuests.Remove(quest);
         _completedQuests.Add(quest);
-        
+        Debug.Log("QUEST COMPLETED");
         EventManager.Broadcast(new QuestCompletedEvent(quest.Quest.QuestID));
         
         // Notify DialogueManager to update Ink variables

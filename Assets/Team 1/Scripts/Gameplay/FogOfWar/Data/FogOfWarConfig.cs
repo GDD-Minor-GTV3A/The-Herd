@@ -5,22 +5,33 @@ using UnityEngine.Events;
 namespace Gameplay.FogOfWar 
 {
     /// <summary>
-    /// General config for Fog Of War.
+    /// General config for Fog Of War. Can be unique for each level.
     /// </summary>
     [CreateAssetMenu(fileName = "FogOfWarConfig", menuName = "Configs/FogOfWarConfig")]
     public class FogOfWarConfig : ScriptableObject
     {
         [Header("Utilities")]
-        [SerializeField, Tooltip("The size of Fog Of War Effect. You can see the Gizmos if it's turned on in FogOfWarManager.")] private float fogPlaneSize = 1f;
-        [SerializeField, Tooltip("The resolution of Fog Of War Texture. Affects performance! Don't make it 0!")] private uint textureResolution = 100;
-        [SerializeField,Required, Tooltip("Shader, which calculates visibility of hidden objects.")] private ComputeShader computeShaderForHiddenObjects;
-        [SerializeField, Tooltip("Layers, which blocks view.")] private LayerMask obstaclesLayers;
+        [SerializeField, Tooltip("The size of Fog Of War Effect. You can see the Gizmos if it's turned on in FogOfWarManager.")] 
+        private float fogPlaneSize = 1f;
 
-        [Space]
-        [Header("Materials")]
-        [SerializeField, Required, Tooltip("Material for Fog Of War projection plane.")] private Material fogProjectionMaterial;
-        [SerializeField, Required, Tooltip("Material for revealers meshes.")] private Material revealerMaterial;
-        [SerializeField, Required, Tooltip("Material for Fog Of War material effect.")] private Material fogEffectMaterial;
+        [SerializeField, Tooltip("The resolution of Fog Of War Texture. Affects performance! Don't make it 0!")] 
+        private uint textureResolution = 100;
+
+        [SerializeField,Required, Tooltip("Shader, which calculates visibility of hidden objects.")] 
+        private ComputeShader computeShaderForHiddenObjects;
+
+        [SerializeField, Tooltip("Layers, which blocks view.")] 
+        private LayerMask obstaclesLayers;
+
+        [Space, Header("Materials")]
+        [SerializeField, Required, Tooltip("Material for Fog Of War projection plane.")] 
+        private Material fogProjectionMaterial;
+
+        [SerializeField, Required, Tooltip("Material for revealers meshes.")] 
+        private Material revealerMaterial;
+
+        [SerializeField, Required, Tooltip("Material for Fog Of War decal effect.")] 
+        private Material fogEffectMaterial;
 
 
         /// <summary>
@@ -55,7 +66,7 @@ namespace Gameplay.FogOfWar
 
 
         /// <summary>
-        /// Invokes when any values changes.
+        /// Invokes when any value changes.
         /// </summary>
         public event UnityAction<FogOfWarConfig> OnValueChanged;
 
@@ -72,6 +83,11 @@ namespace Gameplay.FogOfWar
                 textureResolution = 0;
             }
 
+            if (!fogEffectMaterial.shader.name.Contains("Decal"))
+            {
+                Debug.LogWarning("Material you are trying to assign for fog of war effect inherits from wrong shader!!!");
+                fogEffectMaterial = null;
+            }
 
             OnValueChanged?.Invoke(this);
         }

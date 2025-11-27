@@ -1,3 +1,4 @@
+using Core.Events;
 using Core.Shared;
 using UnityEngine;
 using UnityEngine.AI;
@@ -7,22 +8,22 @@ namespace Gameplay.Dog
     /// <summary>
     /// Movement controller for the dog.
     /// </summary>
-    public class DogMovementController : MovementController
+    public class DogMovementController : MovementController, IPausable
     {
-        private NavMeshAgent _agent;
-      
-        private float _minSpeed;
-        private float _maxSpeed;
-        private float _baseSpeed;
+        private NavMeshAgent agent;
+        
+        private float minSpeed;
+        private float maxSpeed;
+        private float baseSpeed;
 
-        private float _slowDistance;
-        private float _maxDistance;
+        private float slowDistance;
+        private float maxDistance;
 
 
         /// <summary>
         /// True - dog is moving or pending the path, false - dog is in idle state.
         /// </summary>
-        public bool IsMoving => (_agent.hasPath || _agent.pathPending || _agent.remainingDistance > _agent.stoppingDistance || _agent.velocity.sqrMagnitude > 0.1f);
+        public bool IsMoving => (!agent.isStopped || agent.hasPath || agent.pathPending || agent.remainingDistance > agent.stoppingDistance || agent.velocity.sqrMagnitude > 0.1f);
 
 
         /// <summary>
@@ -32,17 +33,19 @@ namespace Gameplay.Dog
         /// <param name="config">Config of the dog.</param>
         public void Initialize(NavMeshAgent agent, DogConfig config)
         {
-            _agent = agent;
+            this.agent = agent;
 
             UpdateValues(config);
+
+            EventManager.Broadcast(new RegisterNewPausableEvent(this));
         }
 
 
         public override void MoveTo(Vector3 target)
         {
-            _agent.speed = _baseSpeed;
+            agent.speed = baseSpeed;
 
-            _agent.destination = target;
+            agent.destination = target;
 
         }
 
@@ -52,10 +55,10 @@ namespace Gameplay.Dog
         /// </summary>
         public float CalculateSpeedToPlayer()
         {
-            float t = Mathf.InverseLerp(_slowDistance, _maxDistance, _agent.remainingDistance);
-            _agent.speed = Mathf.Lerp(_minSpeed, _maxSpeed, t);
+            float _t = Mathf.InverseLerp(slowDistance, maxDistance, agent.remainingDistance);
+            agent.speed = Mathf.Lerp(minSpeed, maxSpeed, _t);
 
-            return _agent.speed;
+            return agent.speed;
         }
 
 
@@ -65,16 +68,31 @@ namespace Gameplay.Dog
         /// <param name="config">Config of the dog.</param>
         public void UpdateValues(DogConfig config)
         {
-            _minSpeed = config.MinSpeed;
-            _maxSpeed = config.MaxSpeed;
-            _baseSpeed = config.BaseSpeed;
+            minSpeed = config.MinSpeed;
+            maxSpeed = config.MaxSpeed;
+            baseSpeed = config.BaseSpeed;
 
-            _slowDistance = config.SlowDistance;
-            _maxDistance = config.MaxDistance;
+            slowDistance = config.SlowDistance;
+            maxDistance = config.MaxDistance;
 
-            _agent.speed = _baseSpeed;
+            agent.speed = baseSpeed;
 
-            _agent.angularSpeed = config.RotationSpeed;
+            agent.angularSpeed = config.RotationSpeed;
+        }
+
+
+        public void Pause()
+        {
+            agent.updatePosition = false;
+            agent.updateRotation = false;
+            agent.isStopped = true;
+        }
+
+        public void Resume()
+        {
+            agent.isStopped = false;
+            agent.updatePosition = true;
+            agent.updateRotation = true;
         }
     }
 }

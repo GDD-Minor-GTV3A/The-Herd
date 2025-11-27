@@ -1,3 +1,4 @@
+using Core.Shared.Utilities;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -9,20 +10,20 @@ namespace Gameplay.Dog
     [RequireComponent(typeof(DogMovementController), typeof(NavMeshAgent), typeof(DogStateManager))]
     public class Dog : MonoBehaviour
     {
-        [Tooltip("Transform of player object to follow.")]
-        [SerializeField] private Transform _playerTransform;
-        [Tooltip("Heard zone reference.")]
-        [SerializeField] private HerdZone _heardZone;
-        [Tooltip("Manager of step sounds.")]
-        [SerializeField] private StepsSoundManager _stepsSoundManager;
-        [Tooltip("Animator of the dog.")]
-        [SerializeField] private Animator _animator;
-        [Tooltip("Config for the dog.")]
-        [SerializeField] private DogConfig _config;
+        [SerializeField, Tooltip("Transform of player object to follow."), Required]
+        private Transform playerTransform;
+        [SerializeField, Tooltip("Herd zone reference."), Required]
+        private HerdZone herdZone;
+        [SerializeField, Tooltip("Manager of step sounds."), Required]
+        private StepsSoundManager stepsSoundManager;
+        [SerializeField, Tooltip("Animator of the dog."), Required]
+        private Animator animator;
+        [SerializeField, Tooltip("Config for the dog."), Required]
+        private DogConfig config;
 
 
-        private DogMovementController _movementController;
-        private DogAnimator _dogAnimator;
+        private DogMovementController movementController;
+        private DogAnimator dogAnimator;
         private DogBark bark;
 
 
@@ -31,42 +32,37 @@ namespace Gameplay.Dog
         /// </summary>
         public void Initialize()
         {
-            _movementController = GetComponent<DogMovementController>();
-            NavMeshAgent agent = GetComponent<NavMeshAgent>();
-            _movementController.Initialize(agent, _config);
+            movementController = GetComponent<DogMovementController>();
+            NavMeshAgent _agent = GetComponent<NavMeshAgent>();
+            movementController.Initialize(_agent, config);
 
-            _stepsSoundManager.Initialize();
+            stepsSoundManager.Initialize();
 
-            _dogAnimator = new DogAnimator(_animator, _config);
+            dogAnimator = new DogAnimator(animator, config);
 
             bark = GetComponent<DogBark>();
-            bark.Initialize(_config);
+            bark.Initialize(config);
 
-            DogStateManager stateManager = GetComponent<DogStateManager>();
-            stateManager.Initialize(_movementController, _dogAnimator, _heardZone, _playerTransform, _config);
+            DogStateManager _stateManager = GetComponent<DogStateManager>();
+            _stateManager.Initialize(movementController, dogAnimator, herdZone, playerTransform, config);
 
-            _config.OnValueChanged += UpdateValues;
-            UpdateValues(_config);
+            config.OnValueChanged += UpdateValues;
+            UpdateValues(config);
         }
+
 
         private void UpdateValues(DogConfig config)
         {
-            _movementController.UpdateValues(config);
-            _dogAnimator.UpdateAnimationValues(config);
+            movementController.UpdateValues(config);
+            dogAnimator.UpdateAnimationValues(config);
 
-            bark.Initialize(_config);
-        }
-
-        // for test, needs to be moved to bootstrap
-        void Start()
-        {
-            Initialize();
+            bark.Initialize(this.config);
         }
 
 
         private void OnDestroy()
         {
-            _config.OnValueChanged -= UpdateValues;
+            config.OnValueChanged -= UpdateValues;
         }
     }
 }

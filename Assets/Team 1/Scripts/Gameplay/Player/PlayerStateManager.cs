@@ -1,6 +1,6 @@
+using Core.Events;
 using Core.Shared.StateMachine;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Gameplay.Player 
 {
@@ -29,6 +29,8 @@ namespace Gameplay.Player
 
             InitializeStatesMap();
             SetState<PlayerIdle>();
+
+            EventManager.Broadcast(new RegisterNewPausableEvent(this));
         }
 
 
@@ -40,6 +42,7 @@ namespace Gameplay.Player
                 { typeof(PlayerWalking), new PlayerWalking(this) },
                 { typeof(PlayerRunning), new PlayerRunning(this) },
             };
+            base.InitializeStatesMap();
         }
     }
 }

@@ -85,7 +85,6 @@ namespace Core.Events
         }
     }
 
-
     /// <summary>
     /// When player wants dog to follow him.
     /// </summary>
@@ -93,16 +92,25 @@ namespace Core.Events
     {
     }
 
-    public class DogHerdModeToggleEvent : GameEvent
+    ///// <summary>
+    ///// When 
+    ///// </summary>
+    //public class DogHerdModeToggleEvent : GameEvent
+    //{
+    //    public bool IsActive { get; }
+
+    //    public DogHerdModeToggleEvent(bool isActive)
+    //    {
+    //        IsActive = isActive;
+    //    }
+    //}
+
+    /// <summary>
+    /// Fired when the player tells the dog to bark.
+    /// </summary>
+    public class DogBarkEvent : GameEvent
     {
-        public bool IsActive { get; }
-
-        public DogHerdModeToggleEvent(bool isActive)
-        {
-            IsActive = isActive;
-        }
     }
-
     #endregion DOG_EVENTS
 
     #region CAMERA_EVENTS
@@ -186,6 +194,23 @@ namespace Core.Events
     }
 
     #endregion FOW_EVENTS
+
+    #region PAUSE_EVENTS
+
+    public class RegisterNewPausableEvent : GameEvent
+    {
+        private IPausable newPausable;
+
+        public IPausable NewPausable => newPausable;
+
+
+        public RegisterNewPausableEvent(IPausable newPausable)
+        {
+            this.newPausable = newPausable;
+        }
+    }
+
+    #endregion PAUSE_EVENTS
 
 
     #region QUEST_EVENTS

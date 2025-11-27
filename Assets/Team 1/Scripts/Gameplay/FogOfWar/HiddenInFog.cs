@@ -10,24 +10,35 @@ namespace Gameplay.FogOfWar
     /// </summary>
     public class HiddenInFog : MonoBehaviour, IHiddenObject
     {
-        [SerializeField, Required, Tooltip("MeshRenderer of this object, which has to be enabled or disabled.")] private Renderer targetRenderer;
+        [SerializeField, Required, Tooltip("MeshRenderer of this object, which has to be enabled or disabled.")] 
+        private Renderer targetRenderer;
 
 
         private bool removed = false;
 
 
+        /// <summary>
+        /// Returns position of the revealer.
+        /// </summary>
+        /// <returns>World position of revealer.</returns>
         public Vector3 GetPosition()
         {
             return targetRenderer.transform.position;
         }
 
 
+        /// <summary>
+        /// Makes object visible or not.
+        /// </summary>
         public void SetVisible(bool visible)
         {
             targetRenderer.enabled = visible;
         }
 
 
+        /// <summary>
+        /// Send message to fog of war manager to add this hidden in the fog object in runtime. Has to be called for spawned objects.
+        /// </summary>
         public void DynamicallyAddHiddenObject()
         {
             EventManager.Broadcast(new AddHiddenObjectEvent(this));
@@ -35,6 +46,9 @@ namespace Gameplay.FogOfWar
         }
 
 
+        /// <summary>
+        /// Send message to fog of war manager to remove this hidden in the fog object in runtime. Has to be called for despawned objects.
+        /// </summary>
         public void DynamicallyRemoveHiddenObject()
         {
             if (removed) return;
