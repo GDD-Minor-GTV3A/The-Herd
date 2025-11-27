@@ -96,10 +96,10 @@ class Args(Namespace):
     """Additional settings for release script."""
 
     # Control flags, on what to do during the release process.
-    compile = Argument(
+    unity = Argument(
         action=ArgumentActions.STORE_BOOL,
         default=False,
-        help="Compile the project using Unity.exe.",
+        help="Run Unity.exe with the given arguments UnityArgs.",
     )
     create_tag = Argument(
         action=ArgumentActions.STORE_BOOL,

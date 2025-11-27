@@ -17,10 +17,10 @@ Examples:
 Examples are shown to be as minimal as possible, only including the necessary flags.
 
 Full release process (all steps):
-    python ./release.py --compile --create-tag --upload-release
+    python ./release.py --unity --create-tag --upload-release
 
-Only compile:
-    python ./release.py --compile
+Only unity (Defaults to compiling and building the project.):
+    python ./release.py --unity
 
 Only create and push tag:
     python ./release.py --create-tag
@@ -48,7 +48,7 @@ from release.args import args, set_defaults, unity_args
 from release.cli import test_gh_cli
 from release.log import logger
 from release.paths import check_paths, ensure_paths
-from release.unity import build_project
+from release.unity import run_unity
 from release.upload import upload_release
 from release.zip import zip_dist
 
@@ -66,8 +66,8 @@ async def main() -> None:
     """Entry point."""
     logger.setLevel(args.log.upper())
     await setup_environment()
-    if args.compile:
-        await build_project(unity_args)
+    if args.unity:
+        await run_unity(unity_args)
     if args.create_tag:
         await tags.create()
         await tags.push()
