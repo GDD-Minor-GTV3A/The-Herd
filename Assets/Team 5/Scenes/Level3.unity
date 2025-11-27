@@ -3324,7 +3324,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 284672727922355001, guid: fafd86a764e6de04988141f2e18b7bef, type: 3}
       propertyPath: drawLevelBordersGizmos
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 284672727922355001, guid: fafd86a764e6de04988141f2e18b7bef, type: 3}
       propertyPath: levelBordersGizmosSize
@@ -5243,6 +5243,51 @@ MonoBehaviour:
   _player: {fileID: 679406624}
   _halfExtents: {x: 10, y: 10}
   _interval: 0.2
+--- !u!1 &1721847395
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1721847397}
+  - component: {fileID: 1721847396}
+  m_Layer: 0
+  m_Name: Level3Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1721847396
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1721847395}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa622072321f64b4b98eeae984034468, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  navMesh: {fileID: 2128779650}
+--- !u!4 &1721847397
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1721847395}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 179.4815, y: -7.773407, z: 259.2226}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1722924906
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5562,6 +5607,7 @@ MonoBehaviour:
   redLights:
   - {fileID: 1454971123}
   - {fileID: 1596762421}
+  enemyManager: {fileID: 0}
 --- !u!4 &1822314548
 Transform:
   m_ObjectHideFlags: 0
@@ -6485,7 +6531,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &2128779651
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6783,3 +6829,4 @@ SceneRoots:
   - {fileID: 943380777}
   - {fileID: 1822314548}
   - {fileID: 545034000}
+  - {fileID: 1721847397}

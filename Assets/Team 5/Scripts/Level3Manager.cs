@@ -2,13 +2,13 @@ using UnityEngine;
 
 public class Level3Manager : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [SerializeField] GameObject navMesh;
+
+    void Awake()
     {
-        
+        navMesh.SetActive(true);
     }
 
-    // Update is called once per frame
     void Update()
     {
         
