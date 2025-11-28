@@ -1,24 +1,27 @@
 ﻿using UnityEngine;
 
-public class InventoryToggle : MonoBehaviour
+namespace Gameplay.Inventory
 {
-    [Header("UI References")]
-    public InventoryUI inventoryPanel;
-
-    private void Update()
+    public class InventoryToggle : MonoBehaviour
     {
-        if (Input.GetKeyDown(KeyCode.B))
+        [Header("UI References")]
+        public InventoryUI inventoryPanel;
+
+        private void Update()
         {
-            ToggleInventory();
+            if (Input.GetKeyDown(KeyCode.B))
+            {
+                ToggleInventory();
+            }
         }
-    }
 
-    public void ToggleInventory()
-    {
-        bool wasOpen = inventoryPanel.rootPanel.activeSelf;
+        public void ToggleInventory()
+        {
+            bool wasOpen = inventoryPanel.rootPanel.activeSelf;
 
-        // Toggle UI
-        inventoryPanel.ToggleOpen();
+            // Toggle UI
+            inventoryPanel.ToggleOpen();
 
+        }
     }
 }

@@ -1,13 +1,16 @@
 using UnityEngine;
 
-public enum ItemCategory
+namespace Gameplay.Inventory
 {
-    Headgear,
-    Chestwear,
-    Legwear,
-    Boots,
-    Trinket,
-    Active,
-    Scroll,
-    ReviveTotem
+    public enum ItemCategory
+    {
+        Headgear,
+        Chestwear,
+        Legwear,
+        Boots,
+        Trinket,
+        Active,
+        Scroll,
+        ReviveTotem
+    }
 }

@@ -3,6 +3,7 @@ using UnityEditor;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
+using Gameplay.Inventory;
 
 public class InventoryItemCreator
 {

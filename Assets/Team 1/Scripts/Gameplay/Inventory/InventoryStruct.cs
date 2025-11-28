@@ -1,12 +1,15 @@
-[System.Serializable]
-public class InventoryStack
+namespace Gameplay.Inventory
 {
-    public InventoryItem item;
-    public int uses;   // Only relevant for active items
-
-    public InventoryStack(InventoryItem item, int uses)
+    [System.Serializable]
+    public class InventoryStack
     {
-        this.item = item;
-        this.uses = uses;
+        public InventoryItem item;
+        public int uses;   // Only relevant for active items
+
+        public InventoryStack(InventoryItem item, int uses)
+        {
+            this.item = item;
+            this.uses = uses;
+        }
     }
 }
