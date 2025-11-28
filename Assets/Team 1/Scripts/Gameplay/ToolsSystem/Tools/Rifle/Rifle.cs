@@ -1,8 +1,13 @@
 ﻿using System.Collections;
+using Core.AI.Sheep;
+using Core.AI.Sheep.Config;
+using Core.AI.Sheep.Event;
 using Core.Events;
 using Core.Shared;
 using CustomEditor.Attributes;
 using Gameplay.Player;
+using Gameplay.SheepEffects;
+
 using UI;
 using UnityEngine;
 using UnityEngine.Events;
@@ -12,7 +17,7 @@ namespace Gameplay.ToolsSystem.Tools.Rifle
     /// <summary>
     /// Handles logic of rifle tool.
     /// </summary>
-    public class Rifle : PlayerTool
+    public class Rifle : PlayerTool, ISheepEffectsEventsHandler
     {
         [Header("Configuration")]
         [SerializeField, Tooltip("Rifle config asset.")]
@@ -37,6 +42,8 @@ namespace Gameplay.ToolsSystem.Tools.Rifle
         private bool isReloading = false;
         private bool isAiming = false;
 
+        private float reloadTimeModifier = 0f;
+
         private PlayerAnimator playerAnimator;
         private BulletPool bulletPool;
 
@@ -49,6 +56,7 @@ namespace Gameplay.ToolsSystem.Tools.Rifle
 
         public int CurrentAmmo => currentMagazineAmmo;
 
+        PersonalityType ISheepEffectsEventsHandler.PersonalityType => PersonalityType.Normal;// needs to be changed on Tihomir
 
         [Space, Header("Debug")]
         [SerializeField, Tooltip("Show fire spread conus. Shot point and config has to be assigned.")]
@@ -89,7 +97,15 @@ namespace Gameplay.ToolsSystem.Tools.Rifle
             }
             HideUI();
             HideTool();
+
             EventManager.AddListener<AddBulletsToRifleEvent>(AddFreeBullets);
+            SheepEffectsDispatcher.AddNewListener(this);
+        }
+
+
+        private void UpdateReloadTimeModifier(float valueChange)
+        {
+            reloadTimeModifier += valueChange;
         }
 
 
@@ -275,6 +291,22 @@ namespace Gameplay.ToolsSystem.Tools.Rifle
                 Gizmos.DrawRay(shotPoint.position, rightEdge);
             }
 
+        }
+
+        private void OnDestroy()
+        {
+            EventManager.RemoveListener<AddBulletsToRifleEvent>(AddFreeBullets);
+        }
+
+
+        void ISheepEffectsEventsHandler.OnSheepJointHerd(SheepArchetype archetype)
+        {
+            // TO-DO: invoke UpdateReloadTimeModifier with value of reload time change
+        }
+
+        void ISheepEffectsEventsHandler.OnSheepLeftHerd(SheepArchetype archetype)
+        {
+            // TO-DO: invoke UpdateReloadTimeModifier with negative value of reload time change
         }
     }
 }
