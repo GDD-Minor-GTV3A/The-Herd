@@ -37,62 +37,37 @@ namespace Gameplay.Inventory
             if (draggedItem == null || draggedItem.Item == null) return;
 
             // Prevent dropping non-matching items into equipment/trinket slots
-            if (isEquipmentSlot && draggedItem.Item.category != slotCategory)
-            {
-                return;
-            }
-
-            if (isTrinketSlot && draggedItem.Item.category != ItemCategory.Trinket)
-            {
-                return;
-            }
+            if (isEquipmentSlot && draggedItem.Item.category != slotCategory) return;
+            if (isTrinketSlot && draggedItem.Item.category != ItemCategory.Trinket) return;
 
             // Get the visual InventoryItemSlot child for this slot
             InventoryItemSlot slotItem = GetComponentInChildren<InventoryItemSlot>();
-            if (slotItem == null)
-            {
-                return;
-            }
+            if (slotItem == null) return;
 
-
-            // Equipment / Trinket slot logic (swap if needed)
+            // === Swap / Equip via PlayerInventory ===
             if (isEquipmentSlot || isTrinketSlot)
             {
-                InventoryItem oldItem = slotItem.Item;           // current Item in slot
-                Transform oldParent = draggedItem.OriginalParent; // where dragged Item came from
+                InventoryItem dragged = draggedItem.Item;
+                InventoryItem target = slotItem.Item;
 
-                // Place new Item in the target slot
-                slotItem.InitializeItem(draggedItem.Item);
-                draggedItem.Image.transform.SetParent(slotItem.transform, false);
-                draggedItem.Image.transform.localPosition = Vector3.zero;
+                // Ask the inventory to equip the dragged item
+                bool success = isTrinketSlot
+                    ? PlayerInventory.Instance.UseItem(dragged, slotNumber)   // use slotNumber for trinkets
+                    : PlayerInventory.Instance.UseItem(dragged);              // equip other categories
 
-                // Equip the new Item
-                PlayerInventory.Instance.UseItem(slotItem.Item, slotNumber);
-
-                // If there was an old Item, return it to the original slot
-                if (oldItem != null)
+                if (success)
                 {
-                    draggedItem.InitializeItem(oldItem);
-                    draggedItem.Image.transform.SetParent(oldParent, false);
-                    draggedItem.Image.transform.localPosition = Vector3.zero;
-                }
-                else
-                {
-                    // Clear dragged slot if nothing was there
-                    draggedItem.InitializeItem(null);
+                    // The inventory will automatically refresh via OnInventoryChanged / OnEquipmentChanged events
+                    // Just update the dragged slot visually
+                    draggedItem.InitializeItem(target); // old item goes back into dragged slot
                 }
             }
             else
             {
-                // Regular inventory slot logic (no swap)
-                if (slotItem.Item != null)
-                {
-                    return;
-                }
+                // Regular inventory slot (no swap)
+                if (slotItem.Item != null) return;
 
                 slotItem.InitializeItem(draggedItem.Item);
-                draggedItem.Image.transform.SetParent(slotItem.transform, false);
-                draggedItem.Image.transform.localPosition = Vector3.zero;
                 draggedItem.InitializeItem(null);
             }
         }

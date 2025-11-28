@@ -78,7 +78,6 @@ namespace Gameplay.Inventory
 
                 default: return false;
             }
-            ;
         }
 
         //======================================================================
