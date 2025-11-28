@@ -27,46 +27,45 @@ public class InventoryUI : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject); // Only one instance allowed
-            return;
-        }
-        Instance = this;
-
         if (rootPanel != null)
             rootPanel.SetActive(false);
+
+        if (PlayerInventory.Instance != null)
+        {
+            PlayerInventory.Instance.OnEquipmentChanged += RefreshWearables;
+            PlayerInventory.Instance.OnInventoryChanged += RefreshInventoryGrid;
+        }
+        else
+        {
+            // Wait for the singleton to be initialized
+            StartCoroutine(SubscribeWhenReady());
+        }
+    }
+
+    private System.Collections.IEnumerator SubscribeWhenReady()
+    {
+        while (PlayerInventory.Instance == null)
+            yield return null;
+
+        PlayerInventory.Instance.OnEquipmentChanged += RefreshWearables;
+        PlayerInventory.Instance.OnInventoryChanged += RefreshInventoryGrid;
     }
 
     public static InventoryUI Instance { get; private set; }
 
-    private void OnEnable()
-    {
-        if (PlayerInventory.Instance == null) return;
-
-        PlayerInventory.Instance.OnEquipmentChanged += RefreshWearables;
-        PlayerInventory.Instance.OnInventoryChanged += RefreshInventoryGrid;
-
-        RefreshWearables();
-        RefreshInventoryGrid();
-    }
-
-    private void OnDisable()
-    {
-        if (PlayerInventory.Instance == null) return;
-
-        PlayerInventory.Instance.OnEquipmentChanged -= RefreshWearables;
-        PlayerInventory.Instance.OnInventoryChanged -= RefreshInventoryGrid;
-    }
-
     public void ToggleOpen()
     {
         rootPanel.SetActive(!rootPanel.activeSelf);
+        if (rootPanel.activeSelf)
+        {
+            RefreshWearables();
+            RefreshInventoryGrid();
+        }
     }
 
     #region Wearables + Trinkets
 
-    public void RefreshWearables()
+    private void RefreshWearables()
     {
         if (PlayerInventory.Instance?.data == null) return;
         var data = PlayerInventory.Instance.data;
@@ -87,24 +86,23 @@ public class InventoryUI : MonoBehaviour
 
     #region Inventory Grid
 
-    public void RefreshInventoryGrid()
+    private void RefreshInventoryGrid()
     {
         if (PlayerInventory.Instance?.data == null) return;
         var inv = PlayerInventory.Instance;
 
-        // Flatten inventory items (ignore stack counts for UI)
-        List<InventoryItem> inventoryItems = new List<InventoryItem>();
+        // Build a flat list with item + amount
+        List<(InventoryItem item, int amount)> inventoryItems = new List<(InventoryItem, int)>();
         foreach (var stack in inv.data.items)
-            if (stack?.item != null) inventoryItems.Add(stack.item);
+            if (stack?.item != null)
+                inventoryItems.Add((stack.item, stack.uses)); // <-- store amount too
 
         int totalItems = inventoryItems.Count;
         int totalRows = Mathf.CeilToInt(totalItems / (float)itemsPerRow);
 
-        // Optional: always have at least, say, 5 rows visible
         int minRows = 5;
         totalRows = Mathf.Max(totalRows, minRows);
 
-        // Instantiate rows if needed
         while (contentParent.childCount < totalRows)
             Instantiate(rowPrefab, contentParent);
 
@@ -113,25 +111,27 @@ public class InventoryUI : MonoBehaviour
         for (int row = 0; row < contentParent.childCount; row++)
         {
             Transform rowT = contentParent.GetChild(row);
-            rowT.gameObject.SetActive(true); // always visible
+            rowT.gameObject.SetActive(true);
 
             for (int col = 0; col < itemsPerRow; col++)
             {
-                Transform slotBG = rowT.GetChild(col);      // Each slot in row
+                Transform slotBG = rowT.GetChild(col);
                 InventoryItemSlot slotUI = slotBG.GetComponentInChildren<InventoryItemSlot>();
                 if (slotUI == null) continue;
 
                 if (itemIndex < totalItems)
                 {
-                    slotUI.InitializeItem(inventoryItems[itemIndex]);
+                    var entry = inventoryItems[itemIndex];
+                    slotUI.InitializeItem(entry.item, entry.amount); // <-- pass stack count
                     itemIndex++;
                 }
                 else
                 {
-                    slotUI.InitializeItem(null); // empty slot
+                    slotUI.InitializeItem(null, 0); // <-- empty slot, no stack
                 }
             }
         }
     }
+
     #endregion
 }

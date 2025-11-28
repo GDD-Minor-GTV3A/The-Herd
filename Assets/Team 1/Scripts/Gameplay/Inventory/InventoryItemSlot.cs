@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using TMPro;
+
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -6,9 +8,11 @@ public class InventoryItemSlot : MonoBehaviour, IBeginDragHandler, IDragHandler,
 {
     [Header("UI References")]
     public Image image;                        // Icon child
+    public TextMeshProUGUI countText;
     [SerializeField] private Transform dragCanvas;
 
     [SerializeField, HideInInspector] public InventoryItem item;
+    [SerializeField, HideInInspector] public int count;
 
     [Header("Settings")]
     public bool draggable = true;              // Set to false for equipment/trinket slots
@@ -17,13 +21,30 @@ public class InventoryItemSlot : MonoBehaviour, IBeginDragHandler, IDragHandler,
     private int originalSiblingIndex;
     private Vector2 originalSizeDelta;
 
-    public void InitializeItem(InventoryItem newItem)
+    public void InitializeItem(InventoryItem newItem, int count = -1)
     {
+        this.count = count;
         this.item = newItem;
         if (image != null)
         {
             image.sprite = item?.icon;
             image.enabled = item != null;
+            RefreshCount();
+        }
+    }
+
+    public void RefreshCount()
+    {
+        if (countText == null) return;
+
+        if (item != null && count > 1 && item.stackable)
+        {
+            countText.gameObject.SetActive(true);
+            countText.SetText(count.ToString());
+        }
+        else
+        {
+            countText.gameObject.SetActive(false);
         }
     }
 
@@ -75,18 +96,7 @@ public class InventoryItemSlot : MonoBehaviour, IBeginDragHandler, IDragHandler,
 
     private void TryAutoEquip()
     {
-
         if (item == null) return;
-
-        if (!PlayerInventory.Instance.UseItem(item))
-        {
-            Debug.Log($"No valid equipment slot for {item.name}"); return;
-        }
-
-        Debug.Log($"Equipped {item.name} via right-click!");
-
-        // Refresh UI
-        InventoryUI.Instance.RefreshWearables();
-        InventoryUI.Instance.RefreshInventoryGrid();
+        PlayerInventory.Instance.UseItem(item);
     }
 }

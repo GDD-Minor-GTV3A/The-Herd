@@ -20,11 +20,5 @@ public class InventoryToggle : MonoBehaviour
         // Toggle UI
         inventoryPanel.ToggleOpen();
 
-        // If it was closed before → now opening → refresh
-        if (!wasOpen)
-        {
-            inventoryPanel.RefreshWearables();
-            inventoryPanel.RefreshInventoryGrid();
-        }
     }
 }

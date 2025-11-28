@@ -27,13 +27,11 @@ public class InventorySlot : MonoBehaviour, IDropHandler
         // Prevent dropping non-matching items into equipment/trinket slots
         if (isEquipmentSlot && draggedItem.item.category != slotCategory)
         {
-            Debug.Log("Wrong category for this equipment slot!");
             return;
         }
 
         if (isTrinketSlot && draggedItem.item.category != ItemCategory.Trinket)
         {
-            Debug.Log("Only trinkets can be placed in trinket slots!");
             return;
         }
 
@@ -41,11 +39,9 @@ public class InventorySlot : MonoBehaviour, IDropHandler
         InventoryItemSlot slotItem = GetComponentInChildren<InventoryItemSlot>();
         if (slotItem == null)
         {
-            Debug.LogWarning("InventorySlot has no InventoryItemSlot child!");
             return;
         }
 
-        bool successfulPlacement = false;
 
         // Equipment / Trinket slot logic (swap if needed)
         if (isEquipmentSlot || isTrinketSlot)
@@ -73,15 +69,12 @@ public class InventorySlot : MonoBehaviour, IDropHandler
                 // Clear dragged slot if nothing was there
                 draggedItem.InitializeItem(null);
             }
-
-            successfulPlacement = true;
         }
         else
         {
             // Regular inventory slot logic (no swap)
             if (slotItem.item != null)
             {
-                Debug.Log("Slot already has an item!");
                 return;
             }
 
@@ -89,14 +82,6 @@ public class InventorySlot : MonoBehaviour, IDropHandler
             draggedItem.image.transform.SetParent(slotItem.transform, false);
             draggedItem.image.transform.localPosition = Vector3.zero;
             draggedItem.InitializeItem(null);
-
-            successfulPlacement = true;
-        }
-
-        // Refresh inventory UI once if placement/swap succeeded
-        if (successfulPlacement && InventoryUI.Instance != null)
-        {
-            InventoryUI.Instance.RefreshInventoryGrid();
         }
     }
 }

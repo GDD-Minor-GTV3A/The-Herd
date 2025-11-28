@@ -37,6 +37,13 @@ public class PlayerInventory : MonoBehaviour
     {
         if (!item || quantity <= 0) return;
 
+        // Equipment uniqueness check
+        if (item.category == ItemCategory.Headgear && data.headgear == item) return;
+        if (item.category == ItemCategory.Chestwear && data.chestwear == item) return;
+        if (item.category == ItemCategory.Legwear && data.legwear == item) return;
+        if (item.category == ItemCategory.Boots && data.boots == item) return;
+        if (item.category == ItemCategory.Trinket && data.trinkets.Contains(item)) return;
+
         switch (item.category)
         {
             case ItemCategory.Scroll: AddScrolls(quantity); return;
@@ -47,7 +54,7 @@ public class PlayerInventory : MonoBehaviour
 
         if (stack != null) stack.uses += quantity;
         else data.items.Add(new InventoryStack(item, quantity));
-
+        
         RaiseInventoryChanged();
     }
 
@@ -78,7 +85,6 @@ public class PlayerInventory : MonoBehaviour
         InventoryStack stack = data.items.Find(s => s.item == item);
         if (stack == null) return false;
 
-        Debug.Log($"Used {item.itemName}");
         stack.uses--;
 
         if (stack.uses <= 0) data.items.Remove(stack);
@@ -94,18 +100,22 @@ public class PlayerInventory : MonoBehaviour
     {
         switch (item.category)
         {
-            case ItemCategory.Headgear: Swap(ref data.headgear, item); break;
-            case ItemCategory.Chestwear: Swap(ref data.chestwear, item); break;
-            case ItemCategory.Legwear: Swap(ref data.legwear, item); break;
-            case ItemCategory.Boots: Swap(ref data.boots, item); break;
+            case ItemCategory.Headgear: SwapItem(ref data.headgear, item); break;
+            case ItemCategory.Chestwear: SwapItem(ref data.chestwear, item); break;
+            case ItemCategory.Legwear: SwapItem(ref data.legwear, item); break;
+            case ItemCategory.Boots: SwapItem(ref data.boots, item); break;
 
             case ItemCategory.Trinket:
                 if (data.trinkets.Count < maxTrinkets)
+                {
                     data.trinkets.Add(item);
+                }
                 else
                 {
-                    AddItem(data.trinkets[trinketSlot]);
-                    data.trinkets[trinketSlot] = item;
+                    InventoryItem oldTrinket = data.trinkets[trinketSlot]; // store old trinket
+                    data.trinkets[trinketSlot] = null;                     // clear slot
+                    if (oldTrinket != null) AddItem(oldTrinket);           // put old trinket back in inventory
+                    data.trinkets[trinketSlot] = item;                     // equip new trinket
                 }
                 break;
         }
@@ -116,9 +126,11 @@ public class PlayerInventory : MonoBehaviour
         return true;
     }
 
-    private void Swap(ref InventoryItem slot, InventoryItem item)
+    private void SwapItem(ref InventoryItem slot, InventoryItem item)
     {
-        if (slot != null) AddItem(slot);
+        InventoryItem old = slot;  // store old equipped item
+        slot = null;               // clear slot so AddItem uniqueness check passes
+        if (old != null) AddItem(old);
         slot = item;
     }
 
