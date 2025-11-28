@@ -59,14 +59,14 @@ async def setup_environment() -> None:
         set_defaults(),
         test_gh_cli(),
         ensure_paths(),
-        check_paths()
+        check_paths(),
     )
 
 async def main() -> None:
     """Entry point."""
     logger.setLevel(args.log.upper())
     await setup_environment()
-    if args.unity:
+    if args.run_unity:
         await run_unity(unity_args)
     if args.create_tag:
         await tags.create()
