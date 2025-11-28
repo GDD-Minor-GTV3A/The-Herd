@@ -52,9 +52,9 @@ namespace Gameplay.Inventory
                 case ItemCategory.ReviveTotem: AddReviveTotems(quantity); return;
             }
 
-            InventoryStack stack = data.items.Find(s => s.item == item);
+            InventoryStack stack = data.items.Find(s => s.Item == item);
 
-            if (stack != null) stack.uses += quantity;
+            if (stack != null) stack.Uses += quantity;
             else data.items.Add(new InventoryStack(item, quantity));
 
             RaiseInventoryChanged();
@@ -86,12 +86,12 @@ namespace Gameplay.Inventory
         //======================================================================
         private bool ConsumeItem(InventoryItem item)
         {
-            InventoryStack stack = data.items.Find(s => s.item == item);
+            InventoryStack stack = data.items.Find(s => s.Item == item);
             if (stack == null) return false;
 
-            stack.uses--;
+            stack.Uses--;
 
-            if (stack.uses <= 0) data.items.Remove(stack);
+            if (stack.Uses <= 0) data.items.Remove(stack);
 
             RaiseInventoryChanged();
             return true;
@@ -143,11 +143,11 @@ namespace Gameplay.Inventory
         //======================================================================
         private void RemoveFromInventory(InventoryItem item)
         {
-            InventoryStack s = data.items.Find(x => x.item == item);
+            InventoryStack s = data.items.Find(x => x.Item == item);
             if (s != null)
             {
-                s.uses--;
-                if (s.uses <= 0) data.items.Remove(s);
+                s.Uses--;
+                if (s.Uses <= 0) data.items.Remove(s);
                 RaiseInventoryChanged();
             }
         }
@@ -177,7 +177,7 @@ namespace Gameplay.Inventory
         public void RaiseInventoryChanged() => OnInventoryChanged?.Invoke();
         public void RaiseEquipmentChanged() => OnEquipmentChanged?.Invoke();
 
-        public int GetUses(InventoryItem item) => data.items.Find(s => s.item == item)?.uses ?? 0;
+        public int GetUses(InventoryItem item) => data.items.Find(s => s.Item == item)?.Uses ?? 0;
         public string GetEquippedSummary() => $"Head:{data.headgear?.itemName} Chest:{data.chestwear?.itemName} Legs:{data.legwear?.itemName} Boots:{data.boots?.itemName} Trinkets:{data.trinkets.Count}";
     }
 }

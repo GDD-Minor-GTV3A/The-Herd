@@ -11,21 +11,35 @@ namespace Gameplay.Inventory
     public class InventoryUI : MonoBehaviour
     {
         [Header("Panels")]
-        public GameObject rootPanel;
+        [SerializeField] private GameObject rootPanel;
+        public GameObject RootPanel { get => rootPanel; set => rootPanel = value; }
 
         [Header("Wearable Slots")]
-        public InventoryItemSlot headSlot;
-        public InventoryItemSlot chestSlot;
-        public InventoryItemSlot legsSlot;
-        public InventoryItemSlot bootsSlot;
+        [SerializeField] private InventoryItemSlot headSlot;
+        public InventoryItemSlot HeadSlot { get => headSlot; set => headSlot = value; }
+
+        [SerializeField] private InventoryItemSlot chestSlot;
+        public InventoryItemSlot ChestSlot { get => chestSlot; set => chestSlot = value; }
+
+        [SerializeField] private InventoryItemSlot legsSlot;
+        public InventoryItemSlot LegsSlot { get => legsSlot; set => legsSlot = value; }
+
+        [SerializeField] private InventoryItemSlot bootsSlot;
+        public InventoryItemSlot BootsSlot { get => bootsSlot; set => bootsSlot = value; }
 
         [Header("Trinket Slots (4)")]
-        public InventoryItemSlot[] trinketSlots = new InventoryItemSlot[4];
+        [SerializeField] private InventoryItemSlot[] trinketSlots = new InventoryItemSlot[4];
+        public InventoryItemSlot[] TrinketSlots { get => trinketSlots; set => trinketSlots = value; }
 
         [Header("Inventory Grid")]
-        public Transform contentParent;   // Parent for grid rows
-        public GameObject rowPrefab;      // Row prefab containing 4 slots
-        public int itemsPerRow = 4;       // Slots per row
+        [SerializeField] private Transform contentParent;   // Parent for grid rows
+        public Transform ContentParent { get => contentParent; set => contentParent = value; }
+
+        [SerializeField] private GameObject rowPrefab;      // Row prefab containing 4 slots
+        public GameObject RowPrefab { get => rowPrefab; set => rowPrefab = value; }
+
+        [SerializeField] private int itemsPerRow = 4;       // Slots per row
+        public int ItemsPerRow { get => itemsPerRow; set => itemsPerRow = value; }
 
         private void Awake()
         {
@@ -52,8 +66,6 @@ namespace Gameplay.Inventory
             PlayerInventory.Instance.OnEquipmentChanged += RefreshWearables;
             PlayerInventory.Instance.OnInventoryChanged += RefreshInventoryGrid;
         }
-
-        public static InventoryUI Instance { get; private set; }
 
         public void ToggleOpen()
         {
@@ -96,8 +108,8 @@ namespace Gameplay.Inventory
             // Build a flat list with item + amount
             List<(InventoryItem item, int amount)> inventoryItems = new List<(InventoryItem, int)>();
             foreach (var stack in inv.data.items)
-                if (stack?.item != null)
-                    inventoryItems.Add((stack.item, stack.uses)); // <-- store amount too
+                if (stack?.Item != null)
+                    inventoryItems.Add((stack.Item, stack.Uses)); // <-- store amount too
 
             int totalItems = inventoryItems.Count;
             int totalRows = Mathf.CeilToInt(totalItems / (float)itemsPerRow);

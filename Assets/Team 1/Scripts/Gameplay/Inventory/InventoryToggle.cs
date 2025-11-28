@@ -17,7 +17,7 @@ namespace Gameplay.Inventory
 
         public void ToggleInventory()
         {
-            bool wasOpen = inventoryPanel.rootPanel.activeSelf;
+            bool wasOpen = inventoryPanel.RootPanel.activeSelf;
 
             // Toggle UI
             inventoryPanel.ToggleOpen();

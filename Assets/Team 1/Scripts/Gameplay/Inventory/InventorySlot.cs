@@ -1,11 +1,13 @@
-﻿using CustomEditor.Attributes;
+﻿using System.Collections.Generic;
+
+using CustomEditor.Attributes;
 
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 /// <summary>
-/// Represents a drop target slot for inventory or equipment items.
-/// Enforces category rules and swaps items if the slot already has an item.
+/// Represents a drop target slot for inventory or equipment Items.
+/// Enforces category rules and swaps Items if the slot already has an Item.
 /// Refreshes InventoryUI after placement or swap.
 /// </summary>
 namespace Gameplay.Inventory
@@ -13,26 +15,34 @@ namespace Gameplay.Inventory
     public class InventorySlot : MonoBehaviour, IDropHandler
     {
         [Header("Slot Configuration")]
-        public bool isEquipmentSlot = false;
-        public bool isTrinketSlot = false;
+        [SerializeField] private bool isEquipmentSlot = false;
+        public bool IsEquipmentSlot { get => isEquipmentSlot; set => isEquipmentSlot = value; }
+
+        [SerializeField] private bool isTrinketSlot = false;
+        public bool IsTrinketSlot { get => isTrinketSlot; set => isTrinketSlot = value; }
+
+        [SerializeField]
         [ShowIf("isTrinketSlot")]
-        public int slotNumber = 0;
-        public ItemCategory slotCategory; // Only relevant for equipment slots
+        private int slotNumber = 0;
+        public int SlotNumber { get => slotNumber; set => slotNumber = value; }
+
+        [SerializeField] private ItemCategory slotCategory; // Only relevant for equipment slots
+        public ItemCategory SlotCategory { get => slotCategory; set => slotCategory = value; }
 
         public void OnDrop(PointerEventData eventData)
         {
             if (eventData.pointerDrag == null) return;
 
             InventoryItemSlot draggedItem = eventData.pointerDrag.GetComponent<InventoryItemSlot>();
-            if (draggedItem == null || draggedItem.item == null) return;
+            if (draggedItem == null || draggedItem.Item == null) return;
 
             // Prevent dropping non-matching items into equipment/trinket slots
-            if (isEquipmentSlot && draggedItem.item.category != slotCategory)
+            if (isEquipmentSlot && draggedItem.Item.category != slotCategory)
             {
                 return;
             }
 
-            if (isTrinketSlot && draggedItem.item.category != ItemCategory.Trinket)
+            if (isTrinketSlot && draggedItem.Item.category != ItemCategory.Trinket)
             {
                 return;
             }
@@ -48,23 +58,23 @@ namespace Gameplay.Inventory
             // Equipment / Trinket slot logic (swap if needed)
             if (isEquipmentSlot || isTrinketSlot)
             {
-                InventoryItem oldItem = slotItem.item;           // current item in slot
-                Transform oldParent = draggedItem.originalParent; // where dragged item came from
+                InventoryItem oldItem = slotItem.Item;           // current Item in slot
+                Transform oldParent = draggedItem.OriginalParent; // where dragged Item came from
 
-                // Place new item in the target slot
-                slotItem.InitializeItem(draggedItem.item);
-                draggedItem.image.transform.SetParent(slotItem.transform, false);
-                draggedItem.image.transform.localPosition = Vector3.zero;
+                // Place new Item in the target slot
+                slotItem.InitializeItem(draggedItem.Item);
+                draggedItem.Image.transform.SetParent(slotItem.transform, false);
+                draggedItem.Image.transform.localPosition = Vector3.zero;
 
-                // Equip the new item
-                PlayerInventory.Instance.UseItem(slotItem.item, slotNumber);
+                // Equip the new Item
+                PlayerInventory.Instance.UseItem(slotItem.Item, slotNumber);
 
-                // If there was an old item, return it to the original slot
+                // If there was an old Item, return it to the original slot
                 if (oldItem != null)
                 {
                     draggedItem.InitializeItem(oldItem);
-                    draggedItem.image.transform.SetParent(oldParent, false);
-                    draggedItem.image.transform.localPosition = Vector3.zero;
+                    draggedItem.Image.transform.SetParent(oldParent, false);
+                    draggedItem.Image.transform.localPosition = Vector3.zero;
                 }
                 else
                 {
@@ -75,14 +85,14 @@ namespace Gameplay.Inventory
             else
             {
                 // Regular inventory slot logic (no swap)
-                if (slotItem.item != null)
+                if (slotItem.Item != null)
                 {
                     return;
                 }
 
-                slotItem.InitializeItem(draggedItem.item);
-                draggedItem.image.transform.SetParent(slotItem.transform, false);
-                draggedItem.image.transform.localPosition = Vector3.zero;
+                slotItem.InitializeItem(draggedItem.Item);
+                draggedItem.Image.transform.SetParent(slotItem.transform, false);
+                draggedItem.Image.transform.localPosition = Vector3.zero;
                 draggedItem.InitializeItem(null);
             }
         }

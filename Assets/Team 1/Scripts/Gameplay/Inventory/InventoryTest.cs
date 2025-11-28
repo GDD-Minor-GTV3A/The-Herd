@@ -54,7 +54,7 @@ namespace Gameplay.Inventory
             if (Input.GetKeyDown(KeyCode.Alpha1))
                 EquipRandomWearable();
 
-            // Use a random active item
+            // Use a random active Item
             if (Input.GetKeyDown(KeyCode.Alpha2))
                 UseRandomActiveItem();
 
@@ -87,21 +87,21 @@ namespace Gameplay.Inventory
         #region Item Actions
 
         /// <summary>
-        /// Equips a random wearable item from the inventory (head, chest, legs, boots)
+        /// Equips a random wearable Item from the inventory (head, chest, legs, boots)
         /// </summary>
         private void EquipRandomWearable()
         {
             var equipableItems = inv.data.items.FindAll(s =>
-                s.item.category == ItemCategory.Headgear ||
-                s.item.category == ItemCategory.Chestwear ||
-                s.item.category == ItemCategory.Legwear ||
-                s.item.category == ItemCategory.Boots
+                s.Item.category == ItemCategory.Headgear ||
+                s.Item.category == ItemCategory.Chestwear ||
+                s.Item.category == ItemCategory.Legwear ||
+                s.Item.category == ItemCategory.Boots
             );
 
             if (equipableItems.Count > 0)
             {
                 var randomIndex = Random.Range(0, equipableItems.Count);
-                var toEquip = equipableItems[randomIndex].item;
+                var toEquip = equipableItems[randomIndex].Item;
                 inv.UseItem(toEquip);
                 Debug.Log($"Equipped random wearable: {toEquip.itemName}");
             }
@@ -116,12 +116,12 @@ namespace Gameplay.Inventory
         /// </summary>
         private void EquipRandomTrinket()
         {
-            var trinketItems = inv.data.items.FindAll(s => s.item.category == ItemCategory.Trinket);
+            var trinketItems = inv.data.items.FindAll(s => s.Item.category == ItemCategory.Trinket);
 
             if (trinketItems.Count > 0)
             {
                 var randomIndex = Random.Range(0, trinketItems.Count);
-                var toEquip = trinketItems[randomIndex].item;
+                var toEquip = trinketItems[randomIndex].Item;
                 inv.UseItem(toEquip);
                 Debug.Log($"Equipped random trinket: {toEquip.itemName}");
             }
@@ -132,15 +132,15 @@ namespace Gameplay.Inventory
         }
 
         /// <summary>
-        /// Uses a random active item from the inventory, if one exists
+        /// Uses a random active Item from the inventory, if one exists
         /// </summary>
         private void UseRandomActiveItem()
         {
-            var activeStack = inv.data.items.Find(s => s.item.category == ItemCategory.Active);
+            var activeStack = inv.data.items.Find(s => s.Item.category == ItemCategory.Active);
             if (activeStack != null)
             {
-                inv.UseItem(activeStack.item);
-                Debug.Log($"Used: {activeStack.item.itemName}, remaining uses: {inv.GetUses(activeStack.item)}");
+                inv.UseItem(activeStack.Item);
+                Debug.Log($"Used: {activeStack.Item.itemName}, remaining uses: {inv.GetUses(activeStack.Item)}");
             }
         }
 
@@ -155,17 +155,17 @@ namespace Gameplay.Inventory
                 return;
             }
 
-            foreach (var item in testItems)
+            foreach (var Item in testItems)
             {
-                bool alreadyExists = inv.data.items.Exists(s => s.item == item);
+                bool alreadyExists = inv.data.items.Exists(s => s.Item == Item);
 
                 // Allow multiple copies for Active items or special categories
-                if (!alreadyExists || item.category == ItemCategory.Active ||
-                    item.category == ItemCategory.Scroll ||
-                    item.category == ItemCategory.ReviveTotem)
+                if (!alreadyExists || Item.category == ItemCategory.Active ||
+                    Item.category == ItemCategory.Scroll ||
+                    Item.category == ItemCategory.ReviveTotem)
                 {
-                    inv.AddItem(item);
-                    Debug.Log($"Added persistent item: {item.itemName} | Category: {item.category} | GUID: {item.GUID}");
+                    inv.AddItem(Item);
+                    Debug.Log($"Added persistent Item: {Item.itemName} | Category: {Item.category} | GUID: {Item.GUID}");
                 }
             }
 
@@ -185,14 +185,13 @@ namespace Gameplay.Inventory
             Debug.Log("=== Inventory ===");
             foreach (var stack in inv.data.items)
             {
-                int uses = stack.item.category == ItemCategory.Active ? stack.uses : -1;
-                Debug.Log($"Item: {stack.item.itemName} | Category: {stack.item.category} | Uses: {uses} | GUID: {stack.item.GUID}");
+                int uses = stack.Item.category == ItemCategory.Active ? stack.Uses : -1;
+                Debug.Log($"Item: {stack.Item.itemName} | Category: {stack.Item.category} | Uses: {uses} | GUID: {stack.Item.GUID}");
             }
 
             Debug.Log(inv.GetEquippedSummary());
             Debug.Log($"Scrolls: {inv.data.scrolls} | Revive Totems: {inv.data.reviveTotems}");
         }
-
         #endregion
     }
 }

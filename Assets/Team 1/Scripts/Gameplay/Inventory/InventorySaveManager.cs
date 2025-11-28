@@ -43,23 +43,23 @@ namespace Gameplay.Inventory
             // Save inventory items and active item uses
             foreach (var stack in inv.data.items)
             {
-                data.inventoryItemIDs.Add(stack.item.GUID);
-                data.activeItemUses.Add(stack.item.category == ItemCategory.Active ? stack.uses : -1);
+                data.InventoryItemIDs.Add(stack.Item.GUID);
+                data.ActiveItemUses.Add(stack.Item.category == ItemCategory.Active ? stack.Uses : -1);
             }
 
             // Save equipped items (head, chest, legs, boots)
-            data.headID = inv.data.headgear?.GUID ?? "";
-            data.chestID = inv.data.chestwear?.GUID ?? "";
-            data.legsID = inv.data.legwear?.GUID ?? "";
-            data.bootsID = inv.data.boots?.GUID ?? "";
+            data.HeadID = inv.data.headgear?.GUID ?? "";
+            data.ChestID = inv.data.chestwear?.GUID ?? "";
+            data.LegsID = inv.data.legwear?.GUID ?? "";
+            data.BootsID = inv.data.boots?.GUID ?? "";
 
             // Save trinkets
             foreach (var t in inv.data.trinkets)
-                data.trinketIDs.Add(t.GUID);
+                data.TrinketIDs.Add(t.GUID);
 
             // Save currency
-            data.scrolls = inv.data.scrolls;
-            data.reviveTotems = inv.data.reviveTotems;
+            data.Scrolls = inv.data.scrolls;
+            data.ReviveTotems = inv.data.reviveTotems;
 
             // Serialize to JSON and write to file
             string json = JsonUtility.ToJson(data, true);
@@ -90,13 +90,13 @@ namespace Gameplay.Inventory
             inv.data.trinkets.Clear();
 
             // Restore inventory stacks
-            for (int i = 0; i < data.inventoryItemIDs.Count; i++)
+            for (int i = 0; i < data.InventoryItemIDs.Count; i++)
             {
-                string id = data.inventoryItemIDs[i];
+                string id = data.InventoryItemIDs[i];
                 if (lookup.TryGetValue(id, out var item))
                 {
-                    int uses = (data.activeItemUses.Count > i && data.activeItemUses[i] >= 0)
-                        ? data.activeItemUses[i]
+                    int uses = (data.ActiveItemUses.Count > i && data.ActiveItemUses[i] >= 0)
+                        ? data.ActiveItemUses[i]
                         : 1;
 
                     inv.data.items.Add(new InventoryStack(item, item.category == ItemCategory.Active ? uses : 1));
@@ -104,21 +104,21 @@ namespace Gameplay.Inventory
             }
 
             // Restore equipped items
-            inv.data.headgear = Find(data.headID);
-            inv.data.chestwear = Find(data.chestID);
-            inv.data.legwear = Find(data.legsID);
-            inv.data.boots = Find(data.bootsID);
+            inv.data.headgear = Find(data.HeadID);
+            inv.data.chestwear = Find(data.ChestID);
+            inv.data.legwear = Find(data.LegsID);
+            inv.data.boots = Find(data.BootsID);
 
             // Restore trinkets
-            foreach (var tid in data.trinketIDs)
+            foreach (var tid in data.TrinketIDs)
             {
                 var tr = Find(tid);
                 if (tr != null) inv.data.trinkets.Add(tr);
             }
 
             // Restore currency
-            inv.data.scrolls = data.scrolls;
-            inv.data.reviveTotems = data.reviveTotems;
+            inv.data.scrolls = data.Scrolls;
+            inv.data.reviveTotems = data.ReviveTotems;
 
             // Notify UI and systems that inventory/equipment changed
             inv.RaiseInventoryChanged();

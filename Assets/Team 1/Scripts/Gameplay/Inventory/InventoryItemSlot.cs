@@ -10,18 +10,30 @@ namespace Gameplay.Inventory
     public class InventoryItemSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerClickHandler
     {
         [Header("UI References")]
-        public Image image;                        // Icon child
-        public TextMeshProUGUI countText;
-        [SerializeField] private Transform dragCanvas;
+        [SerializeField] private Image image;                        // Icon child
+        public Image Image { get => image; set => image = value; }
 
-        [SerializeField, HideInInspector] public InventoryItem item;
-        [SerializeField, HideInInspector] public int count;
+        [SerializeField] private TextMeshProUGUI countText;
+        public TextMeshProUGUI CountText { get => countText; set => countText = value; }
+
+        [SerializeField] private Transform dragCanvas;
+        public Transform DragCanvas { get => dragCanvas; set => dragCanvas = value; }
+
+        [SerializeField, HideInInspector] private InventoryItem item;
+        public InventoryItem Item { get => item; set => item = value; }
+
+        [SerializeField, HideInInspector] private int count;
+        public int Count { get => count; set => count = value; }
 
         [Header("Settings")]
-        public bool draggable = true;              // Set to false for equipment/trinket slots
+        [SerializeField] private bool _draggable = true;              // Set to false for equipment/trinket slots
 
-        public Transform originalParent;
-        private int originalSiblingIndex;
+        [SerializeField] private Transform originalParent;
+        public Transform OriginalParent { get => originalParent; set => originalParent = value; }
+
+        [SerializeField] private int originalSiblingIndex;
+        public int OriginalSiblingIndex { get => originalSiblingIndex; set => originalSiblingIndex = value; }
+
         private Vector2 originalSizeDelta;
 
         public void InitializeItem(InventoryItem newItem, int count = -1)
@@ -53,7 +65,7 @@ namespace Gameplay.Inventory
 
         public void OnBeginDrag(PointerEventData eventData)
         {
-            if (!draggable || image == null || image.sprite == null) return;
+            if (!_draggable || image == null || image.sprite == null) return;
 
             originalParent = image.transform.parent;
             originalSiblingIndex = image.transform.GetSiblingIndex();
@@ -70,13 +82,13 @@ namespace Gameplay.Inventory
 
         public void OnDrag(PointerEventData eventData)
         {
-            if (!draggable || image == null) return;
+            if (!_draggable || image == null) return;
             ((RectTransform)image.transform).position = eventData.position;
         }
 
         public void OnEndDrag(PointerEventData eventData)
         {
-            if (!draggable || image == null) return;
+            if (!_draggable || image == null) return;
 
             // Restore to slot
             image.transform.SetParent(originalParent, false);

@@ -8,9 +8,19 @@ namespace Gameplay.Inventory
         [System.Serializable]
         public class ItemStats
         {
-            public int bonusHealth;
-            public int bonusDamage;
-            public int bonusSpeed;
+            [SerializeField] private int bonusHealth;
+            [SerializeField] private int bonusDamage;
+            [SerializeField] private int bonusSpeed;
+            [SerializeField] private float playerVisionRange;
+            [SerializeField] private float dogVisionRange;
+
+            public int BonusHealth { get => bonusHealth; set => bonusHealth = value; }
+            public int BonusDamage { get => bonusDamage; set => bonusDamage = value; }
+            public int BonusSpeed { get => bonusSpeed; set => bonusSpeed = value; }
+
+            public float PlayerVisionRange { get => playerVisionRange; set => playerVisionRange = value; }
+
+            public float DogVisionRange { get => dogVisionRange; set => dogVisionRange = value; }
         }
 
         [Header("Identity")]
