@@ -1,4 +1,6 @@
-﻿using TMPro;
+﻿using System.Globalization;
+
+using TMPro;
 
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -34,8 +36,6 @@ namespace Gameplay.Inventory
         [SerializeField] private int originalSiblingIndex;
         public int OriginalSiblingIndex { get => originalSiblingIndex; set => originalSiblingIndex = value; }
 
-        private Vector2 originalSizeDelta;
-
         public void InitializeItem(InventoryItem newItem, int count = -1)
         {
             this.count = count;
@@ -68,16 +68,10 @@ namespace Gameplay.Inventory
             if (!_draggable || image == null || image.sprite == null) return;
 
             originalParent = image.transform.parent;
-            originalSiblingIndex = image.transform.GetSiblingIndex();
-
-            RectTransform rt = (RectTransform)image.transform;
-            originalSizeDelta = rt.sizeDelta;
-
             image.transform.SetParent(dragCanvas, false);
             image.transform.SetAsLastSibling();
             image.raycastTarget = false;
 
-            rt.position = eventData.position;
         }
 
         public void OnDrag(PointerEventData eventData)
@@ -94,11 +88,6 @@ namespace Gameplay.Inventory
             image.transform.SetParent(originalParent, false);
             image.transform.SetSiblingIndex(originalSiblingIndex);
             image.raycastTarget = true;
-
-            RectTransform rt = (RectTransform)image.transform;
-            rt.anchoredPosition = Vector2.zero;
-            rt.localPosition = Vector3.zero;
-            rt.sizeDelta = originalSizeDelta;
         }
 
         public void OnPointerClick(PointerEventData eventData)
