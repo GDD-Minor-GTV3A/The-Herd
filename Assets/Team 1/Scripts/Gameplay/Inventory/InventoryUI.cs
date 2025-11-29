@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 
+using TMPro;
+
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Gameplay.Inventory
 {
@@ -13,6 +16,9 @@ namespace Gameplay.Inventory
         [Header("Panels")]
         [SerializeField] private GameObject rootPanel;
         public GameObject RootPanel { get => rootPanel; set => rootPanel = value; }
+
+        [SerializeField] private TextMeshProUGUI scrolls;
+        [SerializeField] private TextMeshProUGUI reviveTotems;
 
         [Header("Wearable Slots")]
         [SerializeField] private InventoryItemSlot headSlot;
@@ -145,8 +151,25 @@ namespace Gameplay.Inventory
                     }
                 }
             }
+            if (PlayerInventory.Instance.data.scrolls > 1)
+            {
+                scrolls.gameObject.SetActive(true);
+                scrolls.SetText(PlayerInventory.Instance.data.scrolls.ToString());
+            }
+            else
+            {
+                scrolls.gameObject.SetActive(false);
+            }
+            if (PlayerInventory.Instance.data.reviveTotems > 1)
+            {
+                reviveTotems.gameObject.SetActive(true);
+                reviveTotems.SetText(PlayerInventory.Instance.data.scrolls.ToString());
+            }
+            else
+            {
+                reviveTotems.gameObject.SetActive(false);
+            }
         }
-
         #endregion
     }
 }
