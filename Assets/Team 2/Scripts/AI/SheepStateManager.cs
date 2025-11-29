@@ -522,12 +522,30 @@ namespace Core.AI.Sheep
                 if (kv.Key) _behaviorContext.ThreatRadius[kv.Key] = kv.Value;
             }
 
-            _behaviorContext.HasThreat = _behaviorContext.Threats.Count > 0;
+            bool hasThreat = _behaviorContext.Threats.Count > 0;
+
+            if (_currentState is SheepScaredState)
+            {
+                if (_panicLoop != null)
+                {
+                    StopPanicLoop();
+                }
+
+                _behaviorContext.HasThreat = false;
+            }
+            else
+            {
+                _behaviorContext.HasThreat = hasThreat;
+            }
 
             if (_behaviorContext.HasThreat && !_hadThreatLastFrame)
+            {
                 StartPanicLoop();
+            }
             else if (!_behaviorContext.HasThreat && _hadThreatLastFrame)
+            {
                 StopPanicLoop();
+            }
 
             _hadThreatLastFrame = _behaviorContext.HasThreat;
         }
