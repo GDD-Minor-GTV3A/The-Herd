@@ -16,15 +16,15 @@ public class EnemySpawnpointQuest : MonoBehaviour
         switch (spawnMethod) {
             case enSpawnMethod.SpawnAll:
                 foreach (GameObject _enemy in enemies) {
-                    Instantiate(_enemy, transform.position, Quaternion.identity);
+                    Instantiate(_enemy, transform.position, Quaternion.identity, this.transform);
                 }
                 break;
             case enSpawnMethod.SpawnFirst:
-                Instantiate(enemies[0], transform.position, Quaternion.identity);
+                Instantiate(enemies[0], transform.position, Quaternion.identity,this.transform);
                 break;
             case enSpawnMethod.SpawnRandom:
                 GameObject enemy = enemies[Random.Range(0, enemies.Length - 1)];
-                Instantiate(enemy, transform.position, Quaternion.identity);
+                Instantiate(enemy, transform.position, Quaternion.identity, this.transform);
                 break;
         }
     }
@@ -32,5 +32,10 @@ public class EnemySpawnpointQuest : MonoBehaviour
     public void SetEnemies(GameObject[] enemies)
     {
         this.enemies = enemies;
+    }
+
+    public void DestroyEnemies()
+    {
+        Destroy(this.gameObject);
     }
 }

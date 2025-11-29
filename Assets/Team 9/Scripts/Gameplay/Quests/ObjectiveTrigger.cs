@@ -19,11 +19,13 @@ public class ObjectiveTrigger : MonoBehaviour
     /// Quest ID of the Objective
     /// </summary>
     [SerializeField] private string questID = "";
+
+    [SerializeField] private bool oneShot = false;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+
+
+    public string QuestID => questID;
+    public string ObjectiveID => objectiveID;
 
     /// <summary>
     /// If the player enters the trigger.
@@ -34,6 +36,17 @@ public class ObjectiveTrigger : MonoBehaviour
     {
         if (!other.CompareTag("Player")) return;
         EventManager.Broadcast(new CompleteObjectiveEvent(questID, objectiveID));
+        if (oneShot)
+        {
+            Destroy(this.gameObject);
+        }
+    }
+
+    private void Start()
+    {
+        //Triggers start deactivated and are activated through the trigger activator
+        this.gameObject.SetActive(false);
+        this.gameObject.GetComponent<MeshRenderer>().enabled = false;
     }
 
     // Update is called once per frame
