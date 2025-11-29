@@ -76,7 +76,7 @@ public class QuestUIEntry : MonoBehaviour
                 if (obj.IsCompleted)
                     text.color = Color.green;
                 else if (obj.IsActive)
-                    text.color = Color.black;
+                    text.color = Color.white;
                 else
                     text.color = Color.red;
 
