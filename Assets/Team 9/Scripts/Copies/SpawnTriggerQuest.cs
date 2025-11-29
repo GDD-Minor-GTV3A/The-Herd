@@ -45,6 +45,7 @@ public class SpawnTriggerQuest : MonoBehaviour
     [SerializeField] private bool npcNeeded = false;
 
     private bool npcEntered = false;
+    private bool playerEntered = false;
     
     [Header("Spawn Settings")]
     [SerializeField] private List<SpawnStep> spawnSteps = new List<SpawnStep>();
@@ -73,9 +74,15 @@ public class SpawnTriggerQuest : MonoBehaviour
             }
         }
         
-        if (other.CompareTag("Player") )
+        if (other.CompareTag("Player"))
+        {
+            playerEntered = true;
+        }
+
+        if (other.CompareTag("Player") || other.name == npcName)
         {
             if (npcNeeded && !npcEntered) return;
+            if (!playerEntered) return;
             Debug.Log($"{other.name} entered the trigger.");
             hasTriggered = true;
             if (spawnRoutine == null)
@@ -109,11 +116,16 @@ public class SpawnTriggerQuest : MonoBehaviour
         }
 
         Debug.Log("Spawn sequence complete.");
-        EventManager.Broadcast(new CompleteObjectiveEvent(questID, objectiveID));
-        DestroyAllSpawns();
+        FinishSpawnTrigger();
         spawnRoutine = null;
     }
-    
+
+    private void FinishSpawnTrigger()
+    {
+        EventManager.Broadcast(new CompleteObjectiveEvent(questID, objectiveID));
+        DestroyAllSpawns();
+        Destroy(this.gameObject);
+    }
     
     //Since enemies cannot die at the moment, destroy after spawn
     private void DestroyAllSpawns()
