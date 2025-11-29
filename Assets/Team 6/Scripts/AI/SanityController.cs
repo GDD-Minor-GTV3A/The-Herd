@@ -1,7 +1,7 @@
 
 // Chris: Should this script exist? I didn't see it on Team#2 branch so maybe Git messed up something with changes?
 
-/*using System.Collections;
+using System.Collections;
 using UnityEngine;
 
 namespace Core.AI.Enemies
@@ -69,22 +69,25 @@ namespace Core.AI.Enemies
 
                     Debug.Log($"[SanityController] 🐑 {name} affecting {sheep.name}");
 
-                    if (sheep.TryGetComponent<Core.AI.Sheep.SheepSanity>(out var sanity))
-                    {
-                        if (!sanity.IsPanicking) // ✅ skip already-panicking sheep
-                        {
-                            sanity.GainSanity(fearPerTick, transform.position);
-                            Debug.Log($"[SanityController] {sheep.name} gained +{fearPerTick} sanity");
-                        }
-                        else
-                        {
-                            Debug.Log($"[SanityController] {sheep.name} already panicking, skipping tick.");
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogWarning($"[SanityController] ⚠️ {sheep.name} has no SheepSanity component!");
-                    }
+
+                    // Brian: Chris Commenting it all out caused wanrings because this script wasn't accesable, either delete this script or update it to the new sanity system
+
+                    //if (sheep.TryGetComponent<Core.AI.Sheep.SheepSanity>(out var sanity))
+                    //{
+                    //    if (!sanity.IsPanicking) // ✅ skip already-panicking sheep
+                    //    {
+                    //        sanity.GainSanity(fearPerTick, transform.position);
+                    //        Debug.Log($"[SanityController] {sheep.name} gained +{fearPerTick} sanity");
+                    //    }
+                    //    else
+                    //    {
+                    //        Debug.Log($"[SanityController] {sheep.name} already panicking, skipping tick.");
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    Debug.LogWarning($"[SanityController] ⚠️ {sheep.name} has no SheepSanity component!");
+                    //}
                 }
 
                 yield return wait;
@@ -103,4 +106,3 @@ namespace Core.AI.Enemies
 #endif
     }
 }
-*/
