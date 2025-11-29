@@ -10,7 +10,6 @@ using UI;
 using UnityEngine;
 using UnityEngine.Events;
 
-using static UnityEditor.Graphs.GraphGUI;
 
 namespace Gameplay.ToolsSystem.Tools.Rifle
 {

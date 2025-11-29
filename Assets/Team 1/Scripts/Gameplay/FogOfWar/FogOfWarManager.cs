@@ -368,6 +368,10 @@ namespace Gameplay.FogOfWar
         private void Update()
         {
             if (isPaused) return;
+            if (fogProjectionPlane == null) Debug.LogError("FOW: fogProjectionPlane is NULL", this);
+            if (playerTransform == null) Debug.LogError("FOW: playerTransform is NULL", this);
+            if (fogMaterial == null) Debug.LogError("FOW: fogMaterial is NULL", this);
+
             fogProjectionPlane.transform.position = new Vector3(playerTransform.position.x, fogProjectionPlane.transform.position.y, playerTransform.position.z);
 
             fogMaterial.SetVector("_Player_Position", playerTransform.position);
