@@ -46,6 +46,7 @@ public class ObjectiveTrigger : MonoBehaviour
     {
         //Triggers start deactivated and are activated through the trigger activator
         this.gameObject.SetActive(false);
+        this.gameObject.GetComponent<MeshRenderer>().enabled = false;
     }
 
     // Update is called once per frame

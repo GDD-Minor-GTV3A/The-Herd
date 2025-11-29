@@ -1,5 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+
+using Core.Events;
+
 using UnityEngine;
 
 
@@ -35,6 +38,14 @@ public class SpawnStep
 
 public class SpawnTriggerQuest : MonoBehaviour
 {
+    [Header("Quest Settings")]
+    [SerializeField] private string questID;
+    [SerializeField] private string objectiveID;
+    [SerializeField] private string npcName;
+    [SerializeField] private bool npcNeeded = false;
+
+    private bool npcEntered = false;
+    
     [Header("Spawn Settings")]
     [SerializeField] private List<SpawnStep> spawnSteps = new List<SpawnStep>();
 
@@ -49,9 +60,22 @@ public class SpawnTriggerQuest : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (oneTime && hasTriggered) return;
-
-        if (other.CompareTag("Player") || other.name == "Vesna")
+        if (!QuestManager.Instance.GetQuestProgressByID(questID).IsObjectiveActive(objectiveID))
         {
+            Debug.Log("OBJECTIVE NOT ACTIVE");
+        }
+
+        if (npcNeeded)
+        {
+            if (other.name == npcName)
+            {
+                npcEntered = true;
+            }
+        }
+        
+        if (other.CompareTag("Player") )
+        {
+            if (npcNeeded && !npcEntered) return;
             Debug.Log($"{other.name} entered the trigger.");
             hasTriggered = true;
             if (spawnRoutine == null)
@@ -85,6 +109,21 @@ public class SpawnTriggerQuest : MonoBehaviour
         }
 
         Debug.Log("Spawn sequence complete.");
+        EventManager.Broadcast(new CompleteObjectiveEvent(questID, objectiveID));
+        DestroyAllSpawns();
         spawnRoutine = null;
+    }
+    
+    
+    //Since enemies cannot die at the moment, destroy after spawn
+    private void DestroyAllSpawns()
+    {
+        foreach (var step in spawnSteps)
+        {
+            foreach (var point in step.spawnPoints)
+            {
+                point.DestroyEnemies();
+            }            
+        }
     }
 }
