@@ -129,10 +129,15 @@ namespace Core.AI.Sheep.Event
     public class SheepLeaveHerdEvent : GameEvent
     {
         public SheepStateManager Sheep { get; }
+        
+        public bool WasLost { get; }
+        public bool Forced { get; }
 
-        public SheepLeaveHerdEvent(SheepStateManager sheep)
+        public SheepLeaveHerdEvent(SheepStateManager sheep, bool wasLost = false, bool forced = false)
         {
             Sheep = sheep;
+            WasLost = wasLost;
+            Forced = forced;
         }
     }
 
@@ -146,6 +151,20 @@ namespace Core.AI.Sheep.Event
         public SanityChangeEvent(float percentage)
         {
             Percentage = percentage;
+        }
+    }
+
+    public sealed class SheepScareEvent : GameEvent
+    {
+        public SheepStateManager Target { get; }
+        public float Amount { get; }
+        public Vector3 SourcePosition { get; }
+
+        public SheepScareEvent(SheepStateManager sheep, float amount, Vector3 sourcePosition)
+        {
+            Target = sheep;
+            Amount = amount;
+            SourcePosition = sourcePosition;
         }
     }
 

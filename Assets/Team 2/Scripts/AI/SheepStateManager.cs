@@ -19,6 +19,7 @@ namespace Core.AI.Sheep
     /// Sheep state manager
     /// </summary>
     [RequireComponent(typeof(NavMeshAgent))]
+    [DisallowMultipleComponent]
     public class SheepStateManager : StateManager<IState>
     {
         private const float DEFAULT_FOLLOW_DISTANCE = 1.8f;
@@ -86,6 +87,8 @@ namespace Core.AI.Sheep
         public bool IsStraggler => _startAsStraggler;
         
         public Sprite FlashbackImage => _flashbackImage;
+        public Vector3 PlayerSquareCenter => _playerCenter;
+        public Vector3 PlayerSquareHalfExtents => _playerHalfExtents;
 
         /// <summary>
         /// Exposed config and archetype and sound driver
@@ -192,6 +195,7 @@ namespace Core.AI.Sheep
                 {typeof(SheepWalkAwayFromHerdState), new SheepWalkAwayFromHerdState(this)},
                 {typeof(SheepFreezeState), new SheepFreezeState(this)},
                 {typeof(SheepPettingState), new SheepPettingState(this)},
+                {typeof(SheepScaredState), new SheepScaredState(this)},
                 {typeof(SheepDieState), new SheepDieState(this)},
             };
         }
@@ -269,7 +273,11 @@ namespace Core.AI.Sheep
 
             if (_startAsStraggler) return;
 
-            if (_currentState is SheepWalkAwayFromHerdState) return;
+            if (_currentState is SheepWalkAwayFromHerdState
+                || _currentState is SheepScaredState
+                || _currentState is SheepFreezeState
+                || _currentState is SheepDieState
+                || _currentState is SheepPettingState) return;
 
             //Decide on state
             bool outside = FlockingUtility.IsOutSquare(transform.position, _playerCenter, _playerHalfExtents);
@@ -300,6 +308,7 @@ namespace Core.AI.Sheep
                 UpdateBehaviorContext();
 
                 if (_currentState is not SheepWalkAwayFromHerdState
+                    && _currentState is not SheepScaredState
                     && Time.time >= _nextWalkingAwayFromHerdAt
                     && Time.time >= _walkAwayReenableAt
                     && !_startAsStraggler)
@@ -546,9 +555,13 @@ namespace Core.AI.Sheep
         /// <summary>
         /// Called when sheep gets separated from herd
         /// </summary>
-        public void OnSeparatedFromHerd()
+        public void OnSeparatedFromHerd(bool wasLost, bool forced)
         {
-            _personality.OnSeparatedFromHerd(this, _behaviorContext);
+            EventManager.Broadcast(new SheepLeaveHerdEvent(this, wasLost, forced));
+            if (_personality != null)
+            {
+                _personality.OnSeparatedFromHerd(this, _behaviorContext);
+            }
         }
 
         /// <summary>
@@ -580,6 +593,7 @@ namespace Core.AI.Sheep
         /// </summary>
         public void Remove()
         {
+            EventManager.Broadcast(new SheepLeaveHerdEvent(this, wasLost: false, forced: true));
             EventManager.Broadcast(new SheepDeathEvent(this));
             Destroy(gameObject);
         }
