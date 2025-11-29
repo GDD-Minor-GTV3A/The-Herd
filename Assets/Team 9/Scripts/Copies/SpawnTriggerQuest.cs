@@ -1,31 +1,90 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 
-public class SpawnTriggerQuest : MonoBehaviour
+
+[System.Serializable]
+public class SpawnStep
 {
-    [SerializeField] private EnemySpawnpoint[] spawnPoints;
+    [Tooltip("Which spawn points to use in this step")]
+    public EnemySpawnpointQuest[] spawnPoints;
 
-    [SerializeField] private SpawnTriggerEvent onSpawnTriggered;
+    [Tooltip("Which enemies are spawned during this step")]
+    public GameObject[] enemies;
+    
+    [Tooltip("How many enemies to spawn in this step")]
+    public int spawnAmount = 5;
 
-    [SerializeField] private bool oneTime = false;
+    [Tooltip("Delay between each spawn")]
+    public float spawnDelay = 1f;
 
-    private bool firstSpawn = false;
+    [Tooltip("How long this step lasts before next one starts")]
+    public float stepDuration = 5f;
 
-    /// <summary>
-    /// Callback for box collider. Gets triggered when player enters, and invokes the onSpawnTriggered Event passing it all its spawnPoints
-    /// </summary>
-    /// <param name="other"></param>
-    private void OnTriggerEnter(Collider other)
+
+    public void SetRandomEnemiesOnSpawnPoints()
     {
-        if (oneTime && firstSpawn) return;
-        firstSpawn = true;
-        if (other.name == "Vesna")
+        foreach (var point in spawnPoints)
         {
-            Debug.Log("Vesna Entered the trigger");
-            onSpawnTriggered.Invoke(spawnPoints);
+            int randomEnemy = Random.Range(0, enemies.Length);
+            point.SetEnemies(new [] {enemies[randomEnemy]});
         }
     }
 }
 
 
+public class SpawnTriggerQuest : MonoBehaviour
+{
+    [Header("Spawn Settings")]
+    [SerializeField] private List<SpawnStep> spawnSteps = new List<SpawnStep>();
+
+    [SerializeField] private bool oneTime = false;
+    private bool hasTriggered = false;
+
+    [Header("Events")]
+    [SerializeField] private SpawnTriggerEvent onSpawnTriggered;
+
+    private Coroutine spawnRoutine;
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (oneTime && hasTriggered) return;
+
+        if (other.CompareTag("Player") || other.name == "Vesna")
+        {
+            Debug.Log($"{other.name} entered the trigger.");
+            hasTriggered = true;
+            if (spawnRoutine == null)
+                spawnRoutine = StartCoroutine(HandleSpawnSequence());
+        }
+    }
+
+    private IEnumerator HandleSpawnSequence()
+    {
+        Debug.Log("Starting spawn sequence...");
+
+        foreach (var step in spawnSteps)
+        {
+            step.SetRandomEnemiesOnSpawnPoints();
+            Debug.Log($"Starting spawn step: {step.spawnAmount} enemies over {step.stepDuration}s");
+            float elapsed = 0f;
+            int spawned = 0;
+
+            while (elapsed < step.stepDuration && spawned < step.spawnAmount)
+            {
+                foreach (var points in step.spawnPoints)
+                {
+                    points.spawn();
+                }
+                spawned++;
+                yield return new WaitForSeconds(step.spawnDelay);
+                elapsed += step.spawnDelay;
+            }
+
+            yield return new WaitForSeconds(Mathf.Max(0f, step.stepDuration - elapsed));
+        }
+
+        Debug.Log("Spawn sequence complete.");
+        spawnRoutine = null;
+    }
+}

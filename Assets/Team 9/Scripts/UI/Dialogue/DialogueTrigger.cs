@@ -42,7 +42,6 @@ public class DialogueTrigger : MonoBehaviour
     private void OnTriggerStay(Collider other)
     {
         if (!other.CompareTag(PLAYER_TAG)) return;
-        Debug.Log($"Inside trigger: {gameObject.name}");
         if (DialogueManager.GetInstance().IsDialoguePlaying)
         {
             if (!_interText) return;
