@@ -7,13 +7,17 @@ namespace Gameplay.Dog
     /// </summary>
     public abstract class DogState : IState
     {
-        protected DogStateManager _manager;
+        protected readonly DogStateManager manager;
+        protected readonly DogMovementController movement;
+        protected readonly DogAnimator animator;
 
 
-        /// <param name="manager">Menager which will use this state.</param>
+        /// <param name="manager">Manager which will use this state.</param>
         public DogState(DogStateManager manager)
         {
-            _manager = manager;
+            this.manager = manager;
+            movement = manager.MovementController as DogMovementController;
+            animator = manager.AnimatorController as DogAnimator;
         }
 
 

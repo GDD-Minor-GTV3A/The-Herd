@@ -11,16 +11,19 @@ namespace Gameplay.Dog
     /// </summary>
     public class DogStateManager : CharacterStateManager<DogState>
     {
-        private Transform _playerTransform;
-        private float _distanceToPlayer;
-        private HerdZone _heardZone;
+        private Transform playerTransform;
+        private float distanceToPlayer;
+        private HerdZone herdZone;
 
 
         /// <summary>
         /// Target of dog's command. CANNOT be the player.
         /// </summary>
         public Observable<Vector3> CurrentCommandTarget { get; set; } = new Observable<Vector3>();
-        public HerdZone HeardZone => _heardZone;
+        /// <summary>
+        /// Reference to the herd controller.
+        /// </summary>
+        public HerdZone HerdZone => herdZone;
 
 
         /// <summary>
@@ -34,13 +37,13 @@ namespace Gameplay.Dog
         {
             _movementController = movementController;
 
-            _heardZone = heardZone;
+            this.herdZone = heardZone;
 
             _animatorController = animator;
 
-            _playerTransform = playerTransform;
+            this.playerTransform = playerTransform;
 
-            _distanceToPlayer = config.DistanceToPlayer;
+            distanceToPlayer = config.DistanceToPlayer;
 
             InitializeStatesMap();
 
@@ -54,8 +57,8 @@ namespace Gameplay.Dog
         {
             StatesMap = new Dictionary<System.Type, DogState>
             {
-                { typeof(DogIdle), new DogIdle(this, _playerTransform, _distanceToPlayer) },
-                { typeof(DogFollowPlayer), new DogFollowPlayer(this, _playerTransform, _distanceToPlayer) },
+                { typeof(DogIdle), new DogIdle(this, playerTransform, distanceToPlayer) },
+                { typeof(DogFollowPlayer), new DogFollowPlayer(this, playerTransform, distanceToPlayer) },
                 { typeof(DogMove), new DogMove(this) },
                 {typeof(DogMoveToSheep), new DogMoveToSheep(this) }
             };

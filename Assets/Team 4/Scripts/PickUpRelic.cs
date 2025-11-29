@@ -18,7 +18,7 @@ public class PickUpRelic : MonoBehaviour
 
             foreach (SlidingDoor door in doorsToOpen)
             {
-                door.Open();
+                door.Unlock();
             }
 
             Destroy(gameObject); // Remove the relic from the scene

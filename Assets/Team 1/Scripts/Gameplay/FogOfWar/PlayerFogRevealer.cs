@@ -1,12 +1,11 @@
-﻿
-using System;
-
-using Core.Events;
-
+﻿using Core.Events;
 using UnityEngine;
 
 namespace Gameplay.FogOfWar
 {
+    /// <summary>
+    /// Specific fog revealer for player only.
+    /// </summary>
     public class PlayerFogRevealer : FogRevealer
     {
         private int coneIndex = -1;
@@ -22,7 +21,6 @@ namespace Gameplay.FogOfWar
         }
 
         
-
         protected override void CreateNewMesh(int revealerIndex, Transform fogPlane, Material meshMaterial)
         {
             if (revealers[revealerIndex].Config.FOV < 360) coneIndex = revealerIndex;
@@ -44,6 +42,7 @@ namespace Gameplay.FogOfWar
             revealers[coneIndex].Renderer.material.SetFloat("_FOVAngle", GetRevealerFOV(coneIndex) * 0.5f * Mathf.Deg2Rad);
             revealers[coneIndex].Renderer.material.SetFloat("_EdgeFadeWidth", GetRevealerFOV(coneIndex) / 250);
         }
+
 
         protected override float GetRevealerFOV(int index)
         {
