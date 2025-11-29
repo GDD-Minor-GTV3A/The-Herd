@@ -75,6 +75,7 @@ public class QuestManager : MonoBehaviour
         _activeQuests.Add(progress);
 
         EventManager.Broadcast(new QuestStartedEvent(quest.QuestID));
+        EventManager.Broadcast(new QuestUpdateEvent(quest.QuestID));
         Debug.Log($"Quest started: {quest.QuestName}");
     }
 

@@ -459,6 +459,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1583580014}
   m_SourcePrefab: {fileID: 100100000, guid: fa5e3b83a0d77b040825c12089c3cc49, type: 3}
+--- !u!4 &247931304 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5414415060780032495, guid: 5f2a964902a693d44aecda3aab5be9ce, type: 3}
+  m_PrefabInstance: {fileID: 8069978961416908948}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &252865022
 GameObject:
   m_ObjectHideFlags: 0
@@ -653,7 +658,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 283474222467695505, guid: c2302b6fd8769e34f89811a4acc3e1e4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2075442766}
   m_SourcePrefab: {fileID: 100100000, guid: c2302b6fd8769e34f89811a4acc3e1e4, type: 3}
 --- !u!1 &300670364
 GameObject:
@@ -1640,6 +1648,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Quest_Trigger
       objectReference: {fileID: 0}
+    - target: {fileID: 8345657651928877880, guid: 80115300ff4759b4cbcc47c7037668e7, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8471827108654038473, guid: 80115300ff4759b4cbcc47c7037668e7, type: 3}
+      propertyPath: oneShot
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8471827108654038473, guid: 80115300ff4759b4cbcc47c7037668e7, type: 3}
       propertyPath: questID
       value: QUEST_001
@@ -1650,7 +1666,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 1246654848072575791, guid: 80115300ff4759b4cbcc47c7037668e7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 247931304}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 80115300ff4759b4cbcc47c7037668e7, type: 3}
 --- !u!1 &965806008
@@ -3778,6 +3797,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Quest_Trigger (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 8345657651928877880, guid: 80115300ff4759b4cbcc47c7037668e7, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8471827108654038473, guid: 80115300ff4759b4cbcc47c7037668e7, type: 3}
       propertyPath: questID
       value: QUEST_001
@@ -4075,7 +4098,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 438995569780662429, guid: c2302b6fd8769e34f89811a4acc3e1e4, type: 3}
   m_PrefabInstance: {fileID: 292586741}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 2075442763}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6119d22dda9cc4a4cb8a55d0e003ddcb, type: 3}
@@ -4282,6 +4305,25 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 121c1d1d0e36d3047a7e064705877f1f, type: 3}
+--- !u!1 &2075442763 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 283474222467695505, guid: c2302b6fd8769e34f89811a4acc3e1e4, type: 3}
+  m_PrefabInstance: {fileID: 292586741}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2075442766
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2075442763}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f466a337830bbd341b26cc8def13bc93, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  triggers: []
+  questID: QUEST_001
 --- !u!1001 &3178950179452058084
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4422,7 +4464,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 0}
+    m_TransformParent: {fileID: 732447734}
     m_Modifications:
     - target: {fileID: 1917637080404582656, guid: 5f2a964902a693d44aecda3aab5be9ce, type: 3}
       propertyPath: ShapeModule.type
@@ -4501,16 +4543,24 @@ PrefabInstance:
       value: ParticleBox
       objectReference: {fileID: 0}
     - target: {fileID: 5414415060780032495, guid: 5f2a964902a693d44aecda3aab5be9ce, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5414415060780032495, guid: 5f2a964902a693d44aecda3aab5be9ce, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5414415060780032495, guid: 5f2a964902a693d44aecda3aab5be9ce, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 2.19
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5414415060780032495, guid: 5f2a964902a693d44aecda3aab5be9ce, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.36
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5414415060780032495, guid: 5f2a964902a693d44aecda3aab5be9ce, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -9.58
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5414415060780032495, guid: 5f2a964902a693d44aecda3aab5be9ce, type: 3}
       propertyPath: m_LocalRotation.w
@@ -4560,7 +4610,6 @@ SceneRoots:
   - {fileID: 1669542071}
   - {fileID: 2065664972}
   - {fileID: 292586741}
-  - {fileID: 8069978961416908948}
   - {fileID: 1738663977}
   - {fileID: 1282593059}
   - {fileID: 965806009}
