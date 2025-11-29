@@ -130,6 +130,7 @@ namespace Core.AI.Sheep
         public void OnStart()
         {
             if (!_stateManager) return;
+            _stateManager.OnSeparatedFromHerd(wasLost: true, forced: false);
 
             _currentTarget = _stateManager.GetTargetOutsideOfHerd();
 
@@ -261,6 +262,114 @@ namespace Core.AI.Sheep
         {
             _isPettingComplete = true;
         }
+    }
+
+    public sealed class SheepScaredState : IState
+    {
+        private readonly SheepStateManager _stateManager;
+        private readonly SheepScareHandler _scareHandler;
+
+        private const float STOP_THRESHOLD = 0.25f;
+        private const float PANIC_DURATION = 3.0f;
+
+        private bool _hasDestination;
+        private float _endTime;
+
+        public SheepScaredState(SheepStateManager context)
+        {
+            _stateManager = context;
+            _scareHandler = context.GetComponent<SheepScareHandler>();
+        }
+
+        public void OnStart()
+        {
+            if (!_stateManager || !_stateManager.CanControlAgent()) return;
+
+            Vector3 fromSource = (_stateManager.transform.position - _scareHandler.LastScareSource);
+            fromSource.y = 0f;
+            if (fromSource.sqrMagnitude < 0.0001f)
+            {
+                fromSource = _stateManager.transform.forward;
+            }
+            
+            fromSource.Normalize();
+            Vector3 safeSpot = _stateManager.transform.position + fromSource * 5f;
+
+            _stateManager.Agent.isStopped = false;
+            _stateManager.Agent.SetDestination(safeSpot);
+            _hasDestination = true;
+            _endTime = Time.time + PANIC_DURATION;
+        }
+
+        public void OnUpdate()
+        {
+            if (!_stateManager || !_stateManager.CanControlAgent()) return;
+            if (!_hasDestination) return;
+
+            if (!_stateManager.Agent.pathPending && _stateManager.Agent.remainingDistance <= STOP_THRESHOLD)
+            {
+                OnReachedSafeSpot();
+            }
+
+            if (Time.time >= _endTime)
+            {
+                //EndPanic();
+            }
+        }
+
+        public void OnStop()
+        {
+            if (_stateManager.CanControlAgent())
+                _stateManager.Agent.isStopped = false;
+        }
+        
+        private void OnReachedSafeSpot()
+        {
+            _stateManager.SummonToHerd(graceSeconds: 2f, clearThreats: true);
+        }
+
+        private void EndPanic()
+        {
+            bool outsideHerd = FlockingUtility.IsOutSquare(
+                _stateManager.transform.position,
+                _stateManager.PlayerSquareCenter,
+                _stateManager.PlayerSquareHalfExtents);
+            
+            if (outsideHerd)
+                _stateManager.SetState<SheepFollowState>();
+            else
+            {
+                _stateManager.SetState<SheepGrazeState>();
+            }
+        }
+
+        /*private bool CalculateFleeDestination(out Vector3 result)
+        {
+            var scareHandler = _stateManager.GetComponent<SheepScareHandler>();
+            Vector3 dangerPos = scareHandler != null ? scareHandler.LastScareSource : _stateManager.transform.position;
+            Vector3 directionAway = (_stateManager.transform.position - dangerPos).normalized;
+
+            if (directionAway.sqrMagnitude < 0.01f)
+            {
+                Vector2 rnd = Random.insideUnitCircle.normalized;
+                directionAway = new Vector3(rnd.x, 0, rnd.y);
+            }
+
+            for (int i = 0; i < NAVMESH_ATTEMPTS; i++)
+            {
+                Vector3 currentDir = Quaternion.Euler(0, i * 15f, 0) * directionAway;
+                Vector3 targetPos = _stateManager.transform.position + (currentDir * RUN_DISTANCE);
+
+                if (NavMesh.SamplePosition(targetPos, out NavMeshHit hit, 5f, NavMesh.AllAreas))
+                {
+                    result = hit.position;
+                    return true;
+                }
+            }
+            
+            result = Vector3.zero;
+            return false;
+        }*/
     }
     
     public class SheepDieState : IState
