@@ -79,6 +79,7 @@
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Audio\WhistleSoundManager.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\FogOfWar\PlayerFogRevealer.cs" />
     <Compile Include="Assets\Team 1\Scripts\UI\HPBarUI.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\SanityEffects\EnemyShadowsSpawner.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\HealthSystem\IDamagable.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Collectables\BulletCollectablePool.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\States\DogState.cs" />
@@ -104,6 +105,7 @@
     <Compile Include="Assets\Team 1\Scripts\UI\AmmoAmountUI.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\States\PlayerIdle.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\PlayerMovement.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\SanityEffects\EffectsTest.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Player\Player.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\DogBark.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\HerdZone.cs" />
@@ -126,6 +128,8 @@
     <Compile Include="Assets\Team 1\Scripts\Gameplay\ToolsSystem\Tools\Rifle\BulletPool.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Audio\DogSoundManager.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\DogStateManager.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\SanityEffects\SanityEffectsConfig.cs" />
+    <Compile Include="Assets\Team 1\Scripts\Gameplay\SanityEffects\SanityEffectsManager.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\Dog\States\DogIdle.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\HealthSystem\IHealable.cs" />
     <Compile Include="Assets\Team 1\Scripts\Gameplay\ToolsSystem\Tools\Whistle.cs" />
@@ -1202,6 +1206,10 @@
     </Reference>
     <Reference Include="Unity.TextMeshPro">
       <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.Core.Runtime">
+      <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Core.Runtime.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEditor.UI">

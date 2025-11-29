@@ -21,7 +21,7 @@ namespace Gameplay.Dog
 
 
         private List<SheepStateManager> freeSheep = new();
-        SphereCollider collider;
+        private SphereCollider sphereCollider;
 
         PersonalityType ISheepEffectsEventsHandler.PersonalityType => PersonalityType.Nino;
 
@@ -31,8 +31,8 @@ namespace Gameplay.Dog
         /// </summary>
         public void Initialize()
         {
-            collider = GetComponent<SphereCollider>();
-            collider.isTrigger = true;
+            sphereCollider = GetComponent<SphereCollider>();
+            sphereCollider.isTrigger = true;
             SheepEffectsDispatcher.AddNewListener(this);
         }
 
