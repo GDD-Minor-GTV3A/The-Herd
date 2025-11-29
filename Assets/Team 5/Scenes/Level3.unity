@@ -16830,7 +16830,7 @@ GameObject:
   m_Component:
   - component: {fileID: 511199921}
   - component: {fileID: 511199923}
-  - component: {fileID: 511199922}
+  - component: {fileID: 511199924}
   m_Layer: 0
   m_Name: CaveInWallTrigger2Enabler
   m_TagString: Untagged
@@ -16853,20 +16853,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 943380777}
   m_LocalEulerAnglesHint: {x: 0, y: -81.951, z: 0}
---- !u!114 &511199922
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 511199920}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ffc6189b35680f043af4f6cf9cddd10a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  triggersToEnable:
-  - {fileID: 1702883264}
 --- !u!65 &511199923
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -16888,6 +16874,21 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &511199924
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 511199920}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 000994aa7eba2964a9f43fcc396a7113, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectsToEnable:
+  - {fileID: 1702883264}
+  objectsToDisable: []
 --- !u!1001 &514041430
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -19857,7 +19858,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 000994aa7eba2964a9f43fcc396a7113, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wallCaveIn: {fileID: 1052262726}
+  objectsToEnable: []
+  objectsToDisable:
+  - {fileID: 1052262726}
 --- !u!65 &623850941
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -31208,7 +31211,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 000994aa7eba2964a9f43fcc396a7113, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wallCaveIn: {fileID: 1052262726}
+  objectsToEnable:
+  - {fileID: 1052262726}
+  objectsToDisable: []
 --- !u!1001 &957237490
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -52668,7 +52673,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 000994aa7eba2964a9f43fcc396a7113, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wallCaveIn: {fileID: 852202211}
+  objectsToEnable:
+  - {fileID: 852202211}
+  objectsToDisable: []
 --- !u!65 &1702883267
 BoxCollider:
   m_ObjectHideFlags: 0

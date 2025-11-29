@@ -2,7 +2,8 @@ using UnityEngine;
 
 public class CaveInWalls : MonoBehaviour
 {
-    [SerializeField] GameObject wallCaveIn;
+    // [SerializeField] GameObject wallCaveIn;
+    [SerializeField] GameObject[] objectsToEnable, objectsToDisable;
 
     /// <summary>
     /// Generic script for making walls cave in, or removing them.
@@ -10,15 +11,30 @@ public class CaveInWalls : MonoBehaviour
     /// <param name="other"></param>
     private void OnTriggerEnter(Collider other)
     {
-        if (other.tag == "Player" && !wallCaveIn.activeSelf)
+        // if (other.tag == "Player" && !wallCaveIn.activeSelf)
+        // {
+        //     wallCaveIn.SetActive(true);
+        //     Destroy(gameObject);    // This currently destroys. Alternatively, the trigger could also just be disabled.
+        // }
+        // else if (other.tag == "Player" && wallCaveIn.activeSelf)
+        // {
+        //     wallCaveIn.SetActive(false);
+        //     Destroy(gameObject);    // This currently destroys. Alternatively, the trigger could also just be disabled.
+        // }
+
+        if(other.tag == "Player")
         {
-            wallCaveIn.SetActive(true);
-            Destroy(gameObject);    // This currently destroys. Alternatively, the trigger could also just be disabled.
-        }
-        else if (other.tag == "Player" && wallCaveIn.activeSelf)
-        {
-            wallCaveIn.SetActive(false);
-            Destroy(gameObject);    // This currently destroys. Alternatively, the trigger could also just be disabled.
+            foreach(GameObject enable in objectsToEnable)
+            {
+                enable.SetActive(true);
+            }
+
+            foreach(GameObject disable in objectsToDisable)
+            {
+                disable.SetActive(true);
+            }
+            
+            Destroy(gameObject);
         }
     }
 }
