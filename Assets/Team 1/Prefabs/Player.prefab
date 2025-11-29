@@ -2625,7 +2625,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b06847e149b594747bf0f4daf19ee3c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _player: {fileID: 7191174862489174219}
+  _player: {fileID: 0}
   _halfExtents: {x: 4, y: 4}
   _interval: 0.2
 --- !u!1 &4526078008777712585
@@ -3997,6 +3997,7 @@ GameObject:
   - component: {fileID: 6837490007019679701}
   - component: {fileID: 3864333901635965738}
   - component: {fileID: 1434559360299301103}
+  - component: {fileID: 8475654111559654055}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -4106,7 +4107,19 @@ MonoBehaviour:
       m_Calls: []
   <DeathEvent>k__BackingField:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8475654111559654055}
+        m_TargetAssemblyTypeName: PlayerRespawnHandler, Assembly-CSharp
+        m_MethodName: HandleDeath
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &5218645149444869217
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4383,6 +4396,19 @@ CapsuleCollider:
   m_Height: 6.5
   m_Direction: 1
   m_Center: {x: 0, y: 3, z: 0}
+--- !u!114 &8475654111559654055
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6065300022185603627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3d5ebffc9c874d479175004adc048a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healthOnRespawn: 100
 --- !u!1 &6273913417554513549
 GameObject:
   m_ObjectHideFlags: 0
