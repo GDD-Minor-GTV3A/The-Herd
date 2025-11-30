@@ -34,9 +34,9 @@ public class MapPlayerPosition : MonoBehaviour
 
         playerIcon.anchoredPosition = new Vector2(rotatedY, rotatedX);
         
-        if (counter >= 60)
+        if (counter >= 120)
         {
-            checkAreaFade(rotatedY, rotatedX);
+            checkAreaFade(rotatedX, rotatedY);
             counter = 0;
         }
     }
@@ -47,10 +47,6 @@ public class MapPlayerPosition : MonoBehaviour
             if (area.checkForReveal(x, y))
             {
                 area.FadeIn();     // reveal
-            }
-            else
-            {
-                return;    // hide again if needed
             }
         }
     }

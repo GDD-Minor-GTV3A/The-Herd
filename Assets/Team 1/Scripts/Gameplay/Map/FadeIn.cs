@@ -27,19 +27,14 @@ public class FadeChildrenImages : MonoBehaviour
         posY = rt.anchoredPosition.y;
         width = rt.rect.width;
         height = rt.rect.height;
-        widthHalf = width / 4f;
-        heightHalf = height / 4f;
+        widthHalf = width / 2f;
+        heightHalf = height / 2f;
 
         cg = GetComponent<CanvasGroup>();
-
-        Debug.Log($"Area initialized at pos=({posX},{posY}) size=({width},{height})");
-        
-
     }
-
+    
     public void FadeIn()
     {
-        Debug.Log("FadeIn called."+ hasfaded);
         if (hasfaded) return; // prevent multiple fades
 
 
@@ -58,7 +53,6 @@ public class FadeChildrenImages : MonoBehaviour
     }
     private IEnumerator FadeInRoutine()
     {
-        Debug.Log("FadeInRoutine started.");
 
         hasfaded = true;
 
@@ -94,8 +88,6 @@ public class FadeChildrenImages : MonoBehaviour
 
             yield return null;
         }
-
-        Debug.Log("Fade complete.");
     }
     public void TurnOff()
     {
@@ -105,13 +97,11 @@ public class FadeChildrenImages : MonoBehaviour
     public bool checkForReveal(float x, float y)
     {
 
+
         if (x < posX - widthHalf || x > posX + widthHalf || y < posY - heightHalf || y > posY + heightHalf)
         {
-            Debug.Log("Area not in range for reveal: " + x + ", " + y + "." + posY + "d" + posX + "d " + widthHalf);
             return false;
-
         }
-        Debug.Log("Area in range for reveal: " + x + ", " + y + "." + posY + "d" + posX + "d " + widthHalf);
         return true;
     }
 
