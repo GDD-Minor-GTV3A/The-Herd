@@ -13,14 +13,14 @@ public class ObjectiveTrigger : MonoBehaviour
     /// <summary>
     /// Objective ID that gets triggered
     /// </summary>
-    [SerializeField] private string objectiveID = "";
+    [SerializeField] protected string objectiveID = "";
 
     /// <summary>
     /// Quest ID of the Objective
     /// </summary>
-    [SerializeField] private string questID = "";
+    [SerializeField] protected string questID = "";
 
-    [SerializeField] private bool oneShot = false;
+    [SerializeField] protected bool oneShot = false;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
 
 
@@ -38,7 +38,8 @@ public class ObjectiveTrigger : MonoBehaviour
         EventManager.Broadcast(new CompleteObjectiveEvent(questID, objectiveID));
         if (oneShot)
         {
-            Destroy(this.gameObject);
+            //Destroy(this.gameObject);
+            Debug.Log("MAYBE DONT DESTROY? Don't destroy is correct");
         }
     }
 

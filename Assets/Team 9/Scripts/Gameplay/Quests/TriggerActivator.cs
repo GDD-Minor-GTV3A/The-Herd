@@ -1,20 +1,18 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Core.Events;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class TriggerActivator : MonoBehaviour
 {
-    [SerializeField] private ObjectiveTrigger[] triggers;
-    [SerializeField] private string questID;
+    // Dictionary maps QuestID -> List of triggers for that quest
+    private Dictionary<string, List<ObjectiveTrigger>> questTriggers = new();
 
-    private QuestProgress progress;
-
-    private void Awake()
-    {
-        DontDestroyOnLoad(gameObject);
-    }
-
+    // Keeps track of active quest progress data
+    private Dictionary<string, QuestProgress> questProgress = new();
+    
     private void OnEnable()
     {
         EventManager.AddListener<QuestStartedEvent>(OnQuestStartedEvent);
@@ -29,44 +27,77 @@ public class TriggerActivator : MonoBehaviour
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Always rebuild the trigger map for the new scene
+        FetchAllTriggers();
+
+        // Re-apply active quests to the new scene’s triggers
+        foreach (var questID in questProgress.Keys)
+        {
+            OnQuestUpdateEvent(new QuestUpdateEvent(questID));
+        }
+    }
+
     private void OnQuestStartedEvent(QuestStartedEvent evt)
     {
-        if (evt.QuestID != questID)
-            return;
+        string questID = evt.QuestID;
 
-        progress = QuestManager.Instance.GetQuestProgressByID(evt.QuestID);
+        if (!questProgress.ContainsKey(questID))
+        {
+            questProgress[questID] = QuestManager.Instance.GetQuestProgressByID(questID);
+        }
+
+        Debug.Log($"TRIGGER_ACTIVATOR: Quest '{questID}' started — progress registered.");
     }
 
     private void OnQuestUpdateEvent(QuestUpdateEvent evt)
     {
-        if (progress == null || evt.QuestID != questID)
+        string questID = evt.QuestID;
+
+        if (!questProgress.TryGetValue(questID, out var progress))
+            return;
+
+        if (!questTriggers.TryGetValue(questID, out var triggers))
             return;
 
         foreach (var trigger in triggers)
         {
-            if (trigger.QuestID == questID && progress.IsObjectiveActive(trigger.ObjectiveID))
+            if (progress.IsObjectiveActive(trigger.ObjectiveID))
             {
                 trigger.gameObject.SetActive(true);
+            }
+            else
+            {
+                trigger.gameObject.SetActive(false);
             }
         }
     }
 
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    void nothingDings()
     {
-        FetchTriggers();
-
-        if (progress == null)
-            progress = QuestManager.Instance.GetQuestProgressByID(questID);
-
-        if (progress != null)
-            OnQuestUpdateEvent(new QuestUpdateEvent(questID));
+        return;
     }
-
-    private void FetchTriggers()
+    
+    private void FetchAllTriggers()
     {
-        triggers = Array.FindAll(FindObjectsOfType<ObjectiveTrigger>(true),
-            t => t.QuestID == questID);
+        questTriggers.Clear();
 
-        Debug.Log($"TRIGGER_ACTIVATOR: Found {triggers.Length} triggers for quest {questID}");
+        var allTriggers = FindObjectsOfType<ObjectiveTrigger>(true);
+
+        foreach (var trigger in allTriggers)
+        {
+            if (string.IsNullOrEmpty(trigger.QuestID))
+                continue;
+
+            if (!questTriggers.ContainsKey(trigger.QuestID))
+            {
+                questTriggers[trigger.QuestID] = new List<ObjectiveTrigger>();
+            }
+
+            questTriggers[trigger.QuestID].Add(trigger);
+        }
+
+        Debug.Log($"TRIGGER_ACTIVATOR: Found {allTriggers.Length} total triggers across {questTriggers.Keys.Count} quests.");
     }
 }
