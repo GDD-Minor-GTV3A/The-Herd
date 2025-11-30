@@ -31,7 +31,7 @@ public class CaveInWalls : MonoBehaviour
 
             foreach(GameObject disable in objectsToDisable)
             {
-                disable.SetActive(true);
+                disable.SetActive(false);
             }
             
             Destroy(gameObject);
