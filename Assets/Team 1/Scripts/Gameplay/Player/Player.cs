@@ -132,7 +132,7 @@ namespace Gameplay.Player
         public void Die()
         {
             DeathEvent?.Invoke();
-            Debug.Log("You are Died!");
+            health.ResetHealth();
         }
 
 
