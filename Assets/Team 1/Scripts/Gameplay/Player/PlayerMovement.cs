@@ -1,4 +1,6 @@
+using Core.AI.Sheep.Config;
 using Core.Shared;
+using Gameplay.SheepEffects;
 using UnityEngine;
 
 namespace Gameplay.Player
@@ -6,7 +8,7 @@ namespace Gameplay.Player
     /// <summary>
     /// Controls player movement.
     /// </summary>
-    public class PlayerMovement : MovementController
+    public class PlayerMovement : MovementController, ISheepEffectsEventsHandler
     {
         private CharacterController controller;
         private Camera mainCamera;
@@ -14,10 +16,13 @@ namespace Gameplay.Player
         private float walkSpeed;
         private float runSpeed;
         private float gravity;
+        private float speedModifier = 0f;
 
         private float rotationSpeed;
 
         private float verticalVelocity = 0f;
+
+        PersonalityType ISheepEffectsEventsHandler.PersonalityType => PersonalityType.Ivana;
 
 
         /// <summary>
@@ -31,6 +36,8 @@ namespace Gameplay.Player
             controller = characterController;
 
             UpdateValues(config);
+
+            SheepEffectsDispatcher.AddNewListener(this);
         }
 
 
@@ -87,7 +94,7 @@ namespace Gameplay.Player
             float _speed = isRunning ? runSpeed : walkSpeed;
 
 
-            return _move * (_speed * Time.deltaTime);
+            return _move * ((_speed + speedModifier) * Time.deltaTime);
         }
 
 
@@ -120,6 +127,17 @@ namespace Gameplay.Player
             runSpeed = config.RunSpeed;
             gravity = config.Gravity;
             rotationSpeed = config.RotationSpeed;
+        }
+
+
+        void ISheepEffectsEventsHandler.OnSheepJointHerd(SheepArchetype archetype)
+        {
+            // TO-DO: invoke UpdateSpeedModifier with value of speed change
+        }
+
+        void ISheepEffectsEventsHandler.OnSheepLeftHerd(SheepArchetype archetype)
+        {
+            // TO-DO: invoke UpdateSpeedModifier with negative value of speed change
         }
     }
 }

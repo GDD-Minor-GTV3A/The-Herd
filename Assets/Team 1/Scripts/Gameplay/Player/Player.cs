@@ -1,4 +1,5 @@
 using Core.Shared.Utilities;
+using Core.Shared;
 using Gameplay.Effects;
 using Gameplay.HealthSystem;
 using Gameplay.ToolsSystem;
@@ -132,7 +133,7 @@ namespace Gameplay.Player
         public void Die()
         {
             DeathEvent?.Invoke();
-            Debug.Log("You are Died!");
+            health.ResetHealth();
         }
 
 
