@@ -5,11 +5,12 @@ using UnityEngine.UI;
 public class ShamanDialogueManager : MonoBehaviour
 {
     public ShamanDialogueTrigger shamanDialogueTrigger;
+
     [Header("UI References")]
     public GameObject dialoguePanel;
     public TMP_Text dialogueText;
-    public TMP_Text speakerNameText; 
-    public GameObject choiceButtons;
+    public TMP_Text speakerNameText;
+    public GameObject choiceButtons; 
     public Image portraitFrame;
 
     [Header("Portraits")]
@@ -20,11 +21,20 @@ public class ShamanDialogueManager : MonoBehaviour
     private bool inDialogue = false;
 
     [System.Serializable]
+    public class DialogueChoice
+    {
+        public string text;
+        public int nextLineIndex;
+    }
+
+    [System.Serializable]
     public class DialogueLine
     {
-        public string speaker;  
+        public string speaker;
         public string text;
-        public bool hasChoices;
+        public DialogueChoice[] choices;
+        
+        public int nextAfterThis = -1;
     }
 
     [Header("Dialogue Data")]
@@ -42,7 +52,10 @@ public class ShamanDialogueManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
         {
-            NextLine();
+            if (lines[index].choices == null || lines[index].choices.Length == 0)
+            {
+                NextLine();
+            }
         }
     }
 
@@ -73,30 +86,58 @@ public class ShamanDialogueManager : MonoBehaviour
         else
         {
             speakerNameText.text = "Shaman";
-            portraitFrame.sprite = shamanSprite;  
+            portraitFrame.sprite = shamanSprite;
         }
 
+        if (line.choices != null && line.choices.Length > 0)
+        {
+            choiceButtons.SetActive(true);
 
-        choiceButtons.SetActive(line.hasChoices);
+            for (int i = 0; i < choiceButtons.transform.childCount; i++)
+            {
+                var button = choiceButtons.transform.GetChild(i).GetComponent<Button>();
+                var buttonText = button.GetComponentInChildren<TMP_Text>();
+
+                if (i < line.choices.Length)
+                {
+                    button.gameObject.SetActive(true);
+                    buttonText.text = line.choices[i].text;
+                    int choiceIndex = i;
+                    button.onClick.RemoveAllListeners();
+                    button.onClick.AddListener(() => Choose(line.choices[choiceIndex].nextLineIndex));
+                }
+                else
+                {
+                    button.gameObject.SetActive(false);
+                }
+            }
+        }
+        else
+        {
+            choiceButtons.SetActive(false);
+        }
     }
 
     public void NextLine()
     {
-        if (lines[index].hasChoices)
-            return;
+        DialogueLine line = lines[index];
+        
+        if (line.nextAfterThis >= 0)
+        {
+            index = line.nextAfterThis;
+        }
+        else
+        {
+            index++;
+        }
 
-        index++;
         ShowLine();
     }
 
-    public void PressYes()
+    public void Choose(int nextLineIndex)
     {
-        EndDialogue();
-    }
-
-    public void PressNo()
-    {
-        EndDialogue();
+        index = nextLineIndex;
+        ShowLine();
     }
 
     void EndDialogue()
