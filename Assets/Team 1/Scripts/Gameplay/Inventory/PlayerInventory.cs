@@ -140,12 +140,12 @@ namespace Gameplay.Inventory
         //======================================================================
         // REMOVE Helper
         //======================================================================
-        public void RemoveFromInventory(InventoryItem item)
+        public void RemoveFromInventory(InventoryItem item, uint amount = 1)
         {
             InventoryStack s = data.items.Find(x => x.Item == item);
             if (s != null)
             {
-                s.Uses--;
+                s.Uses -= (int)amount;
                 if (s.Uses <= 0) data.items.Remove(s);
                 RaiseInventoryChanged();
             }
