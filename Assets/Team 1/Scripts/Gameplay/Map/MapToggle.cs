@@ -16,6 +16,9 @@ namespace Gameplay.Map
 
         private PlayerInput _playerInput;
 
+         private CanvasGroup mapGroup;
+
+        private bool isMapOpen = false;
 
         /// <summary>
         /// Initialization method.
@@ -31,9 +34,11 @@ namespace Gameplay.Map
                 Debug.LogError("MapToggle: PlayerInput reference is NULL. MapKey will not work.");
                 return;
             }
-            _mapUI.SetActive(false);
-            // subscribe to event
+            
             _playerInput.MapToggle.performed += OnMapKey;
+
+            mapGroup = _mapUI.GetComponent<CanvasGroup>();
+
         }
 
 
@@ -50,7 +55,20 @@ namespace Gameplay.Map
         /// </summary>
         private void OnMapKey(InputAction.CallbackContext ctx)
         {
-            _mapUI.SetActive(!_mapUI.activeSelf);
+            isMapOpen = !isMapOpen;
+            if (isMapOpen)
+            {
+                mapGroup.alpha = 1;
+                mapGroup.blocksRaycasts = true;
+                mapGroup.interactable = true;
+            }
+            else
+            {
+                mapGroup.alpha = 0;
+                mapGroup.blocksRaycasts = false;
+                mapGroup.interactable = false;
+            }
+            
             Debug.Log("MapToggle: Toggled map UI to " + _mapUI.activeSelf);
         }
     }
