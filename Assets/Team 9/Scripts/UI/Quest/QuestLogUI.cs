@@ -15,6 +15,8 @@ public class QuestLogUI : MonoBehaviour
     /// </summary>
     [SerializeField] private Transform questListContainer;
 
+    [SerializeField] private Transform questLogUI;
+    
     /// <summary>
     /// The prefab used to create a new quest UI entry when a quest starts.
     /// </summary>
@@ -36,7 +38,9 @@ public class QuestLogUI : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-
+        
+        questLogUI.gameObject.SetActive(false);
+        
         Instance = this;
         transform.SetParent(null);
         DontDestroyOnLoad(gameObject);
@@ -135,6 +139,8 @@ public class QuestLogUI : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.L))
         {
             _activeState = !_activeState;
+            
+            questLogUI.gameObject.SetActive(_activeState);
                 
             foreach (Transform child in questListContainer.transform)
             {
