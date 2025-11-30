@@ -29,8 +29,6 @@ namespace Gameplay.Inventory
             RaiseEquipmentChanged();
         }
 
-        private void OnApplicationQuit() => InventorySaveManager.Save(this);
-
         //======================================================================
         // 🔥  ONE METHOD TO ADD ITEMS
         //======================================================================

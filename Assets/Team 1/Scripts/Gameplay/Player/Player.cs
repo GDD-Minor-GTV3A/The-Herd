@@ -1,6 +1,7 @@
 using Core.Shared.Utilities;
 using Gameplay.Effects;
 using Gameplay.HealthSystem;
+using Gameplay.Inventory;
 using Gameplay.ToolsSystem;
 using UI;
 using UI.Effects;
@@ -34,6 +35,8 @@ namespace Gameplay.Player
         [Space, Header("UI")]
         [SerializeField, Required, Tooltip("Reference for HP bar component.")] 
         private HPBarUI hpBar;
+        [SerializeField, Required, Tooltip("Reference for HP bar component.")] 
+        private InventoryToggle inventoryButton;
 
         [Space]
         [SerializeField, Tooltip("Manager of step sounds.")]
@@ -90,6 +93,9 @@ namespace Gameplay.Player
             stepsSoundManager.Initialize();
             PlayerAnimator _playerAnimator = new PlayerAnimator(animator, this, transform, animationConstrains);
             _stateManager.Initialize(_playerInput, movementController, _playerAnimator);
+
+            inventoryButton.Initialize(_playerInput.Inventory);
+
 
             // Init health
             health = new Health(config);

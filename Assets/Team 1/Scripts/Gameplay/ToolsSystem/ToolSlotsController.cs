@@ -38,6 +38,7 @@ namespace Gameplay.ToolsSystem
         private Player.PlayerInput input;
 
         private bool initializedFirstSlot;
+        private bool isInventoryOpen = false;
         
 
         /// <summary>
@@ -171,6 +172,8 @@ namespace Gameplay.ToolsSystem
             input.Slot_1.started -= (obj) => SetCurrentSlotByIndex(0);
             input.Slot_2.started -= (obj) => SetCurrentSlotByIndex(1);
             input.Slot_3.started -= (obj) => SetCurrentSlotByIndex(2);
+
+            input.Inventory.canceled -= OnInventoryButtonPressed;
         }
 
         public void Resume()
@@ -188,6 +191,13 @@ namespace Gameplay.ToolsSystem
             input.Slot_1.started += (obj) => SetCurrentSlotByIndex(0);
             input.Slot_2.started += (obj) => SetCurrentSlotByIndex(1);
             input.Slot_3.started += (obj) => SetCurrentSlotByIndex(2);
+
+            input.Inventory.canceled += OnInventoryButtonPressed;
+        }
+
+        private void OnInventoryButtonPressed(InputAction.CallbackContext obj)
+        {
+            isInventoryOpen = !isInventoryOpen;
         }
     }
 }
