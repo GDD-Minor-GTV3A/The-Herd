@@ -683,10 +683,10 @@ namespace Core.AI.Sheep
         /// Removes the sheep from the game.
         /// Broadcasts a SheepDeathEvent before destroying the GameObject.
         /// </summary>
-        public void Remove()
+        public void Remove(bool countTowardSanity = true)
         {
             EventManager.Broadcast(new SheepLeaveHerdEvent(this, wasLost: false, forced: true));
-            EventManager.Broadcast(new SheepDeathEvent(this));
+            EventManager.Broadcast(new SheepDeathEvent(this, countTowardSanity));
             Destroy(gameObject);
         }
 
