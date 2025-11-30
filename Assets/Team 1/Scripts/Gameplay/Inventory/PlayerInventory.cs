@@ -24,7 +24,7 @@ namespace Gameplay.Inventory
 
         private void Start()
         {
-            InventorySaveManager.Load(this);
+            //InventorySaveManager.Load(this);
             RaiseInventoryChanged();
             RaiseEquipmentChanged();
         }

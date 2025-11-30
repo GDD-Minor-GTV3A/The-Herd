@@ -76,6 +76,8 @@ namespace Gameplay.ToolsSystem
         
         private void UpdateCurrentSlot(InputAction.CallbackContext obj)
         {
+            if (isInventoryOpen) return;
+
             int _inputValue = -Mathf.RoundToInt(obj.action.ReadValue<Vector2>().y);
 
             SetCurrentSlotByIndex(currentToolIndex + _inputValue);
@@ -111,30 +113,40 @@ namespace Gameplay.ToolsSystem
 
         private void OnCurrentToolReload(InputAction.CallbackContext obj)
         {
+            if (isInventoryOpen) return;
+
             if (toolSlots[currentToolIndex] != null)
                 toolSlots[currentToolIndex].Reload();
         }
 
         private void OnCurrentToolMainUseStarted(InputAction.CallbackContext obj)
         {
+            if (isInventoryOpen) return;
+
             if (toolSlots[currentToolIndex] != null)
                 toolSlots[currentToolIndex].MainUsageStarted(input.Look);
         }
 
         private void OnCurrentToolMainUseFinished(InputAction.CallbackContext obj)
         {
+            if (isInventoryOpen) return;
+
             if (toolSlots[currentToolIndex] != null)
                 toolSlots[currentToolIndex].MainUsageFinished();
         }
 
         private void OnCurrentToolSecondaryUseStarted(InputAction.CallbackContext obj)
         {
+            if (isInventoryOpen) return;
+
             if (toolSlots[currentToolIndex] != null)
                 toolSlots[currentToolIndex].SecondaryUsageStarted(input.Look);
         }
 
         private void OnCurrentToolSecondaryUseFinished(InputAction.CallbackContext obj)
         {
+            if (isInventoryOpen) return;
+
             if (toolSlots[currentToolIndex] != null)
                 toolSlots[currentToolIndex].SecondaryUsageFinished();
         }
@@ -197,7 +209,13 @@ namespace Gameplay.ToolsSystem
 
         private void OnInventoryButtonPressed(InputAction.CallbackContext obj)
         {
+            OnInventoryButtonPressed();
+        }
+
+        public void OnInventoryButtonPressed()
+        {
             isInventoryOpen = !isInventoryOpen;
+
         }
     }
 }

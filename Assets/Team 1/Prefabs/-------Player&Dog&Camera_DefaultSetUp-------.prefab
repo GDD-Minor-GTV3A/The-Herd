@@ -3089,50 +3089,6 @@ MonoBehaviour:
   _draggable: 1
   originalParent: {fileID: 0}
   originalSiblingIndex: 0
---- !u!1 &3816187812268074128
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 5636161374415186179}
-  - component: {fileID: 1166445295724142626}
-  m_Layer: 0
-  m_Name: InventoryTest
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &5636161374415186179
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3816187812268074128}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 144.9, y: 0, z: -59.6}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 405590637181702614}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1166445295724142626
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3816187812268074128}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 202a03c4452204f41b5f3824e6a08c1a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &3880435442321730081
 GameObject:
   m_ObjectHideFlags: 0
@@ -10036,6 +9992,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2534532970623172728, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
+      propertyPath: inventoryButton
+      value: 
+      objectReference: {fileID: 1213171646964128428}
+    - target: {fileID: 2534532970623172728, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
       propertyPath: <DamageEvent>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1583846129854732013}
@@ -10130,9 +10090,6 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 7191174862489174219, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 5636161374415186179}
     - targetCorrespondingSourceObject: {fileID: 7191174862489174219, guid: 4888909fc3c41b640a095fd46a04fb7b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5705982188827312230}
