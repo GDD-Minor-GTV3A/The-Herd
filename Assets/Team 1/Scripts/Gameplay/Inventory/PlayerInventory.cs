@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using System.Collections.Generic;
 
 namespace Gameplay.Inventory
 {
@@ -101,6 +100,7 @@ namespace Gameplay.Inventory
         //======================================================================
         private bool EquipItem(InventoryItem item, int trinketSlot = 0)
         {
+
             switch (item.category)
             {
                 case ItemCategory.Headgear: SwapItem(ref data.headgear, item); break;
@@ -117,7 +117,7 @@ namespace Gameplay.Inventory
                     {
                         InventoryItem oldTrinket = data.trinkets[trinketSlot]; // store old trinket
                         data.trinkets[trinketSlot] = null;                     // clear slot
-                        if (oldTrinket != null) AddItem(oldTrinket);           // put old trinket back in inventory
+                        if (oldTrinket != null) AddItem(oldTrinket); // put old trinket back in inventory
                         data.trinkets[trinketSlot] = item;                     // equip new trinket
                     }
                     break;
@@ -140,7 +140,7 @@ namespace Gameplay.Inventory
         //======================================================================
         // REMOVE Helper
         //======================================================================
-        private void RemoveFromInventory(InventoryItem item)
+        public void RemoveFromInventory(InventoryItem item)
         {
             InventoryStack s = data.items.Find(x => x.Item == item);
             if (s != null)
@@ -149,6 +149,16 @@ namespace Gameplay.Inventory
                 if (s.Uses <= 0) data.items.Remove(s);
                 RaiseInventoryChanged();
             }
+        }
+
+
+        //======================================================================
+        // Return true if inventory contains item.
+        //======================================================================
+        public bool IsItemInInventory(InventoryItem item)
+        {
+            InventoryStack s = data.items.Find(x => x.Item == item);
+            return s != null;
         }
 
         //======================================================================

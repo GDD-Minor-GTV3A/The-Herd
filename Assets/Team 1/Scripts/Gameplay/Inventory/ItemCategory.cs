@@ -10,6 +10,7 @@ namespace Gameplay.Inventory
         Boots,
         Trinket,
         Active,
+        Quest,
         Scroll,
         ReviveTotem
     }

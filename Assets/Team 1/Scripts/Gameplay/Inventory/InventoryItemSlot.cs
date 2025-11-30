@@ -1,7 +1,4 @@
-﻿using System.Globalization;
-
-using TMPro;
-
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -40,6 +37,7 @@ namespace Gameplay.Inventory
         {
             this.count = count;
             this.item = newItem;
+            image.sprite = null;
             if (image != null)
             {
                 image.sprite = item?.icon;
@@ -77,7 +75,17 @@ namespace Gameplay.Inventory
         public void OnDrag(PointerEventData eventData)
         {
             if (!_draggable || image == null) return;
-            ((RectTransform)image.transform).position = eventData.position;
+
+            Vector2 localPoint;
+
+            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                    (RectTransform)dragCanvas.transform,
+                    eventData.position,
+                    eventData.pressEventCamera,
+                    out localPoint))
+            {
+                ((RectTransform)image.transform).localPosition = new Vector3(localPoint.x, localPoint.y, 0);
+            }
         }
 
         public void OnEndDrag(PointerEventData eventData)
@@ -85,6 +93,11 @@ namespace Gameplay.Inventory
             if (!_draggable || image == null) return;
 
             // Restore to slot
+            RestoreToSlot();
+        }
+
+        public void RestoreToSlot()
+        {
             image.transform.SetParent(originalParent, false);
             image.transform.SetSiblingIndex(originalSiblingIndex);
             image.raycastTarget = true;

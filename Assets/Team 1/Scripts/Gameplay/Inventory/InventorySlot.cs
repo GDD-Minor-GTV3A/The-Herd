@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-
-using CustomEditor.Attributes;
-
+﻿using CustomEditor.Attributes;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -50,17 +47,19 @@ namespace Gameplay.Inventory
                 InventoryItem dragged = draggedItem.Item;
                 InventoryItem target = slotItem.Item;
 
+                draggedItem.RestoreToSlot();
+
                 // Ask the inventory to equip the dragged item
                 bool success = isTrinketSlot
                     ? PlayerInventory.Instance.UseItem(dragged, slotNumber)   // use slotNumber for trinkets
                     : PlayerInventory.Instance.UseItem(dragged);              // equip other categories
 
-                if (success)
-                {
-                    // The inventory will automatically refresh via OnInventoryChanged / OnEquipmentChanged events
-                    // Just update the dragged slot visually
-                    draggedItem.InitializeItem(target); // old item goes back into dragged slot
-                }
+                //if (success)
+                //{
+                //    // The inventory will automatically refresh via OnInventoryChanged / OnEquipmentChanged events
+                //    // Just update the dragged slot visually
+                //    draggedItem.InitializeItem(target); // old item goes back into dragged slot
+                //}
             }
             else
             {
