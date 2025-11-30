@@ -27,8 +27,8 @@ public class FadeChildrenImages : MonoBehaviour
         posY = rt.anchoredPosition.y;
         width = rt.rect.width;
         height = rt.rect.height;
-        widthHalf = width / 2f;
-        heightHalf = height / 2f;
+        widthHalf = width / 6f;
+        heightHalf = height / 6f;
 
         cg = GetComponent<CanvasGroup>();
     }
