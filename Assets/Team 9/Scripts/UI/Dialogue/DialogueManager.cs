@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Core.Events;
 using Ink.Runtime;
@@ -46,6 +47,13 @@ public class DialogueManager : MonoBehaviour
     private const string NARRATOR_LAYOUT_STATE = "narrator";
     private const string SHOW_CHOICES_STATE = "showChoices";
 
+    // Coroutine reference to handle stopping/skipping
+    private Coroutine _displayLineCoroutine; 
+    private bool _isTyping = false;
+    
+    [Header("Typewriter Settings")]
+    [SerializeField] private float _typingSpeed = 0.04f;
+    
     /// <summary>
     /// Gets a value indicating whether dialogue is currently playing.
     /// </summary>
@@ -104,18 +112,26 @@ public class DialogueManager : MonoBehaviour
             _pendingPortraitState = null;
         }
 
-        // --- CHOICE KEYBOARD LOGIC ---
-        // If choices are displayed, allow number keys to select choices
+
+        if (_isTyping)
+        {
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                FinishTypingImmediately();
+            }
+            // If we are typing, do not allow choices or continuing yet
+            return; 
+        }
+        
         if (_story.currentChoices.Count > 0)
         {
             if (Input.GetKeyDown(KeyCode.Alpha1)) { MakeChoice(0); return; }
             if (Input.GetKeyDown(KeyCode.Alpha2)) { MakeChoice(1); return; }
             if (Input.GetKeyDown(KeyCode.Alpha3)) { MakeChoice(2); return; }
-            // Add more if you have more than 3 choices
+            // Since choices exist, we return here so Space doesn't trigger "ContinueStory"
             return;
         }
-
-        // Use Space for advancing text only when no choices are available
+        
         if (Input.GetKeyDown(KeyCode.Space))
         {
             ContinueStory();
@@ -251,10 +267,73 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
+        // stop any previous typing coroutine if it exists
+        if (_displayLineCoroutine != null) 
+        {
+            StopCoroutine(_displayLineCoroutine);
+        }
+
         string line = _story.Continue();
         HandleTags(_story.currentTags);
-        _dialogueText.text = line;
-        DisplayChoices();
+        
+        // Hide choices while text is typing
+        HideChoices(); 
+
+        // Start the typewriter effect
+        _displayLineCoroutine = StartCoroutine(ShowText(line));
+    }
+    
+    private IEnumerator ShowText(string fullText)
+    {
+        _isTyping = true;
+        _dialogueText.text = fullText;
+        
+        // Ensure the mesh is generated so we know how many characters there are
+        _dialogueText.ForceMeshUpdate();
+
+        int totalVisibleCharacters = _dialogueText.textInfo.characterCount;
+        int counter = 0;
+
+        // Start with 0 characters visible
+        _dialogueText.maxVisibleCharacters = 0;
+
+        while (counter < totalVisibleCharacters)
+        {
+            int visibleCount = counter % (totalVisibleCharacters + 1);
+            _dialogueText.maxVisibleCharacters = visibleCount;
+            
+            counter++;
+            yield return new WaitForSeconds(_typingSpeed);
+        }
+
+        // Ensure everything is visible at the end
+        _dialogueText.maxVisibleCharacters = totalVisibleCharacters;
+        
+        FinishTypingLogic();
+    }
+
+    private void FinishTypingImmediately()
+    {
+        if (_displayLineCoroutine != null) StopCoroutine(_displayLineCoroutine);
+        
+        _dialogueText.maxVisibleCharacters = int.MaxValue; // Show everything
+        FinishTypingLogic();
+    }
+
+    private void FinishTypingLogic()
+    {
+        _isTyping = false;
+        DisplayChoices(); // Now that text is done, we show choices
+    }
+
+    // Helper to hide choices visually before typing starts
+    private void HideChoices()
+    {
+        foreach (var choice in _choices)
+        {
+            choice.SetActive(false);
+        }
+        // Don't change Animator state here, wait for DisplayChoices to handle the panel animation
     }
 
     private void HandleTags(List<string> tags)
@@ -390,21 +469,19 @@ public class DialogueManager : MonoBehaviour
 
     private void DisplayChoices()
     {
+        if (_isTyping) return;
+
         var currentChoices = _story.currentChoices;
         
-        // Use the Animator to control the visibility of the parent panel, using the corrected state name
         if (currentChoices.Count > 0)
         {
-            // Transition to an animation state that enables the choices panel
             _layoutAnimator.Play(SHOW_CHOICES_STATE);
         }
         else
         {
-            // Revert to a default layout state that disables the choices panel
             _layoutAnimator.Play(DEFAULT_LAYOUT_STATE);
         }
         
-        // The script still handles the individual choice buttons
         int i = 0;
         for (; i < currentChoices.Count && i < _choices.Length; i++)
         {
