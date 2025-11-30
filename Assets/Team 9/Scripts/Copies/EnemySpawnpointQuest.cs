@@ -36,6 +36,6 @@ public class EnemySpawnpointQuest : MonoBehaviour
 
     public void DestroyEnemies()
     {
-        Destroy(this.gameObject);
+        gameObject.SetActive(false);
     }
 }

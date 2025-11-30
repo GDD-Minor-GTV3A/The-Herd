@@ -82,7 +82,16 @@ public class DialogueManager : MonoBehaviour
         {
             _choicesText[i] = _choices[i].GetComponentInChildren<TextMeshProUGUI>();
         }
+        
+        DontDestroyOnLoad(this.gameObject);
     }
+
+
+    private void Awake()
+    {
+        Initialize();
+    }
+
 
     private void OnEnable()
     {

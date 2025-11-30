@@ -19,8 +19,13 @@ MonoBehaviour:
   - _stageID: 000
     _stageDescription: A new location
     _objectives:
-    - objectiveID: LOCATION_010
-      objectiveDescription: Enter Level 2
+    - objectiveID: LOCATION_000
+      objectiveDescription: Finish talking with Vesna
+      type: 2
+      requiredAmount: 1
+      currentAmount: 0
+    - objectiveID: LOCATION_001
+      objectiveDescription: Meet Vesna at the entrace to level 2
       type: 2
       requiredAmount: 1
       currentAmount: 0
@@ -28,6 +33,11 @@ MonoBehaviour:
   - _stageID: 001
     _stageDescription: Find Vesnas Bracelet
     _objectives:
+    - objectiveID: LOCATION_010
+      objectiveDescription: Enter level 2
+      type: 4
+      requiredAmount: 1
+      currentAmount: 0
     - objectiveID: LOCATION_011
       objectiveDescription: Follow Vesna to the Ritual spot
       type: 2

@@ -38,7 +38,7 @@ public class ObjectiveTrigger : MonoBehaviour
         EventManager.Broadcast(new CompleteObjectiveEvent(questID, objectiveID));
         if (oneShot)
         {
-            //Destroy(this.gameObject);
+            gameObject.SetActive(false);
             Debug.Log("MAYBE DONT DESTROY? Don't destroy is correct");
         }
     }
@@ -46,7 +46,7 @@ public class ObjectiveTrigger : MonoBehaviour
     private void Start()
     {
         //Triggers start deactivated and are activated through the trigger activator
-        this.gameObject.SetActive(false);
+        //this.gameObject.SetActive(false);
         this.gameObject.GetComponent<MeshRenderer>().enabled = false;
     }
 

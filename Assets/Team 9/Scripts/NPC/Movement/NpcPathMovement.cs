@@ -1,6 +1,5 @@
 using System;
-using System.IO;
-using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AI;
@@ -9,53 +8,33 @@ public class NpcPathMovement : MonoBehaviour
 {
     [SerializeField] private NpcPath path;
     [SerializeField] private float reachThreshold = 1f;
-    
-    
-    private NavMeshAgent _agent;
-    private int _currentIndex = 0;
 
+    private NavMeshAgent _agent;
     private bool _isRunning = false;
+    private CancellationTokenSource _cts;
 
     public bool IsRunning => _isRunning;
-    
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    async void Start()
+
+    private void Awake()
     {
         _agent = GetComponent<NavMeshAgent>();
-        if (_agent == null) return;
-        if (path.waypoints.Length == 0) return;
-
-        //_isRunning = true;
-        //await FollowPath();
     }
 
-    private async Task FollowPath()
+    private void OnEnable()
     {
-        if (path.IsCompleted)
-        {
-            _isRunning = false;
-            return;
-        }
-        
-        for (int i = 0; i < path.waypoints.Length && _isRunning; i++)
-        {
-            _agent.SetDestination(path.waypoints[i].position);
+        _cts = new CancellationTokenSource();
+    }
 
-            await WaitUntilReached(_agent, reachThreshold);
-
-            await Task.Delay(50);
-        }
-
+    private void OnDisable()
+    {
         _isRunning = false;
-        if (path.IsOneShot)
-            path.IsCompleted = true;
-    }
 
-    private static async Task WaitUntilReached(NavMeshAgent agent, float threshold)
-    {
-        while (agent.pathPending || agent.remainingDistance > threshold)
+        // Cancel any pending async tasks
+        if (_cts != null && !_cts.IsCancellationRequested)
         {
-            await Task.Yield();
+            _cts.Cancel();
+            _cts.Dispose();
+            _cts = null;
         }
     }
 
@@ -64,31 +43,86 @@ public class NpcPathMovement : MonoBehaviour
         path = newPath;
     }
 
-    private async void RevertPath()
-    {
-        path.RevertPath();
-        _isRunning = true;
-        await FollowPath();
-
-    }
-
     public async void StartPath()
     {
-        _isRunning = true;
-        await FollowPath();
+        if (_agent == null || path == null || path.waypoints.Length == 0)
+        {
+            Debug.LogWarning("NPC_PATH: Missing agent or path data.");
+            return;
+        }
 
-        Debug.Log("NPC_PATH: Starting new Path");
-        
+        if (_isRunning)
+        {
+            Debug.Log("NPC_PATH: Already running.");
+            return;
+        }
+
+        _isRunning = true;
+
+        try
+        {
+            await FollowPath(_cts.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            Debug.Log("NPC_PATH: Movement cancelled (scene changed or disabled).");
+        }
+        finally
+        {
+            _isRunning = false;
+        }
     }
 
-
-
-    private void OnDisable() => _isRunning = false;
-
-
-    // Update is called once per frame
-    void Update()
+    private async Task FollowPath(CancellationToken token)
     {
- 
+        if (path.IsCompleted) return;
+
+        Debug.Log("NPC_PATH_MOVEMENT: Follow Path started");
+
+        for (int i = 0; i < path.waypoints.Length && _isRunning; i++)
+        {
+            if (token.IsCancellationRequested || _agent == null) break;
+            if (!_agent.isActiveAndEnabled) break;
+
+            _agent.SetDestination(path.waypoints[i].position);
+
+            await WaitUntilReached(_agent, reachThreshold, token);
+
+            await Task.Delay(50, token);
+        }
+
+        if (path.IsOneShot)
+            path.IsCompleted = true;
+    }
+
+    private static async Task WaitUntilReached(NavMeshAgent agent, float threshold, CancellationToken token)
+    {
+        while (!token.IsCancellationRequested)
+        {
+            if (agent == null || !agent.isActiveAndEnabled) break;
+
+            if (!agent.pathPending && agent.remainingDistance <= threshold)
+                break;
+
+            await Task.Yield();
+        }
+    }
+
+    public async void RevertPath()
+    {
+        if (path == null) return;
+
+        path.RevertPath();
+        _isRunning = true;
+
+        try
+        {
+            await FollowPath(_cts.Token);
+        }
+        catch (OperationCanceledException) { }
+        finally
+        {
+            _isRunning = false;
+        }
     }
 }

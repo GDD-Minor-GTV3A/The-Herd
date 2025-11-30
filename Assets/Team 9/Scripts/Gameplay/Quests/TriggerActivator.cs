@@ -65,10 +65,12 @@ public class TriggerActivator : MonoBehaviour
         {
             if (progress.IsObjectiveActive(trigger.ObjectiveID))
             {
+                Debug.Log($"TRIGGER_ACTIVATOR: Activating {trigger.ObjectiveID}");
                 trigger.gameObject.SetActive(true);
             }
             else
             {
+                Debug.Log($"TRIGGER_ACTIVATOR: Deactivating {trigger.ObjectiveID}");
                 trigger.gameObject.SetActive(false);
             }
         }
