@@ -27,7 +27,7 @@ public class VesnaSheepInteractionZone : MonoBehaviour
             return;
 
         inRange = true;
-        randomDelay = 5f;
+        randomDelay = 8f;
     }
 
     // Checks if player exited Collider
@@ -63,7 +63,6 @@ public class VesnaSheepInteractionZone : MonoBehaviour
         // If timer exceeds random delay, switch to moving state
         if (timer >= randomDelay)
         {
-            currentState = State.Moving;
             timer = 0;
             SendSheepToVesna();
         }
@@ -73,9 +72,11 @@ public class VesnaSheepInteractionZone : MonoBehaviour
     private void UpdateMoving()
     {
         // If sheep reached vesna, switch to interacting state
-        if (sheep.Agent.remainingDistance <= pointReachThreshold)
+        var distance = sheep.transform.position - transform.position;
+        if (distance.magnitude <= pointReachThreshold)
         {
             currentState = State.Interacting;
+            Debug.Log("Sheep arrived at Vesna");
             // TODO : Trigger interaction animation here
         }
     }
@@ -91,8 +92,9 @@ public class VesnaSheepInteractionZone : MonoBehaviour
         {
             currentState = State.Idle;
             timer = 0;
-            randomDelay = Random.Range(3f, 6f);
+            randomDelay = Random.Range(5f, 10f);
             ReturnSheepToPlayer();
+            Debug.Log("Interaction with Vesna done.");
         }
     }
 
@@ -106,13 +108,21 @@ public class VesnaSheepInteractionZone : MonoBehaviour
         int choice = Random.Range(0, sheepManagers.Length);
         sheep = sheepManagers[choice];
 
-        // Temporarily disable AI logic so it does not override movement
-        sheep.enabled = false;
-
-        // Set destination to vesna's position
+        // Calculate distance to vesna
         Vector3 destination = transform.position;
-        sheep.Agent.SetDestination(destination);
-        Debug.Log("Sheep will now go to Vesna.");
+        var distance = (sheep.transform.position - destination).magnitude;
+
+        // If sheep is within reasonable distance, send it to vesna
+        if (distance <= 60)
+        {
+            // Temporarily disable AI logic so it does not override movement
+            currentState = State.Moving;
+            sheep.enabled = false;
+
+            // Set destination to vesna's position
+            sheep.Agent.SetDestination(destination);
+            Debug.Log("Sheep will now go to Vesna.");
+        }
     }
 
     private void ReturnSheepToPlayer()
