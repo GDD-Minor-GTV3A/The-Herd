@@ -2,6 +2,10 @@ using UnityEngine;
 using Core.Shared.StateMachine;
 using UnityEngine.AI;
 using System.Collections.Generic;
+
+using Core.AI.Sheep.Event;
+using Core.Events;
+
 namespace Core.AI.Sheep
 {
     /// <summary>
@@ -55,7 +59,7 @@ namespace Core.AI.Sheep
 
         public void OnStart()
         {
-            ScheduleNextGraze();
+            _nextGrazeAt = Time.time + Random.Range(0f, 0.8f);
             if(_stateManager.Agent !=  null && _stateManager?.Animation != null && _stateManager.CanControlAgent())
             {
                 _stateManager.Agent.isStopped = false;
@@ -133,11 +137,14 @@ namespace Core.AI.Sheep
             {
                 _stateManager.Agent.isStopped = false;
                 //_stateManager.Animation.SetState((int)SheepAnimState.Walk);
-                _stateManager.SoundDriver.ForcePlayBleatSound(
-                    _stateManager.Archetype.DeathSound,
-                    100f,
-                    Random.Range(0.9f, 1.8f));
-                
+                if (_stateManager.Archetype != null && _stateManager.Archetype.DeathSound != null)
+                {
+                    float pitch = Random.Range(0.9f, 1.05f);
+                    _stateManager.SoundDriver.PlayMiscSound(
+                        _stateManager.Archetype.DeathSound,
+                        1.0f,
+                        pitch);
+                }
             }
         }
 
@@ -198,6 +205,64 @@ namespace Core.AI.Sheep
         }
     }
 
+    public sealed class SheepPettingState : IState
+    {
+        private readonly SheepStateManager _stateManager;
+        private bool _isPettingComplete = false;
+
+        public SheepPettingState(SheepStateManager context)
+        {
+            _stateManager = context;
+        }
+
+        public void OnStart()
+        {
+            _isPettingComplete = false;
+
+            if (_stateManager.CanControlAgent())
+            {
+                _stateManager.Agent.isStopped = true;
+                _stateManager.Agent.velocity = Vector3.zero;
+            }
+            
+            //Animation hook
+
+            if (_stateManager.Archetype != null && _stateManager.Archetype.PettingSound != null)
+            {
+                float pitch = Random.Range(0.9f, 1.05f);
+                _stateManager.SoundDriver.PlayMiscSound(
+                    _stateManager.Archetype.PettingSound,
+                    1.0f,
+                    pitch);
+            }
+            
+            EventManager.Broadcast(new ShowFlashbackEvent(
+                _stateManager.FlashbackImage,
+                OnFlashbackClosed));
+        }
+
+        public void OnUpdate()
+        {
+            if (_isPettingComplete)
+            {
+                _stateManager.SetState<SheepGrazeState>();
+            }
+        }
+
+        public void OnStop()
+        {
+            if (_stateManager.CanControlAgent())
+            {
+                _stateManager.Agent.isStopped = false;
+            }
+        }
+
+        private void OnFlashbackClosed()
+        {
+            _isPettingComplete = true;
+        }
+    }
+    
     public class SheepDieState : IState
     {
         private readonly SheepStateManager _stateManager;
@@ -210,11 +275,14 @@ namespace Core.AI.Sheep
         public void OnStart()
         {
             _stateManager.DisableBehavior();
-            _stateManager.SoundDriver.ForcePlayBleatSound(
-                _stateManager.Archetype.DeathSound,
-                100f,
-                Random.Range(0.9f, 1.8f));
-            
+            if (_stateManager.Archetype != null && _stateManager.Archetype.DeathSound != null)
+            {
+                float pitch = Random.Range(0.9f, 1.05f);
+                _stateManager.SoundDriver.PlayMiscSound(
+                    _stateManager.Archetype.DeathSound,
+                    1.0f,
+                    pitch);
+            }
             //possible ragdoll setup in here in the next sprint
         }
 
