@@ -30,7 +30,7 @@ public class QuestPathManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        _quest = QuestManager.Instance.GetQuestProgressByID(questID);
+        _quest = QuestManager.Instance?.GetQuestProgressByID(questID);
         if (_quest == null)
         {
             Debug.LogWarning("_quest is missing");

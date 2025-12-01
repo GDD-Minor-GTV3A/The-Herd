@@ -50,7 +50,6 @@ public class QuestLogUI : MonoBehaviour
             }
         }
         
-        // Hide on startup (Visuals only, objects remain active)
         SetQuestLogVisibility(false);
         
         Instance = this;
@@ -65,12 +64,14 @@ public class QuestLogUI : MonoBehaviour
 
     private void Start()
     {
-        if (Instance == this)
-        {
-            DontDestroyOnLoad(gameObject);
-        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
 
+    /// <summary>
+    /// Subscribes to quest-related events when this component is enabled.
+    /// </summary>
     private void OnEnable()
     {
         EventManager.AddListener<QuestStartedEvent>(OnQuestStartedEvent);
@@ -78,6 +79,9 @@ public class QuestLogUI : MonoBehaviour
         EventManager.AddListener<QuestCompletedEvent>(OnQuestCompletedEvent);
     }
 
+    /// <summary>
+    /// Unsubscribes from quest-related events when this component is disabled.
+    /// </summary>
     private void OnDisable()
     {
         EventManager.RemoveListener<QuestStartedEvent>(OnQuestStartedEvent);
@@ -85,6 +89,10 @@ public class QuestLogUI : MonoBehaviour
         EventManager.RemoveListener<QuestCompletedEvent>(OnQuestCompletedEvent);
     }
 
+    /// <summary>
+    /// Handles the <see cref="QuestStartedEvent"/> by creating and displaying a new quest entry in the UI.
+    /// </summary>
+    /// <param name="evt">The event data containing the ID of the started quest.</param>
     private void OnQuestStartedEvent(QuestStartedEvent evt)
     {
         var quest = QuestManager.Instance.GetQuestProgressByID(evt.QuestID);
@@ -92,18 +100,17 @@ public class QuestLogUI : MonoBehaviour
 
         var entryGO = Instantiate(questEntryPrefab, questListContainer);
         var entry = entryGO.GetComponent<QuestUIEntry>();
-        
-        // 1. Setup the data (Internal script logic runs)
         entry.Setup(quest);
-
-        // 2. FORCE ACTIVE: QuestUIEntry.Setup() disables the GameObject by default.
-        // We must re-enable it so its scripts/coroutines run in the background, 
-        // while the parent CanvasGroup keeps it visually hidden.
+        
         entryGO.SetActive(true);
 
         _questEntries.Add(quest.Quest.QuestID, entry);
     }
 
+    /// <summary>
+    /// Handles the <see cref="QuestUpdateEvent"/> by refreshing the UI for the corresponding quest.
+    /// </summary>
+    /// <param name="evt">The event data containing the ID of the updated quest.</param>
     private void OnQuestUpdateEvent(QuestUpdateEvent evt)
     {
         if (!_questEntries.ContainsKey(evt.QuestID))
@@ -116,6 +123,10 @@ public class QuestLogUI : MonoBehaviour
         questUiEntry.RefreshObjectives();
     }
 
+    /// <summary>
+    /// Handles the <see cref="QuestCompletedEvent"/> by marking the quest as completed in the UI.
+    /// </summary>
+    /// <param name="evt">The event data containing the ID of the completed quest.</param>
     private void OnQuestCompletedEvent(QuestCompletedEvent evt)
     {
         Debug.Log("UI COMPLETE CALLED");
@@ -130,16 +141,14 @@ public class QuestLogUI : MonoBehaviour
         var questUiEntry = _questEntries[evt.QuestID];
         questUiEntry.MarkCompleted();
         
-        // If you want the "Completion Fade Out" coroutine inside QuestUIEntry to run,
-        // you should delay this Destroy or let the Entry destroy itself.
-        // For now, we destroy immediately as per original logic.
+        //Maybe rework this for new log
         Destroy(_questEntries[evt.QuestID].gameObject);
         _questEntries.Remove(evt.QuestID);
     }
 
     private void Update()
     {
-        // Toggle QuestLog Visibility
+        //Enable/Disable QuestLog
         if (Input.GetKeyDown(KeyCode.L))
         {
             _activeState = !_activeState;

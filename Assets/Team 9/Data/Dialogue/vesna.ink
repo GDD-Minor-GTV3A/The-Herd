@@ -180,7 +180,7 @@ Thank you.
 
 #speaker:Vesna
 Take care, dear Shepherd. Find me in the village and we will talk again.
-
+~ after_QUEST_001_completed = true
 -> END
 
 = after_quest_completed_dialogue

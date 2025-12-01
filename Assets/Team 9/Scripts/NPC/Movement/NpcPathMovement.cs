@@ -76,6 +76,7 @@ public class NpcPathMovement : MonoBehaviour
     private async Task FollowPath(CancellationToken token)
     {
         if (path.IsCompleted) return;
+        if (path.QuestCompleted) return;
 
         Debug.Log("NPC_PATH_MOVEMENT: Follow Path started");
 
