@@ -70,6 +70,8 @@ namespace Core.AI.Sheep.Config
                 PersonalityType.Andela => new AndelaPersonality(sheep),
                 PersonalityType.Ivana => new IvanaPersonality(sheep),
                 PersonalityType.Nino => new NinoPersonality(sheep),
+                PersonalityType.Yaro => new YaroPersonality(sheep),
+                PersonalityType.Tihomir => new TihomirPersonality(sheep),
                 _ => new NormalPersonality(sheep)
             };
         }
@@ -88,6 +90,8 @@ namespace Core.AI.Sheep.Config
         Sonja,
         Andela,
         Nino,
-        Ivana
+        Ivana,
+        Yaro,
+        Tihomir
     }
 }
