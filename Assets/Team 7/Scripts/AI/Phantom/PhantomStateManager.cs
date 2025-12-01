@@ -32,6 +32,7 @@ namespace Team_7.Scripts.AI.Phantom
         private float _startedLooking;
         private float _lastCloneSpawn;
         private List<PhantomFake> _clones = new();
+        private int _shotCounter;
 
         public UnityEvent DamageEvent { get; set; }
         
@@ -300,6 +301,30 @@ namespace Team_7.Scripts.AI.Phantom
         public void StartWandering()
         {
             SetState<WanderingState>();
+        }
+
+        public void ToggleVisibility(bool visible)
+        {
+            foreach (var meshRenderer in gameObject.GetComponentsInChildren<SkinnedMeshRenderer>())
+            {
+                meshRenderer.enabled = visible;
+            }
+        }
+        
+        
+        public void IncreaseShotCounter()
+        {
+            _shotCounter++;
+        }
+
+        public void ResetShotCounter()
+        {
+            _shotCounter = 0;
+        }
+        
+        public int GetShotCounter()
+        {
+            return _shotCounter;
         }
     }
 }

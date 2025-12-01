@@ -48,6 +48,8 @@ namespace Team_7.Scripts.AI.Phantom
         public float shootCooldown= 1.5f;
         [Tooltip("How long the enemy charges it's attack before it's shot ")]
         public float chargeDuration = 4.2f; //TODO Scale the animation duration with this.
+        [Tooltip("How many shots the phantom does before repositioning")]
+        public int shotsBeforeDashing = 2;
 
         [Header("Projectile Settings")] 
         [Tooltip("The projectile prefab")]
