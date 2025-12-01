@@ -19,6 +19,7 @@ namespace Core.AI.Sheep
     /// Sheep state manager
     /// </summary>
     [RequireComponent(typeof(NavMeshAgent))]
+    [DisallowMultipleComponent]
     public class SheepStateManager : StateManager<IState>
     {
         private const float DEFAULT_FOLLOW_DISTANCE = 1.8f;
@@ -35,6 +36,8 @@ namespace Core.AI.Sheep
 
         [SerializeField]
         private SheepAnimationDriver _animation;
+
+        [SerializeField] private float _deathDistanceInterval = 0.5f;
 
         [Header("Sounds")]
         [SerializeField][Tooltip("Sheep sound driver")]
@@ -66,6 +69,8 @@ namespace Core.AI.Sheep
         private Vector3 _playerCenter;
         private Vector3 _playerHalfExtents;
         private static readonly List<SheepStateManager> _allSheep = new();
+        private float _nextDeathDistanceCheck;
+        private bool _diedByDistance;
         
 
         // Personality system
@@ -86,6 +91,8 @@ namespace Core.AI.Sheep
         public bool IsStraggler => _startAsStraggler;
         
         public Sprite FlashbackImage => _flashbackImage;
+        public Vector3 PlayerSquareCenter => _playerCenter;
+        public Vector3 PlayerSquareHalfExtents => _playerHalfExtents;
 
         /// <summary>
         /// Exposed config and archetype and sound driver
@@ -119,6 +126,7 @@ namespace Core.AI.Sheep
             
             _personality = _archetype?.CreatePersonality(this);
             _behaviorContext = new PersonalityBehaviorContext();
+            _playerCenter = FindObjectOfType<SheepHerdController>().transform.position;
 
             InitializeStatesMap();
         }
@@ -191,7 +199,9 @@ namespace Core.AI.Sheep
                 {typeof(SheepGrazeState), new SheepGrazeState(this)},
                 {typeof(SheepWalkAwayFromHerdState), new SheepWalkAwayFromHerdState(this)},
                 {typeof(SheepFreezeState), new SheepFreezeState(this)},
+                {typeof(SheepMoveState), new SheepMoveState(this)},
                 {typeof(SheepPettingState), new SheepPettingState(this)},
+                {typeof(SheepScaredState), new SheepScaredState(this)},
                 {typeof(SheepDieState), new SheepDieState(this)},
             };
         }
@@ -269,7 +279,12 @@ namespace Core.AI.Sheep
 
             if (_startAsStraggler) return;
 
-            if (_currentState is SheepWalkAwayFromHerdState) return;
+            if (_currentState is SheepWalkAwayFromHerdState
+                || _currentState is SheepScaredState
+                || _currentState is SheepFreezeState
+                || _currentState is SheepDieState
+                || _currentState is SheepPettingState
+                || _currentState is SheepMoveState) return;
 
             //Decide on state
             bool outside = FlockingUtility.IsOutSquare(transform.position, _playerCenter, _playerHalfExtents);
@@ -295,11 +310,18 @@ namespace Core.AI.Sheep
 
             while(true)
             {
+                CheckDeathByDistance();
+                if (_diedByDistance)
+                {
+                    yield break;
+                }
+                
                 RefreshNeighbours();
                 // Update behavior context for personality
                 UpdateBehaviorContext();
 
                 if (_currentState is not SheepWalkAwayFromHerdState
+                    && _currentState is not SheepScaredState
                     && Time.time >= _nextWalkingAwayFromHerdAt
                     && Time.time >= _walkAwayReenableAt
                     && !_startAsStraggler)
@@ -319,6 +341,45 @@ namespace Core.AI.Sheep
                 }
 
                 yield return wait;
+            }
+        }
+
+        private void CheckDeathByDistance()
+        {
+            if (_diedByDistance) return;
+            if (_config == null) return;
+            if (_startAsStraggler) return;
+
+            float killDist = _config.DeathDistance;
+            if (killDist <= 0f) return;
+
+            Vector3 delta = transform.position - _playerCenter;
+            delta.y = 0f;
+
+            if (delta.sqrMagnitude > killDist * killDist)
+            {
+                KillByDistance();
+            }
+        }
+
+        private void KillByDistance()
+        {
+            if (_diedByDistance) return;
+            _diedByDistance = true;
+
+            var health = GetComponent<SheepHealth>();
+            if (health != null)
+            {
+                EventManager.Broadcast(new SheepDamageEvent(
+                    this,
+                    health.MaxHealth,
+                    transform.position,
+                    SheepDamageType.DeathCircle,
+                    gameObject));
+            }
+            else
+            {
+                Remove();
             }
         }
 
@@ -513,12 +574,30 @@ namespace Core.AI.Sheep
                 if (kv.Key) _behaviorContext.ThreatRadius[kv.Key] = kv.Value;
             }
 
-            _behaviorContext.HasThreat = _behaviorContext.Threats.Count > 0;
+            bool hasThreat = _behaviorContext.Threats.Count > 0;
+
+            if (_currentState is SheepScaredState)
+            {
+                if (_panicLoop != null)
+                {
+                    StopPanicLoop();
+                }
+
+                _behaviorContext.HasThreat = false;
+            }
+            else
+            {
+                _behaviorContext.HasThreat = hasThreat;
+            }
 
             if (_behaviorContext.HasThreat && !_hadThreatLastFrame)
+            {
                 StartPanicLoop();
+            }
             else if (!_behaviorContext.HasThreat && _hadThreatLastFrame)
+            {
                 StopPanicLoop();
+            }
 
             _hadThreatLastFrame = _behaviorContext.HasThreat;
         }
@@ -546,9 +625,13 @@ namespace Core.AI.Sheep
         /// <summary>
         /// Called when sheep gets separated from herd
         /// </summary>
-        public void OnSeparatedFromHerd()
+        public void OnSeparatedFromHerd(bool wasLost, bool forced)
         {
-            _personality.OnSeparatedFromHerd(this, _behaviorContext);
+            EventManager.Broadcast(new SheepLeaveHerdEvent(this, wasLost, forced));
+            if (_personality != null)
+            {
+                _personality.OnSeparatedFromHerd(this, _behaviorContext);
+            }
         }
 
         /// <summary>
@@ -573,14 +656,45 @@ namespace Core.AI.Sheep
         {
             _personality.OnDeath(this, _behaviorContext);
         }
+        
+#if UNITY_EDITOR
+        private void OnDrawGizmosSelected()
+        {
+            // Draw player square
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawWireCube(
+                _playerCenter,
+                new Vector3(_playerHalfExtents.x * 2f, 0.1f, _playerHalfExtents.y * 2f)
+            );
+
+            // Draw agent destination
+            if (_agent != null && _agent.isOnNavMesh)
+            {
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawLine(transform.position, _agent.destination);
+                Gizmos.DrawSphere(_agent.destination, 0.2f);
+            }
+
+            if (_config != null && _config.DeathDistance > 0f && _playerCenter != Vector3.zero)
+
+            {
+                Gizmos.color = new Color(1f, 0f, 0f, 0.35f);
+                Vector3 center = _playerCenter;
+                if (center == Vector3.zero && Application.isPlaying == false)
+                    center = transform.position;
+                Gizmos.DrawWireSphere(center, _config.DeathDistance);
+            }
+        }
+#endif
 
         /// <summary>
         /// Removes the sheep from the game.
         /// Broadcasts a SheepDeathEvent before destroying the GameObject.
         /// </summary>
-        public void Remove()
+        public void Remove(bool countTowardSanity = true)
         {
-            EventManager.Broadcast(new SheepDeathEvent(this));
+            EventManager.Broadcast(new SheepLeaveHerdEvent(this, wasLost: false, forced: true));
+            EventManager.Broadcast(new SheepDeathEvent(this, countTowardSanity));
             Destroy(gameObject);
         }
 
@@ -593,6 +707,26 @@ namespace Core.AI.Sheep
                    && Agent.enabled
                    && Agent.isOnNavMesh
                    && gameObject.activeInHierarchy;
+        }
+
+        public void MoveToPoint(Vector3 target, float stopDistance = 0.5f)
+        {
+            if (StatesMap == null)
+                InitializeStatesMap();
+
+            if (!StatesMap.TryGetValue(typeof(SheepMoveState), out var state))
+            {
+                return;
+            }
+            
+            var moveState = state as SheepMoveState;
+            if (moveState == null)
+            {
+                return;
+            }
+            
+            moveState.Configure(target, stopDistance);
+            SetState<SheepMoveState>();
         }
 
         public IState GetState() => _currentState;
