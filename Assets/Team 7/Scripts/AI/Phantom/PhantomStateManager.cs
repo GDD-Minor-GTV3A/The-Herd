@@ -12,6 +12,7 @@ using Unity.VisualScripting;
 
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UIElements;
 
 using IState = Core.Shared.StateMachine.IState;
 using Random = UnityEngine.Random;
@@ -84,6 +85,7 @@ namespace Team_7.Scripts.AI.Phantom
             if (stats.damage > 0 )
                 SpawnClones(stats.initialCloneAmount);
             
+            ToggleVisibility(false);
             SetState<WanderingState>();
         }
 
