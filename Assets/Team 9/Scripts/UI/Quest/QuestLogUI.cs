@@ -146,6 +146,14 @@ public class QuestLogUI : MonoBehaviour
             {
                 child.gameObject.SetActive(_activeState);
             }
+
+            if (_activeState)
+            {
+                foreach (var entry in _questEntries.Keys)
+                {
+                    EventManager.Broadcast(new QuestUpdateEvent(entry));
+                }
+            }
         }
     }
 }

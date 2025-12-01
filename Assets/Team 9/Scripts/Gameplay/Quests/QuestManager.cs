@@ -65,6 +65,8 @@ public class QuestManager : MonoBehaviour
     /// <param name="quest">Quest ScriptableObject to start</param>
     public void StartQuest(Quest quest)
     {
+        Debug.Log($"StartQuest called for {quest?.name} (instanceID {quest?.GetInstanceID()})",
+            quest);
         if (CheckIfQuestRunningOrComplete(quest.QuestID))
         {
             Debug.Log("QUEST IS ALREADY RUNNING OR COMPLETED!!!");
@@ -75,7 +77,7 @@ public class QuestManager : MonoBehaviour
         _activeQuests.Add(progress);
 
         EventManager.Broadcast(new QuestStartedEvent(quest.QuestID));
-        EventManager.Broadcast(new QuestUpdateEvent(quest.QuestID));
+        //EventManager.Broadcast(new QuestUpdateEvent(quest.QuestID));
         Debug.Log($"Quest started: {quest.QuestName}");
     }
 
@@ -113,6 +115,12 @@ public class QuestManager : MonoBehaviour
         if (!result)
             result = _completedQuests.Exists(q => q.Quest.QuestID == questID);
         return result;
+    }
+
+
+    public bool CheckIfQuestCompleted(string questID)
+    {
+        return _completedQuests.Exists(q => q.Quest.QuestID == questID);
     }
 
     

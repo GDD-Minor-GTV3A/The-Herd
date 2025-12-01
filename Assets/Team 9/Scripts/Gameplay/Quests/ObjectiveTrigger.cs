@@ -38,7 +38,7 @@ public class ObjectiveTrigger : MonoBehaviour
         EventManager.Broadcast(new CompleteObjectiveEvent(questID, objectiveID));
         if (oneShot)
         {
-            gameObject.SetActive(false);
+            //gameObject.SetActive(false);
             Debug.Log("MAYBE DONT DESTROY? Don't destroy is correct");
         }
     }

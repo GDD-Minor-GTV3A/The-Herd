@@ -63,6 +63,8 @@ public class TriggerActivator : MonoBehaviour
         {
             questProgress[questID] = QuestManager.Instance.GetQuestProgressByID(questID);
         }
+        
+        OnQuestUpdateEvent(new QuestUpdateEvent(questID));
 
         Debug.Log($"TRIGGER_ACTIVATOR: Quest '{questID}' started — progress registered.");
     }
@@ -78,7 +80,7 @@ public class TriggerActivator : MonoBehaviour
         if (!questTriggers.TryGetValue(questID, out var triggers))
             return;
 
-        Debug.Log($"QuestID={questID} | Progress null? {progress == null}");
+        Debug.Log($"TRIGGER_ACTIVATOR: QuestID={questID} | Progress null? {progress == null}");
         
         foreach (var trigger in triggers)
         {
