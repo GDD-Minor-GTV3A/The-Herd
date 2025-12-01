@@ -8179,6 +8179,52 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
+--- !u!1 &5189505925386428410
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1706976208251742289}
+  - component: {fileID: 3037731951348167981}
+  m_Layer: 0
+  m_Name: SanityEffectsManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1706976208251742289
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5189505925386428410}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7191174862489174219}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3037731951348167981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5189505925386428410}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74e71c912138eea4a9bb48e61e103805, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  config: {fileID: 11400000, guid: 281787de19f8fac4d98fc5b1517b3abd, type: 2}
+  playerTransform: {fileID: 7191174862489174219}
 --- !u!1 &5265130011821682860
 GameObject:
   m_ObjectHideFlags: 0
@@ -9893,6 +9939,7 @@ Transform:
   - {fileID: 6804874141670479092}
   - {fileID: 4846292856879341384}
   - {fileID: 1638199947979185443}
+  - {fileID: 1706976208251742289}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2534532970623172728
@@ -9918,6 +9965,7 @@ MonoBehaviour:
   vignetteEffect: {fileID: 3063850629989705646}
   hpBar: {fileID: 7112759867059030525}
   inventoryButton: {fileID: 972645774071568866}
+  mapToggle: {fileID: 0}
   stepsSoundManager: {fileID: 2944587949055057029}
   inputActions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   config: {fileID: 11400000, guid: 762ae43344b64e84e84990c9a2509ec1, type: 2}
