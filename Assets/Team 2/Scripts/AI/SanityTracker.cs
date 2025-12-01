@@ -10,13 +10,12 @@ namespace Core.AI.Sheep
     /// Tracks player sanity using a point-based system.
     /// Starts at 100 points with 6 sheep. Each sheep = 16 points.
     /// Losing 16 points removes furthest sheep. Gaining 16 points spawns new sheep.
-    /// NOTE: This should probably be moved to player code for consistency.
     /// </summary>
     public class SanityTracker : MonoBehaviour
     {
-        private const int POINTS_PER_SHEEP = 16;
-        private const int STARTING_POINTS = 96;
-        private const int STARTING_SHEEP_COUNT = 6;
+        private const int STARTING_SHEEP_COUNT = 5;
+        private const int POINTS_PER_SHEEP = 100 / STARTING_SHEEP_COUNT;
+        private const int STARTING_POINTS = POINTS_PER_SHEEP * STARTING_SHEEP_COUNT;
 
         [Header("Spawning")]
         [SerializeField]
@@ -48,7 +47,22 @@ namespace Core.AI.Sheep
         private SanityStage _currentStage;
 
         private static SanityTracker _instance;
+        
+        // --------- public getters ----------
+        public static int CurrentPoints =>
+            _instance != null ? _instance._sanityPoints : 0;
 
+        public static int MaxPoints =>
+            _instance != null ? _instance._maxSanityPoints : 0;
+
+        public static float CurrentPercentage =>
+            _instance != null && _instance._maxSanityPoints > 0
+                ? (_instance._sanityPoints / (float)_instance._maxSanityPoints) * 100f
+                : 0f;
+
+        public static SanityStage CurrentStage =>
+            _instance != null ? _instance._currentStage : SanityStage.Stable;
+        
         private void Awake()
         {
             _instance = this;
@@ -80,7 +94,8 @@ namespace Core.AI.Sheep
         /// </summary>
         private void OnSheepDeath(SheepDeathEvent e)
         {
-            //RemoveSanityPointsInternal(POINTS_PER_SHEEP);
+            if (!e.CountTowardSanity) return;
+            RemoveSanityPointsInternal(POINTS_PER_SHEEP / 2);
         }
 
         /// <summary>
@@ -88,7 +103,8 @@ namespace Core.AI.Sheep
         /// </summary>
         private void OnSheepJoin(SheepJoinEvent e)
         {
-            //AddSanityPointsInternal(POINTS_PER_SHEEP);
+            if (!e.CountTowardSanity) return;
+            AddSanityPointsInternal(POINTS_PER_SHEEP / 2);
         }
 
         /// <summary>
@@ -206,7 +222,7 @@ namespace Core.AI.Sheep
                 // Mark as straggler so it joins the herd
                 newSheep.MarkAsStraggler();
                 
-                EventManager.Broadcast(new SheepJoinEvent(newSheep));
+                EventManager.Broadcast(new SheepJoinEvent(newSheep, false));
 
                 Debug.Log($"[SanityTracker] Spawned sheep at {spawnPosition}");
             }
@@ -271,7 +287,7 @@ namespace Core.AI.Sheep
             {
                 Debug.Log($"[SanityTracker] Removing furthest sheep: {furthestSheep.name}");
                 // TODO: Make sheep flee instead of instant removal
-                furthestSheep.Remove();
+                furthestSheep.Remove(false);
             }
         }
 

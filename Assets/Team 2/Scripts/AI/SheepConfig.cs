@@ -22,6 +22,7 @@ namespace Core.AI.Sheep.Config
         [SerializeField] private float _maxLostDistanceFromHerd = 10f; // This is a test distance and is open to change
         [SerializeField] private float _playerAvoidRadius = 1.5f;
         [SerializeField] private float _playerAvoidWeight = 1.5f;
+        [SerializeField] private float _deathDistance = 150f;
 
 
 
@@ -37,5 +38,6 @@ namespace Core.AI.Sheep.Config
         public float MaxLostDistanceFromHerd => _maxLostDistanceFromHerd;
         public float PlayerAvoidRadius => _playerAvoidRadius;
         public float PlayerAvoidWeight => _playerAvoidWeight;
+        public float DeathDistance => _deathDistance;
     }
 }
