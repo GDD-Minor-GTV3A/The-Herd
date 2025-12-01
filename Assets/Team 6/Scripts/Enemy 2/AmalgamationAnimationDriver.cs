@@ -57,6 +57,7 @@ public class AmalgamationAnimationDriverDebug : MonoBehaviour
             string stateName = GetStateName(animator);
             string clipName  = GetClipName(animator);
 
+            /*
             Debug.Log(
                 $"[AnimDbg '{name}'] state={stateName} clip={clipName} " +
                 $"SpeedParam={animator.GetFloat(SpeedHash):0.00} " +
@@ -65,6 +66,7 @@ public class AmalgamationAnimationDriverDebug : MonoBehaviour
                 $"stopped={agent.isStopped} updPos={agent.updatePosition} updRot={agent.updateRotation} " +
                 $"cull={animator.cullingMode} enabled={animator.enabled}"
             );
+            */
         }
     }
 
