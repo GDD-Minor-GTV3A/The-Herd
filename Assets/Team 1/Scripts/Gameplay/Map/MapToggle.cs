@@ -35,7 +35,7 @@ namespace Gameplay.Map
                 return;
             }
             
-            _playerInput.MapToggle.performed += OnMapKey;
+            _playerInput.Map.performed += OnMapKey;
 
             mapGroup = _mapUI.GetComponent<CanvasGroup>();
 
@@ -45,8 +45,8 @@ namespace Gameplay.Map
         private void OnDestroy()
         {
             // cleanup
-            if (_playerInput != null && _playerInput.MapToggle != null)
-                _playerInput.MapToggle.performed -= OnMapKey;
+            if (_playerInput != null && _playerInput.Map != null)
+                _playerInput.Map.performed -= OnMapKey;
         }
 
 

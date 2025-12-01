@@ -37,6 +37,7 @@ namespace Gameplay.Player
         private InputAction slot2_Action;
         private InputAction slot3_Action;
         private InputAction inventory_Action;
+        private InputAction map_Action;
         #endregion InputActions
 
 
@@ -93,6 +94,10 @@ namespace Gameplay.Player
         /// Input action for inventory button. Use this actions: started, performed, canceled.
         /// </summary>
         public InputAction Inventory => inventory_Action;
+        /// <summary>
+        /// Input action for inventory button. Use this actions: started, performed, canceled.
+        /// </summary>
+        public InputAction Map => map_Action;
 
         #endregion InputActionProps
 
@@ -121,6 +126,7 @@ namespace Gameplay.Player
             slot2_Action = _currentMap.FindAction("Slot_2");
             slot3_Action = _currentMap.FindAction("Slot_3");
             inventory_Action = _currentMap.FindAction("Inventory");
+            map_Action = _currentMap.FindAction("Map");
 
 
             EventManager.Broadcast(new RegisterNewPausableEvent(this));

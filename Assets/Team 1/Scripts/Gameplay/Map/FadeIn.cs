@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
-using System.Linq.Expressions;
 
 public class FadeChildrenImages : MonoBehaviour
 {
@@ -27,8 +26,8 @@ public class FadeChildrenImages : MonoBehaviour
         posY = rt.anchoredPosition.y;
         width = rt.rect.width;
         height = rt.rect.height;
-        widthHalf = width / 6f;
-        heightHalf = height / 6f;
+        widthHalf = width / 2f;
+        heightHalf = height / 2f;
 
         cg = GetComponent<CanvasGroup>();
     }
@@ -104,5 +103,4 @@ public class FadeChildrenImages : MonoBehaviour
         }
         return true;
     }
-
 }
