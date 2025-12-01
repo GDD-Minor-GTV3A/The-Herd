@@ -83,16 +83,16 @@ namespace Gameplay.Player
                 switch (Mathf.Abs(_roundYRotation / 90))
                 {
                     case 1:
-                        _x = _tempY;
-                        _y = -_tempX;
+                        _x = -_tempY;
+                        _y = _tempX;
                         break;
                     case 2:
                         _x *= -1;
                         _y *= -1;
                         break;
                     case 3:
-                        _x = -_tempY;
-                        _y = _tempX;
+                        _x = _tempY;
+                        _y = -_tempX;
                         break;
                 }
             }
@@ -163,7 +163,7 @@ namespace Gameplay.Player
 
             if (keyPoints.ChestTarget != null)
             {
-                animationConstrains.ChestAim.weight = 1;
+                animationConstrains.ChestAim.weight = .6f;
 
                 shouldersCoroutine = player.StartCoroutine(ShouldersRoutine(keyPoints.ChestTarget));
             }

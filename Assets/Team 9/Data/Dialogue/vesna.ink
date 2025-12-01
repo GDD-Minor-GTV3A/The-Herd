@@ -40,26 +40,20 @@ EXTERNAL CompleteObjective(string, string)
 Oh, hello there. You must be the newcomer to our Village? It is nice to meet you.
 
 #speaker:Player
-Yes, hello. I recently just arrived.
-
-#speaker:Narrator
-Vesna looks a bit surprised by the cold tone and short words but hides it behind a smile.
+Yes, hello. I’ve recently just arrived. 
 
 #speaker:Vesna
 I see. Did you come here by accident or were you running from something like most of us?
 
-+ [I don't think that's any of your business.]
-    #speaker:Narrator
-    Vesna’s smile drops a little and she bows her head in apology.
++ [I don’t think that’s any of your business.]
     #speaker:Vesna
-    Forgive me, you are right. Your reasons are your reasons alone and I will respect that.
+    Forgive me, you are right. Your reasons are your reasons alone and I will respect that. 
 + [My past.]
     #speaker:Vesna
-    Ah, this is the sad reality of so many of us. I am sorry that you've felt the need to do that.
-+ [Don't say anything.]
+    Ah, this is the sad reality of so many of us. I am sorry that you’ve felt the need to do that. 
++ [Don’t say anything.]
     #speaker:Vesna
-    I understand your silence, forgive me for my bluntness. I hope you do not have to keep running and feel safe enough to stay in one place.
-
+    I understand your silence, forgive me for my bluntness. 
 -
 
 #speaker:Vesna
@@ -68,158 +62,124 @@ Is there anything I can help you with?
 #speaker:Player
 No. I have come here to seek refuge, not ask for help from strangers.
 
-#speaker:Narrator
-Vesna looks unphased by the hostility of the player and keeps her warm expression.
-
 #speaker:Vesna
-That is understandable. I also came here to seek a new home as the war progressed and I was forced to leave that which was most precious to me.
-
-#speaker:Vesna
-I see you have not come with much? Are your sheep all you've got?
-
-#speaker:Narrator
-Player visibly tenses and quickly scans the area around them as if looking for sudden danger.
+I see. Seek refuge from yourself or from the war? You look like a soldier to me.
 
 #speaker:Player
-Why are you questioning me so much? You look like you don't have much either.
-
-#speaker:Narrator
-Vesna's eyes turn slightly sad and she sighs in melancholy.
+…
 
 #speaker:Vesna
-You are right. I couldn't bring my belongings with me besides the clothes on my back and flowers on my head.
-
-#speaker:Narrator
-She touches the wrist of her right hand and shakes her head as if trying to shoo away unwanted thoughts.
-
-#speaker:Vesna
-I lost something very precious to me. My bracelet, gifted to me by one of the wild horses in the valley, made by their hair and the gold from the soil underneath their feet.
-
-+ [How precious exactly was it?]
-    #speaker:Vesna
-    Very precious. It is one of a kind and worn by a Samodiva at that. If it has to be translated in human terms, it costs a fortune that can last you a lifetime.
-+ [I don't see how this is of any relevance to me.]
-    #speaker:Vesna
-    Perhaps it is not. But at the very least, you have your sheep with you who look just as precious to me. I wouldn't wish to lose them the way I lost my bracelet.
-+ [Kueze 3]
-    #speaker:Vesna
-    goede keuze
--
-
-#speaker:Vesna
-Maybe you could help me find it?
+Soldiers aren’t generally welcome here. The inhabitants of our Village have been through way too much and don’t trust your kind. 
 
 #speaker:Player
-Why would I do that? As I said, I came here to seek refuge and make sure I'm safe, not become an errand boy for random people.
-
-#speaker:Vesna
-Think of it as a favour of some kind, maybe. If you bring my bracelet, I will owe you anything you ask of me, no matter what it is. I am a creature of nature, after all, and can do things no normal human being is capable of.
-
-#speaker:Vesna
-I am also connected to animals in a way no one is. I presume that would be handy when it comes to your sheep, no?
-
-#speaker:Narrator
-The player grows extremely quiet and still, thinking hard on her proposal. It is in his best interest to keep his fami- sheep safe so maybe it is not that bad of an idea.
+I am not proud of the acts I’ve committed but that’s behind me now. 
 
 #speaker:Player
-If I do this for you, you are in my debt, correct?
+Do not condemn me for things you know nothing of. 
 
 #speaker:Vesna
-Yes, precisely.
+I am not condemning you but I cannot say the same for the rest of our Village.
 
-+ [Accept quest: I will do it]
+#speaker:Vesna
+If you want to be welcomed here, you must prove to us that you are a different person than those monsters outside.
+
+#speaker:Player
+And how do you suppose I should do that?
+
+#speaker:Vesna
+Before I came here, I had a companion with me. A beautiful stag that I shared life with.
+
+#speaker:Vesna
+But the war was just as merciless to him as it was to everyone else and he got shot as I was fleeing. His corpse is still where I left it.
+
+#speaker:Vesna
+I want to try and revive him but I will need protection while I use my magic. You could be the one I’ve been waiting for.
+
+#speaker:Player
+And what exactly makes you think I’m your so-called hero?
+
+#speaker:Vesna
+You are an ex soldier. You have good endurance and have killed before. Those skills will be very useful in this case.
+
+#speaker:Vesna
+And, this might be your opportunity to show us we can trust you. I am well-known in The Village so it will give a good impression.
+
+#speaker:Player
+Why must I prove myself to people I do not even know? How come no one else is doing this.
+
+#speaker:Vesna
+Everyone has been scarred by this war. People are scared of soldiers and you used to be one.
+
+#speaker:Vesna
+Use this chance to show us you are different from them. That you are a better man.
+
++ [(Accept Quest) i will do it]
     ~ QUEST_001_accepted = true
     ~ QUEST_001_declined = false
     ~ StartQuest("QUEST_001")
-
+    
     #speaker:Vesna
-    That is very helpful of you! Thank you. You will have to head out to **[Level 2]** and look around as much as possible. I went through that area before I came here and it's the last time I remember wearing it.
-
-    #speaker:Player
-    I will have a look. I hope this will be worth my efforts.
-    -> END
-
-+ [Decline quest: I have more important matters to attend to than this]
+    Very well. I will be waiting for you by the entrance to [Lvl2].
++ [(Decline Quest) i need time to think]
     ~ QUEST_001_accepted = false
     ~ QUEST_001_declined = true
-
+    
     #speaker:Vesna
-    That is no problem. I will be here if you decide otherwise.
-    -> END
-
+    I will be waiting here.
+-
+-> END
 = quest_declined_followup_dialogue
 #speaker:Vesna
-Oh, hello again. Have you reconsidered my request?
+Are you ready to head out now?
 
-#speaker:Player
-What request?
-
-#speaker:Vesna
-My bracelet. The one I lost in **[Level 2]**. I understand you were busy before, but I still need help finding it.
-
-#speaker:Vesna
-As I mentioned, I would be in your debt. My connection to nature and animals could be invaluable to you and your sheep.
-
-+ [Accept quest: Alright, I'll help you find it]
++ [(Accept Quest) Yes, let’s get this over with.]
     ~ QUEST_001_accepted = true
     ~ QUEST_001_declined = false
     ~ StartQuest("QUEST_001")
-
+    
     #speaker:Vesna
-    Wonderful! I truly appreciate this. Please search **[Level 2]** thoroughly. I'm certain it must be there somewhere.
-
-    #speaker:Player
-    I'll see what I can find.
-    -> END
-
-+ [Decline quest: No, I still have other priorities]
+    Very well. I will be waiting for you by the entrance to [Lvl2].
++ [(Decline Quest) No, I am not ready to do this yet.]
     ~ QUEST_001_accepted = false
     ~ QUEST_001_declined = true
-
+    
     #speaker:Vesna
-    I understand. The offer remains open whenever you're ready.
-    -> END
+    I will be waiting here.
+-
+-> END
 
 = quest_in_progress_dialogue
 #speaker:Vesna
-Oh, hello again! Have you found my bracelet yet?
-
-#speaker:Player
-Not yet. I'm still searching.
+This is it. This is where my beloved companion was killed by these monsters and I had to leave him behind.
 
 #speaker:Vesna
-I understand. Please take your time. Remember, it should be somewhere in **[Level 2]**. I have faith you will find it.
+I will start the ritual now, dear Shepherd. It is very important that I am not interrupted or disturbed in any way during the process.
+
+#speaker:Vesna
+Will that be doable for you?
 
 #speaker:Player
-I'll keep looking.
+Yes. I have done far worse than shooting at a few enemies.
+
 -> END
 
 = quest_completed_dialogue
 ~ QUEST_001_completed = true
 
 #speaker:Vesna
-Welcome back! I can see by the look in your eyes that you have good news for me.
+I am deeply thankful for your help and won’t forget this. Neither will the villager as word spreads fast.
 
 #speaker:Player
-I found your bracelet. Here it is.
+So I can assume that I will not be met with further hostility?
 
 #speaker:Vesna
-Wonderful! Ah, thank you so much! You have done me a great favor. 
+Yes, and to show you that we always pay back those who have lent us a hand, you can have one of my Blessings.
 
 #speaker:Player
-Now my part is done. You will help me when I need it, correct? 
-
-#speaker:Narrator
-Something flashes in Vesna’s eyes but her usual smile stays unchanging
+Thank you.
 
 #speaker:Vesna
-Well yes, of course. A samodiva never forgets those who have lent her a hand.
-
-#speaker:Vesna
-In fact, in order to prove my sincerity, I will give you one of my Blessings. 
-
-//Give the player a reward !!!!
-
+Take care, dear Shepherd. Find me in the village and we will talk again.
 ~ after_QUEST_001_completed = true
 -> END
 
@@ -227,6 +187,58 @@ In fact, in order to prove my sincerity, I will give you one of my Blessings.
 ~ after_QUEST_001_completed = true
 
 #speaker:Vesna
-{~Well, hello dear. I’m glad to see that you’ve familiarized yourself with the place. | Hi, there. | Ah, look at these adorable sweetings. How I love them! | If you ever need me for something, don’t feel too shy to ask.}
+Oh… you’re back. I’ve been thinking about what we saw in the forest.
+
+#speaker:Vesna
+That old woman, the one standing between the trees. She wasn’t… ordinary.
+
+
++ [You know her?]
+    #speaker:Vesna
+    Know her? No… but the villagers whisper about her. They call her Mara. The Snow Widow. She lives near the woods… when she wants to.
++ [I thought she was just a villager.]
+    #speaker:Vesna
+    If she were just a villager, the forest wouldn’t have gone silent like that.
++ [Say nothing.]
+    #speaker:Vesna
+    She appears when winter wants something. When the cold chooses someone.
+
+#speaker:Vesna
+When I saw her, I… felt something. As if she was watching you, not me.
+ And then the fog grew colder.
+
++ [Why would she watch me?]
++ [What does she want?]
++ [Where can I find her?]
+-
+
+#speaker:Vesna
+I don’t know. No one really does.
+
+#speaker:Vesna
+She lost her family long ago, some say winter itself took them. And ever since… the cold follows her.
+
+#speaker:Vesna
+But I believe she knows more about this winter than she lets anyone see.
+
+#speaker:Vesna
+If you want real answers… you should find her cabin
+
+#speaker:Vesna
+Follow the river north. When the fog clings low to the ground, her home is near
+
+#speaker:Player
+And talk to her? Just like that?
+
+#speaker:Vesna
+Be careful. Old things live in those trees. But… if anyone can help you, it’s her.
+
+#speaker:Vesna
+She doesn’t speak to most villagers. But she might speak to you.
+
+#speaker:Vesna
+The woods led you to her once, maybe they want you to find her again.
+
+~ StartQuest("QUEST_011")
 
 -> END

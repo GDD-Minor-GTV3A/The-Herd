@@ -232,6 +232,28 @@ public class QuestProgress
             StageProgresses[0].SetActive(true);
     }
 
+    public bool IsObjectiveCompleted(string objectiveID)
+    {
+        foreach (var stage in StageProgresses)
+        {
+            if (stage.IsObjectiveCompleted(objectiveID))
+                return true;
+        }
+
+        return false;
+    }
+
+    public bool IsObjectiveActive(string objectiveID)
+    {
+        foreach (var stage in StageProgresses)
+        {
+            if (stage.IsObjectiveActive(objectiveID))
+                return true;
+        }
+
+        return false;
+    }
+
     /// <summary>
     /// Adds progress to an objective in the current stage.
     /// </summary>
@@ -312,6 +334,32 @@ public class QuestStageProgress
                 0
             ));
         }
+    }
+
+    public bool IsObjectiveCompleted(string objectiveID)
+    {
+        foreach (var objective in Objectives)
+        {
+            if (objective.ObjectiveID == objectiveID)
+            {
+                return objective.IsCompleted;
+            }
+        }
+        
+        Debug.Log($"QUEST: No objective called {objectiveID}");
+        return false;
+    }
+    
+    public bool IsObjectiveActive(string objectiveID)
+    {
+        foreach (var objective in Objectives)
+        {
+            if (objective.ObjectiveID == objectiveID)
+            {
+                return objective.IsActive;
+            }
+        }
+        return false;
     }
 
     /// <summary>

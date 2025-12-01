@@ -17,13 +17,13 @@ namespace UI.ToolSlots
         private TMP_Text slotIndexText;
 
 
-        private readonly float highlightedWidth = 240f;
-        private readonly float commonWidth = 185f;
+       // private readonly float highlightedWidth = 240f;
+       // private readonly float commonWidth = 185f;
 
-        private readonly float commonAlpha = 0.5f;
+       // private readonly float commonAlpha = 0.5f;
 
-        private CanvasGroup canvasGroup;
-        private RectTransform rectTransform;
+       // private CanvasGroup canvasGroup;
+      //  private RectTransform rectTransform;
 
 
         /// <summary>
@@ -32,16 +32,16 @@ namespace UI.ToolSlots
         /// <param name="slotIndex">Index of this slot.</param>
         public void Initialize(int slotIndex)
         {
-            rectTransform = GetComponent<RectTransform>();
+           // rectTransform = GetComponent<RectTransform>();
 
-            if (!TryGetComponent(out canvasGroup))
-            {
-                canvasGroup = gameObject.AddComponent<CanvasGroup>();
-            }
+           // if (!TryGetComponent(out canvasGroup))
+           // {
+           //     canvasGroup = gameObject.AddComponent<CanvasGroup>();
+           // }
 
             slotIndexText.text = (slotIndex + 1).ToString();
 
-            SetSlotHighlight(false);
+           SetVisible(false);
         }
 
 
@@ -49,18 +49,23 @@ namespace UI.ToolSlots
         /// Changes highlighted state of the slot.
         /// </summary>
         /// <param name="highlighted">Highlighted or not.</param>
-        public void SetSlotHighlight(bool highlighted)
+       // public void SetSlotHighlight(bool highlighted)
+       // {
+           // if (highlighted)
+          //  {
+          //      rectTransform.sizeDelta = new Vector2(highlightedWidth, rectTransform.sizeDelta.y);
+          //      canvasGroup.alpha = 1;
+          //  }
+          //  else
+          //  {
+          //      rectTransform.sizeDelta = new Vector2(commonWidth, rectTransform.sizeDelta.y);
+          //     canvasGroup.alpha = commonAlpha;
+          //  }
+      // }
+
+        public void SetVisible(bool visible)
         {
-            if (highlighted)
-            {
-                rectTransform.sizeDelta = new Vector2(highlightedWidth, rectTransform.sizeDelta.y);
-                canvasGroup.alpha = 1;
-            }
-            else
-            {
-                rectTransform.sizeDelta = new Vector2(commonWidth, rectTransform.sizeDelta.y);
-                canvasGroup.alpha = commonAlpha;
-            }
+            gameObject.SetActive(visible); 
         }
     }
 }
