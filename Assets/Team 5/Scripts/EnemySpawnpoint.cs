@@ -20,6 +20,7 @@ public class EnemySpawnpoint : MonoBehaviour
     /// <param name="other"></param>
     public void spawn()
     {
+        Debug.Log("Spawn");
         switch (spawnMethod) {
             case enSpawnMethod.SpawnAll:
                 foreach (GameObject _enemy in enemies) {
