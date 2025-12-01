@@ -17,14 +17,15 @@ namespace Team_7.Scripts.AI.Phantom.States
 
         public override void OnUpdate()
         {
-            if (_running && _movement.Agent.remainingDistance < 3)
+            if (_running && _movement.Agent.remainingDistance < 3 && !IsInVisionCone(_manager.GetPlayerTransform(), _manager.transform.position, _stats.DamageAngle))
             {
                 _movement.SetMovementSpeed(_stats.moveSpeed);
                 _running = false;
+                _manager.ResetShotCounter();
             }
 
             var distance = Vector3.Distance(_manager.GetPlayerTransform().position, _manager.transform.position);
-            if (distance < _stats.shootRange && !_manager.IsBeingLookedAt() && !_running)
+            if (distance < _stats.shootRange && !_manager.IsBeingLookedAt() && !_running && _manager.GetShotCounter() < _stats.shotsBeforeDashing)
             {
                 _manager.SetState<ShootingState>();
                 return;
@@ -33,13 +34,14 @@ namespace Team_7.Scripts.AI.Phantom.States
             if (distance > _stats.shootRange && !_running)
                 _movement.MoveTo(_manager.GetPlayerTransform().position);
 
-            if (!IsInVisionCone(_manager.GetPlayerTransform(), _manager.transform.position, _stats.DamageAngle) || _running)
+            if (_running)
                 return;
 
             // Run to an area outside the players vision.
             Vector3 safePos;
-            if (FindSafeSpot(out safePos))
+            if (FindSafeSpot(out safePos) && _manager.GetShotCounter() != 0)
             {
+                _manager.ToggleVisibility(false);
                 _movement.SetMovementSpeed(_stats.sprintSpeed);
                 _movement.MoveTo(safePos);
                 _running = true;
@@ -56,7 +58,7 @@ namespace Team_7.Scripts.AI.Phantom.States
             for (int i = 0; i < 20; i++)
             {
                 Vector3 randomDir = Random.insideUnitSphere * _stats.repositionDistance;
-                randomDir += _manager.transform.position;
+                randomDir += _manager.GetPlayerTransform().position;
 
                 NavMeshHit hit;
                 if (NavMesh.SamplePosition(randomDir, out hit, 2f, NavMesh.AllAreas))
@@ -79,6 +81,11 @@ namespace Team_7.Scripts.AI.Phantom.States
             Vector3 dirToTarget = (targetPosition - player.position).normalized;
             float angle = Vector3.Angle(player.forward, dirToTarget);
             return angle < viewAngle * 0.5f;
+        }
+        
+        public override void OnStop()
+        {
+            _manager.ToggleVisibility(true);
         }
     }
 }
