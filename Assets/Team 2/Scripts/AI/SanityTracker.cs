@@ -48,7 +48,23 @@ namespace Core.AI.Sheep
         private SanityStage _currentStage;
 
         private static SanityTracker _instance;
+        
+        
+        // --------- public getters ----------
+        public static int CurrentPoints =>
+            _instance != null ? _instance._sanityPoints : 0;
 
+        public static int MaxPoints =>
+            _instance != null ? _instance._maxSanityPoints : 0;
+
+        public static float CurrentPercentage =>
+            _instance != null && _instance._maxSanityPoints > 0
+                ? (_instance._sanityPoints / (float)_instance._maxSanityPoints) * 100f
+                : 0f;
+
+        public static SanityStage CurrentStage =>
+            _instance != null ? _instance._currentStage : SanityStage.Stable;
+        
         private void Awake()
         {
             _instance = this;
