@@ -31,6 +31,10 @@ public class QuestPathManager : MonoBehaviour
     void Start()
     {
         _quest = QuestManager.Instance.GetQuestProgressByID(questID);
+        if (_quest == null)
+        {
+            Debug.LogWarning("_quest is missing");
+        }
     }
 
     private void OnCompleteObjectiveEvent(CompleteObjectiveEvent evt)
@@ -79,7 +83,7 @@ public class QuestPathManager : MonoBehaviour
     private void OnQuestStartedEvent(QuestStartedEvent evt)
     {
         if (evt.QuestID != questID) return;
-        
+        Debug.Log("QUEST_PATH_MANAGER: New Quest Started");
         _quest = QuestManager.Instance.GetQuestProgressByID(questID);
         
         if (_quest == null)
