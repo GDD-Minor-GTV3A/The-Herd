@@ -505,7 +505,10 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 6197805406145803232, guid: d392c5ed69deed24d8ffd780579185f3, type: 3}
+    - {fileID: 2474148595963371542, guid: d392c5ed69deed24d8ffd780579185f3, type: 3}
+    - {fileID: 1601581920423364753, guid: d392c5ed69deed24d8ffd780579185f3, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 2518169155179901372, guid: d392c5ed69deed24d8ffd780579185f3, type: 3}
@@ -518,6 +521,15 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2109449039902560593, guid: d392c5ed69deed24d8ffd780579185f3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1499419907}
+    - targetCorrespondingSourceObject: {fileID: 2109449039902560593, guid: d392c5ed69deed24d8ffd780579185f3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1499419908}
+    - targetCorrespondingSourceObject: {fileID: 2109449039902560593, guid: d392c5ed69deed24d8ffd780579185f3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1499419913}
+    - targetCorrespondingSourceObject: {fileID: 2109449039902560593, guid: d392c5ed69deed24d8ffd780579185f3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1499419912}
   m_SourcePrefab: {fileID: 100100000, guid: d392c5ed69deed24d8ffd780579185f3, type: 3}
 --- !u!1 &189242585
 GameObject:
@@ -7417,6 +7429,73 @@ MonoBehaviour:
   lightRange: 40
   vfxDuration: 14.23
   fadeDuration: 2.31
+--- !u!114 &1499419908
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1499419900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5b3da2cdca6c524eb96be3617c41ac2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentStateEnum: 0
+  player: {fileID: 1813006614}
+  detectionRange: 20.1
+  stalkCooldown: 0.1
+  timeToVanish: 0.1
+  playerTooFarDistance: 40.5
+  sheepDetector: {fileID: 1402191548}
+  animator: {fileID: 1402191552}
+  sheepAttackBoolName: Attack
+  attackStateName: Attack_Scarecrow
+  sheepLoseDelay: 0.5
+  vfx: {fileID: 1499419907}
+  audioSource: {fileID: 0}
+  idleSound: {fileID: 0}
+  stalkingSound: {fileID: 0}
+  teleportSound: {fileID: 0}
+  reappearSound: {fileID: 0}
+  sfxVolume: 0.8
+  idleTeleportDelay: 10
+  requireOutOfPlayerView: 1
+  requireOutOfMonsterFOV: 0
+  teleportCooldown: 1
+--- !u!114 &1499419912
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1499419900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99df09a1741b2044d988407fe83cf25a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  monsert: {fileID: 1402191553}
+  player: {fileID: 1813006614}
+--- !u!114 &1499419913
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1499419900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0baa680da3d406445ab25baded725b39, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  radius: 40
+  angle: 90
+  playerRef: {fileID: 257270651}
+  obstructionMask:
+    serializedVersion: 2
+    m_Bits: 256
+  canSeePlayer: 0
 --- !u!1001 &1574434718
 PrefabInstance:
   m_ObjectHideFlags: 0
