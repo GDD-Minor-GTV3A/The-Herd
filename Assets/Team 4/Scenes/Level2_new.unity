@@ -870,6 +870,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 2080836227}
+        m_TargetAssemblyTypeName: LevelManagerLevel2, Assembly-CSharp
+        m_MethodName: SheepEscape
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1001 &42219165
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1262,6 +1274,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a4a30dbb32fde664a9bcb61376129829, type: 3}
+--- !u!1 &55431814 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1594826984571845529, guid: a4a30dbb32fde664a9bcb61376129829, type: 3}
+  m_PrefabInstance: {fileID: 55431813}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &60595572
 GameObject:
   m_ObjectHideFlags: 0
@@ -1427,6 +1444,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a4a30dbb32fde664a9bcb61376129829, type: 3}
+--- !u!1 &63176766 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1594826984571845529, guid: a4a30dbb32fde664a9bcb61376129829, type: 3}
+  m_PrefabInstance: {fileID: 63176765}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &63531875
 GameObject:
   m_ObjectHideFlags: 0
@@ -8076,6 +8098,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a4a30dbb32fde664a9bcb61376129829, type: 3}
+--- !u!1 &548138810 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1594826984571845529, guid: a4a30dbb32fde664a9bcb61376129829, type: 3}
+  m_PrefabInstance: {fileID: 548138809}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &551779336
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9370,7 +9397,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 602418655262605976, guid: 3afce97881ac9134da0620d0dc49eb06, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 21.352966
+      value: 21.352936
       objectReference: {fileID: 0}
     - target: {fileID: 903955787581024845, guid: 3afce97881ac9134da0620d0dc49eb06, type: 3}
       propertyPath: m_AnchorMax.x
@@ -14321,6 +14348,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a4a30dbb32fde664a9bcb61376129829, type: 3}
+--- !u!1 &1023173127 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1594826984571845529, guid: a4a30dbb32fde664a9bcb61376129829, type: 3}
+  m_PrefabInstance: {fileID: 1023173126}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1023452247
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -16248,6 +16280,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a4a30dbb32fde664a9bcb61376129829, type: 3}
+--- !u!1 &1101968253 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1594826984571845529, guid: a4a30dbb32fde664a9bcb61376129829, type: 3}
+  m_PrefabInstance: {fileID: 1101968252}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1106814062 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 087a3911df138eb4c81da1a2898f6612, type: 3}
@@ -23087,6 +23124,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a4a30dbb32fde664a9bcb61376129829, type: 3}
+--- !u!1 &1529843389 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1594826984571845529, guid: a4a30dbb32fde664a9bcb61376129829, type: 3}
+  m_PrefabInstance: {fileID: 1529843388}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1531985901
 GameObject:
   m_ObjectHideFlags: 0
@@ -29691,8 +29733,19 @@ MonoBehaviour:
   EntranceDoor: {fileID: 1061994745}
   MazeDoor: {fileID: 1133875262}
   ForestDoor: {fileID: 1466278967}
-  SheepPrefab: {fileID: 4607321907588713866, guid: 1ef5723e4c34adb469f5ede693104e4a, type: 3}
-  SheepCount: 3
+  MazeExitDoor: {fileID: 378804907}
+  ReturnPathDoor: {fileID: 1789328568}
+  SheepPrefab: {fileID: 4607321907588713866, guid: 42ac047342bcef347bf1ec0ae54dd8d6, type: 3}
+  SheepModel: {fileID: 919132149155446097, guid: 1355a2f74f2c695469a5b74edf340066, type: 3}
+  EscapeSheepPlaces:
+  - {fileID: 1101968253}
+  - {fileID: 548138810}
+  - {fileID: 55431814}
+  - {fileID: 63176766}
+  - {fileID: 1023173127}
+  - {fileID: 1529843389}
+  SheepCount: 6
+  SheepWalkSpeed: 15
 --- !u!4 &2080836228
 Transform:
   m_ObjectHideFlags: 0
