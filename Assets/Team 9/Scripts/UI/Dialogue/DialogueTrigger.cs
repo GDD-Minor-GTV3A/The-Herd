@@ -12,7 +12,7 @@ public class DialogueTrigger : MonoBehaviour
     //HANDLE UI SOMEWHERE ELSE!!!!
     [SerializeField] private TextMeshProUGUI _interText;
 
-    [SerializeField] private string[] questID;
+    [SerializeField] private string questID = "";
     [SerializeField] private string objectiveID = "";
 
     private const string PLAYER_TAG = "Player";
@@ -41,7 +41,6 @@ public class DialogueTrigger : MonoBehaviour
     /// <param name="other"></param>
     private void OnTriggerStay(Collider other)
     {
-        if (!other.CompareTag(PLAYER_TAG)) return;
         if (DialogueManager.GetInstance().IsDialoguePlaying)
         {
             if (!_interText) return;
@@ -54,10 +53,7 @@ public class DialogueTrigger : MonoBehaviour
         }
         if (Input.GetKey(KeyCode.E))
         {
-            foreach(var id in questID)
-            {
-                EventManager.Broadcast(new CompleteObjectiveEvent(id, objectiveID));
-            }
+            EventManager.Broadcast(new CompleteObjectiveEvent(questID, objectiveID));
             DialogueManager.GetInstance().EnterDialogueMode(_inkJSON);
         }
         //INPUT
@@ -73,7 +69,7 @@ public class DialogueTrigger : MonoBehaviour
     {
         if (other.CompareTag(PLAYER_TAG))
         {
-            Debug.Log("NPC_TRIGGER: EXIT");
+            Debug.Log("Press E to Start Conversation");
             if (!_interText) return;
             _interText.enabled = false;
         }

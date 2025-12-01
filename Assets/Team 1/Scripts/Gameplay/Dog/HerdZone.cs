@@ -1,8 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
 using Core.AI.Sheep;
-using Gameplay.SheepEffects;
-using Core.AI.Sheep.Config;
 
 namespace Gameplay.Dog
 {
@@ -10,7 +8,7 @@ namespace Gameplay.Dog
     /// Handles logic of zone where player can add sheep to herd.
     /// </summary>
     [RequireComponent(typeof(Collider))]
-    public class HerdZone : MonoBehaviour, ISheepEffectsEventsHandler
+    public class HerdZone : MonoBehaviour
     {
         [Header("Herding Settings")]
         [SerializeField, Tooltip("Time when sheep can not be lost after adding to herd.")] 
@@ -21,9 +19,6 @@ namespace Gameplay.Dog
 
 
         private List<SheepStateManager> freeSheep = new();
-        private SphereCollider sphereCollider;
-
-        PersonalityType ISheepEffectsEventsHandler.PersonalityType => PersonalityType.Nino;
 
 
         /// <summary>
@@ -31,9 +26,8 @@ namespace Gameplay.Dog
         /// </summary>
         public void Initialize()
         {
-            sphereCollider = GetComponent<SphereCollider>();
-            sphereCollider.isTrigger = true;
-            SheepEffectsDispatcher.AddNewListener(this);
+            Collider _collider = GetComponent<Collider>();
+            _collider.isTrigger = true;
         }
 
 
@@ -106,17 +100,6 @@ namespace Gameplay.Dog
         public bool IsFreeSheepToHeard()
         {
             return freeSheep.Count != 0;
-        }
-
-
-        void ISheepEffectsEventsHandler.OnSheepJointHerd(SheepArchetype archetype)
-        {
-            // TO-DO: Decrease sphere collider radius on value from archetype
-        }
-
-        void ISheepEffectsEventsHandler.OnSheepLeftHerd(SheepArchetype archetype)
-        {
-            // TO-DO: Increase sphere collider radius on value from archetype
         }
     }
 }
