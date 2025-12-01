@@ -6,6 +6,8 @@ using Core.Shared.Utilities;
 using Team_7.Scripts.AI.Drekavac.States;
 
 using UnityEngine;
+using UnityEngine.AI;
+using Core.AI.Sheep;
 
 namespace Team_7.Scripts.AI.Drekavac
 {
@@ -99,22 +101,25 @@ namespace Team_7.Scripts.AI.Drekavac
                 Flee();
         }
 
-        private void OnCollisionEnter(Collision collision)
+        private void OnTriggerEnter(Collider other)
         {
-            if (_currentState is HuntingState && collision.gameObject.CompareTag("Sheep"))
+            if (_currentState is HuntingState && other.CompareTag("Sheep"))
             {
-                GrabObject(collision.gameObject);
+                Debug.Log("triggered");
+                GrabObject(other.gameObject);
             }
         }
-        
+
         private void GrabObject(GameObject grabbedObject)
         {
-            Debug.Log(gameObject.name + " is grabbing " + grabbedObject.name); // Chris: Temporary debug to check if the enemy gets the sheep
             if (grabbedObject == null) return;
             CreateGrabPoint();
-            //IMP02 CODE FOR DISABELING SHEEP AI WHEN GRABBED
+            //CODE FOR DISABELING SHEEP AI WHEN GRABBED
+            NavMeshAgent SSM = grabbedObject.GetComponent<NavMeshAgent>();
+            SSM.enabled = false;
 
-            // 
+            Rigidbody rb = grabbedObject.GetComponent<Rigidbody>();
+            rb.isKinematic = false;
 
             _enemyMovementController.ResetAgent();
 
@@ -178,7 +183,11 @@ namespace Team_7.Scripts.AI.Drekavac
         public void ReleaseGrabbedObject()
         {
             if (_grabbedObject is null) return;
+            NavMeshAgent SSM = _grabbedObject.GetComponent<NavMeshAgent>();
+            SSM.enabled = true;
 
+            Rigidbody rb = _grabbedObject.GetComponent<Rigidbody>();
+            rb.isKinematic = true;
             _grabbedObject.transform.SetParent(null, true);
 
             if (_grabbedObjectRb is not null)
