@@ -29,10 +29,11 @@ public class MapPlayerPosition : MonoBehaviour
         float mapX = (normX * mapRect.rect.width) - (mapRect.rect.width / 2f);
         float mapY = (normY * mapRect.rect.height) - (mapRect.rect.height / 2f);
 
-        float rotatedX = -mapY - startxoffset;
-        float rotatedY = -mapX - startyoffset;
+        float rotatedX = mapX - startxoffset;
+        float rotatedY = mapY - startyoffset;
 
-        playerIcon.anchoredPosition = new Vector2(rotatedY, rotatedX);
+
+        playerIcon.anchoredPosition = new Vector2(rotatedX, rotatedY);
         
         if (counter >= 120)
         {
@@ -47,7 +48,7 @@ public class MapPlayerPosition : MonoBehaviour
             if (area.checkForReveal(x, y))
             {
                 area.FadeIn();     // reveal
-            }
+            } 
         }
     }
 
