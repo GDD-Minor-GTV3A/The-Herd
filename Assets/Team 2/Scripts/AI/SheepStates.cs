@@ -253,6 +253,62 @@ namespace Core.AI.Sheep
         }
     }
 
+    public sealed class SheepMoveState : IState
+    {
+        private readonly SheepStateManager _stateManager;
+
+        private Vector3 _target;
+        private float _stopDistance = 0.5f;
+        private bool _hasTarget;
+
+        public SheepMoveState(SheepStateManager context)
+        {
+            _stateManager = context;
+        }
+
+        public void Configure(Vector3 target, float stopDistance)
+        {
+            _target = target;
+            _stopDistance = Mathf.Max(0.1f, stopDistance);
+            _hasTarget = true;
+        }
+
+        public void OnStart()
+        {
+            if (!_stateManager || !_stateManager.CanControlAgent()) return;
+
+            var agent = _stateManager.Agent;
+            agent.isStopped = false;
+            agent.ResetPath();
+        }
+
+        public void OnUpdate()
+        {
+            if (!_hasTarget) return;
+            if (!_stateManager || !_stateManager.CanControlAgent()) return;
+            
+            var agent =  _stateManager.Agent;
+            _stateManager.SetDestinationWithHerding(_target);
+            if (agent.pathPending) return;
+            
+            Vector3 toTarget = _target - _stateManager.transform.position;
+            toTarget.y = 0f;
+
+            if (toTarget.sqrMagnitude <= _stopDistance * _stopDistance)
+            {
+                _stateManager.OnSheepFreeze();
+            }
+        }
+
+        public void OnStop()
+        {
+            if (_stateManager && _stateManager.CanControlAgent())
+            {
+                _stateManager.Agent.isStopped = false;
+            }
+        }
+    }
+
     public sealed class SheepPettingState : IState
     {
         private readonly SheepStateManager _stateManager;
