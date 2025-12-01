@@ -317,7 +317,7 @@ namespace Core.AI.Sheep
         private readonly SheepScareHandler _scareHandler;
 
         private const float STOP_THRESHOLD = 0.25f;
-        private const float RUN_DISTANCE = 150f;
+        private const float RUN_DISTANCE = 85f;
         private const float NAVMESH_SEARCH_RADIUS = 25f;
 
         private bool _hasDestination;
