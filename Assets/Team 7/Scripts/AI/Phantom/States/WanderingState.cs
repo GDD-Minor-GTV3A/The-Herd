@@ -22,6 +22,7 @@ namespace Team_7.Scripts.AI.Phantom.States
                 _movement.SetMovementSpeed(_stats.moveSpeed);
                 _running = false;
                 _manager.ResetShotCounter();
+                _movement.Agent.velocity = Vector3.zero;
             }
 
             var distance = Vector3.Distance(_manager.GetPlayerTransform().position, _manager.transform.position);
