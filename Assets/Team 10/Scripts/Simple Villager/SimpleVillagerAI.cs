@@ -114,7 +114,7 @@ public class SimpleVillagerAI : MonoBehaviour
 
         // Still no valid point? Stay idle for a short period before retrying
         idleTimer = wanderRetryDelay;
-        Debug.Log("Failed to find valid point after fallback: " + gameObject.name);
+        //Debug.Log("Failed to find valid point after fallback: " + gameObject.name);
     }
 
     // -----------------------------
