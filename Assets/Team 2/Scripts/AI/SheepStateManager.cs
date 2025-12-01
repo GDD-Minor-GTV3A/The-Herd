@@ -345,6 +345,7 @@ namespace Core.AI.Sheep
         {
             if (_diedByDistance) return;
             if (_config == null) return;
+            if (_startAsStraggler) return;
 
             float killDist = _config.DeathDistance;
             if (killDist <= 0f) return;
