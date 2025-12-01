@@ -198,6 +198,7 @@ namespace Core.AI.Sheep
                 {typeof(SheepGrazeState), new SheepGrazeState(this)},
                 {typeof(SheepWalkAwayFromHerdState), new SheepWalkAwayFromHerdState(this)},
                 {typeof(SheepFreezeState), new SheepFreezeState(this)},
+                {typeof(SheepMoveState), new SheepMoveState(this)},
                 {typeof(SheepPettingState), new SheepPettingState(this)},
                 {typeof(SheepScaredState), new SheepScaredState(this)},
                 {typeof(SheepDieState), new SheepDieState(this)},
@@ -281,7 +282,8 @@ namespace Core.AI.Sheep
                 || _currentState is SheepScaredState
                 || _currentState is SheepFreezeState
                 || _currentState is SheepDieState
-                || _currentState is SheepPettingState) return;
+                || _currentState is SheepPettingState
+                || _currentState is SheepMoveState) return;
 
             //Decide on state
             bool outside = FlockingUtility.IsOutSquare(transform.position, _playerCenter, _playerHalfExtents);
@@ -700,6 +702,26 @@ namespace Core.AI.Sheep
                    && Agent.enabled
                    && Agent.isOnNavMesh
                    && gameObject.activeInHierarchy;
+        }
+
+        public void MoveToPoint(Vector3 target, float stopDistance = 0.5f)
+        {
+            if (StatesMap == null)
+                InitializeStatesMap();
+
+            if (!StatesMap.TryGetValue(typeof(SheepMoveState), out var state))
+            {
+                return;
+            }
+            
+            var moveState = state as SheepMoveState;
+            if (moveState == null)
+            {
+                return;
+            }
+            
+            moveState.Configure(target, stopDistance);
+            SetState<SheepMoveState>();
         }
 
         public IState GetState() => _currentState;
