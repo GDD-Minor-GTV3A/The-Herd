@@ -35,7 +35,7 @@ public class MapPlayerPosition : MonoBehaviour
 
         playerIcon.anchoredPosition = new Vector2(rotatedX, rotatedY);
         
-        if (counter >= 120)
+        if (counter >= 10)
         {
             checkAreaFade(rotatedX, rotatedY);
             counter = 0;
