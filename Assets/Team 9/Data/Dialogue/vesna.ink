@@ -149,7 +149,18 @@ Are you ready to head out now?
 -> END
 
 = quest_in_progress_dialogue
-you didnt finish yet weirdo
+#speaker:Vesna
+This is it. This is where my beloved companion was killed by these monsters and I had to leave him behind.
+
+#speaker:Vesna
+I will start the ritual now, dear Shepherd. It is very important that I am not interrupted or disturbed in any way during the process.
+
+#speaker:Vesna
+Will that be doable for you?
+
+#speaker:Player
+Yes. I have done far worse than shooting at a few enemies.
+
 -> END
 
 = quest_completed_dialogue
