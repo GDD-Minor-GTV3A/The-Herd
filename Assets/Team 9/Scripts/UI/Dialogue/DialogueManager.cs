@@ -530,6 +530,18 @@ public class DialogueManager : MonoBehaviour
         EventManager.Broadcast(new CompleteObjectiveEvent(questID, objectiveID));
         Debug.Log("Completed Objective through dialogue");
     }
+
+    public void OnObjectiveCompleted(ObjectiveCompletedEvent evt)
+    {
+        string objectiveID = evt.ObjectiveID;
+        string inkVariableName = objectiveID + "_completed";
+        if (!string.IsNullOrEmpty(inkVariableName))
+        {
+            SetInkVariable(inkVariableName, true);
+            Debug.Log($"Set Ink variable '{inkVariableName}' to true for completed objective {objectiveID}");
+        }
+    }
+    
     
     /// <summary>
     /// Called through the EventSystem/Manager

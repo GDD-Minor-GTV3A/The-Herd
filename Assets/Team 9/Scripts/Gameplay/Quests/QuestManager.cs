@@ -139,6 +139,7 @@ public class QuestManager : MonoBehaviour
             Debug.Log($"Quest complete: {questProgress.Quest.QuestName}");
         }
 
+        EventManager.Broadcast(new ObjectiveCompletedEvent(objectiveID));
         EventManager.Broadcast(new QuestUpdateEvent(questID));
     }
     
