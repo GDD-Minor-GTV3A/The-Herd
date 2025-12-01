@@ -1,5 +1,4 @@
 using System.Collections;
-
 using Core.Events;
 using Core.Shared.Utilities;
 using Unity.Cinemachine;
@@ -14,18 +13,35 @@ namespace Gameplay.CameraSettings
     public class CameraManager : MonoBehaviour
     {
         [Header("Cameras")]
-        [SerializeField, Required, Tooltip("Main camera.")] private Camera mainCamera;
-        [SerializeField, Required, Tooltip("Main CinemachineCamera.")] private CinemachineCamera virtualCamera;
+        [SerializeField, Required, Tooltip("Main camera.")] 
+        private Camera mainCamera;
+
+        [SerializeField, Required, Tooltip("Main CinemachineCamera.")] 
+        private CinemachineCamera virtualCamera;
 
         [Space]
-        [SerializeField, Required, Tooltip("Camera config.")] private CameraConfig config;
-        [SerializeField, Required, Tooltip("Player transform for camera to follow.")] private Transform playerTransform;
+        [SerializeField, Required, Tooltip("Camera config.")] 
+        private CameraConfig config;
+
+        [SerializeField, Required, Tooltip("Player transform for camera to follow.")] 
+        private Transform playerTransform;
 
 
         private CinemachinePositionComposer composer;
         private CinemachineBasicMultiChannelPerlin cameraNoise;
         private Coroutine shakeRoutine;
 
+
+        /// <summary>
+        /// Shakes camera for specific amount of time. 
+        /// </summary>
+        /// <param name="time">How long camera will be shaking.</param>
+        public void ShakeCamera(float time)
+        {
+            if (shakeRoutine != null)
+                StopCoroutine(shakeRoutine);
+            shakeRoutine = StartCoroutine(ShakeCameraRoutine(time));
+        }
 
 
         private void UpdateCameraSettings(CameraConfig newConfig)
@@ -68,14 +84,6 @@ namespace Gameplay.CameraSettings
         }
 
 
-        public void ShakeCamera(float time)
-        {
-            if (shakeRoutine != null)
-                StopCoroutine(shakeRoutine);
-            shakeRoutine = StartCoroutine(ShakeCameraRoutine(time));
-        }
-
-
         private IEnumerator ShakeCameraRoutine(float time)
         {
             cameraNoise.AmplitudeGain = 1f;
@@ -84,7 +92,7 @@ namespace Gameplay.CameraSettings
         }
 
 
-        public void CameraZoom(ZoomCameraEvent evt)
+        private void CameraZoom(ZoomCameraEvent evt)
         {
             if (config.Type == CameraType.Orthographic)
             {
@@ -114,7 +122,6 @@ namespace Gameplay.CameraSettings
             if (config != null)
                 config.OnValueChanged -= UpdateCameraSettings;
         }
-
 
         private void OnValidate()
         {

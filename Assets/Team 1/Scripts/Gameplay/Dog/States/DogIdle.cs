@@ -1,5 +1,4 @@
-﻿
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 
 namespace Gameplay.Dog
@@ -9,62 +8,60 @@ namespace Gameplay.Dog
     /// </summary>
     public class DogIdle : DogState
     {
-        private readonly Transform _player;
-        private readonly float _distanceToStartFollow;
+        private readonly Transform playerTransform;
+        private readonly float distanceToStartFollow;
 
-        private Coroutine _delayCoroutine;
-        private readonly DogAnimator _animator;
+        private Coroutine delayCoroutine;
 
 
         /// <param name="playerTransform">Transform of player object to follow.</param>
         /// <param name="distanceToStartFollow">Distance between dog and player to start move.</param>
         public DogIdle(DogStateManager manager, Transform playerTransform, float distanceToStartFollow) : base(manager)
         {
-            _player = playerTransform;
-            _distanceToStartFollow = distanceToStartFollow;
-
-            _animator = manager.AnimatorController as DogAnimator;
+            this.playerTransform = playerTransform;
+            this.distanceToStartFollow = distanceToStartFollow;
         }
 
 
         public override void OnStart()
         {
-            _manager.CurrentCommandTarget.OnValueChanged += OnTargetChanged;
-            _animator.SetWalking(false);
+            manager.CurrentCommandTarget.OnValueChanged += OnTargetChanged;
+            animator.SetWalking(false);
         }
 
         public override void OnStop()
         {
-            if (_delayCoroutine != null)
+            if (delayCoroutine != null)
             {
-                _manager.StopCoroutine(_delayCoroutine);
-                _delayCoroutine = null;
+                manager.StopCoroutine(delayCoroutine);
+                delayCoroutine = null;
             }
 
-            _manager.CurrentCommandTarget.OnValueChanged -= OnTargetChanged;
+            manager.CurrentCommandTarget.OnValueChanged -= OnTargetChanged;
         }
 
         public override void OnUpdate()
         {
-            if (_manager.HeardZone.IsFreeSheepToHeard())
-                _manager.SetState<DogMoveToSheep>();
+            if (manager.HerdZone.IsFreeSheepToHeard())
+                manager.SetState<DogMoveToSheep>();
 
 
-            if (Vector3.Distance(_manager.MovementController.transform.position, _player.position) > _distanceToStartFollow && _delayCoroutine == null)
-                _delayCoroutine = _manager.StartCoroutine(MoveDelay());
+            if (Vector3.Distance(manager.MovementController.transform.position, playerTransform.position) > distanceToStartFollow && delayCoroutine == null)
+                delayCoroutine = manager.StartCoroutine(MoveDelayRoutine());
         }
 
 
-        private IEnumerator MoveDelay()
+        private IEnumerator MoveDelayRoutine()
         {
             yield return new WaitForSeconds(1.5f);
-            _delayCoroutine = null;
-            _manager.SetState<DogFollowPlayer>();
+            delayCoroutine = null;
+            manager.SetState<DogFollowPlayer>();
         }
+
 
         private void OnTargetChanged()
         {
-            _manager.SetState<DogMove>();
+            manager.SetState<DogMove>();
         }
     }
 }
