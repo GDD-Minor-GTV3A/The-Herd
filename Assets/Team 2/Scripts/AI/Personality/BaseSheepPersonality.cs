@@ -284,7 +284,7 @@ namespace Core.AI.Sheep.Personality
             var clip = sheep.Archetype?.LeaveHerdSound;
             if (clip)
             {
-                sheep.SoundDriver.ForcePlayBleatSound(
+                sheep.SoundDriver.PlayMiscSound(
                     clip,
                     1.0f,
                     Random.Range(0.95f, 1.05f));
@@ -297,7 +297,7 @@ namespace Core.AI.Sheep.Personality
             var clip = sheep.Archetype?.JoinHerdSound;
             if (clip)
             {
-                sheep.SoundDriver.ForcePlayBleatSound(
+                sheep.SoundDriver.PlayMiscSound(
                     clip,
                     1.0f,
                     Random.Range(0.95f, 1.05f));

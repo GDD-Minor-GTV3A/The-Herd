@@ -1,8 +1,6 @@
-
-
+using Core.AI.Sheep.Config;
 using UnityEngine;
 using UnityEngine.Serialization;
-using UnityEngine.Internal;
 
 public class SheepSoundDriver : MonoBehaviour
 {
@@ -45,25 +43,23 @@ public class SheepSoundDriver : MonoBehaviour
     
     public bool TryPlayWalkSound()
     {
-        if (SheepSoundManager.Instance == null || _walkingSound == null || _walkingAudioSource == null) return false;
         if (_nextMomentWalkSound > Time.time) return false;
 
-        PlaySoundClipInternal(_walkingSound, AudioSourceWalking, FOOTSTEPS_VOLUME, Random.Range(LOWEST_FOOTSTEPS_PITCH, HEIGHEST_FOOTSTEPS_PITCH));
+        PlaySoundClipInternal(_walkingSound, _walkingAudioSource, FOOTSTEPS_VOLUME, Random.Range(LOWEST_FOOTSTEPS_PITCH, HEIGHEST_FOOTSTEPS_PITCH));
 
         _nextMomentWalkSound = Time.time + _walkingSound.length + Random.Range(MIN_TIME_BETWEEN_FOOTSTEPS, MAX_TIME_BETWEEN_FOOTSTEPS);
         return true;
     }
 
 
-    public bool TryPlayBleatSound(Transform sheepTransform, SheepArchetype sheepArchetype)
+    public bool TryPlayBleatSound(SheepArchetype sheepArchetype)
     {
-        if (SheepSoundManager.Instance == null || sheepArchetype == null || _bleatingAudioSource == null) return false;
         if (_nextMomentBleatSound > Time.time) return false;
         
         AudioClip bleatSound = sheepArchetype.BleatSounds[Random.Range(0, sheepArchetype.BleatSounds.Length)];
         if (bleatSound == null) return false;
 
-        PlaySoundClipInternal(bleatSound, AudioSourceBleat, BLEATS_VOLUME, Random.Range(LOWEST_FOOTSTEPS_PITCH, HEIGHEST_FOOTSTEPS_PITCH));
+        PlaySoundClipInternal(bleatSound, _bleatingAudioSource, BLEATS_VOLUME, Random.Range(LOWEST_FOOTSTEPS_PITCH, HEIGHEST_FOOTSTEPS_PITCH));
 
         _nextMomentBleatSound = Time.time + bleatSound.length + Random.Range(MIN_TIME_BETWEEN_BLEATS, MAX_TIME_BETWEEN_BLEATS);
         return true;
@@ -71,13 +67,7 @@ public class SheepSoundDriver : MonoBehaviour
 
     public void PlayMiscSound(AudioClip clip, float volume = 1.0f, float pitch = 1.0f)
     {
-        if (SheepSoundManager.Instance == null || _miscAudioSource == null) return;
-        SheepSoundManager.Instance.PlaySoundClip(clip, _miscAudioSource, volume, pitch);
-    }
-
-    public void ForcePlayBleatSound(AudioClip clip, float volume = 1f, float pitch = 1f)
-    {
-        PlaySoundClipInternal(clip, AudioSourceBleat, volume, pitch);
+        PlaySoundClipInternal(clip, _miscAudioSource, volume, pitch);
     }
 
     private static void PlaySoundClipInternal(AudioClip clip, AudioSource audioSource, float volume, float pitch)

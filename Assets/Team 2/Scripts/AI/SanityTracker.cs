@@ -136,12 +136,12 @@ namespace Core.AI.Sheep
             if (newThreshold > oldThreshold)
             {
                 // Spawn a sheep (doesn't count towards sanity)
-                SpawnSheep();
+                var sheep = SpawnSheep();
 
                 var clip = _sanityAddSound;
                 if (clip)
                 {
-                    sheep.SoundDriver.ForcePlayBleatSound(
+                    sheep?.SoundDriver.PlayMiscSound(
                         clip,
                         1.0f,
                         Random.Range(0.9f, 1.05f));
@@ -167,12 +167,12 @@ namespace Core.AI.Sheep
             if (newThreshold < oldThreshold && _sanityPoints > 0)
             {
                 // Remove furthest sheep (TODO: sheep should flee instead of instant removal)
-                RemoveFurthestSheep();
+                var removedSheep = RemoveFurthestSheep();
 
                 var clip = _sanityRemoveSound;
                 if (clip)
                 {
-                    removedSheep.SoundDriver.ForcePlayBleatSound(
+                    removedSheep?.SoundDriver.PlayMiscSound(
                         clip,
                         1.0f,
                         Random.Range(0.9f, 1.1f));
@@ -185,18 +185,19 @@ namespace Core.AI.Sheep
         /// <summary>
         /// Spawns a sheep out of view, walking towards the player
         /// </summary>
-        private void SpawnSheep()
+        /// <returns>The newly spawned Sheep</returns>
+        private SheepStateManager SpawnSheep()
         {
             if (_sheepPrefab == null)
             {
                 Debug.LogWarning("[SanityTracker] No sheep prefab assigned. Cannot spawn sheep.");
-                return;
+                return null;
             }
 
             if (_playerTransform == null)
             {
                 Debug.LogWarning("[SanityTracker] No player transform assigned. Cannot spawn sheep.");
-                return;
+                return null;
             }
 
             // Calculate spawn position out of view
@@ -219,6 +220,8 @@ namespace Core.AI.Sheep
             {
                 Debug.LogError("[SanityTracker] Spawned sheep prefab does not have SheepStateManager component!");
             }
+
+            return newSheep;
         }
 
         /// <summary>
@@ -250,12 +253,13 @@ namespace Core.AI.Sheep
         /// Removes the sheep furthest from the player
         /// NOTE: For now removes instantly, but should make sheep flee instead
         /// </summary>
-        private void RemoveFurthestSheep()
+        /// <returns>The removed Sheep</returns>
+        private SheepStateManager RemoveFurthestSheep()
         {
             if (_playerTransform == null)
             {
                 Debug.LogWarning("[SanityTracker] No player transform assigned. Cannot remove furthest sheep.");
-                return;
+                return null;
             }
 
             // Find all sheep in the scene
@@ -264,7 +268,7 @@ namespace Core.AI.Sheep
             if (allSheep.Length == 0)
             {
                 Debug.LogWarning("[SanityTracker] No sheep found to remove.");
-                return;
+                return null;
             }
 
             // Find the furthest sheep from player
@@ -278,6 +282,7 @@ namespace Core.AI.Sheep
                 // TODO: Make sheep flee instead of instant removal
                 furthestSheep.Remove();
             }
+            return furthestSheep;
         }
 
         /// <summary>
