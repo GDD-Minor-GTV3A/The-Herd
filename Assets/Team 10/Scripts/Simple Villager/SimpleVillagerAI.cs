@@ -10,6 +10,9 @@ public class SimpleVillagerAI : MonoBehaviour
     public NavMeshAgent agent;      // Reference to the NavMeshAgent component
     public Collider wanderArea;     // Collider defining the NPC's allowed movement zone
 
+    [Header("Animator")]
+    public Animator animator;  // Animator for controlling animations
+
     [Header("Settings")]
     public float idleTimeMin = 1.5f;    // Minimum idle time in seconds
     public float idleTimeMax = 4f;      // Maximum idle time in seconds
@@ -43,6 +46,13 @@ public class SimpleVillagerAI : MonoBehaviour
             case State.Walking: UpdateWalking(); break;
             case State.Idle: UpdateIdle(); break;
         }
+
+        if (animator != null)
+        {
+            float targetSpeed = (currentState == State.Walking) ? 1f : 0f;
+            float currentSpeed = animator.GetFloat("Speed");
+            animator.SetFloat("Speed", Mathf.Lerp(currentSpeed, targetSpeed, Time.deltaTime * 5f));
+        }
     }
 
     // -----------------------------
@@ -70,15 +80,18 @@ public class SimpleVillagerAI : MonoBehaviour
     private void EnterIdleState()
     {
         currentState = State.Idle;
-        idleTimer = Random.Range(idleTimeMin, idleTimeMax); // Random idle duration
-        agent.ResetPath(); // Stop movement
-        // TODO: Trigger idle animation here if NPC team provides one
+        idleTimer = Random.Range(idleTimeMin, idleTimeMax);
+        agent.ResetPath();
+
+        if (animator != null)
+            animator.SetFloat("Speed", 0f); // Idle animation
     }
 
     private void EnterWalkingState()
     {
         currentState = State.Walking;
-        // TODO: Trigger walking animation here if NPC team provides one
+        if (animator != null)
+            animator.SetFloat("Speed", 1f); // Walking animation
     }
 
     // -----------------------------
