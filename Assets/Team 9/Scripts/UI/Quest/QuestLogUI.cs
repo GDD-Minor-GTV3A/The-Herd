@@ -22,6 +22,8 @@ public class QuestLogUI : MonoBehaviour
     /// </summary>
     [SerializeField] private GameObject questEntryPrefab;
 
+    [SerializeField] private GameObject noActiveQuestsMessage;
+    
     /// <summary>
     /// A dictionary that maps quest IDs to their corresponding <see cref="QuestUIEntry"/> components.
     /// </summary>
@@ -51,6 +53,8 @@ public class QuestLogUI : MonoBehaviour
         }
         
         SetQuestLogVisibility(false);
+        
+        CheckEmptyState();
         
         Instance = this;
         transform.SetParent(null);
@@ -121,6 +125,8 @@ public class QuestLogUI : MonoBehaviour
 
         var questUiEntry = _questEntries[evt.QuestID];
         questUiEntry.RefreshObjectives();
+        
+        CheckEmptyState();  
     }
 
     /// <summary>
@@ -144,6 +150,8 @@ public class QuestLogUI : MonoBehaviour
         //Maybe rework this for new log
         Destroy(_questEntries[evt.QuestID].gameObject);
         _questEntries.Remove(evt.QuestID);
+        
+        CheckEmptyState();
     }
 
     private void Update()
@@ -174,4 +182,17 @@ public class QuestLogUI : MonoBehaviour
             questLogUI.gameObject.SetActive(isVisible);
         }
     }
+    
+    /// <summary>
+    /// Checks if there are any active quests and toggles the "No Active Quests" text.
+    /// </summary>
+    private void CheckEmptyState()
+    {
+        if (noActiveQuestsMessage != null)
+        {
+            // If count is 0, set active (true). If count > 0, set inactive (false).
+            noActiveQuestsMessage.SetActive(_questEntries.Count == 0);
+        }
+    }
+    
 }

@@ -7052,7 +7052,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &297462551
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7501,6 +7501,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 304648381}
   m_CullTransparentMesh: 1
+--- !u!1 &305846797 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7027284993373533033, guid: aff58616468d0b24ab1951d994dfba8c, type: 3}
+  m_PrefabInstance: {fileID: 9000343087954030258}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &312872546
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -28401,6 +28406,7 @@ MonoBehaviour:
   questListContainer: {fileID: 0}
   questLogUI: {fileID: 0}
   questEntryPrefab: {fileID: 0}
+  noActiveQuestsMessage: {fileID: 0}
 --- !u!1 &1252826870
 GameObject:
   m_ObjectHideFlags: 0
@@ -49875,6 +49881,46 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 14418323142293330, guid: aff58616468d0b24ab1951d994dfba8c, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 248266406569994139, guid: aff58616468d0b24ab1951d994dfba8c, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 248266406569994139, guid: aff58616468d0b24ab1951d994dfba8c, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 248266406569994139, guid: aff58616468d0b24ab1951d994dfba8c, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 248266406569994139, guid: aff58616468d0b24ab1951d994dfba8c, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 248266406569994139, guid: aff58616468d0b24ab1951d994dfba8c, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 248266406569994139, guid: aff58616468d0b24ab1951d994dfba8c, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2938828598180083928, guid: aff58616468d0b24ab1951d994dfba8c, type: 3}
+      propertyPath: noActiveQuestsMessage
+      value: 
+      objectReference: {fileID: 305846797}
+    - target: {fileID: 2957605751983909923, guid: aff58616468d0b24ab1951d994dfba8c, type: 3}
+      propertyPath: m_fontSize
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 2957605751983909923, guid: aff58616468d0b24ab1951d994dfba8c, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 20
+      objectReference: {fileID: 0}
     - target: {fileID: 4040655705343308357, guid: aff58616468d0b24ab1951d994dfba8c, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -49945,7 +49991,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5625516269780751709, guid: aff58616468d0b24ab1951d994dfba8c, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -41
+      value: -50.005
       objectReference: {fileID: 0}
     - target: {fileID: 5921345934599049731, guid: aff58616468d0b24ab1951d994dfba8c, type: 3}
       propertyPath: m_LocalPosition.x
