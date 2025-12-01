@@ -1,35 +1,28 @@
 using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
-using System.Collections.Generic;
 using Core.AI.Sheep;
+using System.Collections.Generic;
 
 public class SheepPenController : MonoBehaviour
 {
-    [Header("Exit / Return Points")]
-    public Transform exitPoint;
-    public Transform penPoint; // where sheep should regroup inside
+    [Header("Pen Behavior")]
+    [SerializeField] private Transform penPoint;
+    [SerializeField] private float penRadius = 5f;
+    [SerializeField] private float sheepStopDistance = 0.5f;
 
-    private HashSet<SheepStateManager> sheepInPen = new();
+    [Header("Interaction")]
+    [SerializeField] private KeyCode interactKey = KeyCode.E;
+
     private bool playerInRange = false;
     private bool sheepOutside = false;
-    private bool isMovingSheep = false;
+    private bool isProcessing = false;
 
     public bool PlayerInRange => playerInRange;
     public bool SheepOutside => sheepOutside;
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Sheep"))
-        {
-            var sheep = other.GetComponentInParent<SheepStateManager>();
-            if (sheep != null)
-            {
-                sheepInPen.Add(sheep);
-                Debug.Log($"[SheepPen] Sheep added: {sheep.name}");
-            }
-        }
-
         if (other.CompareTag("Player"))
         {
             playerInRange = true;
@@ -39,16 +32,6 @@ public class SheepPenController : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Sheep"))
-        {
-            var sheep = other.GetComponentInParent<SheepStateManager>();
-            if (sheep != null)
-            {
-                sheepInPen.Remove(sheep);
-                Debug.Log($"[SheepPen] Sheep removed: {sheep.name}");
-            }
-        }
-
         if (other.CompareTag("Player"))
         {
             playerInRange = false;
@@ -58,93 +41,110 @@ public class SheepPenController : MonoBehaviour
 
     private void Update()
     {
-        if (!playerInRange || isMovingSheep) return;
+        if (!playerInRange || isProcessing) return;
 
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyDown(interactKey))
         {
             if (!sheepOutside)
             {
                 sheepOutside = true;
-                Debug.Log("[SheepPen] Releasing all sheep");
-                StartCoroutine(MoveAllSheep(exitPoint.position));
+                Debug.Log("[SheepPen] Player requested: STORE ALL SHEEP");
+                StartCoroutine(SendAllSheepToPen());
             }
             else
             {
                 sheepOutside = false;
-                Debug.Log("[SheepPen] Calling back all sheep");
-                StartCoroutine(MoveAllSheep(penPoint.position));
+                Debug.Log("[SheepPen] Player requested: RELEASE ALL SHEEP");
+                ReleaseAllSheep();
             }
         }
     }
 
-    private IEnumerator MoveAllSheep(Vector3 target)
+    // Send all sheep to random points inside the pen area
+    private IEnumerator SendAllSheepToPen()
     {
-        isMovingSheep = true;
+        if (penPoint == null)
+        {
+            Debug.LogError("[SheepPen] penPoint is not assigned!");
+            yield break;
+        }
 
-        List<Coroutine> coroutines = new();
+        isProcessing = true;
 
-        // Move all sheep at once
-        foreach (var sheep in sheepInPen)
+        var all = SheepStateManager.AllSheep;
+        Debug.Log($"[SheepPen] Sending {all.Count} sheep to pen (radius={penRadius})");
+
+        foreach (var sheep in all)
         {
             if (sheep == null) continue;
 
-            sheep.OnSheepUnfreeze();
-            sheep.SetState<SheepFollowState>();
-            coroutines.Add(StartCoroutine(MoveSheepToPoint(sheep, target)));
-        }
-
-        // Also include any sheep outside when calling back
-        if (!sheepOutside)
-        {
-            var allSheep = GameObject.FindGameObjectsWithTag("Sheep");
-            foreach (var obj in allSheep)
+            // ensure the agent can be controlled / is on NavMesh
+            NavMeshAgent agent = sheep.Agent;
+            if (agent == null)
             {
-                var sheep = obj.GetComponentInParent<SheepStateManager>();
-                if (sheep == null) continue;
-                if (sheepInPen.Contains(sheep)) continue; // skip ones already handled
-
-                sheep.OnSheepUnfreeze();
-                sheep.SetState<SheepFollowState>();
-                coroutines.Add(StartCoroutine(MoveSheepToPoint(sheep, target)));
-            }
-        }
-
-        // Wait for all sheep to finish moving
-        foreach (var c in coroutines)
-            yield return c;
-
-        Debug.Log("[SheepPen] All sheep finished moving");
-        isMovingSheep = false;
-    }
-
-    private IEnumerator MoveSheepToPoint(SheepStateManager sheep, Vector3 target)
-    {
-        if (sheep == null) yield break;
-
-        NavMeshAgent agent = sheep.Agent;
-        if (agent == null) yield break;
-
-        agent.isStopped = false;
-        agent.SetDestination(target);
-
-        float timeout = 10f; // safety timeout
-        float startTime = Time.time;
-
-        while (true)
-        {
-            if (!agent.pathPending && agent.remainingDistance <= 0.3f)
-                break;
-
-            if (Time.time - startTime > timeout)
-            {
-                Debug.LogWarning($"[SheepPen] Sheep {sheep.name} stuck while moving to target!");
-                break;
+                Debug.LogWarning($"[SheepPen] {sheep.name} has no NavMeshAgent!");
+                continue;
             }
 
+            if (!sheep.CanControlAgent() || !agent.isOnNavMesh)
+            {
+                Debug.Log($"[SheepPen] {sheep.name} agent not ready (isOnNavMesh={agent.isOnNavMesh}, enabled={agent.enabled}). Attempting to fix...");
+
+                // try to sample a nearby NavMesh position and warp agent there
+                NavMeshHit hit;
+                float sampleRadius = 5f;
+                if (NavMesh.SamplePosition(sheep.transform.position, out hit, sampleRadius, NavMesh.AllAreas))
+                {
+                    agent.Warp(hit.position); // warp onto navmesh
+                    Debug.Log($"[SheepPen] Warped {sheep.name} to nearest NavMesh at {hit.position}");
+                }
+                else
+                {
+                    Debug.LogWarning($"[SheepPen] Failed to find NavMesh near {sheep.name} within {sampleRadius}m. Skipping sheep.");
+                    continue;
+                }
+            }
+
+            // pick random offset inside pen circle
+            Vector2 offset = Random.insideUnitCircle * penRadius;
+            Vector3 target = penPoint.position + new Vector3(offset.x, 0f, offset.y);
+
+            Debug.Log($"[SheepPen] Commanding {sheep.name} -> MoveToPoint({target}, {sheepStopDistance})");
+
+            // call Team2 API
+            sheep.MoveToPoint(target, sheepStopDistance);
+
+            // debug: show agent destination and path status (may be set by the Move state)
+            if (agent.isOnNavMesh)
+            {
+                // if MoveToPoint immediately sets the agent destination via state, it may appear in agent.destination
+                Debug.Log($"[SheepPen] {sheep.name} agent.isOnNavMesh=true, agent.destination={agent.destination}, pathStatus={agent.pathStatus}");
+            }
+
+            // small stagger to avoid performance spikes and give sheep time to register state
             yield return null;
         }
 
-        yield return new WaitForSeconds(0.2f);
-        Debug.Log($"[SheepPen] Sheep {sheep.name} reached target");
+        Debug.Log("[SheepPen] SendAllSheepToPen finished issuing commands.");
+        isProcessing = false;
+    }
+
+    // Call all sheep back to the herd
+    private void ReleaseAllSheep()
+    {
+        var all = SheepStateManager.AllSheep;
+        Debug.Log($"[SheepPen] Releasing {all.Count} sheep to herd.");
+
+        foreach (var sheep in all)
+        {
+            if (sheep == null) continue;
+
+            // Clear any temporary flags and summon to herd (Team2 API)
+            Debug.Log($"[SheepPen] Calling SummonToHerd on {sheep.name}");
+            sheep.SummonToHerd(3f, clearThreats: true);
+
+            // SummonToHerd already calls SetState<SheepFollowState>() internally,
+            // so no need to force a state change here.
+        }
     }
 }
