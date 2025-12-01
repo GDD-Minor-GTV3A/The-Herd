@@ -16,8 +16,22 @@ MonoBehaviour:
   _questName: Maras quest
   _questDescription: 
   _stages:
-  - _stageID: STAGE_001
-    _stageDescription: Retrive the items
+  - _stageID: 000
+    _stageDescription: Enter the maze in the forrest
+    _objectives:
+    - objectiveID: LOCATION_020
+      objectiveDescription: Go to the forrest entrance
+      type: 2
+      requiredAmount: 1
+      currentAmount: 0
+    - objectiveID: LOCATION_021
+      objectiveDescription: Enter the maze
+      type: 2
+      requiredAmount: 1
+      currentAmount: 0
+    _isParallel: 0
+  - _stageID: 001
+    _stageDescription: Find the items
     _objectives:
     - objectiveID: ITEM_021
       objectiveDescription: Gather some straw
@@ -40,16 +54,16 @@ MonoBehaviour:
       requiredAmount: 1
       currentAmount: 0
     _isParallel: 1
-  - _stageID: 001
+  - _stageID: 002
     _stageDescription: Bring mara the items
     _objectives:
-    - objectiveID: NPC_MARA_STAGE_1
+    - objectiveID: NPC_MARA
       objectiveDescription: talk to Mara
       type: 3
       requiredAmount: 1
       currentAmount: 0
     _isParallel: 0
-  - _stageID: 002
+  - _stageID: 003
     _stageDescription: Deliver the effigy
     _objectives:
     - objectiveID: LOCATION_021
