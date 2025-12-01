@@ -12,6 +12,7 @@ using Team_7.Scripts.AI.Phantom.States;
 using Unity.VisualScripting;
 
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.Events;
 using UnityEngine.UIElements;
 
@@ -171,7 +172,7 @@ namespace Team_7.Scripts.AI.Phantom
         private void Respawn()
         {
             DestroyClones();
-            transform.position += GenerateRandomSpawn();
+            transform.position = GenerateRandomSpawn();
 
             //TODO Do this in a different way
             if (stats.damage > 0 )
@@ -182,13 +183,28 @@ namespace Team_7.Scripts.AI.Phantom
 
         private Vector3 GenerateRandomSpawn()
         {
-            // Pick a random direction on the unit sphere
-            Vector3 randomDirection = Random.onUnitSphere;
-
-            // Pick a random distance between min and max
-            float randomDistance = Random.Range(stats.minRespawnDistance, stats.maxRespawnDistance);
+            Vector3 origin = transform.position;
             
-            return randomDirection * randomDistance;
+            for (int i = 0; i < 10; i++)
+            {
+                // Random horizontal direction
+                Vector2 circle = Random.insideUnitCircle.normalized;
+                Vector3 randomDirection = new (circle.x, 0f, circle.y);
+
+                // Random distance
+                float randomDistance = Random.Range(stats.minRespawnDistance, stats.maxRespawnDistance);
+                Vector3 testPos = origin + randomDirection * randomDistance;
+
+                // Snap to NavMesh
+                if (NavMesh.SamplePosition(testPos, out NavMeshHit hit, 5f, NavMesh.AllAreas))
+                {
+                    return hit.position;
+                }
+            }
+
+            // If no spawn is found, spawn near the previous spot.
+            NavMesh.SamplePosition(origin, out NavMeshHit fallback, 2f, NavMesh.AllAreas);
+            return fallback.position;
         }
 
         private void OnCollisionEnter(Collision other)
@@ -246,7 +262,7 @@ namespace Team_7.Scripts.AI.Phantom
             {
                 var clone = Instantiate(stats.fake, transform.position, transform.rotation);
                 _clones.Add(clone);
-                clone.transform.position += GenerateRandomSpawn();
+                clone.transform.position = GenerateRandomSpawn();
             }
 
             _lastCloneSpawn = Time.time;
