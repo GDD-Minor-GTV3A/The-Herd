@@ -106,10 +106,12 @@ namespace Core.AI.Sheep.Event
     public class SheepDeathEvent : GameEvent
     {
         public SheepStateManager Sheep { get; }
+        public bool CountTowardSanity { get; }
 
-        public SheepDeathEvent(SheepStateManager sheep)
+        public SheepDeathEvent(SheepStateManager sheep, bool countTowardSanity = true)
         {
             Sheep = sheep;
+            CountTowardSanity = countTowardSanity;
         }
     }
 
@@ -119,10 +121,12 @@ namespace Core.AI.Sheep.Event
     public class SheepJoinEvent : GameEvent
     {
         public SheepStateManager Sheep { get; }
+        public bool CountTowardSanity { get; }
 
-        public SheepJoinEvent(SheepStateManager sheep)
+        public SheepJoinEvent(SheepStateManager sheep, bool countTowardSanity = true)
         {
             Sheep = sheep;
+            CountTowardSanity = countTowardSanity;
         }
     }
 

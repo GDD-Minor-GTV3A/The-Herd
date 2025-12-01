@@ -7,7 +7,8 @@ public class AmalgamationAttackState : IAmalgamationState
     private enum AttackType
     {
         SlamCone = 0,
-        SecondAttack = 1
+        SecondAttack = 1,
+        ShootLine = 2
     }
 
     private readonly AmalgamationStateMachine ctx;
@@ -24,6 +25,7 @@ public class AmalgamationAttackState : IAmalgamationState
     // Separate helpers for each attack
     private readonly AmalgamationSlamAttack slamAttack;
     private readonly AmalgamationSecondAttack secondAttack;
+    private readonly AmalgamationShootAttack shootAttack;
 
     public AmalgamationAttackState(
         AmalgamationStateMachine ctx,
@@ -38,6 +40,8 @@ public class AmalgamationAttackState : IAmalgamationState
 
         slamAttack   = new AmalgamationSlamAttack(ctx, agent, player, logPrefix);
         secondAttack = new AmalgamationSecondAttack(ctx, agent, player, logPrefix);
+        shootAttack = new AmalgamationShootAttack(ctx, agent, player, logPrefix);
+
     }
 
     public void Enter()
@@ -70,6 +74,10 @@ public class AmalgamationAttackState : IAmalgamationState
             case AttackType.SecondAttack:
                 secondAttack.Begin();
                 break;
+
+            case AttackType.ShootLine:
+                shootAttack.Begin();
+                break;
         }
     }
 
@@ -87,6 +95,10 @@ public class AmalgamationAttackState : IAmalgamationState
             case AttackType.SecondAttack:
                 secondAttack.Tick();
                 break;
+
+            case AttackType.ShootLine:
+                shootAttack.Tick();
+                break;
         }
     }
 
@@ -97,6 +109,7 @@ public class AmalgamationAttackState : IAmalgamationState
         // Let both attacks clean themselves up; only the active one will actually matter
         slamAttack.Cancel();
         secondAttack.Cancel();
+        shootAttack.Cancel();
 
         if (agent != null && agent.enabled)
         {
@@ -119,22 +132,71 @@ public class AmalgamationAttackState : IAmalgamationState
 
     private AttackType ChooseNextAttackType()
     {
+        // Distance to player at the moment we decide the attack
+        float distToPlayer = (player != null)
+            ? Vector3.Distance(ctx.transform.position, player.position)
+            : Mathf.Infinity;
+
+        bool inShootRange =
+            distToPlayer >= ctx.shootLineMinDistance &&
+            distToPlayer <= ctx.shootLineMaxDistance;
+
         AttackType candidate;
 
-        bool mustSwitch = sameAttackCount >= 2; // <-- keeps "no 3 in a row"
-        if (mustSwitch)
+        bool mustSwitch = sameAttackCount >= 2; // "no 3 in a row" rule stays
+
+        if (!inShootRange)
         {
-            candidate = (lastAttackType == AttackType.SlamCone)
-                ? AttackType.SecondAttack
-                : AttackType.SlamCone;
+            // ---------- CLOSE / MID RANGE ----------
+            // Behaviour 100% stays in your teammates' world:
+            // only SlamCone / SecondAttack, no ShootLine here.
+
+            if (mustSwitch)
+            {
+                candidate = (lastAttackType == AttackType.SlamCone)
+                    ? AttackType.SecondAttack
+                    : AttackType.SlamCone;
+            }
+            else
+            {
+                // 50/50 between Slam and Second
+                candidate = (Random.value < 0.5f)
+                    ? AttackType.SlamCone
+                    : AttackType.SecondAttack;
+            }
         }
         else
         {
-            candidate = (Random.value < 0.5f)
-                ? AttackType.SlamCone
-                : AttackType.SecondAttack;
+            // ---------- LONG RANGE ----------
+            // Now ShootLine is allowed.
+
+            AttackType[] options;
+
+            if (mustSwitch)
+            {
+                // Can't repeat same attack 3x; build a list that excludes lastAttackType
+                if (lastAttackType == AttackType.SlamCone)
+                    options = new[] { AttackType.SecondAttack, AttackType.ShootLine };
+                else if (lastAttackType == AttackType.SecondAttack)
+                    options = new[] { AttackType.SlamCone, AttackType.ShootLine };
+                else // lastAttackType == AttackType.ShootLine
+                    options = new[] { AttackType.SlamCone, AttackType.SecondAttack };
+            }
+            else
+            {
+                // All three are possible
+                options = new[]
+                {
+                AttackType.SlamCone,
+                AttackType.SecondAttack,
+                AttackType.ShootLine
+            };
+            }
+
+            candidate = options[Random.Range(0, options.Length)];
         }
 
+        // ---- bookkeeping for "no 3 same in a row" ----
         if (candidate == lastAttackType)
         {
             sameAttackCount++;
@@ -147,11 +209,15 @@ public class AmalgamationAttackState : IAmalgamationState
 
         if (ctx.debugLogs)
         {
-            DebugLog($"ChooseNextAttackType -> {candidate}, last={lastAttackType}, sameCount={sameAttackCount}");
+            DebugLog(
+                $"ChooseNextAttackType -> {candidate}, dist={distToPlayer:F1}, " +
+                $"inShootRange={inShootRange}, last={lastAttackType}, sameCount={sameAttackCount}"
+            );
         }
 
         return candidate;
     }
+
 
     private void DebugLog(string message)
     {

@@ -50,6 +50,14 @@ public class AmalgamationStateMachine : MonoBehaviour
     public float chaseRotationSpeed = 10f;        // how fast we rotate to look at the player
     public float chaseSustainSpeed = 6f;          // sustained chase speed once we've reached the ring
     public float chasePreferredArriveTolerance = 1f;
+    [Header("ShootLine (Teo) Attack Distance")]
+    public float shootLineMinDistance = 25f;   // start using ShootLine at/after this distance
+    public float shootLineMaxDistance = 60f;   // optional; don't use if player is insanely far
+    public Transform lineFirePoint;          // spawn origin
+    public GameObject lineBulletPrefab;      // bullet prefab
+    public int lineBulletsInLine = 8;        // number of bullets
+    public float lineBulletSpacing = 1f;     // spread between bullets
+    public float lineIndicatorLength = 15f;
 
     // When losing aggro, we want to go back to a patrol node near (but not too close to) the player
     public float chaseReengageMinNodeDistance = 15f;

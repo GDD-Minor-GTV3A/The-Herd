@@ -37,6 +37,8 @@ namespace Core.AI.Sheep
         [SerializeField]
         private SheepAnimationDriver _animation;
 
+        [SerializeField] private float _deathDistanceInterval = 0.5f;
+
         [Header("Sounds")]
         [SerializeField][Tooltip("Sheep sound driver")]
         private SheepSoundDriver _sheepSoundDriver;
@@ -67,6 +69,8 @@ namespace Core.AI.Sheep
         private Vector3 _playerCenter;
         private Vector3 _playerHalfExtents;
         private static readonly List<SheepStateManager> _allSheep = new();
+        private float _nextDeathDistanceCheck;
+        private bool _diedByDistance;
         
 
         // Personality system
@@ -303,6 +307,12 @@ namespace Core.AI.Sheep
 
             while(true)
             {
+                CheckDeathByDistance();
+                if (_diedByDistance)
+                {
+                    yield break;
+                }
+                
                 RefreshNeighbours();
                 // Update behavior context for personality
                 UpdateBehaviorContext();
@@ -328,6 +338,45 @@ namespace Core.AI.Sheep
                 }
 
                 yield return wait;
+            }
+        }
+
+        private void CheckDeathByDistance()
+        {
+            if (_diedByDistance) return;
+            if (_config == null) return;
+            if (_startAsStraggler) return;
+
+            float killDist = _config.DeathDistance;
+            if (killDist <= 0f) return;
+
+            Vector3 delta = transform.position - _playerCenter;
+            delta.y = 0f;
+
+            if (delta.sqrMagnitude > killDist * killDist)
+            {
+                KillByDistance();
+            }
+        }
+
+        private void KillByDistance()
+        {
+            if (_diedByDistance) return;
+            _diedByDistance = true;
+
+            var health = GetComponent<SheepHealth>();
+            if (health != null)
+            {
+                EventManager.Broadcast(new SheepDamageEvent(
+                    this,
+                    health.MaxHealth,
+                    transform.position,
+                    SheepDamageType.DeathCircle,
+                    gameObject));
+            }
+            else
+            {
+                Remove();
             }
         }
 
@@ -522,12 +571,30 @@ namespace Core.AI.Sheep
                 if (kv.Key) _behaviorContext.ThreatRadius[kv.Key] = kv.Value;
             }
 
-            _behaviorContext.HasThreat = _behaviorContext.Threats.Count > 0;
+            bool hasThreat = _behaviorContext.Threats.Count > 0;
+
+            if (_currentState is SheepScaredState)
+            {
+                if (_panicLoop != null)
+                {
+                    StopPanicLoop();
+                }
+
+                _behaviorContext.HasThreat = false;
+            }
+            else
+            {
+                _behaviorContext.HasThreat = hasThreat;
+            }
 
             if (_behaviorContext.HasThreat && !_hadThreatLastFrame)
+            {
                 StartPanicLoop();
+            }
             else if (!_behaviorContext.HasThreat && _hadThreatLastFrame)
+            {
                 StopPanicLoop();
+            }
 
             _hadThreatLastFrame = _behaviorContext.HasThreat;
         }
@@ -586,15 +653,41 @@ namespace Core.AI.Sheep
         {
             _personality.OnDeath(this, _behaviorContext);
         }
+        
+#if UNITY_EDITOR
+        private void OnDrawGizmosSelected()
+        {
+            // Draw player square
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawWireCube(
+                _playerCenter,
+                new Vector3(_playerHalfExtents.x * 2f, 0.1f, _playerHalfExtents.y * 2f)
+            );
+
+            // Draw agent destination
+            if (_agent != null && _agent.isOnNavMesh)
+            {
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawLine(transform.position, _agent.destination);
+                Gizmos.DrawSphere(_agent.destination, 0.2f);
+            }
+
+            if (_config != null && _config.DeathDistance > 0f)
+            {
+                Gizmos.color = new Color(1f, 0f, 0f, 0.35f);
+                Gizmos.DrawWireSphere(_playerCenter, _config.DeathDistance);
+            }
+        }
+#endif
 
         /// <summary>
         /// Removes the sheep from the game.
         /// Broadcasts a SheepDeathEvent before destroying the GameObject.
         /// </summary>
-        public void Remove()
+        public void Remove(bool countTowardSanity = true)
         {
             EventManager.Broadcast(new SheepLeaveHerdEvent(this, wasLost: false, forced: true));
-            EventManager.Broadcast(new SheepDeathEvent(this));
+            EventManager.Broadcast(new SheepDeathEvent(this, countTowardSanity));
             Destroy(gameObject);
         }
 

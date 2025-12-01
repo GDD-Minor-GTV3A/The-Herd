@@ -136,6 +136,10 @@ namespace Core.AI.Sheep
                     case KeyCode.H:
                         ShowHelp();
                         break;
+                    
+                    case KeyCode.O:
+                        PrintOrderedHerd();
+                        break;
                 }
             }
         }
@@ -373,6 +377,7 @@ namespace Core.AI.Sheep
 <color=yellow>J</color> - Spawn Sheep (Join Event)
 <color=yellow>P</color> - Pet Sheep (RequestPetSheepEvent)
 <color=yellow>L</color> - Scare Sheep (Trigger Panic)
+<color=yellow>O</color> - Get sheep in herd
 
 <b><color=#00FFFFFF>SANITY CONTROL</color></b>
 <color=yellow>+</color> - Increase Sanity Points
@@ -382,6 +387,28 @@ namespace Core.AI.Sheep
 
             DisplayEventFeedback(help, 15f);
             Debug.Log("[EventDemo] Help displayed");
+        }
+        
+        private void PrintOrderedHerd()
+        {
+            if (SheepTracker.Instance == null)
+            {
+                DisplayEventFeedback("<color=red>No SheepTracker found!</color>");
+                return;
+            }
+
+            var ordered = SheepTracker.Instance.GetOrderedSheepList();
+
+            string msg = "<b><color=#00FFFFFF>Ordered Herd List</color></b>\n";
+
+            for (int i = 0; i < ordered.Count; i++)
+            {
+                var s = ordered[i];
+                msg += $"{i+1}. {s.name} ({s.Archetype.PersonalityType})\n";
+            }
+
+            DisplayEventFeedback(msg, 5f);
+            Debug.Log("[EventDemo] Ordered herd:\n" + msg.Replace("<br>", "\n"));
         }
 
         private void DisplayEventFeedback(string message, float duration = -1f)
@@ -408,7 +435,7 @@ namespace Core.AI.Sheep
         private void OnDisable()
         {
             // Remove all highlights
-            var copy = _originalMaterials.Keys;
+            List<SheepStateManager> copy = new(_originalMaterials.Keys);
             foreach (var sheep in copy)
             {
                 RemoveHighlight(sheep);
