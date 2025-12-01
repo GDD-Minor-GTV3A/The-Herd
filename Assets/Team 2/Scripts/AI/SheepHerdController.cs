@@ -15,7 +15,7 @@ namespace Core.AI.Sheep
 
         [SerializeField]
         [Tooltip("Half size of player's square XZ")]
-        private Vector2 _halfExtents = new Vector2(4f, 4f);
+        private Vector2 _halfExtents = new Vector2(12f, 12f);
 
         [SerializeField]
         [Tooltip("Broadcasting sheep tick event")]
