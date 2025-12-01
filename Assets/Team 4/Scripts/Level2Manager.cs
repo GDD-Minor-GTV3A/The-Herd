@@ -34,6 +34,11 @@ public class LevelManagerLevel2 : MonoBehaviour
         else
         {
             Instance = this;
+            // Spawn sheep in the level
+            for (int i = 0; i < SheepCount; i++)
+            {
+                SpawnSheep();
+            }
         }
     }
 
@@ -43,12 +48,6 @@ public class LevelManagerLevel2 : MonoBehaviour
     public void EnterLevel()
     {
         Debug.Log("Level 2 entered");
-
-        // Spawn sheep in the level
-        for (int i = 0; i < SheepCount; i++)
-        {
-            SpawnSheep();
-        }
     }
 
     /// <summary>
@@ -105,7 +104,7 @@ public class LevelManagerLevel2 : MonoBehaviour
     /// </summary>
     public void SpawnSheep(Vector3? position = null)
     {
-        Vector3 spawnPosition = position ?? new Vector3(891, 0, 548);
+        Vector3 spawnPosition = position ?? new Vector3(879, 0, 513);
         GameObject sheep = Instantiate(SheepPrefab, spawnPosition, Quaternion.identity);
         SpawnedSheep.Add(sheep);
     }
