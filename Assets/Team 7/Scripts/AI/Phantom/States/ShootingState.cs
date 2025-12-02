@@ -15,6 +15,7 @@ namespace Team_7.Scripts.AI.Phantom.States
         
         public override void OnStart()
         {
+            _manager.ToggleVisibility(true);
             if (_stats.shootCooldown > Time.time - _lastShot && _lastShot != 0)
             {
                 _manager.SetState<WanderingState>();
@@ -38,6 +39,7 @@ namespace Team_7.Scripts.AI.Phantom.States
                 _animator.SetThrowing(true);
                 _animator.SetCharging(false);
                 _lastShot = Time.time;
+                _manager.IncreaseShotCounter();
             }
             
             // Check if the throwing animation has finished

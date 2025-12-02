@@ -97,6 +97,12 @@ namespace Gameplay.Player
                 }
             }
 
+            if (sprint)
+            {
+                _x = 0;
+                _y = 1;
+            }
+
             _animator.SetFloat(WalkingX, _x);
             _animator.SetFloat(WalkingY, _y);
         }
