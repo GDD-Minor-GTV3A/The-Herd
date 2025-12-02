@@ -39,7 +39,7 @@ public class QuestPathManager : MonoBehaviour
 
     private void OnCompleteObjectiveEvent(CompleteObjectiveEvent evt)
     {
-        _quest = QuestManager.Instance.GetQuestProgressByID(questID);
+        _quest = QuestManager.Instance?.GetQuestProgressByID(questID);
         if (_quest == null)
         {
             Debug.Log($"QUEST_PATH_MAN: No Quest");

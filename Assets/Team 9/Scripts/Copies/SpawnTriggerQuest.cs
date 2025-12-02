@@ -61,6 +61,7 @@ public class SpawnTriggerQuest : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (oneTime && hasTriggered) return;
+        if (!QuestManager.Instance) return;
         if (!QuestManager.Instance.GetQuestProgressByID(questID).IsObjectiveActive(objectiveID))
         {
             Debug.Log("OBJECTIVE NOT ACTIVE");
