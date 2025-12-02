@@ -4,7 +4,7 @@ from __future__ import annotations
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, Namespace
 from enum import Enum
 from pathlib import Path
-from typing import TYPE_CHECKING, Generic, TypeVar
+from typing import TYPE_CHECKING, Generator, Generic, TypeVar
 
 from release.log import logger
 from release.paths import BUILD_DIR, ROOT, UNITY, UNITY_LOG, ZIP_FILE
@@ -35,6 +35,7 @@ T = TypeVar("T")
 
 class Argument(Generic[T]):
     """Helper to define arguments with argparse."""
+    internal_prefix = "_ARGUMENT_"
 
     def __init__(
         self,
@@ -56,7 +57,7 @@ class Argument(Generic[T]):
         """Set the name of the attribute to the name of the descriptor."""
         self.setup_parser_argument(name)
         self.name = name
-        self.private_name = f"__{name}"
+        self.private_name = f"{self.internal_prefix}{name}"
 
     def __get__(self, obj: object, obj_type: object) -> T:
         """Get the value of the attribute."""
@@ -144,60 +145,60 @@ class GithubArgs(Namespace):
     """Command line context."""
 
     # GitHub CLI release settings. matches https://cli.github.com/manual/gh_release_create.
-    discussion_category: Argument = Argument(
+    discussion_category = Argument(
         default=None,
         help="Discussion category for the release notes.",
     )
-    draft: Argument = Argument(
+    draft = Argument(
         action=ArgumentActions.STORE_BOOL,
         help="Mark the release as a draft.",
     )
-    fail_on_no_commits: Argument = Argument(
+    fail_on_no_commits = Argument(
         action=ArgumentActions.STORE_BOOL,
         help="Fail if there are no new commits since the last release.",
     )
-    generate_notes: Argument = Argument(
+    generate_notes = Argument(
         action=ArgumentActions.STORE_BOOL,
         help="Generate release notes automatically.",
     )
-    latest: Argument = Argument(
+    latest = Argument(
         action=ArgumentActions.STORE_BOOL,
         help="Mark the release as the latest release. Mark as false to explicitly NOT set as latest",
     )
-    notes: Argument = Argument[str | None](
+    notes = Argument[str | None](
         help="Additional notes for the release.",
     )
-    notes_file: Argument = Argument[Path | None](
+    notes_file = Argument[Path | None](
         Path,
         default=None,
         help="Read release notes from file (use '-' to read from standard input).",
     )
-    notes_from_tag: Argument = Argument(
+    notes_from_tag = Argument(
         action=ArgumentActions.STORE_BOOL,
         help="Fetch notes from the tag annotation or message of commit associated with tag.",
     )
-    notes_start_tag: Argument = Argument[str | None](
+    notes_start_tag = Argument[str | None](
         help="Tag to use as the starting point for generating release notes",
     )
-    prerelease: Argument = Argument(
+    prerelease = Argument(
         action=ArgumentActions.STORE_BOOL,
         help="Mark the release as a prerelease.",
     )
-    target: Argument = Argument(
+    target = Argument(
         default="main",
         help="Target branch or full commit SHA",
     )
-    title: Argument = Argument[str | None](
+    title = Argument[str | None](
         help="Title for the release.",
     )
-    verify_tag: Argument = Argument(
+    verify_tag = Argument(
         action=ArgumentActions.STORE_BOOL,
         help="Verify the tag exists on remote. Abort if it does not.",
     )
 
     def generate_setting_flags(self) -> Generator[str]:
         """Generate command line flags from settings as a list of tokens."""
-        for i in GithubArgs.__annotations__:
+        for i in get_argument_names(self):
             val = getattr(self, i)
             match val:
                 # true  -> add flag
@@ -219,37 +220,37 @@ class UnityArgs(Namespace):
         default=UNITY,
         help="Path to the Unity executable.",
     )
-    buildTarget: Argument = Argument(
+    buildTarget = Argument(
         default="standalonewindows64",
         help="Build target platform.",
     )
-    projectPath: Argument = Argument(
+    projectPath = Argument(
         Path,
         default=ROOT,
         help="Path to the Unity project.",
     )
-    logFile: Argument = Argument(
+    logFile = Argument(
         Path,
         default=UNITY_LOG,
         help="Path to the Unity log file.",
     )
-    skipMissingProjectId: Argument = Argument(
+    skipMissingProjectId = Argument(
         action=ArgumentActions.STORE_BOOL,
         help="Skip missing project ID.",
     )
-    skipMissingUpid: Argument = Argument(
+    skipMissingUpid = Argument(
         action=ArgumentActions.STORE_BOOL,
         help="Skip missing UPID.",
     )
-    batchmode: Argument = Argument(
+    batchmode = Argument(
         action=ArgumentActions.STORE_BOOL,
         help="Run Unity in batch mode.",
     )
-    quit: Argument = Argument(
+    quit = Argument(
         action=ArgumentActions.STORE_BOOL,
         help="Quit Unity after executing commands.",
     )
-    executeMethod: Argument = Argument(
+    executeMethod = Argument(
         default="CommandLineBuild.BuildGame",
         help="Method to execute after launching Unity.",
     )
@@ -257,7 +258,7 @@ class UnityArgs(Namespace):
     def build_command(self) -> list[str]:
         """Generate the command line to run unity with the given arguments."""
         command = [str(self.unityPath)]
-        for arg in self.__annotations__:
+        for arg in get_argument_names(self):
             if arg == "unityPath":
                 continue
 
@@ -275,6 +276,11 @@ class UnityArgs(Namespace):
                     logger.warning("Unused unity argument type or value: %s=%r", arg, val)
         return command
 
+def get_argument_names(inst: Namespace) -> Generator[str]:
+    """Get all argument names from a Namespace instance."""
+    for i in inst.__dict__:
+        if i.startswith(Argument.internal_prefix):
+            yield i[len(Argument.internal_prefix):]
 
 args: Args = parser.parse_args(namespace=Args())
 github_args: GithubArgs = parser.parse_args(namespace=GithubArgs())
