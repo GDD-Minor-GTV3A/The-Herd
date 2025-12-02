@@ -51,6 +51,7 @@ namespace Core.AI.Sheep
             {
                 if (!(_sheep.GetState() is SheepScaredState))
                 {
+                    //Debug.Log($"[SheepScareHandler] {_sheep.name} panic interrupted by state {_sheep.GetState().GetType().Name}");
                     _isPanicking = false;
                     _currentScareValue = 0f;
                     _nextCanPanicTime = Time.time + _cooldownAfterPanic;

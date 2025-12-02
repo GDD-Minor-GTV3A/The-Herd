@@ -145,21 +145,6 @@ namespace Core.AI.Sheep.Event
         }
     }
 
-    public class SheepLeaveHerdEvent : GameEvent
-    {
-        public SheepStateManager Sheep { get; }
-        
-        public bool WasLost { get; }
-        public bool Forced { get; }
-
-        public SheepLeaveHerdEvent(SheepStateManager sheep, bool wasLost = false, bool forced = false)
-        {
-            Sheep = sheep;
-            WasLost = wasLost;
-            Forced = forced;
-        }
-    }
-
     /// <summary>
     /// Called when player sanity changes
     /// </summary>

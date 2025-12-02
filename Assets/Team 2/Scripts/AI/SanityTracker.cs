@@ -10,13 +10,12 @@ namespace Core.AI.Sheep
     /// Tracks player sanity using a point-based system.
     /// Starts at 100 points with 6 sheep. Each sheep = 16 points.
     /// Losing 16 points removes furthest sheep. Gaining 16 points spawns new sheep.
-    /// NOTE: This should probably be moved to player code for consistency.
     /// </summary>
     public class SanityTracker : MonoBehaviour
     {
-        private const int POINTS_PER_SHEEP = 16;
-        private const int STARTING_POINTS = 96;
-        private const int STARTING_SHEEP_COUNT = 6;
+        private const int STARTING_SHEEP_COUNT = 5;
+        private const int POINTS_PER_SHEEP = 100 / STARTING_SHEEP_COUNT;
+        private const int STARTING_POINTS = POINTS_PER_SHEEP * STARTING_SHEEP_COUNT;
 
         [Header("Spawning")]
         [SerializeField]
@@ -48,7 +47,6 @@ namespace Core.AI.Sheep
         private SanityStage _currentStage;
 
         private static SanityTracker _instance;
-        
         
         // --------- public getters ----------
         public static int CurrentPoints =>
@@ -96,7 +94,8 @@ namespace Core.AI.Sheep
         /// </summary>
         private void OnSheepDeath(SheepDeathEvent e)
         {
-            //RemoveSanityPointsInternal(POINTS_PER_SHEEP);
+            if (!e.CountTowardSanity) return;
+            RemoveSanityPointsInternal(POINTS_PER_SHEEP, false);
         }
 
         /// <summary>
@@ -104,7 +103,8 @@ namespace Core.AI.Sheep
         /// </summary>
         private void OnSheepJoin(SheepJoinEvent e)
         {
-            //AddSanityPointsInternal(POINTS_PER_SHEEP);
+            if (!e.CountTowardSanity) return;
+            AddSanityPointsInternal(POINTS_PER_SHEEP, false);
         }
 
         /// <summary>
@@ -138,7 +138,7 @@ namespace Core.AI.Sheep
         /// <summary>
         /// Internal method to add sanity points
         /// </summary>
-        private void AddSanityPointsInternal(int points)
+        private void AddSanityPointsInternal(int points, bool addSheep = true)
         {
             int oldPoints = _sanityPoints;
 
@@ -149,7 +149,7 @@ namespace Core.AI.Sheep
             int oldThreshold = oldPoints / POINTS_PER_SHEEP;
             int newThreshold = _sanityPoints / POINTS_PER_SHEEP;
 
-            if (newThreshold > oldThreshold)
+            if (newThreshold > oldThreshold && addSheep)
             {
                 // Spawn a sheep (doesn't count towards sanity)
                 SpawnSheep();
@@ -168,7 +168,7 @@ namespace Core.AI.Sheep
         /// <summary>
         /// Internal method to remove sanity points
         /// </summary>
-        private void RemoveSanityPointsInternal(int points)
+        private void RemoveSanityPointsInternal(int points, bool removeSheep = true)
         {
             int oldPoints = _sanityPoints;
 
@@ -178,7 +178,7 @@ namespace Core.AI.Sheep
             int oldThreshold = oldPoints > 0 ? Mathf.CeilToInt((float)oldPoints / POINTS_PER_SHEEP) : 0;
             int newThreshold = _sanityPoints > 0 ? Mathf.CeilToInt((float)_sanityPoints / POINTS_PER_SHEEP) : 0;
 
-            if (newThreshold < oldThreshold && _sanityPoints > 0)
+            if (newThreshold < oldThreshold && _sanityPoints > 0 && removeSheep)
             {
                 // Remove furthest sheep (TODO: sheep should flee instead of instant removal)
                 RemoveFurthestSheep();
@@ -222,7 +222,7 @@ namespace Core.AI.Sheep
                 // Mark as straggler so it joins the herd
                 newSheep.MarkAsStraggler();
                 
-                EventManager.Broadcast(new SheepJoinEvent(newSheep));
+                EventManager.Broadcast(new SheepJoinEvent(newSheep, false));
 
                 Debug.Log($"[SanityTracker] Spawned sheep at {spawnPosition}");
             }
@@ -287,7 +287,7 @@ namespace Core.AI.Sheep
             {
                 Debug.Log($"[SanityTracker] Removing furthest sheep: {furthestSheep.name}");
                 // TODO: Make sheep flee instead of instant removal
-                furthestSheep.Remove();
+                furthestSheep.Remove(false);
             }
         }
 
