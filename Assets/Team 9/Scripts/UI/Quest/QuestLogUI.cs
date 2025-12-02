@@ -22,12 +22,15 @@ public class QuestLogUI : MonoBehaviour
     /// </summary>
     [SerializeField] private GameObject questEntryPrefab;
 
+    [SerializeField] private GameObject noActiveQuestsMessage;
+    
     /// <summary>
     /// A dictionary that maps quest IDs to their corresponding <see cref="QuestUIEntry"/> components.
     /// </summary>
     private readonly Dictionary<string, QuestUIEntry> _questEntries = new();
 
     private bool _activeState = false;
+    private CanvasGroup _questLogCanvasGroup;
 
     public static QuestLogUI Instance { get; private set; }
     
@@ -38,13 +41,24 @@ public class QuestLogUI : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
+        // Get or Add CanvasGroup to handle visibility without disabling scripts
+        if (questLogUI != null)
+        {
+            _questLogCanvasGroup = questLogUI.GetComponent<CanvasGroup>();
+            if (_questLogCanvasGroup == null)
+            {
+                _questLogCanvasGroup = questLogUI.gameObject.AddComponent<CanvasGroup>();
+            }
+        }
         
-        questLogUI.gameObject.SetActive(false);
+        SetQuestLogVisibility(false);
+        
+        CheckEmptyState();
         
         Instance = this;
         transform.SetParent(null);
         DontDestroyOnLoad(gameObject);
-        
     }
 
     private void Awake()
@@ -91,6 +105,9 @@ public class QuestLogUI : MonoBehaviour
         var entryGO = Instantiate(questEntryPrefab, questListContainer);
         var entry = entryGO.GetComponent<QuestUIEntry>();
         entry.Setup(quest);
+        
+        entryGO.SetActive(true);
+
         _questEntries.Add(quest.Quest.QuestID, entry);
     }
 
@@ -108,6 +125,8 @@ public class QuestLogUI : MonoBehaviour
 
         var questUiEntry = _questEntries[evt.QuestID];
         questUiEntry.RefreshObjectives();
+        
+        CheckEmptyState();  
     }
 
     /// <summary>
@@ -131,6 +150,8 @@ public class QuestLogUI : MonoBehaviour
         //Maybe rework this for new log
         Destroy(_questEntries[evt.QuestID].gameObject);
         _questEntries.Remove(evt.QuestID);
+        
+        CheckEmptyState();
     }
 
     private void Update()
@@ -139,21 +160,39 @@ public class QuestLogUI : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.L))
         {
             _activeState = !_activeState;
-            
-            questLogUI.gameObject.SetActive(_activeState);
-                
-            foreach (Transform child in questListContainer.transform)
-            {
-                child.gameObject.SetActive(_activeState);
-            }
-
-            if (_activeState)
-            {
-                foreach (var entry in _questEntries.Keys)
-                {
-                    EventManager.Broadcast(new QuestUpdateEvent(entry));
-                }
-            }
+            SetQuestLogVisibility(_activeState);
         }
     }
+
+    /// <summary>
+    /// Controls visibility via Alpha/Raycasting. 
+    /// Does NOT disable child objects, so their scripts continue to run.
+    /// </summary>
+    private void SetQuestLogVisibility(bool isVisible)
+    {
+        if (_questLogCanvasGroup != null)
+        {
+            _questLogCanvasGroup.alpha = isVisible ? 1f : 0f;
+            _questLogCanvasGroup.interactable = isVisible;
+            _questLogCanvasGroup.blocksRaycasts = isVisible;
+        }
+        else
+        {
+            // Fallback for safety
+            questLogUI.gameObject.SetActive(isVisible);
+        }
+    }
+    
+    /// <summary>
+    /// Checks if there are any active quests and toggles the "No Active Quests" text.
+    /// </summary>
+    private void CheckEmptyState()
+    {
+        if (noActiveQuestsMessage != null)
+        {
+            // If count is 0, set active (true). If count > 0, set inactive (false).
+            noActiveQuestsMessage.SetActive(_questEntries.Count == 0);
+        }
+    }
+    
 }
