@@ -17,7 +17,7 @@ public class FieldOfView : MonoBehaviour
     public bool canSeePlayer;
 
     // Internal
-    private WaitForSeconds _wait = new WaitForSeconds(0.1f); // check 10x per sec
+    private WaitForSeconds _wait = new WaitForSeconds(0.05f); // check 10x per sec
 
     private void Start()
     {
