@@ -5,6 +5,7 @@ using Core.Shared.Utilities;
 
 using Gameplay.Dog;
 using Gameplay.HealthSystem;
+using Gameplay.ToolsSystem.Tools.Rifle;
 
 using Team_7.Scripts.AI.Phantom.States;
 
