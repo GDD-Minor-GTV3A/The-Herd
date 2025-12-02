@@ -79,6 +79,7 @@ namespace Core.UI.Sheep
                 }
             }
         }
+        
         private void OnShowFlashback(ShowFlashbackEvent evt)
         {
             if (!_canvasGroup) return;
@@ -105,12 +106,12 @@ namespace Core.UI.Sheep
             if (_fadeCoroutine != null) StopCoroutine(_fadeCoroutine);
             
             _fadeCoroutine = StartCoroutine(FadeCanvasGroup(_canvasGroup, 0f, _fadeDuration, ResumeGameAndCallback));
-            _currentCloseCallback = null;
         }
 
         private void ResumeGameAndCallback()
         {
             _currentCloseCallback?.Invoke();
+            _currentCloseCallback = null;
             ShowOtherUI();
             Time.timeScale = 1f;
         }
@@ -131,8 +132,9 @@ namespace Core.UI.Sheep
             }
             
             canvasGroup.alpha = targetAlpha;
-            canvasGroup.blocksRaycasts = true;
-            canvasGroup.interactable = true;
+            bool visible = targetAlpha > 0.01f;
+            canvasGroup.blocksRaycasts = visible;
+            canvasGroup.interactable = visible;
             
             onComplete?.Invoke();
             _fadeCoroutine = null;
