@@ -214,7 +214,7 @@ class UnityArgs(Namespace):
     """Arguments for the unity exe."""
 
     # Unity executable settings. matches https://docs.unity3d.com/Manual/PlayerCommandLineArguments.html
-    unityPath: Argument = Argument(
+    unityPath = Argument(
         Path,
         default=UNITY,
         help="Path to the Unity executable.",
