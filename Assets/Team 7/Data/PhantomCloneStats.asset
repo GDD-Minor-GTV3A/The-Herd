@@ -12,27 +12,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9316c9ffbaed0644c9e33e511018c126, type: 3}
   m_Name: PhantomCloneStats
   m_EditorClassIdentifier: 
-  health: 3
+  health: 1
   initialCloneAmount: 4
+  maxCloneAmount: 8
   cloneSpawnDelay: 8
   fake: {fileID: 8849764200154239751, guid: 0545894bf191fe54abe237fe24aec52a, type: 3}
   lookDuration: 0.25
-  minRespawnDistance: 50
-  maxRespawnDistance: 100
+  stunDuration: 1000
+  minRespawnDistance: 40
+  maxRespawnDistance: 50
   DamageAngle: 30
   damageDistance: 30
-  minRepositionPlayerDistance: 35
-  repositionDistance: 45
+  minRepositionPlayerDistance: 20
+  repositionDistance: 30
   moveSpeed: 7
-  sprintSpeed: 15
+  sprintSpeed: 80
   shootRange: 25
   shootCooldown: 1.5
   chargeDuration: 5
+  shotsBeforeDashing: 2
   projectile: {fileID: 8121238138393363441, guid: 015b74b9e3b4aad40b92358eb70e1ea3, type: 3}
   maxProjectileScale: {x: 0.35, y: 0.35, z: 0.35}
   damage: 0
   projectileSpeed: 15
   projectileRange: 50
+  homingStrength: 1.5
   screechSound: {fileID: 8300000, guid: 2e7db83001c545d4c96b26e87a79a712, type: 3}
   projectileChargeSound: {fileID: 8300000, guid: 455424c94b8853b4c80973c03ecd32d1, type: 3}
   projectileShootSound: {fileID: 8300000, guid: f9056e69ec0082c47bae79e860a7f092, type: 3}
