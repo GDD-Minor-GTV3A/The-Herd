@@ -18,12 +18,15 @@ namespace UI.ToolSlots
         /// </summary>
         public void Initialize()
         {
-            slots = GetComponentsInChildren<ToolSlotUI>().ToList();
+            slots = GetComponentsInChildren<ToolSlotUI>(true).ToList();
 
             for (int i = 0; i < slots.Count; i++)
             {
                 slots[i].Initialize(i);
             }
+
+            
+           
         }
 
 
@@ -34,10 +37,10 @@ namespace UI.ToolSlots
         public void ChangeHighlightedSlot(int slotIndex)
         {
             if (currentHighlightedSlot != null)
-                currentHighlightedSlot.SetSlotHighlight(false);
+                currentHighlightedSlot.SetVisible(false);
 
             currentHighlightedSlot = slots[slotIndex];
-            currentHighlightedSlot.SetSlotHighlight(true);
+            currentHighlightedSlot.SetVisible(true);
         }
     }
 }

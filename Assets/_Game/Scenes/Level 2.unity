@@ -15500,14 +15500,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 780017016643321308, guid: a57a52618a6290a439e1b21778411546, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 454.1
-      objectReference: {fileID: 0}
-    - target: {fileID: 780017016643321308, guid: a57a52618a6290a439e1b21778411546, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -45.4
-      objectReference: {fileID: 0}
     - target: {fileID: 969416696715821878, guid: a57a52618a6290a439e1b21778411546, type: 3}
       propertyPath: m_LocalScale.y
       value: 1
@@ -15515,10 +15507,6 @@ PrefabInstance:
     - target: {fileID: 1549972713240377101, guid: a57a52618a6290a439e1b21778411546, type: 3}
       propertyPath: entryId
       value: FromLevel2
-      objectReference: {fileID: 0}
-    - target: {fileID: 4064343783161636017, guid: a57a52618a6290a439e1b21778411546, type: 3}
-      propertyPath: m_Name
-      value: SceneSystem
       objectReference: {fileID: 0}
     - target: {fileID: 5435770740383413124, guid: a57a52618a6290a439e1b21778411546, type: 3}
       propertyPath: m_LocalScale.y
@@ -15568,11 +15556,55 @@ PrefabInstance:
       propertyPath: exitIdForNextScene
       value: FromLevel2
       objectReference: {fileID: 0}
+    - target: {fileID: 261517648159540867, guid: 94b5452c2ac1d8d47ab9c5b246493fd5, type: 3}
+      propertyPath: exitIdForNextScene
+      value: FromLevel2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3264579808335207373, guid: 94b5452c2ac1d8d47ab9c5b246493fd5, type: 3}
+      propertyPath: entryId
+      value: FromLevel2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4012375009101776846, guid: 94b5452c2ac1d8d47ab9c5b246493fd5, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 454.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4012375009101776846, guid: 94b5452c2ac1d8d47ab9c5b246493fd5, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -45.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4151599963672076261, guid: 94b5452c2ac1d8d47ab9c5b246493fd5, type: 3}
+      propertyPath: m_Size.x
+      value: 102.6333
+      objectReference: {fileID: 0}
+    - target: {fileID: 4151599963672076261, guid: 94b5452c2ac1d8d47ab9c5b246493fd5, type: 3}
+      propertyPath: m_Size.y
+      value: 26.792603
+      objectReference: {fileID: 0}
+    - target: {fileID: 4151599963672076261, guid: 94b5452c2ac1d8d47ab9c5b246493fd5, type: 3}
+      propertyPath: m_Size.z
+      value: 65.90192
+      objectReference: {fileID: 0}
+    - target: {fileID: 4151599963672076261, guid: 94b5452c2ac1d8d47ab9c5b246493fd5, type: 3}
+      propertyPath: m_Center.x
+      value: 1699.7747
+      objectReference: {fileID: 0}
+    - target: {fileID: 4151599963672076261, guid: 94b5452c2ac1d8d47ab9c5b246493fd5, type: 3}
+      propertyPath: m_Center.z
+      value: 480.8594
+      objectReference: {fileID: 0}
+    - target: {fileID: 7300756488499085692, guid: 94b5452c2ac1d8d47ab9c5b246493fd5, type: 3}
+      propertyPath: m_Name
+      value: MemoryAnchor
+      objectReference: {fileID: 0}
+    - target: {fileID: 8112616309586029872, guid: 94b5452c2ac1d8d47ab9c5b246493fd5, type: 3}
+      propertyPath: m_Name
+      value: SceneSystem
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: a57a52618a6290a439e1b21778411546, type: 3}
+  m_SourcePrefab: {fileID: 100100000, guid: 94b5452c2ac1d8d47ab9c5b246493fd5, type: 3}
 --- !u!1001 &1787929480
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -15875,50 +15907,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8bbed39fa89d7b6418e11a4a4619445b, type: 3}
---- !u!1 &1807577966
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1807577968}
-  - component: {fileID: 1807577967}
-  m_Layer: 0
-  m_Name: Scene Changer
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &1807577967
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1807577966}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a687251d2c3294c46b45eee41b179dfe, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &1807577968
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1807577966}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1815064814 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 8bbed39fa89d7b6418e11a4a4619445b, type: 3}
