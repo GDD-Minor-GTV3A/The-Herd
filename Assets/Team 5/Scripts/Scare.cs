@@ -6,6 +6,7 @@ public class Scare : MonoBehaviour
 
     [SerializeField] private EnemySpawnpoint enemiesParent;
     [SerializeField] private Light[] redLights;
+    [SerializeField] private EnemyManager enemyManager;
     private bool playerEnteredQuestArea = false;
     private bool spawnedScare = false;
 
@@ -25,9 +26,12 @@ public class Scare : MonoBehaviour
     /// <param name="spawnPoints"></param>
     public void OnQuestAreaExit(EnemySpawnpoint[] spawnPoints)
     {
+        Debug.Log("player exited quest area");
         if (!playerEnteredQuestArea || spawnedScare) return;
         spawnedScare = true;
+        Debug.Log("Scare");
 
+        //enemyManager.removeAllEnemies();
         foreach (Light light in redLights) { light.enabled = true; }
         foreach (EnemySpawnpoint spawnPoint in spawnPoints)
         {
