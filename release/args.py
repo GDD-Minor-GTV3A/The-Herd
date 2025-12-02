@@ -144,53 +144,53 @@ class GithubArgs(Namespace):
     """Command line context."""
 
     # GitHub CLI release settings. matches https://cli.github.com/manual/gh_release_create.
-    discussion_category = Argument(
+    discussion_category: Argument = Argument(
         default=None,
         help="Discussion category for the release notes.",
     )
-    draft = Argument(
+    draft: Argument = Argument(
         action=ArgumentActions.STORE_BOOL,
         help="Mark the release as a draft.",
     )
-    fail_on_no_commits = Argument(
+    fail_on_no_commits: Argument = Argument(
         action=ArgumentActions.STORE_BOOL,
         help="Fail if there are no new commits since the last release.",
     )
-    generate_notes = Argument(
+    generate_notes: Argument = Argument(
         action=ArgumentActions.STORE_BOOL,
         help="Generate release notes automatically.",
     )
-    latest = Argument(
+    latest: Argument = Argument(
         action=ArgumentActions.STORE_BOOL,
         help="Mark the release as the latest release. Mark as false to explicitly NOT set as latest",
     )
-    notes = Argument[str | None](
+    notes: Argument = Argument[str | None](
         help="Additional notes for the release.",
     )
-    notes_file = Argument[Path | None](
+    notes_file: Argument = Argument[Path | None](
         Path,
         default=None,
         help="Read release notes from file (use '-' to read from standard input).",
     )
-    notes_from_tag = Argument(
+    notes_from_tag: Argument = Argument(
         action=ArgumentActions.STORE_BOOL,
         help="Fetch notes from the tag annotation or message of commit associated with tag.",
     )
-    notes_start_tag = Argument[str | None](
+    notes_start_tag: Argument = Argument[str | None](
         help="Tag to use as the starting point for generating release notes",
     )
-    prerelease = Argument(
+    prerelease: Argument = Argument(
         action=ArgumentActions.STORE_BOOL,
         help="Mark the release as a prerelease.",
     )
-    target = Argument(
+    target: Argument = Argument(
         default="main",
         help="Target branch or full commit SHA",
     )
-    title = Argument[str | None](
+    title: Argument = Argument[str | None](
         help="Title for the release.",
     )
-    verify_tag = Argument(
+    verify_tag: Argument = Argument(
         action=ArgumentActions.STORE_BOOL,
         help="Verify the tag exists on remote. Abort if it does not.",
     )
@@ -214,7 +214,7 @@ class UnityArgs(Namespace):
     """Arguments for the unity exe."""
 
     # Unity executable settings. matches https://docs.unity3d.com/Manual/PlayerCommandLineArguments.html
-    unityPath = Argument(
+    unityPath: Argument = Argument(
         Path,
         default=UNITY,
         help="Path to the Unity executable.",
