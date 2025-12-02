@@ -6,6 +6,7 @@ public class PathLighting : MonoBehaviour
     [SerializeField] private PathLighting nextLight;
 
     private Light currentLight;
+    private bool forcedOn;
 
     private void Awake()
     {
@@ -47,9 +48,20 @@ public class PathLighting : MonoBehaviour
 
     public void TurnOff()
     {
+        if (forcedOn)
+        {
+            return;
+        }
+
         if (currentLight != null)
         {
             currentLight.enabled = false;
         }
+    }
+
+    public void ForceOn()
+    {
+        forcedOn = true;
+        TurnOn();
     }
 }

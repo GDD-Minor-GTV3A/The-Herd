@@ -2,18 +2,33 @@ using UnityEngine;
 using TMPro;
 using Core.Events;
 using Core.AI.Sheep.Event;
+using System.Linq;
 
 namespace Core.AI.Sheep
 {
     /// <summary>
-    /// Tracks player sanity based on sheep count.
-    /// NOTE: This should probably be moved to player code for consistency.
+    /// Tracks player sanity using a point-based system.
+    /// Starts at 100 points with 6 sheep. Each sheep = 16 points.
+    /// Losing 16 points removes furthest sheep. Gaining 16 points spawns new sheep.
     /// </summary>
     public class SanityTracker : MonoBehaviour
     {
+        private const int STARTING_SHEEP_COUNT = 5;
+        private const int POINTS_PER_SHEEP = 100 / STARTING_SHEEP_COUNT;
+        private const int STARTING_POINTS = POINTS_PER_SHEEP * STARTING_SHEEP_COUNT;
+
+        [Header("Spawning")]
         [SerializeField]
-        [Tooltip("Maximum number of sheep in the herd")]
-        private int _maxSheepCount = 10;
+        [Tooltip("Sheep prefab to spawn when gaining sanity")]
+        private GameObject _sheepPrefab;
+
+        [SerializeField]
+        [Tooltip("Player transform for spawn positioning")]
+        private Transform _playerTransform;
+
+        [SerializeField]
+        [Tooltip("Distance behind/beside player to spawn sheep (out of view)")]
+        private float _spawnDistance = 15f;
 
         [Header("Debug")]
         [SerializeField]
@@ -23,8 +38,35 @@ namespace Core.AI.Sheep
         [SerializeField]
         [Tooltip("TextMeshPro component for debug display")]
         private TextMeshProUGUI _debugText;
+        
+        [Header("Audio")] [SerializeField] private AudioClip _sanityAddSound;
+        [SerializeField] private AudioClip _sanityRemoveSound;
 
-        private int _currentSheepCount;
+        private int _sanityPoints;
+        private int _maxSanityPoints;
+        private SanityStage _currentStage;
+
+        private static SanityTracker _instance;
+        
+        // --------- public getters ----------
+        public static int CurrentPoints =>
+            _instance != null ? _instance._sanityPoints : 0;
+
+        public static int MaxPoints =>
+            _instance != null ? _instance._maxSanityPoints : 0;
+
+        public static float CurrentPercentage =>
+            _instance != null && _instance._maxSanityPoints > 0
+                ? (_instance._sanityPoints / (float)_instance._maxSanityPoints) * 100f
+                : 0f;
+
+        public static SanityStage CurrentStage =>
+            _instance != null ? _instance._currentStage : SanityStage.Stable;
+        
+        private void Awake()
+        {
+            _instance = this;
+        }
 
         private void OnEnable()
         {
@@ -40,8 +82,10 @@ namespace Core.AI.Sheep
 
         private void Start()
         {
-            _currentSheepCount = FindObjectsByType<SheepStateManager>(FindObjectsSortMode.None).Length;
-            _maxSheepCount = Mathf.Max(_maxSheepCount, _currentSheepCount);
+            _sanityPoints = STARTING_POINTS;
+            _maxSanityPoints = STARTING_POINTS;
+            _currentStage = SanityStage.Stable;
+
             UpdateSanity();
         }
 
@@ -50,8 +94,8 @@ namespace Core.AI.Sheep
         /// </summary>
         private void OnSheepDeath(SheepDeathEvent e)
         {
-            _currentSheepCount = Mathf.Max(0, _currentSheepCount - 1);
-            UpdateSanity();
+            if (!e.CountTowardSanity) return;
+            RemoveSanityPointsInternal(POINTS_PER_SHEEP / 2);
         }
 
         /// <summary>
@@ -59,40 +103,249 @@ namespace Core.AI.Sheep
         /// </summary>
         private void OnSheepJoin(SheepJoinEvent e)
         {
-            _currentSheepCount = Mathf.Min(_maxSheepCount, _currentSheepCount + 1);
+            if (!e.CountTowardSanity) return;
+            AddSanityPointsInternal(POINTS_PER_SHEEP / 2);
+        }
+
+        /// <summary>
+        /// Static method to add sanity points from external systems
+        /// </summary>
+        public static void AddSanityPoints(int points)
+        {
+            if (_instance == null)
+            {
+                Debug.LogWarning("[SanityTracker] No instance found. Cannot add sanity points.");
+                return;
+            }
+
+            _instance.AddSanityPointsInternal(points);
+        }
+
+        /// <summary>
+        /// Static method to remove sanity points from external systems
+        /// </summary>
+        public static void RemoveSanityPoints(int points)
+        {
+            if (_instance == null)
+            {
+                Debug.LogWarning("[SanityTracker] No instance found. Cannot remove sanity points.");
+                return;
+            }
+
+            _instance.RemoveSanityPointsInternal(points);
+        }
+
+        /// <summary>
+        /// Internal method to add sanity points
+        /// </summary>
+        private void AddSanityPointsInternal(int points)
+        {
+            int oldPoints = _sanityPoints;
+
+            // Add points and increase max
+            if (_sanityPoints == _maxSanityPoints) _maxSanityPoints += points;
+            _sanityPoints += points;
+            
+            int oldThreshold = oldPoints / POINTS_PER_SHEEP;
+            int newThreshold = _sanityPoints / POINTS_PER_SHEEP;
+
+            if (newThreshold > oldThreshold)
+            {
+                // Spawn a sheep (doesn't count towards sanity)
+                SpawnSheep();
+
+                var clip = _sanityAddSound;
+                if (clip)
+                {
+                    float pitch = Random.Range(0.9f, 1.05f);
+                    // Waiting for sound manager to roll out
+                }
+            }
+
             UpdateSanity();
         }
 
         /// <summary>
-        /// Calculates and broadcasts sanity percentage
+        /// Internal method to remove sanity points
         /// </summary>
-        private void UpdateSanity()
+        private void RemoveSanityPointsInternal(int points)
         {
-            float percentage = (_currentSheepCount / (float)_maxSheepCount) * 100f;
-            EventManager.Broadcast(new SanityChangeEvent(percentage));
+            int oldPoints = _sanityPoints;
 
-            if (_showDebug && _debugText != null)
+            _sanityPoints = Mathf.Max(0, _sanityPoints - points);
+            
+            // only changes when losing a full sheep's worth
+            int oldThreshold = oldPoints > 0 ? Mathf.CeilToInt((float)oldPoints / POINTS_PER_SHEEP) : 0;
+            int newThreshold = _sanityPoints > 0 ? Mathf.CeilToInt((float)_sanityPoints / POINTS_PER_SHEEP) : 0;
+
+            if (newThreshold < oldThreshold && _sanityPoints > 0)
             {
-                _debugText.text = $"Sanity: {percentage:F1}% ({_currentSheepCount}/{_maxSheepCount})";
+                // Remove furthest sheep (TODO: sheep should flee instead of instant removal)
+                RemoveFurthestSheep();
+
+                var clip = _sanityRemoveSound;
+                if (clip)
+                {
+                    //Waiting for sound manager
+                }
+            }
+
+            UpdateSanity();
+        }
+
+        /// <summary>
+        /// Spawns a sheep out of view, walking towards the player
+        /// </summary>
+        private void SpawnSheep()
+        {
+            if (_sheepPrefab == null)
+            {
+                Debug.LogWarning("[SanityTracker] No sheep prefab assigned. Cannot spawn sheep.");
+                return;
+            }
+
+            if (_playerTransform == null)
+            {
+                Debug.LogWarning("[SanityTracker] No player transform assigned. Cannot spawn sheep.");
+                return;
+            }
+
+            // Calculate spawn position out of view
+            Vector3 spawnPosition = GetSpawnPositionOutOfView();
+
+            // Instantiate sheep
+            GameObject newSheepObj = Instantiate(_sheepPrefab, spawnPosition, Quaternion.identity);
+            SheepStateManager newSheep = newSheepObj.GetComponent<SheepStateManager>();
+
+            if (newSheep != null)
+            {
+                // Mark as straggler so it joins the herd
+                newSheep.MarkAsStraggler();
+                
+                EventManager.Broadcast(new SheepJoinEvent(newSheep, false));
+
+                Debug.Log($"[SanityTracker] Spawned sheep at {spawnPosition}");
+            }
+            else
+            {
+                Debug.LogError("[SanityTracker] Spawned sheep prefab does not have SheepStateManager component!");
             }
         }
 
         /// <summary>
-        /// Sets the maximum sheep count
+        /// Calculates a spawn position out of the camera's view
         /// </summary>
-        public void SetMaxSheepCount(int maxCount)
+        private Vector3 GetSpawnPositionOutOfView()
         {
-            _maxSheepCount = Mathf.Max(1, maxCount);
-            UpdateSanity();
+            // Get a random direction behind or to the side of the player
+            float randomAngle = Random.Range(90f, 270f); // Behind player (90-270 degrees from forward)
+            Vector3 direction = Quaternion.Euler(0, randomAngle, 0) * _playerTransform.forward;
+
+            Vector3 spawnPos = _playerTransform.position + direction.normalized * _spawnDistance;
+
+            // Ensure spawn position is on the ground (raycast down)
+            if (Physics.Raycast(spawnPos + Vector3.up * 10f, Vector3.down, out RaycastHit hit, 20f))
+            {
+                spawnPos = hit.point;
+            }
+            else
+            {
+                // If raycast fails, just use player's Y position
+                spawnPos.y = _playerTransform.position.y;
+            }
+
+            return spawnPos;
         }
 
         /// <summary>
-        /// Sets the current sheep count
+        /// Removes the sheep furthest from the player
+        /// NOTE: For now removes instantly, but should make sheep flee instead
         /// </summary>
-        public void SetCurrentSheepCount(int currentCount)
+        private void RemoveFurthestSheep()
         {
-            _currentSheepCount = Mathf.Clamp(currentCount, 0, _maxSheepCount);
-            UpdateSanity();
+            if (_playerTransform == null)
+            {
+                Debug.LogWarning("[SanityTracker] No player transform assigned. Cannot remove furthest sheep.");
+                return;
+            }
+
+            // Find all sheep in the scene
+            SheepStateManager[] allSheep = FindObjectsByType<SheepStateManager>(FindObjectsSortMode.None);
+
+            if (allSheep.Length == 0)
+            {
+                Debug.LogWarning("[SanityTracker] No sheep found to remove.");
+                return;
+            }
+
+            // Find the furthest sheep from player
+            SheepStateManager furthestSheep = allSheep
+                .OrderByDescending(sheep => Vector3.Distance(sheep.transform.position, _playerTransform.position))
+                .FirstOrDefault();
+
+            if (furthestSheep != null)
+            {
+                Debug.Log($"[SanityTracker] Removing furthest sheep: {furthestSheep.name}");
+                // TODO: Make sheep flee instead of instant removal
+                furthestSheep.Remove(false);
+            }
+        }
+
+        /// <summary>
+        /// Calculates and broadcasts sanity percentage and stage
+        /// </summary>
+        private void UpdateSanity()
+        {
+            float percentage = (_sanityPoints / (float)_maxSanityPoints) * 100f;
+            
+            EventManager.Broadcast(new SanityChangeEvent(percentage));
+
+            // Check for stage change
+            SanityStage newStage = GetSanityStage(percentage);
+            if (newStage != _currentStage)
+            {
+                SanityStage oldStage = _currentStage;
+                _currentStage = newStage;
+                EventManager.Broadcast(new SanityStageChangeEvent(oldStage, newStage));
+                Debug.Log($"[SanityTracker] Stage changed: {oldStage} -> {newStage}");
+            }
+            
+            if (_showDebug && _debugText != null)
+            {
+                string stageText = GetStageName(_currentStage);
+                _debugText.text = $"Sanity: {percentage:F1}% ({_sanityPoints}/{_maxSanityPoints}) - {stageText}";
+            }
+        }
+
+        /// <summary>
+        /// Determines sanity stage based on percentage
+        /// </summary>
+        private SanityStage GetSanityStage(float percentage)
+        {
+            return percentage switch
+            {
+                <= 0f => SanityStage.Death,
+                < 25f => SanityStage.BreakingPoint,
+                < 50f => SanityStage.Unstable,
+                < 75f => SanityStage.Fragile,
+                _ => SanityStage.Stable
+            };
+        }
+
+        /// <summary>
+        /// Gets the display name for a sanity stage
+        /// </summary>
+        private string GetStageName(SanityStage stage)
+        {
+            return stage switch
+            {
+                SanityStage.Stable => "Stable",
+                SanityStage.Fragile => "Fragile",
+                SanityStage.Unstable => "Unstable",
+                SanityStage.BreakingPoint => "Breaking Point",
+                SanityStage.Death => "Death",
+                _ => "Unknown"
+            };
         }
     }
 }

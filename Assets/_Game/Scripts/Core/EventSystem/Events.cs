@@ -195,6 +195,23 @@ namespace Core.Events
 
     #endregion FOW_EVENTS
 
+    #region PAUSE_EVENTS
+
+    public class RegisterNewPausableEvent : GameEvent
+    {
+        private IPausable newPausable;
+
+        public IPausable NewPausable => newPausable;
+
+
+        public RegisterNewPausableEvent(IPausable newPausable)
+        {
+            this.newPausable = newPausable;
+        }
+    }
+
+    #endregion PAUSE_EVENTS
+
 
     #region QUEST_EVENTS
 

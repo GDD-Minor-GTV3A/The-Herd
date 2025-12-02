@@ -1,6 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+
+using Core.Events;
+using Core.Shared;
+
 using UnityEngine;
 
 namespace Gameplay.FogOfWar
@@ -8,7 +12,7 @@ namespace Gameplay.FogOfWar
     /// <summary>
     /// Handles logic of creating and updating revealing mesh of the object for Fog Of War.
     /// </summary>
-    public class FogRevealer : MonoBehaviour
+    public class FogRevealer : MonoBehaviour, IPausable
     {
         /// <summary>
         /// Contains all information about revealer.
@@ -49,6 +53,7 @@ namespace Gameplay.FogOfWar
 
 
         private LayerMask obstaclesLayers;
+        private bool isPaused = false;
 
 
         /// <summary>
@@ -60,6 +65,9 @@ namespace Gameplay.FogOfWar
         public virtual void Initialize(Transform fogPlane, Material meshMaterial, LayerMask obstaclesLayers)
         {
             CreateFovMeshes(fogPlane, meshMaterial, obstaclesLayers);
+
+            EventManager.Broadcast(new RegisterNewPausableEvent(this));
+            Resume();
         }
 
 
@@ -100,6 +108,7 @@ namespace Gameplay.FogOfWar
 
         private void Update()
         {
+            if (isPaused) return;
             for (int i = 0; i < revealers.Count; i++)
             {
                 if (revealers[i].Renderer == null) continue;
@@ -224,11 +233,15 @@ namespace Gameplay.FogOfWar
 
         private IEnumerator UpdateMeshCor(float updateTime, int meshIndex)
         {
-            yield return null;
             while (true)
             {
-                yield return new WaitForSeconds(updateTime);
-                UpdateMesh(meshIndex);
+                if (isPaused)
+                    yield return null;
+                else
+                {
+                    yield return new WaitForSeconds(updateTime);
+                    UpdateMesh(meshIndex);
+                }
             }
         }
 
@@ -236,6 +249,16 @@ namespace Gameplay.FogOfWar
         protected virtual void OnDestroy()
         {
             StopAllCoroutines();
+        }
+
+        public void Pause()
+        {
+            isPaused = true;
+        }
+
+        public void Resume()
+        {
+            isPaused = false;
         }
     }
 }

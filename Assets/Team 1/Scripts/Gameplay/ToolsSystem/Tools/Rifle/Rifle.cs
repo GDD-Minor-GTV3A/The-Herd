@@ -1,10 +1,15 @@
 ﻿using System.Collections;
+
 using Core.Events;
 using Core.Shared;
+
 using Gameplay.Player;
+
 using UI;
+
 using UnityEngine;
 using UnityEngine.Events;
+
 
 namespace Gameplay.ToolsSystem.Tools.Rifle
 {
@@ -58,7 +63,6 @@ namespace Gameplay.ToolsSystem.Tools.Rifle
                 return;
             }
 
-            HideUI();
 
             // Initialize the bullet pool using values from config
             bulletPool = new BulletPool(config.BulletPrefab, config.Damage, initialCapacity: 0, maxSize: config.MaxPoolSize);
@@ -66,13 +70,14 @@ namespace Gameplay.ToolsSystem.Tools.Rifle
             playerAnimator = animator;
             currentAmmo = config.MaxAmmo;
             OnAmmoChanged?.Invoke(currentAmmo);
-            gameObject.SetActive(false);
 
-            CooldownUI _cooldown = toolUI.GetComponentInChildren<CooldownUI>(true);
+             CooldownUI _cooldown = toolUI.GetComponentInChildren<CooldownUI>(true);
             if (_cooldown != null)
             {
                 _cooldown.Initialize(config.ReloadTime);
             }
+            HideUI();
+            HideTool();
         }
 
 

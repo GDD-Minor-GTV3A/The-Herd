@@ -1,5 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+
+using Core.AI.Sheep.Event;
+using Core.AI.Sheep;
+using Core.Events;
+
 using UnityEngine;
 
 public enum EnemyState
@@ -17,8 +22,8 @@ public class Monster1AI : MonoBehaviour
 
     [Header("Detection Settings")]
     public float detectionRange = 15f;
-    public float stalkCooldown = 2f;
-    public float timeToVanish = 3f;
+    public float stalkCooldown = 0.1f;
+    public float timeToVanish = 0.1f;
     public float playerTooFarDistance = 20f;
 
     private EnemyState previousState;
@@ -26,16 +31,26 @@ public class Monster1AI : MonoBehaviour
     private FieldOfView fieldOfView;
     private NEWInCameraDetector cameraDetector;
 
-    [Header("Animator")]
+    [Header("Animator / Attack")]
+    [SerializeField] private DetectSheep sheepDetector;
     [SerializeField] private Animator animator;
-    private bool isTeleporting;
+    [SerializeField] private string sheepAttackBoolName = "Attack";
+    [SerializeField] private string attackStateName = "Attack_Scarecrow"; // <- Animator state name
+    [SerializeField] private float sheepLoseDelay = 0.5f;
+    [SerializeField] private float _scareAmount = 1f;
 
-    // Double-event guard (animation may fire twice)
+    private bool _isAttackingSheep = false;
+    private float _sheepLostTimer = 0f;
+
+    [Header("VFX")]
+    [SerializeField] private ScarecrowVFX vfx;
+
+    private bool isTeleporting;
     private bool teleportEventConsumed = false;
 
     private Node[] allNodes;
     private Node currentNode;
-    private Node lastNode; // prevent immediate repeats
+    private Node lastNode;
 
     private float stalkTimer = 0f;
     private float visibleTimer = 0f;
@@ -50,18 +65,23 @@ public class Monster1AI : MonoBehaviour
 
     private Node nextTeleportTarget;
 
-    // Idle teleport safety
+    [Header("Idle Teleport")]
+    [SerializeField] private float idleTeleportDelay = 10f;
     private float idleTimer = 0f;
-    private float idleTeleportDelay = 10f; // seconds before auto teleport if idle too long
 
-    // Optional: also require the target not to be currently in monster FOV
     [Header("Target Filters")]
     public bool requireOutOfPlayerView = true;
     public bool requireOutOfMonsterFOV = false;
 
-    void Start()
+    [Header("Teleport Cooldown")]
+    [SerializeField] private float teleportCooldown = 2f;
+    private float teleportCooldownTimer = 0f;
+
+    private void Start()
     {
-        animator = GetComponent<Animator>();
+        if (animator == null)
+            animator = GetComponent<Animator>();
+
         fieldOfView = GetComponent<FieldOfView>();
         cameraDetector = GetComponent<NEWInCameraDetector>();
 
@@ -69,7 +89,9 @@ public class Monster1AI : MonoBehaviour
         {
             audioSource = GetComponent<AudioSource>();
             if (audioSource == null)
+            {
                 Debug.LogWarning("[Monster1AI] No AudioSource found! Sounds will be skipped safely.");
+            }
         }
 
         allNodes = FindObjectsOfType<Node>();
@@ -80,11 +102,10 @@ public class Monster1AI : MonoBehaviour
             return;
         }
 
-        // Start on closest node
         currentNode = GetClosestNode(transform.position);
         if (currentNode != null)
         {
-            transform.position = currentNode.transform.position; // IMPORTANT: not transform.root!
+            transform.position = currentNode.transform.position;
             lastNode = null;
             Debug.Log($"[Monster1AI] Starting on node: {currentNode.name} @ {transform.position}");
         }
@@ -93,7 +114,7 @@ public class Monster1AI : MonoBehaviour
         previousState = currentState;
     }
 
-    void Update()
+    private void Update()
     {
         if (previousState != currentState)
         {
@@ -101,7 +122,16 @@ public class Monster1AI : MonoBehaviour
             previousState = currentState;
         }
 
-        idleTimer += Time.deltaTime;
+        // Only count idle time when not in attack state
+        if (!IsInAttackState())
+        {
+            idleTimer += Time.deltaTime;
+        }
+
+        if (teleportCooldownTimer > 0f)
+        {
+            teleportCooldownTimer -= Time.deltaTime;
+        }
 
         switch (currentState)
         {
@@ -113,16 +143,18 @@ public class Monster1AI : MonoBehaviour
                 break;
         }
 
-        // Safety teleport if idle too long
-        if (idleTimer >= idleTeleportDelay && !isTeleporting)
+        // Idle teleport
+        if (idleTimer >= idleTeleportDelay && !isTeleporting && !IsInAttackState())
         {
             Debug.Log("[Monster1AI] Idle teleport triggered (timeout).");
             TryTeleport(excludeNode: currentNode);
             idleTimer = 0f;
         }
+
+        HandleSheepAttack();
     }
 
-    void IdleBehavior()
+    private void IdleBehavior()
     {
         if (player != null && Vector3.Distance(player.position, transform.position) < detectionRange)
         {
@@ -130,7 +162,7 @@ public class Monster1AI : MonoBehaviour
         }
     }
 
-    void StalkingBehavior()
+    private void StalkingBehavior()
     {
         stalkTimer -= Time.deltaTime;
 
@@ -143,7 +175,7 @@ public class Monster1AI : MonoBehaviour
             if (visibleTimer >= timeToVanish && stalkTimer <= 0f)
             {
                 Debug.Log("[Monster1AI] Player stared too long -> teleporting!");
-                TryTeleport(excludeNode: currentNode);
+                TryTeleport(excludeNode: currentNode, allowDuringAttack: true); // <- key change
                 visibleTimer = 0f;
                 stalkTimer = stalkCooldown;
             }
@@ -156,16 +188,83 @@ public class Monster1AI : MonoBehaviour
         if (player != null && Vector3.Distance(player.position, transform.position) > playerTooFarDistance && stalkTimer <= 0f)
         {
             Debug.Log("[Monster1AI] Player is too far -> teleporting closer.");
-            TryTeleport(excludeNode: currentNode);
+            TryTeleport(excludeNode: currentNode, allowDuringAttack: false); // blocked while attacking
             stalkTimer = stalkCooldown;
         }
     }
 
+    private void HandleSheepAttack()
+    {
+        if (sheepDetector == null)
+            return;
+
+        bool sheepInRange = sheepDetector.visibleTargets.Count > 0;
+
+        if (sheepInRange)
+        {
+            _sheepLostTimer = 0f;
+
+            foreach (Transform t in sheepDetector.visibleTargets)
+            {
+                if (t.TryGetComponent<SheepStateManager>(out var sheepStateManager))
+                {
+                    EventManager.Broadcast(new SheepScareEvent(
+                        sheepStateManager,
+                        _scareAmount,         // You must define this field
+                        transform.position    // Scarecrow position
+                    ));
+                }
+            }
+
+
+            if (!_isAttackingSheep)
+            {
+                _isAttackingSheep = true;
+                animator.SetBool(sheepAttackBoolName, true);
+
+                if (vfx != null)
+                    vfx.TriggerVFX();
+
+                Debug.Log("[Monster1AI] Sheep detected -> start attack.");
+            }
+        }
+        else
+        {
+            if (_isAttackingSheep)
+            {
+                _sheepLostTimer += Time.deltaTime;
+
+                if (_sheepLostTimer >= sheepLoseDelay)
+                {
+                    _isAttackingSheep = false;
+                    animator.SetBool(sheepAttackBoolName, false);
+                    Debug.Log("[Monster1AI] Sheep gone -> stop attack.");
+                }
+            }
+            else
+            {
+                _sheepLostTimer = 0f;
+            }
+        }
+    }
+
+    public void FreezePose()
+    {
+        // Make sure this matches your attack state/clip name
+        animator.Play(attackStateName, 0, 1f);
+        Debug.Log("Monster forced to final attack frame.");
+    }
+
     // ===== Teleport selection =====
 
-    void TryTeleport(Node excludeNode)
+    private void TryTeleport(Node excludeNode, bool allowDuringAttack = false)
     {
-        if (isTeleporting) return; // block repeat
+        
+        if (!allowDuringAttack && IsInAttackState())
+            return;
+
+        if (isTeleporting || teleportCooldownTimer > 0f || nextTeleportTarget != null)
+            return;
 
         if (allNodes == null || allNodes.Length == 0)
         {
@@ -187,17 +286,17 @@ public class Monster1AI : MonoBehaviour
         }
     }
 
-    Node PickBestNode(Node excludeNode)
+
+    private Node PickBestNode(Node excludeNode)
     {
         Camera cam = (cameraDetector != null) ? cameraDetector.cam : Camera.main;
 
-        // Build candidate list
         List<Node> candidates = new List<Node>();
         foreach (var n in allNodes)
         {
             if (n == null) continue;
-            if (n == excludeNode) continue;     // not the current node
-            if (n == lastNode) continue;        // not the immediately previous node (prevents repeats)
+            if (n == excludeNode) continue;
+            if (n == lastNode) continue;
 
             bool ok = true;
 
@@ -209,16 +308,13 @@ public class Monster1AI : MonoBehaviour
 
             if (ok && requireOutOfMonsterFOV && fieldOfView != null)
             {
-                // Simple LOS from monster "eyes" to node
                 Vector3 eyePos = transform.position + Vector3.up * 1.5f;
                 Vector3 dir = (n.transform.position - eyePos).normalized;
                 float dist = Vector3.Distance(eyePos, n.transform.position);
 
-                // Reuse obstruction mask from FOV if set; otherwise nothing blocks
                 LayerMask mask = fieldOfView.obstructionMask;
                 if (!Physics.Raycast(eyePos, dir, dist, mask))
                 {
-                    // Node is directly visible -> reject if we require "out of monster FOV"
                     ok = false;
                 }
             }
@@ -226,7 +322,6 @@ public class Monster1AI : MonoBehaviour
             if (ok) candidates.Add(n);
         }
 
-        // If too strict and nothing left, relax to "anything except current"
         if (candidates.Count == 0)
         {
             foreach (var n in allNodes)
@@ -238,7 +333,6 @@ public class Monster1AI : MonoBehaviour
 
         if (candidates.Count == 0) return null;
 
-        // Choose the candidate closest to the player (feels smart)…
         Node best = candidates[0];
         float bestDist = (player != null)
             ? Vector3.Distance(player.position, best.transform.position)
@@ -260,20 +354,17 @@ public class Monster1AI : MonoBehaviour
         return best;
     }
 
-    // Camera visibility check for a world point
-    bool IsPointVisibleToCamera(Vector3 worldPos, Camera cam)
+    private bool IsPointVisibleToCamera(Vector3 worldPos, Camera cam)
     {
         if (cam == null) return false;
 
         Vector3 vp = cam.WorldToViewportPoint(worldPos);
-        if (vp.z <= 0f) return false; // behind camera
-        if (vp.x < 0f || vp.x > 1f || vp.y < 0f || vp.y > 1f) return false; // off screen
+        if (vp.z <= 0f) return false;
+        if (vp.x < 0f || vp.x > 1f || vp.y < 0f || vp.y > 1f) return false;
 
-        // Optional: confirm unobstructed line of sight from camera to the point
         Ray ray = cam.ScreenPointToRay(new Vector3(vp.x * cam.pixelWidth, vp.y * cam.pixelHeight, 0));
         if (Physics.Raycast(ray, out RaycastHit hit, 1000f))
         {
-            // If the first thing hit is very close to the node position, we consider it "visible"
             return Vector3.Distance(hit.point, worldPos) < 0.75f;
         }
         return false;
@@ -282,7 +373,7 @@ public class Monster1AI : MonoBehaviour
     private IEnumerator PlayTeleportAnimation()
     {
         isTeleporting = true;
-        teleportEventConsumed = false; // allow exactly one event to act
+        teleportEventConsumed = false;
 
         animator.SetTrigger("Teleport");
 
@@ -297,20 +388,17 @@ public class Monster1AI : MonoBehaviour
         }
 
         Debug.Log("[Monster1AI] Teleport animation triggered.");
-        yield return new WaitForSeconds(0.13f); // small wait to sync with animation timing
 
-        isTeleporting = false; // we still wait for event to move
+        yield return null;
+
         idleTimer = 0f;
     }
 
-    // Called by animation event (ensure there is only ONE event on the Teleport clip)
     public void OnTeleportMoment()
     {
         if (teleportEventConsumed)
-        {
-            // Ignore duplicate events
             return;
-        }
+
         teleportEventConsumed = true;
 
         Debug.Log($"[Monster1AI] Teleport event fired at {Time.time}");
@@ -320,7 +408,6 @@ public class Monster1AI : MonoBehaviour
             Vector3 from = transform.position;
             Vector3 to = nextTeleportTarget.transform.position;
 
-            // IMPORTANT: move only THIS transform, not root
             transform.position = to;
 
             lastNode = currentNode;
@@ -333,6 +420,21 @@ public class Monster1AI : MonoBehaviour
         {
             Debug.LogWarning("[Monster1AI] TeleportMoment called but no target set!");
         }
+
+        isTeleporting = false;
+        teleportCooldownTimer = teleportCooldown;
+        nextTeleportTarget = null;
+
+        visibleTimer = 0f;
+        stalkTimer = stalkCooldown;
+    }
+
+    private bool IsInAttackState()
+    {
+        if (animator == null) return false;
+
+        AnimatorStateInfo info = animator.GetCurrentAnimatorStateInfo(0);
+        return info.IsName(attackStateName);
     }
 
     private void OnStateChanged(EnemyState oldState, EnemyState newState)
@@ -348,14 +450,10 @@ public class Monster1AI : MonoBehaviour
         }
     }
 
-    // === Sound Handling (safe) ===
     private void PlayStateSound(AudioClip clip, bool loop)
     {
         if (audioSource == null || clip == null)
-        {
-            // Silent mode OK
             return;
-        }
 
         audioSource.Stop();
         audioSource.clip = clip;
@@ -364,8 +462,7 @@ public class Monster1AI : MonoBehaviour
         audioSource.Play();
     }
 
-    // === Node Helpers ===
-    Node GetClosestNode(Vector3 pos)
+    private Node GetClosestNode(Vector3 pos)
     {
         Node closest = null;
         float minDist = Mathf.Infinity;

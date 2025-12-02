@@ -14,7 +14,7 @@ namespace Gameplay.Player
     /// Base player script.
     /// </summary>
     [RequireComponent(typeof(PlayerMovement), typeof(PlayerStateManager))]
-    [RequireComponent(typeof(PlayerInput), typeof(ToolSlotsController), typeof(CharacterController))]
+    [RequireComponent(typeof(PlayerInput), typeof(CharacterController))]
     public class Player : MonoBehaviour, IDamageable, IHealable, IKillable
     {
         [Header("Animations")]
@@ -61,12 +61,6 @@ namespace Gameplay.Player
         private Health health;
 
 
-        // for test, needs to be moved to bootstrap
-        private void Start()
-        {
-            Initialize();
-        }
-
         /// <summary>
         /// Initialization method.
         /// </summary>
@@ -102,7 +96,8 @@ namespace Gameplay.Player
 
             config.OnValueChanged += UpdateConfigValues;
 
-            _slotsController.Initialize(_playerInput, _playerAnimator, 2);
+            if (_slotsController != null)
+                _slotsController.Initialize(_playerInput, _playerAnimator, 2);
             
             dmgEffect.Initialize();
             vignetteEffect.Initialize();

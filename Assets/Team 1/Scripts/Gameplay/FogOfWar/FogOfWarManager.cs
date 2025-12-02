@@ -11,7 +11,7 @@ namespace Gameplay.FogOfWar
     /// <summary>
     /// Main Fog Of War script. Creates all required objects, initialize revealers and update objects which are hidden in the fog.
     /// </summary>
-    public class FogOfWarManager : MonoBehaviour
+    public class FogOfWarManager : MonoBehaviour, IPausable
     {
         [SerializeField, Required, Tooltip("Player root object. Required for proper planes positioning.")] 
         private Transform playerTransform;
@@ -60,13 +60,7 @@ namespace Gameplay.FogOfWar
         private MeshRenderer fogProjectionPlane;
         private Camera renderCamera;
         private DecalProjector decal;
-
-
-        // for test, needs to be moved to bootstrap
-        private void Start()
-        {
-            Initialize();
-        }
+        private bool isPaused = false;
 
 
         /// <summary>
@@ -86,15 +80,16 @@ namespace Gameplay.FogOfWar
             SetUpComputeShader();
 
             foreach (FogRevealer revealer in revealers)
-            {
                 revealer.Initialize(fogProjectionPlane.transform, revealerMaterial, obstaclesLayers);
-            }
 
             fogOfWarConfig.OnValueChanged += UpdateValuesFromFogConfig;
             levelData.OnValueChanged += UpdateValuesFromLevelData;
 
             EventManager.AddListener<AddHiddenObjectEvent>(AddNewHiddenObject);
             EventManager.AddListener<RemoveHiddenObjectEvent>(RemoveHiddenObject);
+
+            EventManager.Broadcast(new RegisterNewPausableEvent(this));
+            Resume();
         }
 
 
@@ -372,6 +367,11 @@ namespace Gameplay.FogOfWar
 
         private void Update()
         {
+            if (isPaused) return;
+            if (fogProjectionPlane == null) Debug.LogError("FOW: fogProjectionPlane is NULL", this);
+            if (playerTransform == null) Debug.LogError("FOW: playerTransform is NULL", this);
+            if (fogMaterial == null) Debug.LogError("FOW: fogMaterial is NULL", this);
+
             fogProjectionPlane.transform.position = new Vector3(playerTransform.position.x, fogProjectionPlane.transform.position.y, playerTransform.position.z);
 
             fogMaterial.SetVector("_Player_Position", playerTransform.position);
@@ -379,6 +379,15 @@ namespace Gameplay.FogOfWar
             UpdateHiddenObjectsVisibility();
         }
 
+
+        private void OnDestroy()
+        {
+            fogOfWarConfig.OnValueChanged -= UpdateValuesFromFogConfig;
+            levelData.OnValueChanged -= UpdateValuesFromLevelData;
+
+            EventManager.RemoveListener<AddHiddenObjectEvent>(AddNewHiddenObject);
+            EventManager.RemoveListener<RemoveHiddenObjectEvent>(RemoveHiddenObject);
+        }
 
         private void OnDrawGizmos()
         {
@@ -406,14 +415,14 @@ namespace Gameplay.FogOfWar
             }
         }
 
-
-        private void OnDestroy()
+        public void Pause()
         {
-            fogOfWarConfig.OnValueChanged -= UpdateValuesFromFogConfig;
-            levelData.OnValueChanged -= UpdateValuesFromLevelData;
+            isPaused = true;
+        }
 
-            EventManager.RemoveListener<AddHiddenObjectEvent>(AddNewHiddenObject);
-            EventManager.RemoveListener<RemoveHiddenObjectEvent>(RemoveHiddenObject);
+        public void Resume()
+        {
+            isPaused = false;
         }
     }
 }
