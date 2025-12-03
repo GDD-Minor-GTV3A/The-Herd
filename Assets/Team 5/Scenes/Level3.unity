@@ -12433,10 +12433,6 @@ Transform:
   - {fileID: 414398794}
   - {fileID: 1930592943}
   - {fileID: 1227726048}
-  - {fileID: 323077683}
-  - {fileID: 65238685}
-  - {fileID: 264833358}
-  - {fileID: 1118400724}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &163769512
@@ -35628,6 +35624,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 0}
+  cam: {fileID: 0}
   triggerName: PlayAnim
 --- !u!1 &624759624 stripped
 GameObject:
@@ -46426,6 +46423,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 848350782}
+  cam: {fileID: 0}
   triggerName: PlayAnim
 --- !u!65 &757802214
 BoxCollider:
@@ -53660,10 +53658,6 @@ Transform:
   - {fileID: 858479224}
   - {fileID: 601820753}
   - {fileID: 1378026823}
-  - {fileID: 1232299661}
-  - {fileID: 1596711984}
-  - {fileID: 1648857135}
-  - {fileID: 2060849441}
   - {fileID: 757802212}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -84965,7 +84959,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 366954846902213099, guid: 949b4c49ab05bbb4abde14eee43ce17a, type: 3}
       propertyPath: field of view
-      value: 65
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 366954846902213099, guid: 949b4c49ab05bbb4abde14eee43ce17a, type: 3}
       propertyPath: near clip plane
@@ -90912,7 +90906,7 @@ MonoBehaviour:
   redLights:
   - {fileID: 1454971123}
   - {fileID: 1596762421}
-  enemyManager: {fileID: 270533201}
+  enemyManager: {fileID: 0}
 --- !u!4 &1822314548
 Transform:
   m_ObjectHideFlags: 0
@@ -103634,7 +103628,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &2128779651
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -103665,7 +103659,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.16666667
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: a87d6a897102fe040868ec37d8c4dc2b, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: b72cf137cb383bb45ac447b43d339f98, type: 2}
   m_BuildHeightMesh: 0
 --- !u!4 &2128779652
 Transform:
@@ -103712,7 +103706,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.16666667
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: f07686614aaf75c47a4ad76e7b8d2170, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: 2ef1290d075a48b409ecafb2065aef57, type: 2}
   m_BuildHeightMesh: 0
 --- !u!114 &2129570325 stripped
 MonoBehaviour:
