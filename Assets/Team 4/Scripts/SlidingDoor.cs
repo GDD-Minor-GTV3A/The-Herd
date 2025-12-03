@@ -11,7 +11,7 @@ public class SlidingDoor : MonoBehaviour
     private Vector3 startPosition;
     private bool isSliding = false;
     private bool isLocked = true;
-    private bool isOpen = false;
+    public bool isOpen { get; private set; } = false;
 
     private void Awake()
     {
