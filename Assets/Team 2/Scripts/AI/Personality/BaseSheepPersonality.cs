@@ -17,6 +17,9 @@ namespace Core.AI.Sheep.Personality
     {
         protected readonly SheepStateManager _sheep;
 
+        private Vector3 _lastFinalDestination;
+        private bool _hasLastFinalDestination;
+
         protected BaseSheepPersonality(SheepStateManager sheep)
         {
             _sheep = sheep;
@@ -113,6 +116,9 @@ namespace Core.AI.Sheep.Personality
             return sheep.transform.position + playerHalf + new Vector3(rand.x, 0f, rand.y);
         }
 
+#if UNITY_EDITOR
+        private Vector3 _lastLoggedFinal;
+#endif
         public virtual void SetDestinationWithHerding(Vector3 destination, SheepStateManager sheep, PersonalityBehaviorContext context)
         {
             Vector3 goal = context.HasThreat && context.Threats.Count > 0
@@ -157,14 +163,15 @@ namespace Core.AI.Sheep.Personality
             float alignW = sheep.Config?.AlignmentWeight ?? 0.6f;
             float clamp = sheep.Config?.SteerClamp ?? 2.5f;
 
-            Vector3 flockSteer = FlockingUtility.Steering(
+            /*Vector3 flockSteer = FlockingUtility.Steering(
                 sheep.transform,
                 sheep.Neighbours,
                 sepDist,
                 sepW,
                 alignW,
                 clamp
-            );
+            );*/
+            Vector3 flockSteer = Vector3.zero;
 
             Vector3 repulsion = Vector3.zero;
             Vector3 fromPlayerToSheep = sheep.transform.position - playerPos;
@@ -181,12 +188,38 @@ namespace Core.AI.Sheep.Personality
             }
             
             Vector3 final = sheep.transform.position + desired + flockSteer + repulsion;
+#if UNITY_EDITOR
+            if ((final - _lastLoggedFinal).sqrMagnitude > 1f)
+            {
+                //Debug.Log($"[{sheep.name}] FINAL DESTINATION JUMP at frame {Time.frameCount}: {final}");
+                _lastLoggedFinal = final;
+            }
+#endif
+            const float MIN_DELTA = 0.4f;
+            const float MAX_DELTA = 1f;
+
+            if (_hasLastFinalDestination)
+            {
+                Vector3 delta = final - _lastFinalDestination;
+                float dist = delta.magnitude;
+
+                if (dist < MIN_DELTA)
+                {
+                    final =  _lastFinalDestination;
+                }
+                else if (dist > MAX_DELTA)
+                {
+                    final = _lastFinalDestination + delta.normalized * MAX_DELTA;
+                }
+            }
+
+            _lastFinalDestination = final;
+            _hasLastFinalDestination = true;
 
             if (sheep.CanControlAgent())
             {
                 float baseSpeed = sheep.Config?.BaseSpeed ?? 2.2f;
                 bool isFleeing = context.HasThreat;
-                
                 sheep.Agent.speed = isFleeing ? baseSpeed * 1.5f : baseSpeed;
                 sheep.Agent.SetDestination(final);
 
@@ -197,9 +230,7 @@ namespace Core.AI.Sheep.Personality
                     if (look.sqrMagnitude > 0.0001f)
                     {
                         var q = Quaternion.LookRotation(look);
-                        sheep.transform.rotation = Quaternion.Slerp(sheep.transform.rotation, 
-                            q,
-                            Time.deltaTime * 10f);
+                        sheep.transform.rotation = Quaternion.Slerp(sheep.transform.rotation, q, Time.deltaTime * 10f);
                     }
                 }
             }

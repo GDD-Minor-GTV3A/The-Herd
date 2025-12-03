@@ -13,11 +13,11 @@ namespace UI
         private TextMeshProUGUI ammoText;
 
 
-        public void UpdateAmmoText(int ammoAmount)
+        public void UpdateAmmoText(int magazineCapacity, uint freeAmmoAmount)
         {
             if (ammoText != null)
             {
-                ammoText.text = $"{ammoAmount}";
+                ammoText.text = $"{magazineCapacity}/{freeAmmoAmount}";
             }
         }
     }
