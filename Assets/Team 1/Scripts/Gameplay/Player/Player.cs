@@ -1,6 +1,8 @@
 using Core.Shared.Utilities;
 using Gameplay.Effects;
 using Gameplay.HealthSystem;
+using Gameplay.Inventory;
+using Gameplay.Map;
 using Gameplay.ToolsSystem;
 using UI;
 using UI.Effects;
@@ -34,6 +36,10 @@ namespace Gameplay.Player
         [Space, Header("UI")]
         [SerializeField, Required, Tooltip("Reference for HP bar component.")] 
         private HPBarUI hpBar;
+        [SerializeField, Required, Tooltip("Reference for InventoryToggle component.")] 
+        private InventoryToggle inventoryButton;
+        [SerializeField, Tooltip("Reference for MapToggle component.")] 
+        private MapToggle mapToggle;
 
         [Space]
         [SerializeField, Tooltip("Manager of step sounds.")]
@@ -91,6 +97,10 @@ namespace Gameplay.Player
             PlayerAnimator _playerAnimator = new PlayerAnimator(animator, this, transform, animationConstrains);
             _stateManager.Initialize(_playerInput, movementController, _playerAnimator);
 
+            inventoryButton.Initialize(_playerInput.Inventory);
+            if (mapToggle != null)
+                mapToggle.Initialize(_playerInput);
+
             // Init health
             health = new Health(config);
 
@@ -132,7 +142,7 @@ namespace Gameplay.Player
         public void Die()
         {
             DeathEvent?.Invoke();
-            Debug.Log("You are Died!");
+            health.ResetHealth();
         }
 
 
