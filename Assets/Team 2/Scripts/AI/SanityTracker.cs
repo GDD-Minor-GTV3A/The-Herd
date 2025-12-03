@@ -95,7 +95,7 @@ namespace Core.AI.Sheep
         private void OnSheepDeath(SheepDeathEvent e)
         {
             if (!e.CountTowardSanity) return;
-            RemoveSanityPointsInternal(POINTS_PER_SHEEP / 2);
+            RemoveSanityPointsInternal(POINTS_PER_SHEEP, false);
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace Core.AI.Sheep
         private void OnSheepJoin(SheepJoinEvent e)
         {
             if (!e.CountTowardSanity) return;
-            AddSanityPointsInternal(POINTS_PER_SHEEP / 2);
+            AddSanityPointsInternal(POINTS_PER_SHEEP, false);
         }
 
         /// <summary>
@@ -138,7 +138,7 @@ namespace Core.AI.Sheep
         /// <summary>
         /// Internal method to add sanity points
         /// </summary>
-        private void AddSanityPointsInternal(int points)
+        private void AddSanityPointsInternal(int points, bool addSheep = true)
         {
             int oldPoints = _sanityPoints;
 
@@ -149,7 +149,7 @@ namespace Core.AI.Sheep
             int oldThreshold = oldPoints / POINTS_PER_SHEEP;
             int newThreshold = _sanityPoints / POINTS_PER_SHEEP;
 
-            if (newThreshold > oldThreshold)
+            if (newThreshold > oldThreshold && addSheep)
             {
                 // Spawn a sheep (doesn't count towards sanity)
                 SpawnSheep();
@@ -168,7 +168,7 @@ namespace Core.AI.Sheep
         /// <summary>
         /// Internal method to remove sanity points
         /// </summary>
-        private void RemoveSanityPointsInternal(int points)
+        private void RemoveSanityPointsInternal(int points, bool removeSheep = true)
         {
             int oldPoints = _sanityPoints;
 
@@ -178,7 +178,7 @@ namespace Core.AI.Sheep
             int oldThreshold = oldPoints > 0 ? Mathf.CeilToInt((float)oldPoints / POINTS_PER_SHEEP) : 0;
             int newThreshold = _sanityPoints > 0 ? Mathf.CeilToInt((float)_sanityPoints / POINTS_PER_SHEEP) : 0;
 
-            if (newThreshold < oldThreshold && _sanityPoints > 0)
+            if (newThreshold < oldThreshold && _sanityPoints > 0 && removeSheep)
             {
                 // Remove furthest sheep (TODO: sheep should flee instead of instant removal)
                 RemoveFurthestSheep();
