@@ -68,12 +68,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 4607321907588713866}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: db0452d576429ac4b86a13ed6b31254d, type: 3}
+  m_Script: {fileID: 11500000, guid: a65fa025e3e68e542b440679fe223220, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _config: {fileID: 11400000, guid: a315586506ad64147acec4d4f83e8d2d, type: 2}
   _archetype: {fileID: 11400000, guid: af609ab8455ff234482080e93f959104, type: 2}
   _animation: {fileID: 4010757028322601433}
+  _deathDistanceInterval: 0.5
   _sheepSoundDriver: {fileID: 855214617170984871}
   _neighbours: []
   _joinHerdVFXPrefab: {fileID: 0}
@@ -134,6 +135,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66c01baaf74c0964eaddf595bfe90c84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _walkingAudioSource: {fileID: 0}
+  _bleatingAudioSource: {fileID: 0}
+  _miscAudioSource: {fileID: 0}
   _walkingSound: {fileID: 8300000, guid: 491095ee20a38634eb6f3d2ee4f12df4, type: 3}
 --- !u!1001 &7202839196276731856
 PrefabInstance:
