@@ -181,6 +181,7 @@ GameObject:
   - component: {fileID: 2328448271608897750}
   - component: {fileID: 9146458439907415834}
   - component: {fileID: -5832850277584567378}
+  - component: {fileID: 8305555662025546995}
   m_Layer: 14
   m_Name: Sheep newest
   m_TagString: Sheep
@@ -237,7 +238,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4607321907588713866}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: db0452d576429ac4b86a13ed6b31254d, type: 3}
+  m_Script: {fileID: 11500000, guid: a65fa025e3e68e542b440679fe223220, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _config: {fileID: 11400000, guid: a315586506ad64147acec4d4f83e8d2d, type: 2}
@@ -386,6 +387,31 @@ MonoBehaviour:
     StartingAngle: 0
     Mesh: {fileID: 0}
   origin: {fileID: 0}
+--- !u!114 &8305555662025546995
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4607321907588713866}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a65fa025e3e68e542b440679fe223220, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _config: {fileID: 0}
+  _archetype: {fileID: 0}
+  _animation: {fileID: 0}
+  _deathDistanceInterval: 0.5
+  _sheepSoundDriver: {fileID: 0}
+  _neighbours: []
+  _joinHerdVFXPrefab: {fileID: 0}
+  _leaveHerdVFXPrefab: {fileID: 0}
+  _vfxOffset: {x: 0, y: 0.3, z: 0}
+  _flashbackImage: {fileID: 0}
+  _threatMemory: 1.25
+  _startAsStraggler: 0
+  _joinGrace: 3
 --- !u!1 &6242324432467352130
 GameObject:
   m_ObjectHideFlags: 0
