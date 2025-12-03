@@ -1,0 +1,119 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7652926358080042692
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1589522986917101634}
+  - component: {fileID: 7694224471242102894}
+  m_Layer: 0
+  m_Name: ShamanDialogueManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1589522986917101634
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7652926358080042692}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 1394.4321, y: 725.1644, z: 106.94281}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7694224471242102894
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7652926358080042692}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e086601e65163f45bea4b79fd21d6f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shamanSpawner: {fileID: 0}
+  dialoguePanel: {fileID: 0}
+  dialogueText: {fileID: 0}
+  speakerNameText: {fileID: 0}
+  choiceButtons: {fileID: 0}
+  portraitFrame: {fileID: 0}
+  shamanSprite: {fileID: 21300000, guid: 4a831e8fcdf52a8419d0886fd255c57e, type: 3}
+  playerSprite: {fileID: 21300000, guid: 7b129483a7d9dd14384f99dc2457d24c, type: 3}
+  lines:
+  - speaker: Shaman
+    text: "Ah\u2026  A wandering Shepard\u2026  And his flock\u2026  What a delectable
+      treat\u2026 "
+    choices: []
+    nextAfterThis: -1
+  - speaker: Shaman
+    text: "What finds one\u2026  Such as yourself\u2026  Out of their farm\u2026 
+      At a time like this\u2026? "
+    choices:
+    - text: What are you?
+      nextLineIndex: 2
+    - text: None of your business.
+      nextLineIndex: 3
+    - text: '*Stay quiet*'
+      nextLineIndex: 4
+    nextAfterThis: -1
+  - speaker: Shaman
+    text: "What am I\u2026?  A very good\u2026  Question\u2026 "
+    choices: []
+    nextAfterThis: 5
+  - speaker: Shaman
+    text: "A feisty one\u2026 Your self preservation\u2026 Is not high is it\u2026 
+      Young one\u2026 "
+    choices: []
+    nextAfterThis: 5
+  - speaker: Shaman
+    text: "Silence\u2026 From fear\u2026 Or disbelief\u2026? "
+    choices: []
+    nextAfterThis: 5
+  - speaker: Shaman
+    text: "Nevertheless\u2026 I sense a feint\u2026 Presence\u2026 A fallen one\u2026 "
+    choices: []
+    nextAfterThis: -1
+  - speaker: Shaman
+    text: "I also notice\u2026 The presence of\u2026 A totem in\u2026 Your possession\u2026 "
+    choices: []
+    nextAfterThis: -1
+  - speaker: Shaman
+    text: "I am able to\u2026 Bring them back\u2026  If you so please\u2026 For that
+      totem\u2026 "
+    choices:
+    - text: Why would you want the totem?
+      nextLineIndex: 8
+    - text: You can do that?
+      nextLineIndex: 9
+    - text: Anything to get them back.
+      nextLineIndex: 10
+    nextAfterThis: -1
+  - speaker: Shaman
+    text: "That is\u2026 None of your\u2026 Concern\u2026 "
+    choices: []
+    nextAfterThis: 11
+  - speaker: Shaman
+    text: "Yes\u2026 Now\u2026 The totem\u2026? "
+    choices: []
+    nextAfterThis: 11
+  - speaker: Shaman
+    text: "Good\u2026"
+    choices: []
+    nextAfterThis: 11
+  - speaker: Shaman
+    text: "Let\u2019s begin\u2026"
+    choices: []
+    nextAfterThis: -1
