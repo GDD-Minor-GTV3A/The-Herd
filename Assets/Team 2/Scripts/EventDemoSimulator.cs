@@ -114,7 +114,7 @@ namespace Core.AI.Sheep
                     case KeyCode.J:
                         SpawnSheep();
                         break;
-                    case KeyCode.P:
+                    case KeyCode.V:
                         TriggerPetSheep();
                         break;
                     case KeyCode.L:
@@ -375,7 +375,7 @@ namespace Core.AI.Sheep
 <color=yellow>T</color> - Threat Detected
 <color=yellow>K</color> - Kill Sheep (Death Event)
 <color=yellow>J</color> - Spawn Sheep (Join Event)
-<color=yellow>P</color> - Pet Sheep (RequestPetSheepEvent)
+<color=yellow>V</color> - Pet Sheep (RequestPetSheepEvent)
 <color=yellow>L</color> - Scare Sheep (Trigger Panic)
 <color=yellow>O</color> - Get sheep in herd
 
