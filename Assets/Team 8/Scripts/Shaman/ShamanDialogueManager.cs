@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class ShamanDialogueManager : MonoBehaviour
 {
-    public ShamanDialogueTrigger shamanDialogueTrigger;
+    public ShamanSpawner shamanSpawner;
 
     [Header("UI References")]
     public GameObject dialoguePanel;
@@ -140,11 +140,14 @@ public class ShamanDialogueManager : MonoBehaviour
         ShowLine();
     }
 
-    void EndDialogue()
+    public void EndDialogue()
     {
         dialoguePanel.SetActive(false);
         choiceButtons.SetActive(false);
         inDialogue = false;
-        shamanDialogueTrigger.ShowInterText();
+        if (shamanSpawner.Triggered == true)
+        {
+            shamanSpawner.InterText.enabled = true;
+        }
     }
 }

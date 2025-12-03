@@ -1,4 +1,4 @@
-using UnityEngine;
+/*using UnityEngine;
 using TMPro;
 
 public class ShamanDialogueTrigger : MonoBehaviour
@@ -48,4 +48,4 @@ public class ShamanDialogueTrigger : MonoBehaviour
             _interText.enabled = true;
     }
 
-}
+}*/
