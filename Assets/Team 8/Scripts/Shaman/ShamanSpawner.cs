@@ -1,4 +1,5 @@
 using UnityEngine;
+using TMPro;
 
 public class ShamanSpawner : MonoBehaviour
 {
@@ -8,13 +9,19 @@ public class ShamanSpawner : MonoBehaviour
     [Header("Audio Settings")]
     public AudioSource shamanSound; 
     
+    public ShamanDialogueManager shamanDialogueManager;
+    
     private bool triggered = false;
+    public bool Triggered => triggered;
+
+    public TextMeshProUGUI InterText;
 
     void OnTriggerEnter(Collider other)
     {
         if (!triggered && other.CompareTag("Player"))
         {
             triggered = true;
+            InterText.enabled = true;
             SpawnShaman();
             ControlAudio();
         }
@@ -25,8 +32,19 @@ public class ShamanSpawner : MonoBehaviour
         if (triggered && other.CompareTag("Player"))
         {
             triggered = false;
+            InterText.enabled = false;
             DespawnShaman();
             RestoreAudio();
+            shamanDialogueManager.EndDialogue();
+        }
+    }
+    
+    void Update()
+    {
+        if (triggered && Input.GetKeyDown(KeyCode.E))
+        {
+            shamanDialogueManager.StartDialogue();
+            InterText.enabled = false;
         }
     }
 
@@ -45,7 +63,7 @@ public class ShamanSpawner : MonoBehaviour
         if (audio.musicSource != null)
             audio.musicSource.Stop();
         //if (audio.sfxSource != null)
-            //audio.sfxSource.Stop();
+           // audio.sfxSource.Stop();
 
         // Also stop all 3D sound boxes
         foreach (var box in audio.soundBoxes)
