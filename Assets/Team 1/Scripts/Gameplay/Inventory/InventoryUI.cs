@@ -160,7 +160,7 @@ namespace Gameplay.Inventory
             if (PlayerInventory.Instance.data.reviveTotems > 1)
             {
                 reviveTotems.gameObject.SetActive(true);
-                reviveTotems.SetText(PlayerInventory.Instance.data.scrolls.ToString());
+                reviveTotems.SetText(PlayerInventory.Instance.data.reviveTotems.ToString());
             }
             else
             {
