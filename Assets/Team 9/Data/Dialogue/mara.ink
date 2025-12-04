@@ -42,11 +42,11 @@ EXTERNAL CompleteObjective(string, string)
 
 = intro_dialogue
 #speaker:Mara
-You should not have come here… The cold follows those who seek me.
+You arrived sooner than I expected. The cold always brings wandering souls to my door.
 
 + [I was just passing by.]
     #speaker:Mara
-    No one comes here “by accident.” The woods do not allow it.
+    No one comes here “by accident. The woods do not allow it.
 + [Are you Mara? The villagers warned me about you.]
     #speaker:Mara
     They fear what they do not understand. One day, you will too.
@@ -63,9 +63,7 @@ But winter is approaching. And winter… takes.
 What do you want from me?
 
 #speaker:Mara
-Not from you. From Her.  
-*She points at something unseen.*  
-Morana watches us. She demands the old ways be restored.
+Not from you. From Her. *She points at something unseen.* Morana watches us. She demands the old ways be restored.
 
 + [I don’t deal with spirits.]
     #speaker:Mara
@@ -79,8 +77,7 @@ Morana watches us. She demands the old ways be restored.
 -
 
 #speaker:Mara
-Bring me the pieces. I will carve the face of the goddess.  
-And together… we will drown death itself.
+Bring me the pieces. I will carve the face of the goddess. And together… we will drown death itself.
 
 + [Accept quest: I’ll find the items you need.]
     ~ QUEST_002_accepted = true
@@ -136,8 +133,6 @@ Then keep to the paths where the snow does not whisper. Bring the pieces soon…
 
 = stage_002_dialogue
 ~ STAGE_001_completed = true
-#speaker:Narrator
-The player returns to Mara’s cabin. The mist outside is heavier than before. Inside, the air is freezing.
 
 #speaker:Mara
 You have them… I can feel their weight before you even step inside.
@@ -145,36 +140,24 @@ You have them… I can feel their weight before you even step inside.
 #speaker:Player
 Yes. Here.
 
-#speaker:Narrator
-Mara touches the straw, the fabric, the ribbon. Her hand lingers on the red ribbon, caressing it as if it were alive.
-
 #speaker:Mara
-Good… good… the threads of winter are weaving together again.  
-But it is not complete.
+Well… well… the bones of winter are regaining their shape. The effigy is complete… and it is hungry.
 
 #speaker:Player
-What’s missing?
+What now?
 
 #speaker:Mara
-The face. Without a face, she cannot see us. Without eyes, she cannot judge us.
+Now she sees you. She sees right through you.
 
-#speaker:Narrator
-Mara picks up a sheep skull from the corner. Her hands tremble as she carves pagan symbols into it with a rusty knife, murmuring strange words.
+#speaker:Mara
+Blood for lines, breath for form… She is already walking beside us.
 
 + [What are you whispering?]
-    #speaker:Mara
-    Not for your ears. To speak her name too often is to invite frost into your lungs.
 + [This is madness.]
-    #speaker:Mara
-    Madness is denying the cold when your bones already ache. Madness is pretending the dead do not hunger.
 + [Say nothing.]
-    #speaker:Mara
-    Wise again. The sheep bleat, but the shepherd knows when silence is safer.
 -
-
 #speaker:Mara
-It is done. The effigy breathes now.  
-You must carry it to the altar, north of the village. Cast it into the frozen water, or the hunger of winter will never end.
+Go to the frozen altar, north of the village. Offer her what we have crafted. Burn her... or drown her. Winter will decide the rest..
 
 #speaker:Player
 And if I refuse?
@@ -192,10 +175,6 @@ Then you will feed her with your flock… and your soul.
 ~ QUEST_002_completed = true
 ~ all_QUEST_002_objectives_completed = true
 
-#speaker:Narrator
-The player carries the effigy through the storm to the frozen altar.  
-The sheep panic. The dog refuses to approach. Mara appears near the altar.
-
 #speaker:Mara
 Throw it into the water… let her wake.
 
@@ -205,34 +184,34 @@ And if I don't?
 #speaker:Mara
 Then the frost will claim you… one breath at a time.
 
-
-#speaker:Narrator
-The player casts the effigy into the frozen waters.  
-
 #speaker:Narrator
 The ice cracks loudly. A heavy silence falls.  
-
-#speaker:Narrator
-Mara’s form begins to shift—her eyes glow pale, her skin turns to frost.
 
 #speaker:Mara
 She is here… She is me.
 
 #speaker:Player
 + [What are you?]
-    #speaker:Morena
-    I am the end that walks with every step of man. I am the silence in the snow. I am death dressed in winter’s veil.
+    #speaker:Mara
+    I am the end that walks with every step of man.
+    
+    #speaker:Mara
+    I am the silence in the snow.
+    
+    #speaker:Mara
+    I am the dead dressed in winter’s veil.
+    
+    
 + [Stay away from me!]
-    #speaker:Morena
+    #speaker:Mara
     You walk on my breath, shepherd. Where would you run?
 + [Say nothing.]
-    #speaker:Morena
+    #speaker:Mara
     Silent… like the grave. Fitting.
 -
 
-#speaker:Morena
-Every step toward survival is also a step toward death.  
-From now on, shepherd… you belong to me.
+#speaker:Mara
+Every step toward survival is also a step toward death. From now on, shepherd… you belong to me.
 ~ CompleteObjective("QUEST_002", "NPC_MARA_STAGE_2")
 ~ after_QUEST_002_completed = true
 -> END
