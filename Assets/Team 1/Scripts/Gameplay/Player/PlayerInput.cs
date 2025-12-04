@@ -1,6 +1,5 @@
 using Core.Events;
 using Core.Shared;
-
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -32,12 +31,6 @@ namespace Gameplay.Player
         private InputAction reloadAction;
         private InputAction mainUsageAction;
         private InputAction secondaryUsageAction;
-        private InputAction slotsScrollAction;
-        private InputAction slot1_Action;
-        private InputAction slot2_Action;
-        private InputAction slot3_Action;
-        private InputAction inventory_Action;
-        private InputAction map_Action;
         #endregion InputActions
 
 
@@ -74,31 +67,6 @@ namespace Gameplay.Player
         /// Input action for secondary usage button(RMB). Use this actions: started, performed, canceled.
         /// </summary>
         public InputAction SecondaryUsage => secondaryUsageAction;
-        /// <summary>
-        /// Input action for scrolling. Use this actions: started, performed, canceled.
-        /// </summary>
-        public InputAction SlotsScroll => slotsScrollAction;
-        /// <summary>
-        /// Input action for slot 1 button. Use this actions: started, performed, canceled.
-        /// </summary>
-        public InputAction Slot_1 => slot1_Action;
-        /// <summary>
-        /// Input action for slot 2 button. Use this actions: started, performed, canceled.
-        /// </summary>
-        public InputAction Slot_2 => slot2_Action;
-        /// <summary>
-        /// Input action for slot 3 button. Use this actions: started, performed, canceled.
-        /// </summary>
-        public InputAction Slot_3 => slot3_Action;
-        /// <summary>
-        /// Input action for inventory button. Use this actions: started, performed, canceled.
-        /// </summary>
-        public InputAction Inventory => inventory_Action;
-        /// <summary>
-        /// Input action for inventory button. Use this actions: started, performed, canceled.
-        /// </summary>
-        public InputAction Map => map_Action;
-
         #endregion InputActionProps
 
 
@@ -113,7 +81,6 @@ namespace Gameplay.Player
             _currentMap = this.inputActions.FindActionMap("Player");
             _secondaryMap = this.inputActions.FindActionMap("UI");
 
-
             // Get Input Actions
             moveAction = _currentMap.FindAction("Move");
             lookAction = _currentMap.FindAction("Look");
@@ -121,12 +88,6 @@ namespace Gameplay.Player
             reloadAction = _currentMap.FindAction("Reload");
             mainUsageAction = _currentMap.FindAction("MainUsage");
             secondaryUsageAction = _currentMap.FindAction("SecondaryUsage");
-            slotsScrollAction = _currentMap.FindAction("SlotsScroll");
-            slot1_Action = _currentMap.FindAction("Slot_1");
-            slot2_Action = _currentMap.FindAction("Slot_2");
-            slot3_Action = _currentMap.FindAction("Slot_3");
-            inventory_Action = _currentMap.FindAction("Inventory");
-            map_Action = _currentMap.FindAction("Map");
 
 
             EventManager.Broadcast(new RegisterNewPausableEvent(this));

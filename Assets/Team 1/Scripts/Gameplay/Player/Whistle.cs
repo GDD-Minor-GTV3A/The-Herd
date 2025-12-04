@@ -3,19 +3,23 @@ using Core.Shared;
 using Core.Shared.Utilities;
 using Gameplay.Dog;
 using Gameplay.Effects;
-using Gameplay.Player;
 using UI;
 using UnityEngine;
+using UnityEngine.Events;
 
-namespace Gameplay.ToolsSystem.Tools.Whistle
+namespace Gameplay.Player
 {
     /// <summary>
     /// Tool for controlling dogs.
     /// </summary>
-    public class Whistle : PlayerTool
+    public class Whistle : MonoBehaviour
     {
         [SerializeField, Tooltip("Dog config for initializing bark cooldown."), Required] 
         private DogConfig dogConfig;
+
+        [SerializeField, Tooltip("Dog config for initializing bark cooldown."), Required] 
+        private RectTransform whistleUI;
+
 
         [SerializeField, Tooltip("Prefab of VFX for dog move command."), Required] 
         private DogCommandMarker markerPrefab;
@@ -23,66 +27,76 @@ namespace Gameplay.ToolsSystem.Tools.Whistle
 
         private Observable<Vector3> cursorWorldPosition;
         private PlayerAnimator playerAnimator;
+        private PlayerInput input;
         private DogCommandMarker markerObject;
+
+
+        [Space]
+        [Header("Events")]
+        [Tooltip("Invokes when player uses main action(LMB) of the tool.")]
+        public UnityEvent OnMainUse;
+        [Tooltip("Invokes when player uses reload(R) of the tool.")]
+        public UnityEvent OnReload;
+        [Tooltip("Invokes when player uses secondary action(RMB) of the tool.")]
+        public UnityEvent OnSecondaryUse;
+
 
         /// <summary>
         /// Initialization method.
         /// </summary>
         /// <param name="animator">Player animator.</param>
-        public void Initialize(PlayerAnimator animator)
+        public void Initialize(PlayerAnimator animator, PlayerInput input)
         {
-            HideUI();
             playerAnimator = animator;
 
-            CooldownUI _cooldown = toolUI.GetComponentInChildren<CooldownUI>(true);
+            this.input = input;
+
+            CooldownUI _cooldown = whistleUI.GetComponentInChildren<CooldownUI>(true);
             if (_cooldown != null) _cooldown.Initialize(dogConfig.BarkCooldown);
 
             markerObject = Instantiate(markerPrefab);
             markerObject.Initialize();
+
+            this.input.MainUsage.started += MainUsageStarted;
+            this.input.MainUsage.canceled += MainUsageFinished;
+
+            this.input.Reload.started += Reload;
+
+            this.input.SecondaryUsage.started += SecondaryUsageStarted;
+            this.input.SecondaryUsage.canceled += SecondaryUsageFinished;
         }
 
 
-        public override void HideTool()
+        public void MainUsageFinished(UnityEngine.InputSystem.InputAction.CallbackContext context)
         {
-            base.HideTool();
-            playerAnimator.RemoveHands();
         }
 
 
-        public override void MainUsageFinished()
-        {
-        }
-        public override void MainUsageStarted(Observable<Vector3> cursorWorldPosition)
+        public void MainUsageStarted(UnityEngine.InputSystem.InputAction.CallbackContext context)
         {
             OnMainUse?.Invoke();
             TryBark();
         }
 
-        public override void Reload()
+        public void Reload(UnityEngine.InputSystem.InputAction.CallbackContext context)
         {
             OnReload?.Invoke();
             EventManager.Broadcast(new DogFollowCommandEvent());
         }
 
-        public override void SecondaryUsageFinished()
+        public void SecondaryUsageFinished(UnityEngine.InputSystem.InputAction.CallbackContext context)
         {
             cursorWorldPosition.OnValueChanged -= SendDogMoveCommand;
             cursorWorldPosition = null;
         }
-        public override void SecondaryUsageStarted(Observable<Vector3> cursorWorldPosition)
+        public void SecondaryUsageStarted(UnityEngine.InputSystem.InputAction.CallbackContext context)
         {
+            this.cursorWorldPosition = input.Look;
             OnSecondaryUse?.Invoke();
-            this.cursorWorldPosition = cursorWorldPosition;
             SendDogMoveCommand();
             this.cursorWorldPosition.OnValueChanged += SendDogMoveCommand;
         }
 
-
-        public override void ShowTool()
-        {
-            base.ShowTool();
-            playerAnimator.GetTool(keyPoints);
-        }
 
         private void SendDogMoveCommand()
         {
