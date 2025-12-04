@@ -335,9 +335,9 @@ namespace Core.AI.Sheep
                 if (_sheepSoundDriver != null)
                 {
                     if (_behaviorContext.CurrentVelocity != Vector3.zero)
-                        _sheepSoundDriver.TryPlayWalkSound(transform);
+                        _sheepSoundDriver.TryPlayWalkSound();
 
-                    _sheepSoundDriver.TryPlayBleatSound(transform, _archetype);
+                    _sheepSoundDriver.TryPlayBleatSound(_archetype);
                 }
 
                 yield return wait;
