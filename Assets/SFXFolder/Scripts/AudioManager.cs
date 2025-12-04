@@ -10,6 +10,7 @@ public class AudioManager : MonoBehaviour
     public AudioSource sfxSource;
     public AudioSource TorchSfx;
     public AudioSource sfxSource2;
+    public AudioSource MazeMusic;
 
 
     [Header("3D Sound Boxes")]
@@ -21,6 +22,7 @@ public class AudioManager : MonoBehaviour
     public AudioClip IntroMusic;
     public AudioClip Candle;
     public AudioClip Torch;
+    public AudioClip MazeSong;
 
     [Header("Settings")]
     [Range(0f, 1f)]
@@ -28,6 +30,7 @@ public class AudioManager : MonoBehaviour
     public float IntroVolume = 0.5f;
     public float CandleVolume = 2f;
     public float TorchVolume = 2f;
+    public float MazeVolume = 30f;
 
     public GameObject EndTrigger;
 
@@ -77,6 +80,14 @@ public class AudioManager : MonoBehaviour
             sfxSource2.volume = CandleVolume;
             sfxSource2.loop = true;
             sfxSource2.Play();
+        }
+
+        if (MazeSong != null && MazeMusic != null)
+        {
+            MazeMusic.clip = MazeSong;
+            MazeMusic.volume = MazeVolume;
+            MazeMusic.loop = false;
+            MazeMusic.playOnAwake = false;
         }
 
         // Ensure sound boxes are properly set for 3D
@@ -154,5 +165,7 @@ public class AudioManager : MonoBehaviour
 
         musicSource.volume = 0f;
         musicSource.Stop();
+
+        MazeMusic.Play();
     }
 }
