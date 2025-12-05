@@ -11,7 +11,6 @@ namespace Gameplay.Player
 
         public override void OnStart()
         {
-            animator.SetAnimationRotation(false);
         }
 
         public override void OnStop()
@@ -44,6 +43,7 @@ namespace Gameplay.Player
             playerMovement.Rotate(playerInput);
 
             animator.Walking(manager.Input.Move, true);
+            animator.RotateHead(manager.Input.Look.Value);
         }
     }
 }

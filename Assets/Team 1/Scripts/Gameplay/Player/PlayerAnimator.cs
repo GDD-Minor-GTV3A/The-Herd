@@ -23,8 +23,6 @@ namespace Gameplay.Player
 
         private readonly float startYRotation;
 
-        private bool isRotating;
-
 
         private const string WalkingX = "X";
         private const string WalkingY = "Y";
@@ -44,6 +42,8 @@ namespace Gameplay.Player
 
             leftHandTarget = animationConstrains.LeftHand.data.target;
             leftHandHint = animationConstrains.LeftHand.data.hint;
+
+            animationConstrains.HeadAim.weight = 1;
 
             EventManager.Broadcast(new RegisterNewPausableEvent(this));
         }
@@ -100,25 +100,6 @@ namespace Gameplay.Player
 
 
         /// <summary>
-        /// Define if animator controls character rotation or no.
-        /// </summary>
-        public void SetAnimationRotation(bool rotate)
-        {
-            isRotating = rotate;
-
-            if (rotate)
-            {
-                animationConstrains.HeadAim.weight = 1;
-            }
-            else
-            {
-                animationConstrains.HeadAim.weight = 0;
-                lookTarget.position = root.transform.position + root.transform.forward * 10;
-            }
-        }
-
-
-        /// <summary>
         /// Rotate character towards cursor world position.
         /// </summary>
         public void RotateCharacterBody(Vector3 mouseWorldPosition)
@@ -132,8 +113,24 @@ namespace Gameplay.Player
 
             if (angle >= 70f)
                 root.Rotate(0, 90, 0);
+        }
 
 
+        public void Pause()
+        {
+            Walking(Vector2.zero);
+            animationConstrains.HeadAim.weight = 0;
+            lookTarget.position = root.transform.position + root.transform.forward * 10;
+        }
+
+        public void Resume()
+        {
+            animationConstrains.HeadAim.weight = 1;
+        }
+
+
+        public void RotateHead(Vector3 mouseWorldPosition)
+        {
             Vector3 targetPosition = new Vector3(mouseWorldPosition.x, lookTarget.position.y, mouseWorldPosition.z);
             Vector3 playerPosition = root.position;
 
@@ -153,18 +150,6 @@ namespace Gameplay.Player
             }
 
             lookTarget.position = targetPosition;
-        }
-
-        public void Pause()
-        {
-            Walking(Vector2.zero);
-            animationConstrains.HeadAim.weight = 0;
-            lookTarget.position = root.transform.position + root.transform.forward * 10;
-        }
-
-        public void Resume()
-        {
-            SetAnimationRotation(isRotating);
         }
     }
 
