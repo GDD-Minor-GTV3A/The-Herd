@@ -74,7 +74,7 @@ namespace Gameplay.Player
             movementController.Initialize(_characterController, config);
 
             stepsSoundManager.Initialize();
-            PlayerAnimator _playerAnimator = new PlayerAnimator(animator, this, transform, animationConstrains);
+            PlayerAnimator _playerAnimator = new PlayerAnimator(animator, transform, animationConstrains);
             _stateManager.Initialize(_playerInput, movementController, _playerAnimator);
 
             whistle.Initialize(_playerAnimator, _playerInput);

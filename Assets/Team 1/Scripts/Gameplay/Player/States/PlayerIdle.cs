@@ -31,7 +31,7 @@ namespace Gameplay.Player
             //_manager.Rotation.Rotate(playerInput, _manager.Input.Look.Value);
 
 
-            animator.Walking(Vector2.zero);
+            animator.Walking(false);
             animator.RotateCharacterBody(manager.Input.Look.Value);
             animator.RotateHead(manager.Input.Look.Value);
         }

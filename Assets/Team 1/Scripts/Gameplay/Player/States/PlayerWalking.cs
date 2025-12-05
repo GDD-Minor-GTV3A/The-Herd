@@ -43,7 +43,7 @@ namespace Gameplay.Player
 
             playerMovement.Rotate(playerInput);
 
-            animator.Walking(manager.Input.Move);
+            animator.Walking(true);
             animator.RotateHead(manager.Input.Look.Value);
         }
     }

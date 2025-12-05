@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-
 using Core.Events;
 using Core.Shared;
 using UnityEngine;
@@ -18,22 +16,15 @@ namespace Gameplay.Player
         private readonly Transform leftHandTarget;
         private readonly Transform leftHandHint;
 
-        private readonly Player player;
         private readonly Transform root;
 
-        private readonly float startYRotation;
+        private const string WalkingSpeed = "WalkingSpeed";
 
 
-        private const string WalkingX = "X";
-        private const string WalkingY = "Y";
-
-
-        public PlayerAnimator(Animator animator, Player player, Transform root, PlayerAnimationConstraints constraints) : base(animator)
+        public PlayerAnimator(Animator animator, Transform root, PlayerAnimationConstraints constraints) : base(animator)
         {
             this.root = root;
-            this.player = player;
             animationConstrains = constraints;
-            startYRotation = root.eulerAngles.y;
 
             lookTarget = animationConstrains.HeadAim.data.sourceObjects[0].transform;
 
@@ -54,48 +45,13 @@ namespace Gameplay.Player
         /// </summary>
         /// <param name="walkingDirection">Direction of walking.</param>
         /// <param name="sprint">Is sprinting.</param>
-        public void Walking(Vector2 walkingDirection, bool sprint = false)
+        public void Walking(bool isWalking, bool sprint = false)
         {
-            float _x = walkingDirection.x;
-            float _y = walkingDirection.y;
+            float wakingSpeed = isWalking ? 1 : 0;
 
-            _x /= (sprint) ? 1 : 2;
-            _y /= (sprint) ? 1 : 2;
+            wakingSpeed /= (sprint) ? 1 : 2;
 
-            float _yRotation = root.eulerAngles.y;
-
-            int _roundYRotation = Mathf.RoundToInt(_yRotation - startYRotation);
-
-            if (_roundYRotation != 0)
-            {
-                float _tempX = _x;
-                float _tempY = _y;
-
-                switch (Mathf.Abs(_roundYRotation / 90))
-                {
-                    case 1:
-                        _x = -_tempY;
-                        _y = _tempX;
-                        break;
-                    case 2:
-                        _x *= -1;
-                        _y *= -1;
-                        break;
-                    case 3:
-                        _x = _tempY;
-                        _y = -_tempX;
-                        break;
-                }
-            }
-
-            if (sprint)
-            {
-                _x = 0;
-                _y = 1;
-            }
-
-            _animator.SetFloat(WalkingX, _x);
-            _animator.SetFloat(WalkingY, _y);
+            _animator.SetFloat(WalkingSpeed, wakingSpeed);
         }
 
 
@@ -118,7 +74,7 @@ namespace Gameplay.Player
 
         public void Pause()
         {
-            Walking(Vector2.zero);
+            Walking(false);
             animationConstrains.HeadAim.weight = 0;
             lookTarget.position = root.transform.position + root.transform.forward * 10;
         }
