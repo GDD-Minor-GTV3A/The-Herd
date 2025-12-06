@@ -310,11 +310,11 @@ namespace Core.AI.Sheep
 
             while(true)
             {
-                CheckDeathByDistance();
+                /*CheckDeathByDistance();
                 if (_diedByDistance)
                 {
                     yield break;
-                }
+                }*/
                 
                 RefreshNeighbours();
                 // Update behavior context for personality
