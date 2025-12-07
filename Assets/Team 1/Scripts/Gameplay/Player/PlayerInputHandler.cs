@@ -160,17 +160,17 @@ namespace Gameplay.Player
         }
 
         
-        public static void PlayerOnlyActionEnable(string enabledAction)
+        public static void OnlyPlayerActionEnable(string enabledAction)
         {
             if (Instance == null)
             {
                 Debug.LogWarning("PlayerInputHandler: Instance was not initialized!!!");
                 return;
             }
-            Instance.PlayerOnlyActionEnableImpl(enabledAction);
+            Instance.OnlyPlayerActionEnableImpl(enabledAction);
         }
 
-        private void PlayerOnlyActionEnableImpl(string enabledAction)
+        private void OnlyPlayerActionEnableImpl(string enabledAction)
         {
             if (currentMap.name != "Player")
             {
@@ -205,17 +205,17 @@ namespace Gameplay.Player
         }
 
 
-        public static void DisablePlayerAction(string enabledAction)
+        public static void DisablePlayerAction(string disabledAction)
         {
             if (Instance == null)
             {
                 Debug.LogWarning("PlayerInputHandler: Instance was not initialized!!!");
                 return;
             }
-            Instance.DisablePlayerActionImpl(enabledAction);
+            Instance.DisablePlayerActionImpl(disabledAction);
         }
 
-        private void DisablePlayerActionImpl(string enabledAction)
+        private void DisablePlayerActionImpl(string disabledAction)
         {
             if (currentMap.name != "Player")
             {
