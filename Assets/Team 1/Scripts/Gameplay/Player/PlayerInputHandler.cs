@@ -223,7 +223,7 @@ namespace Gameplay.Player
                 return;
             }
 
-            currentMap.FindAction(enabledAction).Disable();
+            currentMap.FindAction(disabledAction).Disable();
         }
 
 
