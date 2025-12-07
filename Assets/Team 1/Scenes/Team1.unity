@@ -554,11 +554,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!4 &973133949 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 3098041042009271123, guid: 3afce97881ac9134da0620d0dc49eb06, type: 3}
-  m_PrefabInstance: {fileID: 1133149224}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1042319090
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -639,14 +634,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 3257706111561134916, guid: 3afce97881ac9134da0620d0dc49eb06, type: 3}
-      propertyPath: m_Data.m_MaxLimit
-      value: 85
-      objectReference: {fileID: 0}
-    - target: {fileID: 3257706111561134916, guid: 3afce97881ac9134da0620d0dc49eb06, type: 3}
-      propertyPath: m_Data.m_MinLimit
-      value: -85
-      objectReference: {fileID: 0}
     - target: {fileID: 4520377452014377577, guid: 3afce97881ac9134da0620d0dc49eb06, type: 3}
       propertyPath: m_Name
       value: -------Player&Dog&Camera_DefaultSetUp-------
@@ -703,14 +690,10 @@ PrefabInstance:
       propertyPath: fogOfWar
       value: 
       objectReference: {fileID: 1075288330}
-    m_RemovedComponents:
-    - {fileID: 4166543258235294085, guid: 3afce97881ac9134da0620d0dc49eb06, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 8612496791635076497, guid: 3afce97881ac9134da0620d0dc49eb06, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1850482055}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3afce97881ac9134da0620d0dc49eb06, type: 3}
 --- !u!1 &1167434481
 GameObject:
@@ -1135,31 +1118,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1850482053 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8612496791635076497, guid: 3afce97881ac9134da0620d0dc49eb06, type: 3}
-  m_PrefabInstance: {fileID: 1133149224}
-  m_PrefabAsset: {fileID: 0}
---- !u!1818360609 &1850482055
-RotationConstraint:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1850482053}
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Weight: 1
-  m_RotationAtRest: {x: 0, y: 0, z: 0}
-  m_RotationOffset: {x: -0.5748378, y: 0, z: 0}
-  m_AffectRotationX: 0
-  m_AffectRotationY: 1
-  m_AffectRotationZ: 0
-  m_Active: 1
-  m_IsLocked: 1
-  m_Sources:
-  - sourceTransform: {fileID: 973133949}
-    weight: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

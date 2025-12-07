@@ -12,7 +12,7 @@ namespace Gameplay.Player
     /// Base player script.
     /// </summary>
     [RequireComponent(typeof(PlayerMovement), typeof(PlayerStateManager))]
-    [RequireComponent(typeof(PlayerInput), typeof(CharacterController))]
+    [RequireComponent(typeof(PlayerInputHandler), typeof(CharacterController))]
     public class Player : MonoBehaviour, IKillable
     {
         [Header("Animations")]
@@ -66,7 +66,7 @@ namespace Gameplay.Player
 
             movementController = GetComponent<PlayerMovement>();
             PlayerStateManager _stateManager = GetComponent<PlayerStateManager>();
-            PlayerInput _playerInput = GetComponent<PlayerInput>();
+            PlayerInputHandler _playerInput = GetComponent<PlayerInputHandler>();
 
             _playerInput.Initialize(inputActions);
 

@@ -27,7 +27,7 @@ namespace Gameplay.Player
 
         private Observable<Vector3> cursorWorldPosition;
         private PlayerAnimator playerAnimator;
-        private PlayerInput input;
+        private PlayerInputHandler input;
         private DogCommandMarker markerObject;
 
 
@@ -45,7 +45,7 @@ namespace Gameplay.Player
         /// Initialization method.
         /// </summary>
         /// <param name="animator">Player animator.</param>
-        public void Initialize(PlayerAnimator animator, PlayerInput input)
+        public void Initialize(PlayerAnimator animator, PlayerInputHandler input)
         {
             playerAnimator = animator;
 
