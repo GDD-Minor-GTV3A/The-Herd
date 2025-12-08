@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Gameplay.Inventory
 {
@@ -7,13 +8,23 @@ namespace Gameplay.Inventory
         [Header("UI References")]
         public InventoryUI inventoryPanel;
 
-        private void Update()
+
+        InputAction inventoryAction;
+
+
+        public void Initialize(InputAction inventoryAction)
         {
-            if (Input.GetKeyDown(KeyCode.B))
-            {
-                ToggleInventory();
-            }
+            this.inventoryAction = inventoryAction;
+
+            this.inventoryAction.canceled += OnInventoryButtonPressed;
         }
+
+
+        private void OnInventoryButtonPressed(InputAction.CallbackContext obj)
+        {
+            ToggleInventory();
+        }
+
 
         public void ToggleInventory()
         {
@@ -22,6 +33,11 @@ namespace Gameplay.Inventory
             // Toggle UI
             inventoryPanel.ToggleOpen();
 
+        }
+
+        private void OnDestroy()
+        {
+            inventoryAction.canceled -= OnInventoryButtonPressed;
         }
     }
 }

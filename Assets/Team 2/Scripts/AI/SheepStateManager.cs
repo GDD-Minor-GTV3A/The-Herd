@@ -126,6 +126,7 @@ namespace Core.AI.Sheep
             
             _personality = _archetype?.CreatePersonality(this);
             _behaviorContext = new PersonalityBehaviorContext();
+            _playerCenter = FindObjectOfType<SheepHerdController>().transform.position;
 
             InitializeStatesMap();
         }
@@ -334,9 +335,9 @@ namespace Core.AI.Sheep
                 if (_sheepSoundDriver != null)
                 {
                     if (_behaviorContext.CurrentVelocity != Vector3.zero)
-                        _sheepSoundDriver.TryPlayWalkSound(transform);
+                        _sheepSoundDriver.TryPlayWalkSound();
 
-                    _sheepSoundDriver.TryPlayBleatSound(transform, _archetype);
+                    _sheepSoundDriver.TryPlayBleatSound(_archetype);
                 }
 
                 yield return wait;
@@ -674,10 +675,14 @@ namespace Core.AI.Sheep
                 Gizmos.DrawSphere(_agent.destination, 0.2f);
             }
 
-            if (_config != null && _config.DeathDistance > 0f)
+            if (_config != null && _config.DeathDistance > 0f && _playerCenter != Vector3.zero)
+
             {
                 Gizmos.color = new Color(1f, 0f, 0f, 0.35f);
-                Gizmos.DrawWireSphere(_playerCenter, _config.DeathDistance);
+                Vector3 center = _playerCenter;
+                if (center == Vector3.zero && Application.isPlaying == false)
+                    center = transform.position;
+                Gizmos.DrawWireSphere(center, _config.DeathDistance);
             }
         }
 #endif
