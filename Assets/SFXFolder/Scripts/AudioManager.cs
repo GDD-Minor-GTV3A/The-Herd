@@ -8,7 +8,6 @@ public class AudioManager : MonoBehaviour
     [Header("Audio Sources")]
     public AudioSource musicSource;
     public AudioSource sfxSource;
-    public AudioSource TorchSfx;
     public AudioSource sfxSource2;
     public AudioSource MazeMusic;
 
@@ -21,7 +20,6 @@ public class AudioManager : MonoBehaviour
     public AudioClip windClip;
     public AudioClip IntroMusic;
     public AudioClip Candle;
-    public AudioClip Torch;
     public AudioClip MazeSong;
 
     [Header("Settings")]
@@ -29,10 +27,10 @@ public class AudioManager : MonoBehaviour
     public float windVolume = 0.5f;
     public float IntroVolume = 0.5f;
     public float CandleVolume = 2f;
-    public float TorchVolume = 2f;
     public float MazeVolume = 30f;
 
     public GameObject EndTrigger;
+
 
     void Awake()
     {
@@ -66,14 +64,6 @@ public class AudioManager : MonoBehaviour
             musicSource.Play();
         }
 
-        if (Torch != null && TorchSfx != null)
-        {
-            TorchSfx.clip = Torch;
-            TorchSfx.volume = TorchVolume;
-            TorchSfx.loop = true;
-            TorchSfx.Play();
-        }
-
         if (Candle != null && sfxSource2 != null)
         {
             sfxSource2.clip = Candle;
@@ -102,6 +92,7 @@ public class AudioManager : MonoBehaviour
             }
         }
     }
+
 
     // Play 2D SFX (UI clicks, global sounds, etc.)
     public void PlaySFX(int index, float volume = 1f)
