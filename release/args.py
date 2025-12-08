@@ -295,6 +295,6 @@ async def set_defaults() -> None:
 
     # Set default title and notes if not provided
     args.tag = args.tag if args.tag != str(NULL_SEMVER) else str(tag)
-    github_args.title = github_args.title or f"Release {tag}"
-    github_args.notes = github_args.notes or f"Automated release of version {tag}."
+    github_args.title = github_args.title or f"Release {args.tag}"
+    github_args.notes = github_args.notes or f"Automated release of version {args.tag}."
     logger.info("Successfully set up context for release.")
