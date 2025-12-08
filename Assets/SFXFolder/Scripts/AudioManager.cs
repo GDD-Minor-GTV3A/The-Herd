@@ -163,8 +163,10 @@ public class AudioManager : MonoBehaviour
             Debug.Log("Fade out begins");
         }
 
+        sfxSource.volume = 0.01f;
         musicSource.volume = 0f;
         musicSource.Stop();
+        
 
         MazeMusic.Play();
     }
