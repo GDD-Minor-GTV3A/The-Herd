@@ -23,7 +23,7 @@ namespace Gameplay.Dog
         /// <summary>
         /// True - dog is moving or pending the path, false - dog is in idle state.
         /// </summary>
-        public bool IsMoving => (!agent.isStopped || agent.hasPath || agent.pathPending || agent.remainingDistance > agent.stoppingDistance || agent.velocity.sqrMagnitude > 0.1f);
+        public bool IsMoving => (agent.hasPath || agent.pathPending || agent.remainingDistance > agent.stoppingDistance || agent.velocity.sqrMagnitude > 0.1f);
 
 
         /// <summary>

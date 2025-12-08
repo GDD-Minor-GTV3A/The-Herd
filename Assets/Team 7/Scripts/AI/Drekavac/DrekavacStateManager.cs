@@ -6,6 +6,8 @@ using Core.Shared.Utilities;
 using Team_7.Scripts.AI.Drekavac.States;
 
 using UnityEngine;
+using UnityEngine.AI;
+using Core.AI.Sheep;
 
 namespace Team_7.Scripts.AI.Drekavac
 {
@@ -58,7 +60,10 @@ namespace Team_7.Scripts.AI.Drekavac
             _playerLocation = _playerObject.transform.position;
 
             _dogObject = GameObject.Find("Dog");
-            _dogLocation = _dogObject.transform.position;
+            if (_dogObject != null)
+            {
+                _dogLocation = _dogObject.transform.position;
+            }
 
             // Find sheep
             // TODO replace this
@@ -88,27 +93,33 @@ namespace Team_7.Scripts.AI.Drekavac
         {
             base.Update();
             _playerLocation = _playerObject.transform.position;
-            _dogLocation = _dogObject.transform.position;
+            if (_dogObject != null)
+            {
+                _dogLocation = _dogObject.transform.position;
+            }
             if (_currentState is not FleeingState && _currentState is not BigState && (Vector3.Distance(transform.position, _playerLocation) <= _drekavacStats.fleeTriggerDistance || Vector3.Distance(transform.position, _dogLocation) <= _drekavacStats.fleeTriggerDistance))
                 Flee();
         }
 
-        private void OnCollisionEnter(Collision collision)
+        private void OnTriggerEnter(Collider other)
         {
-            if (_currentState is HuntingState && collision.gameObject.CompareTag("Sheep"))
+            if (_currentState is HuntingState && other.CompareTag("Sheep"))
             {
-                GrabObject(collision.gameObject);
+                Debug.Log("triggered");
+                GrabObject(other.gameObject);
             }
         }
-        
+
         private void GrabObject(GameObject grabbedObject)
         {
-            Debug.Log(gameObject.name + " is grabbing " + grabbedObject.name); // Chris: Temporary debug to check if the enemy gets the sheep
             if (grabbedObject == null) return;
             CreateGrabPoint();
-            //IMP02 CODE FOR DISABELING SHEEP AI WHEN GRABBED
+            //CODE FOR DISABELING SHEEP AI WHEN GRABBED
+            NavMeshAgent SSM = grabbedObject.GetComponent<NavMeshAgent>();
+            SSM.enabled = false;
 
-            // 
+            Rigidbody rb = grabbedObject.GetComponent<Rigidbody>();
+            rb.isKinematic = false;
 
             _enemyMovementController.ResetAgent();
 
@@ -172,7 +183,11 @@ namespace Team_7.Scripts.AI.Drekavac
         public void ReleaseGrabbedObject()
         {
             if (_grabbedObject is null) return;
+            NavMeshAgent SSM = _grabbedObject.GetComponent<NavMeshAgent>();
+            SSM.enabled = true;
 
+            Rigidbody rb = _grabbedObject.GetComponent<Rigidbody>();
+            rb.isKinematic = true;
             _grabbedObject.transform.SetParent(null, true);
 
             if (_grabbedObjectRb is not null)

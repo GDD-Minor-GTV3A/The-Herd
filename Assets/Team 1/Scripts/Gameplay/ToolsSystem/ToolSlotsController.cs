@@ -38,6 +38,7 @@ namespace Gameplay.ToolsSystem
         private Player.PlayerInput input;
 
         private bool initializedFirstSlot;
+        private bool isInventoryOpen = false;
         
 
         /// <summary>
@@ -75,6 +76,8 @@ namespace Gameplay.ToolsSystem
         
         private void UpdateCurrentSlot(InputAction.CallbackContext obj)
         {
+            if (isInventoryOpen) return;
+
             int _inputValue = -Mathf.RoundToInt(obj.action.ReadValue<Vector2>().y);
 
             SetCurrentSlotByIndex(currentToolIndex + _inputValue);
@@ -110,30 +113,40 @@ namespace Gameplay.ToolsSystem
 
         private void OnCurrentToolReload(InputAction.CallbackContext obj)
         {
+            if (isInventoryOpen) return;
+
             if (toolSlots[currentToolIndex] != null)
                 toolSlots[currentToolIndex].Reload();
         }
 
         private void OnCurrentToolMainUseStarted(InputAction.CallbackContext obj)
         {
+            if (isInventoryOpen) return;
+
             if (toolSlots[currentToolIndex] != null)
                 toolSlots[currentToolIndex].MainUsageStarted(input.Look);
         }
 
         private void OnCurrentToolMainUseFinished(InputAction.CallbackContext obj)
         {
+            if (isInventoryOpen) return;
+
             if (toolSlots[currentToolIndex] != null)
                 toolSlots[currentToolIndex].MainUsageFinished();
         }
 
         private void OnCurrentToolSecondaryUseStarted(InputAction.CallbackContext obj)
         {
+            if (isInventoryOpen) return;
+
             if (toolSlots[currentToolIndex] != null)
                 toolSlots[currentToolIndex].SecondaryUsageStarted(input.Look);
         }
 
         private void OnCurrentToolSecondaryUseFinished(InputAction.CallbackContext obj)
         {
+            if (isInventoryOpen) return;
+
             if (toolSlots[currentToolIndex] != null)
                 toolSlots[currentToolIndex].SecondaryUsageFinished();
         }
@@ -171,6 +184,8 @@ namespace Gameplay.ToolsSystem
             input.Slot_1.started -= (obj) => SetCurrentSlotByIndex(0);
             input.Slot_2.started -= (obj) => SetCurrentSlotByIndex(1);
             input.Slot_3.started -= (obj) => SetCurrentSlotByIndex(2);
+
+            input.Inventory.canceled -= OnInventoryButtonPressed;
         }
 
         public void Resume()
@@ -188,6 +203,19 @@ namespace Gameplay.ToolsSystem
             input.Slot_1.started += (obj) => SetCurrentSlotByIndex(0);
             input.Slot_2.started += (obj) => SetCurrentSlotByIndex(1);
             input.Slot_3.started += (obj) => SetCurrentSlotByIndex(2);
+
+            input.Inventory.canceled += OnInventoryButtonPressed;
+        }
+
+        private void OnInventoryButtonPressed(InputAction.CallbackContext obj)
+        {
+            OnInventoryButtonPressed();
+        }
+
+        public void OnInventoryButtonPressed()
+        {
+            isInventoryOpen = !isInventoryOpen;
+
         }
     }
 }

@@ -5,8 +5,15 @@ using System.Collections.Generic;
 /// <summary>
 /// The container for all saved data. Do not touch please.
 /// </summary>
-[Serializable]
+[System.Serializable]
 public class SaveFile
 {
-    public Dictionary<string, object> data = new();
+    public List<ModuleData> modules = new List<ModuleData>();
+}
+
+[System.Serializable]
+public class ModuleData
+{
+    public string moduleID;
+    public string jsonData; // store each module as JSON string
 }
