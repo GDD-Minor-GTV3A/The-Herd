@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 using UnityEngine;
@@ -9,10 +10,16 @@ public class LevelManagerLevel2 : MonoBehaviour
     private bool ForestQuestComplete = false;
     private bool FrontDoorReturn = false;
     private List<GameObject> SpawnedSheep = new List<GameObject>();
+    private List<GameObject> EscapedSheep = new List<GameObject>();
+    private bool SheepEscaped = false;
+    private int SheepCollectedCount = 0;
 
-    [SerializeField] private SlidingDoor EntranceDoor, MazeDoor, ForestDoor;
+    [SerializeField] private SlidingDoor EntranceDoor, MazeDoor, ForestDoor, MazeExitDoor, ReturnPathDoor;
     [SerializeField] private GameObject SheepPrefab;
+    [SerializeField] private GameObject SheepModel;
+    [SerializeField] private GameObject[] EscapeSheepPlaces;
     [SerializeField] private int SheepCount;
+    [SerializeField] private float SheepWalkSpeed = 15f;
 
     /// <summary>
     /// Create instance of level manager
@@ -27,6 +34,11 @@ public class LevelManagerLevel2 : MonoBehaviour
         else
         {
             Instance = this;
+            // Spawn sheep in the level
+            for (int i = 0; i < SheepCount; i++)
+            {
+                SpawnSheep();
+            }
         }
     }
 
@@ -36,12 +48,6 @@ public class LevelManagerLevel2 : MonoBehaviour
     public void EnterLevel()
     {
         Debug.Log("Level 2 entered");
-
-        // Spawn sheep in the level
-        for (int i = 0; i < SheepCount; i++)
-        {
-            SpawnSheep();
-        }
     }
 
     /// <summary>
@@ -98,9 +104,74 @@ public class LevelManagerLevel2 : MonoBehaviour
     /// </summary>
     public void SpawnSheep(Vector3? position = null)
     {
-        Vector3 spawnPosition = position ?? new Vector3(891, 0, 548);
+        Vector3 spawnPosition = position ?? new Vector3(879, 0, 513);
         GameObject sheep = Instantiate(SheepPrefab, spawnPosition, Quaternion.identity);
-        sheep.transform.localScale *= 3;
         SpawnedSheep.Add(sheep);
+    }
+
+    /// <summary>
+    /// Make all sheep escape to designated points
+    /// </summary>
+    public void SheepEscape()
+    {
+        // If sheep have already escaped, do nothing
+        if (SheepEscaped) return;
+
+        foreach (GameObject spawnedSheep in SpawnedSheep)
+        {
+            EscapedSheep.Add(spawnedSheep);
+            GameObject sheepModel = Instantiate(SheepModel, spawnedSheep.transform.position, Quaternion.identity);
+            sheepModel.transform.localScale *= 3;
+            spawnedSheep.transform.position = new Vector3(0, -100, 0);
+            // Walk sheep to first available escape point
+            foreach (GameObject escapePoint in EscapeSheepPlaces)
+            {
+                if (!escapePoint.GetComponent<FrozenSheepTrigger>().ContainsSheep)
+                {
+                    escapePoint.GetComponent<FrozenSheepTrigger>().SetSheep(spawnedSheep);
+                    StartCoroutine(WalkSheepToEscapePoint(sheepModel, escapePoint.transform.position));
+
+                    break;
+                }
+            }
+        }
+
+        SheepEscaped = true;
+    }
+
+    /// <summary>
+    /// Coroutine to walk the sheep model gradually to the escape point and remove it
+    /// </summary>
+    private IEnumerator WalkSheepToEscapePoint(GameObject sheepModel, Vector3 escapePoint)
+    {
+        if (sheepModel == null) yield break;
+
+        while (sheepModel != null && Vector3.Distance(sheepModel.transform.position, escapePoint) > 0.1f)
+        {
+            sheepModel.transform.position = Vector3.MoveTowards(sheepModel.transform.position, escapePoint, SheepWalkSpeed * Time.deltaTime);
+            yield return null;
+        }
+
+        // Ensure the sheep reaches the exact position
+        if (sheepModel != null)
+        {
+            sheepModel.transform.position = escapePoint;
+            
+            // Remove the sheep model
+            Destroy(sheepModel);
+        }
+    }
+
+    /// <summary>
+    /// When all sheep collected, open the maze exit and return path doors
+    /// </summary>
+    public void SheepCollected()
+    {
+        SheepCollectedCount++;
+        if (SheepCollectedCount >= SheepCount)
+        {
+            MazeExitDoor.Open();
+            ReturnPathDoor.Open();
+        }
     }
 }

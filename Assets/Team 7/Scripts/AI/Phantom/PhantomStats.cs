@@ -12,12 +12,16 @@ namespace Team_7.Scripts.AI.Phantom
         public int health = 3;
         [Tooltip("The amount of clones the phantom spawns whenever it appears")]
         public int initialCloneAmount = 4;
+        [Tooltip("The maximum amount of clones a single phantom will summon")]
+        public int maxCloneAmount = 7;
         [Tooltip("The amount of seconds between spawning a new clone while in the shooting state")]
         public float cloneSpawnDelay = 5;
         [FormerlySerializedAs("clone")] [Tooltip("The clone prefab")]
         public PhantomFake? fake; // Chris: Made this nullable to avoid a warning. You can delete this comment once its fixed.
         [Tooltip("How long the player should continuously look at the enemy before it loses 1 health.")]
         public float lookDuration = 2;
+        [Tooltip("How many seconds the Phantom is stunned by a dog bark")]
+        public float stunDuration = 10;
         [Tooltip("The minimum distance from it's previous location the enemy will respawn at.")]
         public float minRespawnDistance = 50;
         [Tooltip("The maximum distance the enemy will respawn at.")]
@@ -44,6 +48,8 @@ namespace Team_7.Scripts.AI.Phantom
         public float shootCooldown= 1.5f;
         [Tooltip("How long the enemy charges it's attack before it's shot ")]
         public float chargeDuration = 4.2f; //TODO Scale the animation duration with this.
+        [Tooltip("How many shots the phantom does before repositioning")]
+        public int shotsBeforeDashing = 2;
 
         [Header("Projectile Settings")] 
         [Tooltip("The projectile prefab")]
@@ -56,6 +62,8 @@ namespace Team_7.Scripts.AI.Phantom
         public float projectileSpeed = 15f;
         [Tooltip("How far the projectile travels before it gets deleted.")]
         public float projectileRange = 50f;
+        [Tooltip("How strong the homing effect is")]
+        public float homingStrength = 1.5f;
         
         [Header("Audio Settings")] 
         public AudioClip? screechSound;

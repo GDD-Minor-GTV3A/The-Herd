@@ -11,6 +11,25 @@ public class AmalgamationStateMachine : MonoBehaviour
     public List<Transform> patrolNodes;   // All the nodes in your maze
     public AmalgamationVision vision;     // Vision component on this enemy
 
+    [Header("Spawn / Intro State")]
+    [Tooltip("If true, Amalgamation will use the spawn intro (follow player -> go to box -> then patrol).")]
+    public bool useSpawnIntroState = true;
+
+    [Tooltip("Square object with the BoxCollider that the spawn intro ends at.")]
+    public Transform spawnBoxTarget;
+
+    [Tooltip("Speed while following the player/box during the spawn intro.")]
+    public float spawnIntroSpeed = 4f;
+
+    [Tooltip("Radius around the box collider where we switch from 'follow player' to 'go to box'.")]
+    public float spawnBoxTriggerRadius = 12f;
+
+    [Tooltip("How close to the box we have to be to count as 'reached'.")]
+    public float spawnBoxArriveDistance = 0.75f;
+
+    [Tooltip("How long to wait at the box before switching into the normal PATROL behaviour.")]
+    public float spawnWaitAtBoxTime = 2f;
+
     [Header("Patrol Settings")]
     [Range(0f, 1f)] public float interceptChance = 0.6f;  // Chance to try to intersect player
     public float nodeReachThreshold = 0.5f;               // How close is "reached" a node?
@@ -146,11 +165,13 @@ public class AmalgamationStateMachine : MonoBehaviour
     private AmalgamationPatrolState patrolState;
     private AmalgamationChaseState chaseState;
     private AmalgamationAttackState attackState;
+    private AmalgamationSpawnIntroState spawnIntroState;
 
     // Expose states to other states (so Chase / Attack can switch)
     public AmalgamationPatrolState PatrolState => patrolState;
     public AmalgamationChaseState ChaseState => chaseState;
     public AmalgamationAttackState AttackState => attackState;
+    public AmalgamationSpawnIntroState SpawnIntroState => spawnIntroState;
 
     private void Awake()
     {
@@ -168,11 +189,29 @@ public class AmalgamationStateMachine : MonoBehaviour
         patrolState = new AmalgamationPatrolState(this, agent, player, patrolNodes);
         chaseState  = new AmalgamationChaseState(this, agent, player, patrolNodes);
         attackState = new AmalgamationAttackState(this, agent, player);
+        spawnIntroState = new AmalgamationSpawnIntroState(this, agent);
     }
 
     private void Start()
     {
-        SwitchState(patrolState);
+        // If we want to use the spawn intro and we have the required references, start there
+        if (useSpawnIntroState && spawnBoxTarget != null && player != null)
+        {
+            if (debugLogs)
+            {
+                Debug.Log($"[Amalgamation {gameObject.name}] Starting in SPAWN INTRO state.");
+            }
+            SwitchState(spawnIntroState);
+        }
+        else
+        {
+            if (debugLogs)
+            {
+                Debug.Log($"[Amalgamation {gameObject.name}] Starting directly in PATROL " +
+                        "(spawn intro disabled or missing player/box target).");
+            }
+            SwitchState(patrolState);
+        }
     }
 
     private void Update()

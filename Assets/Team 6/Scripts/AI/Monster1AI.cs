@@ -1,5 +1,9 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
+
+using Core.AI.Sheep.Event;
+using Core.AI.Sheep;
+using Core.Events;
 
 using UnityEngine;
 
@@ -33,6 +37,7 @@ public class Monster1AI : MonoBehaviour
     [SerializeField] private string sheepAttackBoolName = "Attack";
     [SerializeField] private string attackStateName = "Attack_Scarecrow"; // <- Animator state name
     [SerializeField] private float sheepLoseDelay = 0.5f;
+    [SerializeField] private float _scareAmount = 1f;
 
     private bool _isAttackingSheep = false;
     private float _sheepLostTimer = 0f;
@@ -198,6 +203,19 @@ public class Monster1AI : MonoBehaviour
         if (sheepInRange)
         {
             _sheepLostTimer = 0f;
+
+            foreach (Transform t in sheepDetector.visibleTargets)
+            {
+                if (t.TryGetComponent<SheepStateManager>(out var sheepStateManager))
+                {
+                    EventManager.Broadcast(new SheepScareEvent(
+                        sheepStateManager,
+                        _scareAmount,         // You must define this field
+                        transform.position    // Scarecrow position
+                    ));
+                }
+            }
+
 
             if (!_isAttackingSheep)
             {
