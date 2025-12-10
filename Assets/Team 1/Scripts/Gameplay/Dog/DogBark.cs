@@ -63,8 +63,6 @@ namespace Gameplay.Dog
                 manager.SetState<DogMoveToSheep>();
             }
 
-            Debug.Log("Didn't find any free sheep");
-
             if (Time.time - lastBarkTime < config.BarkCooldown)
                 return;
 
