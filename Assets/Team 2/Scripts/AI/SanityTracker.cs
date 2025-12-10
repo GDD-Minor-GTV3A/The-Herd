@@ -279,8 +279,6 @@ namespace Core.AI.Sheep
         /// </summary>
         private void ApplySanityDelta(float delta)
         {
-            float oldPoints = _sanityPoints;
-
             // If gaining sanity while at max, increase the ceiling
             if (delta > 0 && _sanityPoints >= _maxSanityPoints - 0.1f)
             {
@@ -290,133 +288,7 @@ namespace Core.AI.Sheep
             // Apply change
             _sanityPoints = Mathf.Clamp(_sanityPoints + delta, 0f, _maxSanityPoints);
 
-            // Check for threshold crossings for spawning/removal
-            int oldThreshold = Mathf.FloorToInt(oldPoints / POINTS_PER_SHEEP);
-            int newThreshold = Mathf.FloorToInt(_sanityPoints / POINTS_PER_SHEEP);
-
-            if (newThreshold > oldThreshold)
-            {
-                // Gained enough sanity to spawn a sheep
-                SpawnSheep();
-
-                var clip = _sanityAddSound;
-                if (clip)
-                {
-                    float pitch = Random.Range(0.9f, 1.05f);
-                    // Waiting for sound manager to roll out
-                }
-            }
-            else if (newThreshold < oldThreshold && _sanityPoints > 0)
-            {
-                // Lost enough sanity to remove a sheep
-                RemoveFurthestSheep();
-
-                var clip = _sanityRemoveSound;
-                if (clip)
-                {
-                    // Waiting for sound manager
-                }
-            }
-
             UpdateSanity();
-        }
-
-        /// <summary>
-        /// Spawns a sheep out of view, walking towards the player
-        /// </summary>
-        private void SpawnSheep()
-        {
-            if (_sheepPrefab == null)
-            {
-                Debug.LogWarning("[SanityTracker] No sheep prefab assigned. Cannot spawn sheep.");
-                return;
-            }
-
-            if (_playerTransform == null)
-            {
-                Debug.LogWarning("[SanityTracker] No player transform assigned. Cannot spawn sheep.");
-                return;
-            }
-
-            // Calculate spawn position out of view
-            Vector3 spawnPosition = GetSpawnPositionOutOfView();
-
-            // Instantiate sheep
-            GameObject newSheepObj = Instantiate(_sheepPrefab, spawnPosition, Quaternion.identity);
-            SheepStateManager newSheep = newSheepObj.GetComponent<SheepStateManager>();
-
-            if (newSheep != null)
-            {
-                // Mark as straggler so it joins the herd
-                newSheep.MarkAsStraggler();
-                
-                EventManager.Broadcast(new SheepJoinEvent(newSheep, false));
-
-                Debug.Log($"[SanityTracker] Spawned sheep at {spawnPosition}");
-            }
-            else
-            {
-                Debug.LogError("[SanityTracker] Spawned sheep prefab does not have SheepStateManager component!");
-            }
-        }
-
-        /// <summary>
-        /// Calculates a spawn position out of the camera's view
-        /// </summary>
-        private Vector3 GetSpawnPositionOutOfView()
-        {
-            // Get a random direction behind or to the side of the player
-            float randomAngle = Random.Range(90f, 270f); // Behind player (90-270 degrees from forward)
-            Vector3 direction = Quaternion.Euler(0, randomAngle, 0) * _playerTransform.forward;
-
-            Vector3 spawnPos = _playerTransform.position + direction.normalized * _spawnDistance;
-
-            // Ensure spawn position is on the ground (raycast down)
-            if (Physics.Raycast(spawnPos + Vector3.up * 10f, Vector3.down, out RaycastHit hit, 20f))
-            {
-                spawnPos = hit.point;
-            }
-            else
-            {
-                // If raycast fails, just use player's Y position
-                spawnPos.y = _playerTransform.position.y;
-            }
-
-            return spawnPos;
-        }
-
-        /// <summary>
-        /// Removes the sheep furthest from the player
-        /// NOTE: For now removes instantly, but should make sheep flee instead
-        /// </summary>
-        private void RemoveFurthestSheep()
-        {
-            if (_playerTransform == null)
-            {
-                Debug.LogWarning("[SanityTracker] No player transform assigned. Cannot remove furthest sheep.");
-                return;
-            }
-
-            // Find all sheep in the scene
-            SheepStateManager[] allSheep = FindObjectsByType<SheepStateManager>(FindObjectsSortMode.None);
-
-            if (allSheep.Length == 0)
-            {
-                Debug.LogWarning("[SanityTracker] No sheep found to remove.");
-                return;
-            }
-
-            // Find the furthest sheep from player
-            SheepStateManager furthestSheep = allSheep
-                .OrderByDescending(sheep => Vector3.Distance(sheep.transform.position, _playerTransform.position))
-                .FirstOrDefault();
-
-            if (furthestSheep != null)
-            {
-                Debug.Log($"[SanityTracker] Removing furthest sheep: {furthestSheep.name}");
-                // TODO: Make sheep flee instead of instant removal
-                furthestSheep.Remove(false);
-            }
         }
 
         /// <summary>
