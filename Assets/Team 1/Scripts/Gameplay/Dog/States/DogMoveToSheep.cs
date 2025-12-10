@@ -32,6 +32,7 @@ namespace Gameplay.Dog
 
         public override void OnUpdate()
         {
+            if (targetSheep == null) return;
             if (Vector3.Distance(manager.transform.position, targetSheep.transform.position) <= 3f)
             {
                 manager.HerdZone.HeardSheep(targetSheep);
