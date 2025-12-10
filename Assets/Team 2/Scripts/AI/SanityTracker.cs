@@ -2,14 +2,33 @@ using UnityEngine;
 using TMPro;
 using Core.Events;
 using Core.AI.Sheep.Event;
+using System;
 using System.Linq;
+
+using Random = UnityEngine.Random;
 
 namespace Core.AI.Sheep
 {
     /// <summary>
-    /// Tracks player sanity using a point-based system.
-    /// Starts at 100 points with 6 sheep. Each sheep = 16 points.
-    /// Losing 16 points removes furthest sheep. Gaining 16 points spawns new sheep.
+    /// Distance zone configuration for sanity system
+    /// </summary>
+    [Serializable]
+    public class SanityDistanceZone
+    {
+        [Tooltip("Maximum radius for this zone in meters")]
+        public float maxRadius;
+
+        [Tooltip("Sanity points per second per sheep in this zone")]
+        public float sanityRatePerSecond;
+
+        [Tooltip("Zone name for debugging")]
+        public string zoneName = "Zone";
+    }
+
+    /// <summary>
+    /// Tracks player sanity using a distance-based system.
+    /// Sheep distance from player affects sanity over time.
+    /// Closer sheep increase sanity, farther sheep decrease it.
     /// </summary>
     public class SanityTracker : MonoBehaviour
     {
@@ -42,22 +61,57 @@ namespace Core.AI.Sheep
         [Header("Audio")] [SerializeField] private AudioClip _sanityAddSound;
         [SerializeField] private AudioClip _sanityRemoveSound;
 
-        private int _sanityPoints;
-        private int _maxSanityPoints;
+        [Header("Distance-Based Sanity")]
+        [SerializeField]
+        [Tooltip("Enable distance-based sanity system")]
+        private bool _enableDistanceBasedSanity = true;
+
+        [SerializeField]
+        [Tooltip("Define zones from closest to furthest. Each sheep in a zone contributes its rate.")]
+        private SanityDistanceZone[] _sanityZones =
+        {
+            new(){ zoneName = "Safe", maxRadius = 15f, sanityRatePerSecond = 2f },
+            new(){ zoneName = "Warning", maxRadius = 30f, sanityRatePerSecond = 0f },
+            new(){zoneName = "Dangerous", maxRadius = 45f, sanityRatePerSecond = -1f },
+            new(){ zoneName = "Death", maxRadius = 60f, sanityRatePerSecond = -2f },
+            new(){ zoneName = "Outside", maxRadius = float.MaxValue, sanityRatePerSecond = -3f }
+        };
+
+        [Header("Escalation Settings")]
+        [SerializeField]
+        [Tooltip("Which zone index (0-based) should have escalation. -1 to disable.")]
+        private int _escalationZoneIndex = 4;
+
+        [SerializeField]
+        [Tooltip("Additional sanity change per second that accumulates each second (e.g., -1 means it gets -1 worse each second)")]
+        private float _escalationRatePerSecond = -1f;
+
+        [Header("Performance")]
+        [SerializeField]
+        [Tooltip("Update interval in seconds (0 = every frame)")]
+        private float _updateInterval = 0.1f;
+
+        private float _sanityPoints;
+        private float _maxSanityPoints;
         private SanityStage _currentStage;
 
-        private static SanityTracker _instance;
-        
-        // --------- public getters ----------
-        public static int CurrentPoints =>
-            _instance != null ? _instance._sanityPoints : 0;
+        // Distance-based sanity tracking
+        private float _timeSinceLastUpdate = 0f;
+        private float _escalationZoneEntryTime = -1f;
+        private bool _anySheepInEscalationZone = false;
 
-        public static int MaxPoints =>
-            _instance != null ? _instance._maxSanityPoints : 0;
+        private static SanityTracker _instance;
+
+        // --------- public getters ----------
+        public static float CurrentPoints =>
+            _instance != null ? _instance._sanityPoints : 0f;
+
+        public static float MaxPoints =>
+            _instance != null ? _instance._maxSanityPoints : 0f;
 
         public static float CurrentPercentage =>
             _instance != null && _instance._maxSanityPoints > 0
-                ? (_instance._sanityPoints / (float)_instance._maxSanityPoints) * 100f
+                ? (_instance._sanityPoints / _instance._maxSanityPoints) * 100f
                 : 0f;
 
         public static SanityStage CurrentStage =>
@@ -66,18 +120,6 @@ namespace Core.AI.Sheep
         private void Awake()
         {
             _instance = this;
-        }
-
-        private void OnEnable()
-        {
-            EventManager.AddListener<SheepDeathEvent>(OnSheepDeath);
-            EventManager.AddListener<SheepJoinEvent>(OnSheepJoin);
-        }
-
-        private void OnDisable()
-        {
-            EventManager.RemoveListener<SheepDeathEvent>(OnSheepDeath);
-            EventManager.RemoveListener<SheepJoinEvent>(OnSheepJoin);
         }
 
         private void Start()
@@ -89,22 +131,119 @@ namespace Core.AI.Sheep
             UpdateSanity();
         }
 
-        /// <summary>
-        /// Called when a sheep dies
-        /// </summary>
-        private void OnSheepDeath(SheepDeathEvent e)
+        private void Update()
         {
-            if (!e.CountTowardSanity) return;
-            RemoveSanityPointsInternal(POINTS_PER_SHEEP, false);
+            if (!_enableDistanceBasedSanity) return;
+
+            _timeSinceLastUpdate += Time.deltaTime;
+
+            if (_timeSinceLastUpdate >= _updateInterval)
+            {
+                float deltaTime = _timeSinceLastUpdate;
+                _timeSinceLastUpdate = 0f;
+
+                float sanityDelta = CalculateSanityDeltaForInterval(deltaTime);
+
+                if (Mathf.Abs(sanityDelta) > 0.001f)
+                {
+                    ApplySanityDelta(sanityDelta);
+                }
+            }
         }
 
         /// <summary>
-        /// Called when a sheep joins the herd
+        /// Calculates sanity change based on all sheep distances from player
         /// </summary>
-        private void OnSheepJoin(SheepJoinEvent e)
+        private float CalculateSanityDeltaForInterval(float deltaTime)
         {
-            if (!e.CountTowardSanity) return;
-            AddSanityPointsInternal(POINTS_PER_SHEEP, false);
+            if (_playerTransform == null) return 0f;
+
+            float totalDelta = 0f;
+            Vector3 playerPos = _playerTransform.position;
+            int furthestZoneSheepCount = 0;
+
+            // Get all active sheep
+            SheepStateManager[] allSheep = FindObjectsByType<SheepStateManager>(FindObjectsSortMode.None);
+
+            foreach (var sheep in allSheep)
+            {
+                if (sheep == null || !sheep.isActiveAndEnabled) continue;
+
+                // Calculate distance to player
+                float distance = Vector3.Distance(sheep.transform.position, playerPos);
+
+                // Determine which zone this sheep is in
+                int zoneIndex = GetZoneIndexForDistance(distance);
+
+                if (zoneIndex >= 0 && zoneIndex < _sanityZones.Length)
+                {
+                    float baseRate = _sanityZones[zoneIndex].sanityRatePerSecond;
+
+                    // Track the furthest zone occupancy for escalation
+                    if (zoneIndex == _escalationZoneIndex)
+                    {
+                        furthestZoneSheepCount++;
+                    }
+
+                    totalDelta += baseRate * deltaTime;
+                }
+            }
+
+            // Update escalation tracking
+            bool wasInEscalationZone = _anySheepInEscalationZone;
+            _anySheepInEscalationZone = furthestZoneSheepCount > 0;
+
+            if (!wasInEscalationZone && _anySheepInEscalationZone)
+            {
+                // First sheep entered escalation zone
+                _escalationZoneEntryTime = Time.time;
+            }
+            else if (wasInEscalationZone && !_anySheepInEscalationZone)
+            {
+                // All sheep left escalation zone
+                _escalationZoneEntryTime = -1f;
+            }
+
+            // Add escalation penalty
+            if (_anySheepInEscalationZone && _escalationZoneIndex >= 0)
+            {
+                float escalationPenalty = CalculateEscalationPenalty();
+                totalDelta += escalationPenalty * furthestZoneSheepCount * deltaTime;
+            }
+
+            return totalDelta;
+        }
+
+        /// <summary>
+        /// Determines which zone a sheep is in based on distance
+        /// </summary>
+        private int GetZoneIndexForDistance(float distance)
+        {
+            for (int i = 0; i < _sanityZones.Length; i++)
+            {
+                if (distance <= _sanityZones[i].maxRadius)
+                {
+                    return i;
+                }
+            }
+
+            // If distance exceeds all zones, return last zone
+            return _sanityZones.Length - 1;
+        }
+
+        /// <summary>
+        /// Calculates additional penalty based on how long sheep have been in escalation zone
+        /// Escalates linearly: baseRate + (escalationRate * timeInSeconds)
+        /// Example: -3/sec base + (-1/sec escalation) after 5 seconds = -3 + (-1*5) = -8/sec
+        /// </summary>
+        private float CalculateEscalationPenalty()
+        {
+            if (_escalationZoneEntryTime < 0f) return 0f;
+
+            float timeInZone = Time.time - _escalationZoneEntryTime;
+
+            // Linear escalation: multiply rate by time in zone
+            return _escalationRatePerSecond * timeInZone;
         }
 
         /// <summary>
@@ -118,7 +257,7 @@ namespace Core.AI.Sheep
                 return;
             }
 
-            _instance.AddSanityPointsInternal(points);
+            _instance.ApplySanityDelta(points);
         }
 
         /// <summary>
@@ -132,26 +271,32 @@ namespace Core.AI.Sheep
                 return;
             }
 
-            _instance.RemoveSanityPointsInternal(points);
+            _instance.ApplySanityDelta(-(float)points);
         }
 
         /// <summary>
-        /// Internal method to add sanity points
+        /// Applies a change to sanity points (positive or negative)
         /// </summary>
-        private void AddSanityPointsInternal(int points, bool addSheep = true)
+        private void ApplySanityDelta(float delta)
         {
-            int oldPoints = _sanityPoints;
+            float oldPoints = _sanityPoints;
 
-            // Add points and increase max
-            if (_sanityPoints == _maxSanityPoints) _maxSanityPoints += points;
-            _sanityPoints += points;
-            
-            int oldThreshold = oldPoints / POINTS_PER_SHEEP;
-            int newThreshold = _sanityPoints / POINTS_PER_SHEEP;
-
-            if (newThreshold > oldThreshold && addSheep)
+            // If gaining sanity while at max, increase the ceiling
+            if (delta > 0 && _sanityPoints >= _maxSanityPoints - 0.1f)
             {
-                // Spawn a sheep (doesn't count towards sanity)
+                _maxSanityPoints += delta;
+            }
+
+            // Apply change
+            _sanityPoints = Mathf.Clamp(_sanityPoints + delta, 0f, _maxSanityPoints);
+
+            // Check for threshold crossings for spawning/removal
+            int oldThreshold = Mathf.FloorToInt(oldPoints / POINTS_PER_SHEEP);
+            int newThreshold = Mathf.FloorToInt(_sanityPoints / POINTS_PER_SHEEP);
+
+            if (newThreshold > oldThreshold)
+            {
+                // Gained enough sanity to spawn a sheep
                 SpawnSheep();
 
                 var clip = _sanityAddSound;
@@ -161,32 +306,15 @@ namespace Core.AI.Sheep
                     // Waiting for sound manager to roll out
                 }
             }
-
-            UpdateSanity();
-        }
-
-        /// <summary>
-        /// Internal method to remove sanity points
-        /// </summary>
-        private void RemoveSanityPointsInternal(int points, bool removeSheep = true)
-        {
-            int oldPoints = _sanityPoints;
-
-            _sanityPoints = Mathf.Max(0, _sanityPoints - points);
-            
-            // only changes when losing a full sheep's worth
-            int oldThreshold = oldPoints > 0 ? Mathf.CeilToInt((float)oldPoints / POINTS_PER_SHEEP) : 0;
-            int newThreshold = _sanityPoints > 0 ? Mathf.CeilToInt((float)_sanityPoints / POINTS_PER_SHEEP) : 0;
-
-            if (newThreshold < oldThreshold && _sanityPoints > 0 && removeSheep)
+            else if (newThreshold < oldThreshold && _sanityPoints > 0)
             {
-                // Remove furthest sheep (TODO: sheep should flee instead of instant removal)
+                // Lost enough sanity to remove a sheep
                 RemoveFurthestSheep();
 
                 var clip = _sanityRemoveSound;
                 if (clip)
                 {
-                    //Waiting for sound manager
+                    // Waiting for sound manager
                 }
             }
 
@@ -313,7 +441,14 @@ namespace Core.AI.Sheep
             if (_showDebug && _debugText != null)
             {
                 string stageText = GetStageName(_currentStage);
-                _debugText.text = $"Sanity: {percentage:F1}% ({_sanityPoints}/{_maxSanityPoints}) - {stageText}";
+                _debugText.text = $"Sanity: {percentage:F1}% ({_sanityPoints:F1}/{_maxSanityPoints:F1}) - {stageText}";
+
+                if (_anySheepInEscalationZone && _escalationZoneEntryTime >= 0f)
+                {
+                    float escalationTime = Time.time - _escalationZoneEntryTime;
+                    float penalty = CalculateEscalationPenalty();
+                    _debugText.text += $"\nEscalation: {escalationTime:F1}s (penalty: {penalty:F1}/s)";
+                }
             }
         }
 

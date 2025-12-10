@@ -55,7 +55,8 @@ namespace Core.AI.Sheep
             EventManager.AddListener<SheepDeathEvent>(OnSheepDeath);
             
             BootstrapSheepList();
-            _loop = StartCoroutine(TickLoop());
+            // infinite loop????
+            //_loop = StartCoroutine(TickLoop());
         }
 
         private void OnDisable()
