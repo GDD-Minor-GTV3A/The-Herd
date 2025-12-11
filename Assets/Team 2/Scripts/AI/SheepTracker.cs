@@ -20,7 +20,7 @@ namespace Core.AI.Sheep
         private static readonly PersonalityType[] FAMILY_ORDER =
         {
             PersonalityType.Andela, PersonalityType.Sonja, PersonalityType.Ivana, PersonalityType.Nino,
-            PersonalityType.Yaro
+            PersonalityType.Yaro, PersonalityType.Tihomir
         };
 
         private void Awake()

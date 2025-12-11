@@ -10,13 +10,12 @@ namespace Core.AI.Sheep
     /// Tracks player sanity using a point-based system.
     /// Starts at 100 points with 6 sheep. Each sheep = 16 points.
     /// Losing 16 points removes furthest sheep. Gaining 16 points spawns new sheep.
-    /// NOTE: This should probably be moved to player code for consistency.
     /// </summary>
     public class SanityTracker : MonoBehaviour
     {
-        private const int POINTS_PER_SHEEP = 16;
-        private const int STARTING_POINTS = 96;
-        private const int STARTING_SHEEP_COUNT = 6;
+        private const int STARTING_SHEEP_COUNT = 5;
+        private const int POINTS_PER_SHEEP = 100 / STARTING_SHEEP_COUNT;
+        private const int STARTING_POINTS = POINTS_PER_SHEEP * STARTING_SHEEP_COUNT;
 
         [Header("Spawning")]
         [SerializeField]
@@ -48,7 +47,6 @@ namespace Core.AI.Sheep
         private SanityStage _currentStage;
 
         private static SanityTracker _instance;
-        
         
         // --------- public getters ----------
         public static int CurrentPoints =>
@@ -96,7 +94,8 @@ namespace Core.AI.Sheep
         /// </summary>
         private void OnSheepDeath(SheepDeathEvent e)
         {
-            //RemoveSanityPointsInternal(POINTS_PER_SHEEP);
+            if (!e.CountTowardSanity) return;
+            RemoveSanityPointsInternal(POINTS_PER_SHEEP, false);
         }
 
         /// <summary>
@@ -104,7 +103,8 @@ namespace Core.AI.Sheep
         /// </summary>
         private void OnSheepJoin(SheepJoinEvent e)
         {
-            //AddSanityPointsInternal(POINTS_PER_SHEEP);
+            if (!e.CountTowardSanity) return;
+            AddSanityPointsInternal(POINTS_PER_SHEEP, false);
         }
 
         /// <summary>
@@ -138,7 +138,7 @@ namespace Core.AI.Sheep
         /// <summary>
         /// Internal method to add sanity points
         /// </summary>
-        private void AddSanityPointsInternal(int points)
+        private void AddSanityPointsInternal(int points, bool addSheep = true)
         {
             int oldPoints = _sanityPoints;
 
@@ -149,16 +149,18 @@ namespace Core.AI.Sheep
             int oldThreshold = oldPoints / POINTS_PER_SHEEP;
             int newThreshold = _sanityPoints / POINTS_PER_SHEEP;
 
-            if (newThreshold > oldThreshold)
+            if (newThreshold > oldThreshold && addSheep)
             {
                 // Spawn a sheep (doesn't count towards sanity)
-                SpawnSheep();
+                var sheep = SpawnSheep();
 
                 var clip = _sanityAddSound;
                 if (clip)
                 {
-                    float pitch = Random.Range(0.9f, 1.05f);
-                    // Waiting for sound manager to roll out
+                    sheep?.SoundDriver.PlayMiscSound(
+                        clip,
+                        1.0f,
+                        Random.Range(0.9f, 1.05f));
                 }
             }
 
@@ -168,7 +170,7 @@ namespace Core.AI.Sheep
         /// <summary>
         /// Internal method to remove sanity points
         /// </summary>
-        private void RemoveSanityPointsInternal(int points)
+        private void RemoveSanityPointsInternal(int points, bool removeSheep = true)
         {
             int oldPoints = _sanityPoints;
 
@@ -178,15 +180,18 @@ namespace Core.AI.Sheep
             int oldThreshold = oldPoints > 0 ? Mathf.CeilToInt((float)oldPoints / POINTS_PER_SHEEP) : 0;
             int newThreshold = _sanityPoints > 0 ? Mathf.CeilToInt((float)_sanityPoints / POINTS_PER_SHEEP) : 0;
 
-            if (newThreshold < oldThreshold && _sanityPoints > 0)
+            if (newThreshold < oldThreshold && _sanityPoints > 0 && removeSheep)
             {
                 // Remove furthest sheep (TODO: sheep should flee instead of instant removal)
-                RemoveFurthestSheep();
+                var removedSheep = RemoveFurthestSheep();
 
                 var clip = _sanityRemoveSound;
                 if (clip)
                 {
-                    //Waiting for sound manager
+                    removedSheep?.SoundDriver.PlayMiscSound(
+                        clip,
+                        1.0f,
+                        Random.Range(0.9f, 1.1f));
                 }
             }
 
@@ -196,18 +201,19 @@ namespace Core.AI.Sheep
         /// <summary>
         /// Spawns a sheep out of view, walking towards the player
         /// </summary>
-        private void SpawnSheep()
+        /// <returns>The newly spawned Sheep</returns>
+        private SheepStateManager SpawnSheep()
         {
             if (_sheepPrefab == null)
             {
                 Debug.LogWarning("[SanityTracker] No sheep prefab assigned. Cannot spawn sheep.");
-                return;
+                return null;
             }
 
             if (_playerTransform == null)
             {
                 Debug.LogWarning("[SanityTracker] No player transform assigned. Cannot spawn sheep.");
-                return;
+                return null;
             }
 
             // Calculate spawn position out of view
@@ -222,7 +228,7 @@ namespace Core.AI.Sheep
                 // Mark as straggler so it joins the herd
                 newSheep.MarkAsStraggler();
                 
-                EventManager.Broadcast(new SheepJoinEvent(newSheep));
+                EventManager.Broadcast(new SheepJoinEvent(newSheep, false));
 
                 Debug.Log($"[SanityTracker] Spawned sheep at {spawnPosition}");
             }
@@ -230,6 +236,8 @@ namespace Core.AI.Sheep
             {
                 Debug.LogError("[SanityTracker] Spawned sheep prefab does not have SheepStateManager component!");
             }
+
+            return newSheep;
         }
 
         /// <summary>
@@ -261,12 +269,13 @@ namespace Core.AI.Sheep
         /// Removes the sheep furthest from the player
         /// NOTE: For now removes instantly, but should make sheep flee instead
         /// </summary>
-        private void RemoveFurthestSheep()
+        /// <returns>The removed Sheep</returns>
+        private SheepStateManager RemoveFurthestSheep()
         {
             if (_playerTransform == null)
             {
                 Debug.LogWarning("[SanityTracker] No player transform assigned. Cannot remove furthest sheep.");
-                return;
+                return null;
             }
 
             // Find all sheep in the scene
@@ -275,7 +284,7 @@ namespace Core.AI.Sheep
             if (allSheep.Length == 0)
             {
                 Debug.LogWarning("[SanityTracker] No sheep found to remove.");
-                return;
+                return null;
             }
 
             // Find the furthest sheep from player
@@ -287,8 +296,9 @@ namespace Core.AI.Sheep
             {
                 Debug.Log($"[SanityTracker] Removing furthest sheep: {furthestSheep.name}");
                 // TODO: Make sheep flee instead of instant removal
-                furthestSheep.Remove();
+                furthestSheep.Remove(false);
             }
+            return furthestSheep;
         }
 
         /// <summary>
