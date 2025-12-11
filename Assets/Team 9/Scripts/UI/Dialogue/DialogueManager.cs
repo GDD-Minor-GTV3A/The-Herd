@@ -2,6 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Core.Events;
+
+using Gameplay.Player;
+
 using Ink.Runtime;
 using TMPro;
 using UnityEngine;
@@ -160,6 +163,12 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
+        //Set a different PlayerControlMap during dialogue 
+        if (PlayerInputHandler.Instance)
+        {
+            PlayerInputHandler.SwitchControlMap();
+        }
+        
         _story = new Story(inkJson.text);
         
         // Restore previously saved Ink variables
@@ -194,6 +203,12 @@ public class DialogueManager : MonoBehaviour
         
         _onDialogueFinished?.Invoke(); 
         _onDialogueFinished = null;
+        
+        //Switch back PlayerControlMap after dialogue is finished
+        if (PlayerInputHandler.Instance)
+        {
+            PlayerInputHandler.SwitchControlMap();
+        }
     }
 
     /// <summary>
