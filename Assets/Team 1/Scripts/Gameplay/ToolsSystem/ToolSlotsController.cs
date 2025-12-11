@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+
+using Core.Events;
 using Core.Shared;
 using Core.Shared.Utilities;
 using Gameplay.Player;
@@ -13,7 +15,7 @@ namespace Gameplay.ToolsSystem
     /// <summary>
     /// Handles logic of quick slots scrolling.
     /// </summary>
-    public class ToolSlotsController : MonoBehaviour
+    public class ToolSlotsController : MonoBehaviour, IPausable
     {
         [SerializeField, Tooltip("Reference on whistle component. (Temp solution)"), Required] 
         private Whistle whistle;
@@ -36,6 +38,7 @@ namespace Gameplay.ToolsSystem
         private Player.PlayerInput input;
 
         private bool initializedFirstSlot;
+        private bool isInventoryOpen = false;
         
 
         /// <summary>
@@ -53,21 +56,6 @@ namespace Gameplay.ToolsSystem
 
             currentToolIndex = -1;
 
-
-            this.input.MainUsage.started += OnCurrentToolMainUseStarted;
-            this.input.MainUsage.canceled += OnCurrentToolMainUseFinished;
-
-            this.input.Reload.started += OnCurrentToolReload;
-
-            this.input.SecondaryUsage.started += OnCurrentToolSecondaryUseStarted;
-            this.input.SecondaryUsage.canceled += OnCurrentToolSecondaryUseFinished;
-
-            this.input.SlotsScroll.started += UpdateCurrentSlot;
-
-            this.input.Slot_1.started += (obj) => SetCurrentSlotByIndex(0);
-            this.input.Slot_2.started += (obj) => SetCurrentSlotByIndex(1);
-            this.input.Slot_3.started += (obj) => SetCurrentSlotByIndex(2);
-
             toolSlotsUI.Initialize();
 
             // test
@@ -79,11 +67,17 @@ namespace Gameplay.ToolsSystem
 
             SetCurrentSlotByIndex(0);
             initializedFirstSlot = true;
+
+            EventManager.Broadcast(new RegisterNewPausableEvent(this));
+
+            Resume();
         }
         
         
         private void UpdateCurrentSlot(InputAction.CallbackContext obj)
         {
+            if (isInventoryOpen) return;
+
             int _inputValue = -Mathf.RoundToInt(obj.action.ReadValue<Vector2>().y);
 
             SetCurrentSlotByIndex(currentToolIndex + _inputValue);
@@ -119,30 +113,40 @@ namespace Gameplay.ToolsSystem
 
         private void OnCurrentToolReload(InputAction.CallbackContext obj)
         {
+            if (isInventoryOpen) return;
+
             if (toolSlots[currentToolIndex] != null)
                 toolSlots[currentToolIndex].Reload();
         }
 
         private void OnCurrentToolMainUseStarted(InputAction.CallbackContext obj)
         {
+            if (isInventoryOpen) return;
+
             if (toolSlots[currentToolIndex] != null)
                 toolSlots[currentToolIndex].MainUsageStarted(input.Look);
         }
 
         private void OnCurrentToolMainUseFinished(InputAction.CallbackContext obj)
         {
+            if (isInventoryOpen) return;
+
             if (toolSlots[currentToolIndex] != null)
                 toolSlots[currentToolIndex].MainUsageFinished();
         }
 
         private void OnCurrentToolSecondaryUseStarted(InputAction.CallbackContext obj)
         {
+            if (isInventoryOpen) return;
+
             if (toolSlots[currentToolIndex] != null)
                 toolSlots[currentToolIndex].SecondaryUsageStarted(input.Look);
         }
 
         private void OnCurrentToolSecondaryUseFinished(InputAction.CallbackContext obj)
         {
+            if (isInventoryOpen) return;
+
             if (toolSlots[currentToolIndex] != null)
                 toolSlots[currentToolIndex].SecondaryUsageFinished();
         }
@@ -161,6 +165,12 @@ namespace Gameplay.ToolsSystem
 
         private void OnDestroy()
         {
+            Pause();
+        }
+
+
+        public void Pause()
+        {
             input.MainUsage.started -= OnCurrentToolMainUseStarted;
             input.MainUsage.canceled -= OnCurrentToolMainUseFinished;
 
@@ -174,6 +184,38 @@ namespace Gameplay.ToolsSystem
             input.Slot_1.started -= (obj) => SetCurrentSlotByIndex(0);
             input.Slot_2.started -= (obj) => SetCurrentSlotByIndex(1);
             input.Slot_3.started -= (obj) => SetCurrentSlotByIndex(2);
+
+            input.Inventory.canceled -= OnInventoryButtonPressed;
+        }
+
+        public void Resume()
+        {
+            input.MainUsage.started += OnCurrentToolMainUseStarted;
+            input.MainUsage.canceled += OnCurrentToolMainUseFinished;
+
+            input.Reload.started += OnCurrentToolReload;
+
+            input.SecondaryUsage.started += OnCurrentToolSecondaryUseStarted;
+            input.SecondaryUsage.canceled += OnCurrentToolSecondaryUseFinished;
+
+            input.SlotsScroll.started += UpdateCurrentSlot;
+
+            input.Slot_1.started += (obj) => SetCurrentSlotByIndex(0);
+            input.Slot_2.started += (obj) => SetCurrentSlotByIndex(1);
+            input.Slot_3.started += (obj) => SetCurrentSlotByIndex(2);
+
+            input.Inventory.canceled += OnInventoryButtonPressed;
+        }
+
+        private void OnInventoryButtonPressed(InputAction.CallbackContext obj)
+        {
+            OnInventoryButtonPressed();
+        }
+
+        public void OnInventoryButtonPressed()
+        {
+            isInventoryOpen = !isInventoryOpen;
+
         }
     }
 }

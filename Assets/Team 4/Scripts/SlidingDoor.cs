@@ -5,28 +5,40 @@ public class SlidingDoor : MonoBehaviour
 {
     [SerializeField] private float slideHeight = 5f;
     [SerializeField] private float slideSpeed = 2f;
+    [SerializeField] private bool closingDoor = false;
     private Light doorLight;
 
     private Vector3 startPosition;
     private bool isSliding = false;
     private bool isLocked = true;
-    private bool isOpen = false;
+    public bool isOpen { get; private set; } = false;
 
     private void Awake()
     {
         doorLight = GetComponentInChildren<Light>();
 
         TurnLightOff();
+
+        if (closingDoor)
+        {
+            Open();
+        }
     }
 
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            if (!isLocked && !isOpen)
+            // Door should open only if unlocked when player enters trigger
+            if (!isLocked && !isOpen && !closingDoor)
             {
                 Open();
                 TurnLightOff();
+            }
+            // Door should just close when player enters trigger
+            if (closingDoor && isOpen)
+            {
+                Close();
             }
         }
     }

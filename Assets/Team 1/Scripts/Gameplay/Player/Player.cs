@@ -1,6 +1,8 @@
 using Core.Shared.Utilities;
 using Gameplay.Effects;
 using Gameplay.HealthSystem;
+using Gameplay.Inventory;
+using Gameplay.Map;
 using Gameplay.ToolsSystem;
 using UI;
 using UI.Effects;
@@ -14,7 +16,7 @@ namespace Gameplay.Player
     /// Base player script.
     /// </summary>
     [RequireComponent(typeof(PlayerMovement), typeof(PlayerStateManager))]
-    [RequireComponent(typeof(PlayerInput), typeof(ToolSlotsController), typeof(CharacterController))]
+    [RequireComponent(typeof(PlayerInput), typeof(CharacterController))]
     public class Player : MonoBehaviour, IDamageable, IHealable, IKillable
     {
         [Header("Animations")]
@@ -34,6 +36,10 @@ namespace Gameplay.Player
         [Space, Header("UI")]
         [SerializeField, Required, Tooltip("Reference for HP bar component.")] 
         private HPBarUI hpBar;
+        [SerializeField, Required, Tooltip("Reference for InventoryToggle component.")] 
+        private InventoryToggle inventoryButton;
+        [SerializeField, Tooltip("Reference for MapToggle component.")] 
+        private MapToggle mapToggle;
 
         [Space]
         [SerializeField, Tooltip("Manager of step sounds.")]
@@ -60,12 +66,6 @@ namespace Gameplay.Player
         private PlayerMovement movementController;
         private Health health;
 
-
-        // for test, needs to be moved to bootstrap
-        private void Start()
-        {
-            Initialize();
-        }
 
         /// <summary>
         /// Initialization method.
@@ -97,12 +97,17 @@ namespace Gameplay.Player
             PlayerAnimator _playerAnimator = new PlayerAnimator(animator, this, transform, animationConstrains);
             _stateManager.Initialize(_playerInput, movementController, _playerAnimator);
 
+            inventoryButton.Initialize(_playerInput.Inventory);
+            if (mapToggle != null)
+                mapToggle.Initialize(_playerInput);
+
             // Init health
             health = new Health(config);
 
             config.OnValueChanged += UpdateConfigValues;
 
-            _slotsController.Initialize(_playerInput, _playerAnimator, 2);
+            if (_slotsController != null)
+                _slotsController.Initialize(_playerInput, _playerAnimator, 2);
             
             dmgEffect.Initialize();
             vignetteEffect.Initialize();
@@ -137,7 +142,7 @@ namespace Gameplay.Player
         public void Die()
         {
             DeathEvent?.Invoke();
-            Debug.Log("You are Died!");
+            health.ResetHealth();
         }
 
 

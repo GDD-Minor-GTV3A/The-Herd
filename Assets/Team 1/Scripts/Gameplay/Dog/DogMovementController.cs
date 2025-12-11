@@ -1,3 +1,4 @@
+using Core.Events;
 using Core.Shared;
 using UnityEngine;
 using UnityEngine.AI;
@@ -7,7 +8,7 @@ namespace Gameplay.Dog
     /// <summary>
     /// Movement controller for the dog.
     /// </summary>
-    public class DogMovementController : MovementController
+    public class DogMovementController : MovementController, IPausable
     {
         private NavMeshAgent agent;
         
@@ -35,6 +36,8 @@ namespace Gameplay.Dog
             this.agent = agent;
 
             UpdateValues(config);
+
+            EventManager.Broadcast(new RegisterNewPausableEvent(this));
         }
 
 
@@ -75,6 +78,21 @@ namespace Gameplay.Dog
             agent.speed = baseSpeed;
 
             agent.angularSpeed = config.RotationSpeed;
+        }
+
+
+        public void Pause()
+        {
+            agent.updatePosition = false;
+            agent.updateRotation = false;
+            agent.isStopped = true;
+        }
+
+        public void Resume()
+        {
+            agent.isStopped = false;
+            agent.updatePosition = true;
+            agent.updateRotation = true;
         }
     }
 }

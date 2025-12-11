@@ -15,18 +15,64 @@ public class QuestLogUI : MonoBehaviour
     /// </summary>
     [SerializeField] private Transform questListContainer;
 
+    [SerializeField] private Transform questLogUI;
+    
     /// <summary>
     /// The prefab used to create a new quest UI entry when a quest starts.
     /// </summary>
     [SerializeField] private GameObject questEntryPrefab;
 
+    [SerializeField] private GameObject noActiveQuestsMessage;
+    
     /// <summary>
     /// A dictionary that maps quest IDs to their corresponding <see cref="QuestUIEntry"/> components.
     /// </summary>
     private readonly Dictionary<string, QuestUIEntry> _questEntries = new();
 
     private bool _activeState = false;
+    private CanvasGroup _questLogCanvasGroup;
+
+    public static QuestLogUI Instance { get; private set; }
     
+    public void Initialize()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        // Get or Add CanvasGroup to handle visibility without disabling scripts
+        if (questLogUI != null)
+        {
+            _questLogCanvasGroup = questLogUI.GetComponent<CanvasGroup>();
+            if (_questLogCanvasGroup == null)
+            {
+                _questLogCanvasGroup = questLogUI.gameObject.AddComponent<CanvasGroup>();
+            }
+        }
+        
+        SetQuestLogVisibility(false);
+        
+        CheckEmptyState();
+        
+        Instance = this;
+        transform.SetParent(null);
+        DontDestroyOnLoad(gameObject);
+    }
+
+    private void Awake()
+    {
+        Initialize();
+    }
+
+    private void Start()
+    {
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+
     /// <summary>
     /// Subscribes to quest-related events when this component is enabled.
     /// </summary>
@@ -59,6 +105,9 @@ public class QuestLogUI : MonoBehaviour
         var entryGO = Instantiate(questEntryPrefab, questListContainer);
         var entry = entryGO.GetComponent<QuestUIEntry>();
         entry.Setup(quest);
+        
+        entryGO.SetActive(true);
+
         _questEntries.Add(quest.Quest.QuestID, entry);
     }
 
@@ -76,6 +125,8 @@ public class QuestLogUI : MonoBehaviour
 
         var questUiEntry = _questEntries[evt.QuestID];
         questUiEntry.RefreshObjectives();
+        
+        CheckEmptyState();  
     }
 
     /// <summary>
@@ -84,14 +135,23 @@ public class QuestLogUI : MonoBehaviour
     /// <param name="evt">The event data containing the ID of the completed quest.</param>
     private void OnQuestCompletedEvent(QuestCompletedEvent evt)
     {
+        Debug.Log("UI COMPLETE CALLED");
         if (!_questEntries.ContainsKey(evt.QuestID))
         {
             Debug.LogWarning($"Quest entry for {evt.QuestID} does not exist!");
             return;
         }
 
+        Debug.Log($"{evt.QuestID} has been found");
+
         var questUiEntry = _questEntries[evt.QuestID];
         questUiEntry.MarkCompleted();
+        
+        //Maybe rework this for new log
+        Destroy(_questEntries[evt.QuestID].gameObject);
+        _questEntries.Remove(evt.QuestID);
+        
+        CheckEmptyState();
     }
 
     private void Update()
@@ -100,11 +160,39 @@ public class QuestLogUI : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.L))
         {
             _activeState = !_activeState;
-                
-            foreach (Transform child in questListContainer.transform)
-            {
-                child.gameObject.SetActive(_activeState);
-            }
+            SetQuestLogVisibility(_activeState);
         }
     }
+
+    /// <summary>
+    /// Controls visibility via Alpha/Raycasting. 
+    /// Does NOT disable child objects, so their scripts continue to run.
+    /// </summary>
+    private void SetQuestLogVisibility(bool isVisible)
+    {
+        if (_questLogCanvasGroup != null)
+        {
+            _questLogCanvasGroup.alpha = isVisible ? 1f : 0f;
+            _questLogCanvasGroup.interactable = isVisible;
+            _questLogCanvasGroup.blocksRaycasts = isVisible;
+        }
+        else
+        {
+            // Fallback for safety
+            questLogUI.gameObject.SetActive(isVisible);
+        }
+    }
+    
+    /// <summary>
+    /// Checks if there are any active quests and toggles the "No Active Quests" text.
+    /// </summary>
+    private void CheckEmptyState()
+    {
+        if (noActiveQuestsMessage != null)
+        {
+            // If count is 0, set active (true). If count > 0, set inactive (false).
+            noActiveQuestsMessage.SetActive(_questEntries.Count == 0);
+        }
+    }
+    
 }

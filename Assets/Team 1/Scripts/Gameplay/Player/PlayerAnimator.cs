@@ -1,12 +1,14 @@
 using System;
 using System.Collections;
+
+using Core.Events;
 using Core.Shared;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
 namespace Gameplay.Player
 {
-    public class PlayerAnimator : AnimatorController
+    public class PlayerAnimator : AnimatorController, IPausable
     {
         private readonly PlayerAnimationConstraints animationConstrains;
 
@@ -21,6 +23,8 @@ namespace Gameplay.Player
         private readonly Transform root;
 
         private readonly float startYRotation;
+
+        private bool isRotating;
 
         private Coroutine rightHandCoroutine;
         private Coroutine leftHandCoroutine;
@@ -49,6 +53,8 @@ namespace Gameplay.Player
             shouldersTarget = animationConstrains.ChestAim.data.sourceObjects[0].transform;
 
             RemoveHands();
+
+            EventManager.Broadcast(new RegisterNewPausableEvent(this));
         }
 
 
@@ -77,18 +83,24 @@ namespace Gameplay.Player
                 switch (Mathf.Abs(_roundYRotation / 90))
                 {
                     case 1:
-                        _x = _tempY;
-                        _y = -_tempX;
+                        _x = -_tempY;
+                        _y = _tempX;
                         break;
                     case 2:
                         _x *= -1;
                         _y *= -1;
                         break;
                     case 3:
-                        _x = -_tempY;
-                        _y = _tempX;
+                        _x = _tempY;
+                        _y = -_tempX;
                         break;
                 }
+            }
+
+            if (sprint)
+            {
+                _x = 0;
+                _y = 1;
             }
 
             _animator.SetFloat(WalkingX, _x);
@@ -101,6 +113,8 @@ namespace Gameplay.Player
         /// </summary>
         public void SetAnimationRotation(bool rotate)
         {
+            isRotating = rotate;
+
             if (rotate)
             {
                 animationConstrains.HeadAim.weight = 1;
@@ -155,7 +169,7 @@ namespace Gameplay.Player
 
             if (keyPoints.ChestTarget != null)
             {
-                animationConstrains.ChestAim.weight = 1;
+                animationConstrains.ChestAim.weight = .6f;
 
                 shouldersCoroutine = player.StartCoroutine(ShouldersRoutine(keyPoints.ChestTarget));
             }
@@ -250,6 +264,19 @@ namespace Gameplay.Player
             Vector3 targetPosition = new Vector3(mouseWorldPosition.x, lookTarget.position.y, mouseWorldPosition.z);
 
             lookTarget.position = targetPosition;
+        }
+
+        public void Pause()
+        {
+            Walking(Vector2.zero);
+            animationConstrains.HeadAim.weight = 0;
+            animationConstrains.BodyAim.weight = 0;
+            lookTarget.position = root.transform.position + root.transform.forward * 10;
+        }
+
+        public void Resume()
+        {
+            SetAnimationRotation(isRotating);
         }
     }
 

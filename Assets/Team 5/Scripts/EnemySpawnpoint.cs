@@ -7,12 +7,13 @@ public class EnemySpawnpoint : MonoBehaviour
     [SerializeField] private GameObject[] enemies;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
 
-    private Transform enemyParent;
+    [Header("Enemy spawn parent")]
+    [SerializeField] private Transform enemyParent;
 
-    private void Start()
-    {
-        enemyParent = GameObject.Find("EnemyManager").transform;
-    }
+    // private void Start()
+    // {
+    //     enemyParent = GameObject.Find("EnemyManager").transform;
+    // }
 
     /// <summary>
     /// Spawn function, spawns the enemies that it as been assigned. Can spawn in 3 different methods 
