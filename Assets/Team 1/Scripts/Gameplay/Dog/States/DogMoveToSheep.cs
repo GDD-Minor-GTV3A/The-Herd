@@ -37,7 +37,11 @@ namespace Gameplay.Dog
             {
                 manager.HerdZone.HeardSheep(targetSheep);
 
-                manager.SetState<DogIdle>();
+                if (manager.HerdZone.GetFreeSheep() != null) 
+                {
+                    manager.SetState<DogMoveToSheep>();
+                }
+                else manager.SetState<DogIdle>();
 
                 return;
             }
