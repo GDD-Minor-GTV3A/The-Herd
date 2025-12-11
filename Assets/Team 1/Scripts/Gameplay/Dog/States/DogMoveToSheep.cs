@@ -35,13 +35,9 @@ namespace Gameplay.Dog
             if (targetSheep == null) return;
             if (Vector3.Distance(manager.transform.position, targetSheep.transform.position) <= 3f)
             {
-                manager.HerdZone.HeardSheep(targetSheep);
 
-                if (manager.HerdZone.GetFreeSheep() != null) 
-                {
-                    manager.SetState<DogMoveToSheep>();
-                }
-                else manager.SetState<DogIdle>();
+                manager.HerdZone.herdAllSheep();
+                manager.SetState<DogIdle>();
 
                 return;
             }
