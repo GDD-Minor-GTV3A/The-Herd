@@ -4,18 +4,13 @@ namespace Gameplay.Player
 {
     public class PlayerRunning: PlayerState
     {
-        private readonly PlayerAnimator _animator;
-        private readonly PlayerMovement _movement;
-
         public PlayerRunning(PlayerStateManager stateMachine) : base(stateMachine)
         {
-            _animator = _manager.AnimatorController as PlayerAnimator;
-            _movement = _manager.MovementController as PlayerMovement;
         }
+
 
         public override void OnStart()
         {
-            _animator.SetAnimationRotation(false);
         }
 
         public override void OnStop()
@@ -24,30 +19,31 @@ namespace Gameplay.Player
 
         public override void OnUpdate()
         {
-            Vector2 playerInput = _manager.Input.Move;
+            Vector2 playerInput = manager.Input.Move;
 
             // If there's no input, go idle.
             if (playerInput.magnitude == 0)
             {
-                _manager.SetState<PlayerIdle>();
+                manager.SetState<PlayerIdle>();
                 return;
             }
 
-            if (!_manager.Input.Run)
+            if (!manager.Input.Run)
             {
-                _manager.SetState<PlayerWalking>();
+                manager.SetState<PlayerWalking>();
                 return;
             }
 
-            _playerMovement.ApplyGravity();
+            playerMovement.ApplyGravity();
 
 
-            Vector3 movementTarget = _playerMovement.CalculateMovementTargetFromInput(playerInput, true);
-            _playerMovement.MoveTo(movementTarget);
+            Vector3 movementTarget = playerMovement.CalculateMovementTargetFromInput(playerInput, true);
+            playerMovement.MoveTo(movementTarget);
 
-            _movement.Rotate(playerInput);
+            playerMovement.Rotate(playerInput);
 
-            _animator.Walking(_manager.Input.Move, true);
+            animator.Walking(true, true);
+            animator.RotateHead(manager.Input.Look.Value);
         }
     }
 }

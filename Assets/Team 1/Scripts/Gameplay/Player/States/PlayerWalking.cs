@@ -7,16 +7,13 @@ namespace Gameplay.Player
     /// </summary>
     public class PlayerWalking : PlayerState
     {
-        private readonly PlayerAnimator _animator;
-
         public PlayerWalking(PlayerStateManager stateMachine) : base(stateMachine)
         {
-            _animator = _manager.AnimatorController as PlayerAnimator;
         }
+
 
         public override void OnStart()
         {
-            _animator.SetAnimationRotation(true);
         }
 
         public override void OnStop()
@@ -25,30 +22,29 @@ namespace Gameplay.Player
 
         public override void OnUpdate()
         {
-            Vector2 playerInput = _manager.Input.Move;
+            Vector2 playerInput = manager.Input.Move;
 
             // If there's no input, go idle.
             if (playerInput.magnitude == 0)
             {
-                _manager.SetState<PlayerIdle>();
+                manager.SetState<PlayerIdle>();
                 return;
             }
 
-            if (_manager.Input.Run)
+            if (manager.Input.Run)
             {
-                _manager.SetState<PlayerRunning>();
+                manager.SetState<PlayerRunning>();
                 return;
             }
-            _playerMovement.ApplyGravity();
+            playerMovement.ApplyGravity();
 
-            Vector3 movementTarget = _playerMovement.CalculateMovementTargetFromInput(playerInput, false);
-            _playerMovement.MoveTo(movementTarget);
+            Vector3 movementTarget = playerMovement.CalculateMovementTargetFromInput(playerInput, false);
+            playerMovement.MoveTo(movementTarget);
 
-            // Rotate based on current rotation mode (movement or mouse)
-            //_manager.Rotation.Rotate(playerInput, _manager.Input.Look.Value);
-            _animator.RotateCharacterBody(_manager.Input.Look.Value);
+            playerMovement.Rotate(playerInput);
 
-            _animator.Walking(_manager.Input.Move);
+            animator.Walking(true);
+            animator.RotateHead(manager.Input.Look.Value);
         }
     }
 }

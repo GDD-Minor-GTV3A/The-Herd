@@ -37,6 +37,10 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _RenderTexture:
+        m_Texture: {fileID: 8400000, guid: 4141bdc3dc161a1459f3e56912325f42, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -53,8 +57,11 @@ Material:
     m_Floats:
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _SnowScale: 80
-    - _VertexOffset: 0.5
-    m_Colors: []
+    - _SnowBrightness: 1.25
+    - _SnowPower: 2
+    - _SnowScale: 258
+    - _VertexOffset: 1
+    m_Colors:
+    - _SnowColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

@@ -1,145 +1,57 @@
 using System;
+using Core.Events;
 using Core.Shared;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
 namespace Gameplay.Player
 {
-    public class PlayerAnimator : AnimatorController
+    public class PlayerAnimator : AnimatorController, IPausable
     {
-        private PlayerAnimationConstraints animationConstrains;
+        private readonly PlayerAnimationConstraints animationConstrains;
+
+        private readonly Transform lookTarget;
+        private readonly Transform rightHandTarget;
+        private readonly Transform rightHandHint;
+        private readonly Transform leftHandTarget;
+        private readonly Transform leftHandHint;
+
         private readonly Transform root;
 
-        private readonly float startYRotation;
-
-        private const string WalkingX = "X";
-        private const string WalkingY = "Y";
+        private const string WalkingSpeed = "WalkingSpeed";
 
 
-        public PlayerAnimator(Animator animator,Transform root, PlayerAnimationConstraints constraints) : base(animator)
+        public PlayerAnimator(Animator animator, Transform root, PlayerAnimationConstraints constraints) : base(animator)
         {
             this.root = root;
             animationConstrains = constraints;
-            startYRotation = root.eulerAngles.y;
-            RemoveHands();
+
+            lookTarget = animationConstrains.HeadAim.data.sourceObjects[0].transform;
+
+            rightHandTarget = animationConstrains.RightHand.data.target;
+            rightHandHint = animationConstrains.RightHand.data.hint;
+
+            leftHandTarget = animationConstrains.LeftHand.data.target;
+            leftHandHint = animationConstrains.LeftHand.data.hint;
+
+            animationConstrains.HeadAim.weight = 1;
+
+            EventManager.Broadcast(new RegisterNewPausableEvent(this));
         }
 
 
         /// <summary>
         /// Sets walking animation state.
         /// </summary>
-        /// <param name="walking">Is walking.</param>
-        public void Walking(Vector2 walkingDirection, bool sprint = false)
+        /// <param name="walkingDirection">Direction of walking.</param>
+        /// <param name="sprint">Is sprinting.</param>
+        public void Walking(bool isWalking, bool sprint = false)
         {
-            float x = walkingDirection.x;
-            float y = walkingDirection.y;
+            float wakingSpeed = isWalking ? 1 : 0;
 
-            x /= (sprint) ? 1 : 2;
-            y /= (sprint) ? 1 : 2;
+            wakingSpeed /= (sprint) ? 1 : 2;
 
-            float yRotation = root.eulerAngles.y;
-
-            int roundYRotation = Mathf.RoundToInt(yRotation - startYRotation);
-
-            if (roundYRotation != 0)
-            {
-                float tempX = x;
-                float tempY = y;
-
-                switch (Mathf.Abs(roundYRotation / 90)) 
-                {
-                    case 1:
-                        x = tempY;
-                        y = -tempX;
-                        break;
-                    case 2:
-                        x *= -1;
-                        y *= -1;
-                        break;
-                    case 3:
-                        x = -tempY;
-                        y = tempX;
-                        break;
-                }
-            }
-
-            _animator.SetFloat(WalkingX, x);
-            _animator.SetFloat(WalkingY, y);
-        }
-
-
-        /// <summary>
-        /// Define if animator controls character rotation or no.
-        /// </summary>
-        public void SetAnimationRotation(bool rotate)
-        {
-            if (rotate)
-            {
-                animationConstrains.HeadAim.weight = 1;
-                animationConstrains.BodyAim.weight = 1;
-            }
-            else
-            {
-                animationConstrains.HeadAim.weight = 0;
-                animationConstrains.BodyAim.weight = 0;
-                animationConstrains.LookTarget.position = root.transform.position + root.transform.forward * 10;
-            }
-        }
-
-
-        /// <summary>
-        /// Moves hands on tool's animation key points.
-        /// </summary>
-        public void GetTool(ToolAnimationKeyPoints keyPoints)
-        {
-            var _handData = animationConstrains.RightHand.data;
-            _handData.target = keyPoints.RightHandTarget;
-            _handData.hint = keyPoints.RightHandHint;
-            animationConstrains.RightHand.data = _handData;
-
-            _handData = animationConstrains.LeftHand.data;
-            _handData.target = keyPoints.LeftHandTarget;
-            _handData.hint = keyPoints.LeftHandHint;
-            animationConstrains.LeftHand.data = _handData;
-
-
-            var _shouldersData = animationConstrains.ShoulderAim.data;
-            var _targets = _shouldersData.sourceObjects;
-            _targets.Add(new WeightedTransform(keyPoints.ShouldersTarget, 1));
-            _shouldersData.sourceObjects = _targets;
-            animationConstrains.ShoulderAim.data = _shouldersData;
-
-            animationConstrains.RightHand.weight = 1;
-            animationConstrains.LeftHand.weight = 1;
-            animationConstrains.ShoulderAim.weight = 1;
-        }
-
-
-        /// <summary>
-        /// Resets hands position.
-        /// </summary>
-        public void RemoveHands()
-        {
-            var _handData = animationConstrains.RightHand.data;
-            _handData.target = null;
-            _handData.hint = null;
-            animationConstrains.RightHand.data = _handData;
-
-            _handData = animationConstrains.LeftHand.data;
-            _handData.target = null;
-            _handData.hint = null;
-            animationConstrains.LeftHand.data = _handData;
-
-
-            var _shouldersData = animationConstrains.ShoulderAim.data;
-            var _targets = _shouldersData.sourceObjects;
-            _targets.Clear();
-            _shouldersData.sourceObjects = _targets;
-            animationConstrains.ShoulderAim.data = _shouldersData;
-
-            animationConstrains.RightHand.weight = 0;
-            animationConstrains.LeftHand.weight = 0;
-            animationConstrains.ShoulderAim.weight = 0;
+            _animator.SetFloat(WalkingSpeed, wakingSpeed);
         }
 
 
@@ -152,17 +64,48 @@ namespace Gameplay.Player
             direction.Normalize();
             float angle = Vector3.SignedAngle(root.forward, direction, root.up);
 
-            if (angle <= -80f)
+            if (angle <= -70f)
                 root.Rotate(0, -90, 0);
 
-            if (angle >= 80f)
+            if (angle >= 70f)
                 root.Rotate(0, 90, 0);
-
-            if (Mathf.Round(root.rotation.eulerAngles.y) % 90 == 0)
-                root.Rotate(0, 45, 0);
+        }
 
 
-            animationConstrains.LookTarget.position = new Vector3(mouseWorldPosition.x, animationConstrains.LookTarget.position.y, mouseWorldPosition.z);
+        public void Pause()
+        {
+            Walking(false);
+            animationConstrains.HeadAim.weight = 0;
+            lookTarget.position = root.transform.position + root.transform.forward * 10;
+        }
+
+        public void Resume()
+        {
+            animationConstrains.HeadAim.weight = 1;
+        }
+
+
+        public void RotateHead(Vector3 mouseWorldPosition)
+        {
+            Vector3 targetPosition = new Vector3(mouseWorldPosition.x, lookTarget.position.y, mouseWorldPosition.z);
+            Vector3 playerPosition = root.position;
+
+            Vector2 targetPositionXZ = new Vector2(mouseWorldPosition.x, mouseWorldPosition.z);
+            Vector2 playerPositionXZ = new Vector2(root.position.x, root.position.z);
+
+            float distance = Vector2.Distance(targetPositionXZ, playerPositionXZ);
+
+            if (distance < 2.5f)
+            {
+                Vector2 correctionDirectionXZ = targetPositionXZ - playerPositionXZ;
+                correctionDirectionXZ.Normalize();
+
+                Vector3 correctionDirection = new Vector3(correctionDirectionXZ.x, 0, correctionDirectionXZ.y);
+
+                targetPosition += correctionDirection * (2.5f - distance);
+            }
+
+            lookTarget.position = targetPosition;
         }
     }
 
@@ -170,13 +113,8 @@ namespace Gameplay.Player
     [Serializable]
     public struct PlayerAnimationConstraints
     {
-        public MultiAimConstraint BodyAim;
         public MultiAimConstraint HeadAim;
-        public MultiAimConstraint ShoulderAim;
         public TwoBoneIKConstraint LeftHand;
         public TwoBoneIKConstraint RightHand;
-
-        public Transform LookTarget;
     }
 }
-

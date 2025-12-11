@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace Gameplay.Player 
 {
@@ -8,18 +7,13 @@ namespace Gameplay.Player
     /// </summary>
     public class PlayerIdle : PlayerState
     {
-        private readonly PlayerAnimator _animator;
-
-
         public PlayerIdle(PlayerStateManager stateMachine) : base(stateMachine)
         {
-            _animator = _manager.AnimatorController as PlayerAnimator;
         }
 
 
         public override void OnStart()
         {
-            _animator.SetAnimationRotation(true);
         }
 
         public override void OnStop()
@@ -28,16 +22,18 @@ namespace Gameplay.Player
 
         public override void OnUpdate()
         {
-            if (_manager.Input.Move.magnitude > 0)
-                _manager.SetState<PlayerWalking>();
+            if (manager.Input.Move.magnitude > 0)
+                manager.SetState<PlayerWalking>();
 
-            _playerMovement.ApplyGravity();
-            Vector2 playerInput = _manager.Input.Move;
+            playerMovement.ApplyGravity();
+
+            //Vector2 _playerInput = manager.Input.Move;
             //_manager.Rotation.Rotate(playerInput, _manager.Input.Look.Value);
 
-            _animator.RotateCharacterBody(_manager.Input.Look.Value);
 
-            _animator.Walking(Vector2.zero);
+            animator.Walking(false);
+            animator.RotateCharacterBody(manager.Input.Look.Value);
+            animator.RotateHead(manager.Input.Look.Value);
         }
     }
 }
