@@ -60,7 +60,7 @@ namespace Gameplay.Dog
             if (manager.HerdZone.IsFreeSheepToHeard())
             {
                 Debug.Log("Found free sheep");
-                manager.SetState<DogMoveToSheep>();
+                manager.SetState<TryToHerdSheep>();
             }
 
             if (Time.time - lastBarkTime < config.BarkCooldown)
