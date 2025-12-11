@@ -181,6 +181,7 @@ GameObject:
   - component: {fileID: 2328448271608897750}
   - component: {fileID: 9146458439907415834}
   - component: {fileID: -5832850277584567378}
+  - component: {fileID: 3361442587010083243}
   m_Layer: 14
   m_Name: Sheep newest
   m_TagString: Sheep
@@ -332,7 +333,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _walkingAudioSource: {fileID: 5438659552871175397}
-  _bleatingAudioSource: {fileID: 2271728169343192938}
+  _bleatingAudioSource: {fileID: 0}
   _miscAudioSource: {fileID: 4941028203068089971}
   _walkingSound: {fileID: 8300000, guid: 491095ee20a38634eb6f3d2ee4f12df4, type: 3}
 --- !u!114 &2328448271608897750
@@ -386,6 +387,25 @@ MonoBehaviour:
     StartingAngle: 0
     Mesh: {fileID: 0}
   origin: {fileID: 0}
+--- !u!114 &3361442587010083243
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4607321907588713866}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc5d0031c1b73b2488aa6d16c2ae9cb5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sheepCategory: 1
+  source: {fileID: 2271728169343192938}
+  heavyClips: []
+  mediumClips: []
+  lightClips: []
+  minTime: 4
+  maxTime: 12
 --- !u!1 &6242324432467352130
 GameObject:
   m_ObjectHideFlags: 0

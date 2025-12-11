@@ -56,7 +56,7 @@ namespace Core.AI.Sheep
             
             BootstrapSheepList();
             // infinite loop????
-            //_loop = StartCoroutine(TickLoop());
+            _loop = StartCoroutine(TickLoop());
         }
 
         private void OnDisable()
@@ -132,11 +132,8 @@ namespace Core.AI.Sheep
         {
             while (true)
             {
-                while (true)
-                {
-                    
-                    
-                }
+                EvaluateZone();
+                yield return _wait;
             }
         }
 
