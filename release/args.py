@@ -291,7 +291,7 @@ async def set_defaults() -> None:
     """Set default values for settings if not provided."""
     from release import tags
     tag = await tags.get()
-    tag = tag.bump_minor()
+    tag = tag.bump_patch()
 
     # Set default title and notes if not provided
     args.tag = args.tag if args.tag != str(NULL_SEMVER) else str(tag)
