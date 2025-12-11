@@ -6,6 +6,7 @@ public class KnockOnDoorUI : MonoBehaviour
     [Header("References")]
     public KnockOnDoorController knockController;
     public TextMeshProUGUI knockText;
+    [SerializeField] private string responseText = "You knocked on the door!";
 
     void Start()
     {
@@ -29,7 +30,7 @@ public class KnockOnDoorUI : MonoBehaviour
         else if (knockController.IsInteracting)
         {
             knockText.gameObject.SetActive(true);
-            knockText.text = "You knocked on the door!";
+            knockText.text = responseText;
         }
         else
         {
