@@ -41,6 +41,7 @@ namespace Gameplay.ToolsSystem.Tools.Rifle
         /// <param name="direction">Direction of shot.</param>
         public void Shoot(Vector3 direction)
         {
+            transform.forward = direction;
             rb.linearVelocity = direction * speed;
             StartCoroutine(DespawnCoroutine());
         }

@@ -1902,6 +1902,12 @@ MonoBehaviour:
   - {fileID: 2436655409199837608}
   - {fileID: 6617376388208219788}
   vision: {fileID: 5903798430956308949}
+  useSpawnIntroState: 1
+  spawnBoxTarget: {fileID: 0}
+  spawnIntroSpeed: 4
+  spawnBoxTriggerRadius: 12
+  spawnBoxArriveDistance: 0.75
+  spawnWaitAtBoxTime: 2
   interceptChance: 0.583
   nodeReachThreshold: 3
   pathPassRadius: 2
@@ -1926,6 +1932,13 @@ MonoBehaviour:
   chaseRotationSpeed: 10
   chaseSustainSpeed: 4
   chasePreferredArriveTolerance: 1
+  shootLineMinDistance: 25
+  shootLineMaxDistance: 60
+  lineFirePoint: {fileID: 0}
+  lineBulletPrefab: {fileID: 0}
+  lineBulletsInLine: 8
+  lineBulletSpacing: 1
+  lineIndicatorLength: 15
   chaseReengageMinNodeDistance: 70
   chaseReengageMaxNodeDistance: 400
   chaseReaggroCooldown: 2
@@ -3337,7 +3350,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3444091594567113112}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: AmalgamtionEnemy 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5729,6 +5742,12 @@ MonoBehaviour:
   - {fileID: 2436655409199837608}
   - {fileID: 6617376388208219788}
   vision: {fileID: 4127638983817422346}
+  useSpawnIntroState: 1
+  spawnBoxTarget: {fileID: 0}
+  spawnIntroSpeed: 4
+  spawnBoxTriggerRadius: 12
+  spawnBoxArriveDistance: 0.75
+  spawnWaitAtBoxTime: 2
   interceptChance: 0.583
   nodeReachThreshold: 3
   pathPassRadius: 2
@@ -5753,6 +5772,13 @@ MonoBehaviour:
   chaseRotationSpeed: 10
   chaseSustainSpeed: 4
   chasePreferredArriveTolerance: 1
+  shootLineMinDistance: 25
+  shootLineMaxDistance: 60
+  lineFirePoint: {fileID: 0}
+  lineBulletPrefab: {fileID: 0}
+  lineBulletsInLine: 8
+  lineBulletSpacing: 1
+  lineIndicatorLength: 15
   chaseReengageMinNodeDistance: 70
   chaseReengageMaxNodeDistance: 400
   chaseReaggroCooldown: 2
