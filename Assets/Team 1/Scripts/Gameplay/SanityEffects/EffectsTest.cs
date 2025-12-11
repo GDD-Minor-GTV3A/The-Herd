@@ -1,5 +1,4 @@
-using Core.AI.Sheep;
-
+using Gameplay.Player;
 using UnityEngine;
 
 public class EffectsTest : MonoBehaviour
@@ -8,12 +7,7 @@ public class EffectsTest : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.M))
         {
-            SanityTracker.RemoveSanityPoints(16);
-        }
-
-        if (Input.GetKeyDown(KeyCode.N))
-        {
-            SanityTracker.AddSanityPoints(16);
+            PlayerInputHandler.SwitchControlMap();
         }
     }
 }
