@@ -24,7 +24,7 @@ async def zip_dist(build: Path, zip_file: Path) -> None:
     zip_file.copy(clone) if exists else None
 
     logger.info("Zipping files from %s to %s", build, zip_file)
-    with zipfile.ZipFile(zip_file, "w", compression = zipfile.ZIP_ZSTANDARD) as zf:
+    with zipfile.ZipFile(zip_file, "w", compression = zipfile.ZIP_DEFLATED) as zf:
         for file in build.glob("**/*"):
             _add_file(zf, file, build)
 
