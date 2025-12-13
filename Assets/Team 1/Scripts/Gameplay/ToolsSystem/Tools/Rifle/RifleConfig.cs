@@ -1,5 +1,3 @@
-using Codice.Client.BaseCommands.CheckIn;
-
 using CustomEditor.Attributes;
 
 using UnityEngine;

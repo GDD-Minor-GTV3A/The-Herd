@@ -22,6 +22,7 @@ namespace Core.InputSystem
         public UnityAction<int> SlotsEvent;
         public UnityAction<Vector2> SlotsScrollEvent;
         public UnityAction BarkEvent;
+        public UnityAction PauseEvent;
 
         public UnityAction<Vector2> NavigateEvent;
         #endregion Events
@@ -115,6 +116,11 @@ namespace Core.InputSystem
         {
             if (context.performed)
                 BarkEvent?.Invoke();
+        }
+
+        public void OnPause(InputAction.CallbackContext context)
+        {
+            PauseEvent?.Invoke();
         }
         #endregion Player Inputs
 
