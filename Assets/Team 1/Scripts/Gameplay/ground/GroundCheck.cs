@@ -1,14 +1,22 @@
+using System;
+using System.Collections.Generic;
+
 using UnityEngine;
 
 public class GroundCheck : MonoBehaviour
 {
     public Terrain terrain;  // Assign in inspector
 
+    [SerializeField]
+    private List<GroundType> groundTypes = new List<GroundType>();
+
     void Update()
     {
         int textureIndex = GetMainTexture(transform.position);
 
-        Debug.Log("Standing on texture index: " + textureIndex);
+        GroundType _currentGroundType = groundTypes.Find(x => x.TextureIndex == textureIndex);
+
+        Debug.Log($"Standing on {_currentGroundType.GroundSurface}");
     }
 
     int GetMainTexture(Vector3 worldPos)
@@ -37,4 +45,23 @@ public class GroundCheck : MonoBehaviour
 
         return dominant;
     }
+}
+
+
+[Serializable]
+public struct GroundType
+{
+    [field: SerializeField]
+    public int TextureIndex { get; private set; }
+
+    [field: SerializeField]
+    public GroundSurface GroundSurface { get; private set; }
+}
+
+public enum GroundSurface
+{
+    Dirt,
+    Snow,
+    Rock,
+    Ice
 }
