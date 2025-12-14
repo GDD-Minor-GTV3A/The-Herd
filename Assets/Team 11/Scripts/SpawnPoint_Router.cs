@@ -3,62 +3,59 @@ using System.Collections;
 
 public class SpawnPointRouter : MonoBehaviour
 {
-    [SerializeField] string playerTag = "Player";
+    [SerializeField] private string playerTag = "Player";
 
-    IEnumerator Start()
+    private IEnumerator Start()
     {
-        // Wait one frame so all SpawnPoints have registered
+        // Wait a frame so RespawnManager + SpawnPoints Awake/OnEnable have run.
         yield return null;
 
         var player = GameObject.FindGameObjectWithTag(playerTag);
         if (!player) yield break;
 
-        // Get all SpawnPoints in the scene (entrances + anchors)
         var points = FindObjectsOfType<SpawnPoint>(true);
 
-        // We only care about LevelEntrance spawn points for scene entry
-        SpawnPoint target = null;
         string desiredEntryId = TransitionMemory.LastExitId;
+        SpawnPoint target = null;
 
-        Debug.Log($"[SpawnPointRouter] Desired entryId from TransitionMemory: '{desiredEntryId}'");
-
-        // 1) Try to find a LevelEntrance with matching entryId from previous scene
+        // 1) Exact match by entryId among LevelEntrances
         if (!string.IsNullOrEmpty(desiredEntryId))
         {
-            foreach (var p in points)
+            for (int i = 0; i < points.Length; i++)
             {
-                if (p.type == SpawnPointType.LevelEntrance && p.entryId == desiredEntryId)
+                if (points[i] != null &&
+                    points[i].type == SpawnPointType.LevelEntrance &&
+                    points[i].entryId == desiredEntryId)
                 {
-                    target = p;
-                    Debug.Log($"[SpawnPointRouter] Found matching LevelEntrance: '{p.name}' for entryId '{desiredEntryId}'.");
+                    target = points[i];
                     break;
                 }
             }
         }
 
-        // 2) If nothing matched, fall back to any LevelEntrance marked as default
+        // 2) Default entrance
         if (target == null)
         {
-            foreach (var p in points)
+            for (int i = 0; i < points.Length; i++)
             {
-                if (p.type == SpawnPointType.LevelEntrance && p.isDefault)
+                if (points[i] != null &&
+                    points[i].type == SpawnPointType.LevelEntrance &&
+                    points[i].isDefault)
                 {
-                    target = p;
-                    Debug.Log($"[SpawnPointRouter] Using default LevelEntrance: '{p.name}'.");
+                    target = points[i];
                     break;
                 }
             }
         }
 
-        // 3) If still nothing, just take the first LevelEntrance we find
+        // 3) Any entrance
         if (target == null)
         {
-            foreach (var p in points)
+            for (int i = 0; i < points.Length; i++)
             {
-                if (p.type == SpawnPointType.LevelEntrance)
+                if (points[i] != null && points[i].type == SpawnPointType.LevelEntrance)
                 {
-                    target = p;
-                    Debug.LogWarning($"[SpawnPointRouter] No matching/default entry. Using first LevelEntrance: '{p.name}'.");
+                    target = points[i];
                     break;
                 }
             }
@@ -66,20 +63,22 @@ public class SpawnPointRouter : MonoBehaviour
 
         if (target == null)
         {
-            Debug.LogError("[SpawnPointRouter] No suitable LevelEntrance SpawnPoint found. Player not moved.");
+            Debug.LogWarning("[SpawnPointRouter] No SpawnPoint found to place player.");
             yield break;
         }
 
-        // Move the player to the chosen spawn
+        // CharacterController teleport fix
+        var cc = player.GetComponent<CharacterController>();
+        if (cc != null) cc.enabled = false;
+
         player.transform.SetPositionAndRotation(target.transform.position, target.transform.rotation);
+        Physics.SyncTransforms();
 
-        // Tell RespawnManager this is the entrance for respawn logic
+        if (cc != null) cc.enabled = true;
+
         if (RespawnManager.Instance != null)
-        {
             RespawnManager.Instance.SetEntrancePoint(target);
-        }
 
-        // Clear the memory so we don't reuse it accidentally
         TransitionMemory.LastExitId = null;
     }
 }
