@@ -17,6 +17,19 @@ namespace Core.AI.Sheep.Event
     }
 
     /// <summary>
+    /// How far is the sheep from the player in zone system
+    /// </summary>
+    public enum SheepDistanceZone
+    {
+        Unknown = -1,
+        Safe = 0,
+        Warning = 1,
+        Dangerous = 2,
+        Death = 3,
+        Outside = 4
+    }
+
+    /// <summary>
     /// Type of damage dealt to the sheep might have different effects or interpretation
     /// </summary>
     public enum SheepDamageType
@@ -27,6 +40,58 @@ namespace Core.AI.Sheep.Event
         Drekavac,
         DeathCircle,
         Other
+    }
+    
+    /// <summary>
+    /// Notification on sheep changed zones
+    /// </summary>
+    public sealed class SheepDistanceZoneChangedEvent : GameEvent
+    {
+        public SheepStateManager Sheep { get; }
+        public SheepDistanceZone OldZone { get; }
+        public SheepDistanceZone NewZone { get; }
+        public float Distance { get; }
+
+        public SheepDistanceZoneChangedEvent(
+            SheepStateManager sheep,
+            SheepDistanceZone oldZone,
+            SheepDistanceZone newZone,
+            float distance)
+        {
+            Sheep = sheep;
+            OldZone = oldZone;
+            NewZone = newZone;
+            Distance = distance;
+        }
+    }
+
+    /// <summary>
+    /// Snapshot of all sheep in each zone
+    /// </summary>
+    public sealed class SheepDistanceZonesSummaryEvent : GameEvent
+    {
+        public int SafeCount { get; }
+        public int WarningCount { get; }
+        public int DangerousCount { get; }
+        public int DeathCount { get; }
+        public int OutsideCount { get; }
+        public int TotalTracked { get; }
+
+        public SheepDistanceZonesSummaryEvent(
+            int safeCount,
+            int warningCount,
+            int dangerousCount,
+            int deathCount,
+            int outsideCount,
+            int totalTracked)
+        {
+           SafeCount = safeCount;
+           WarningCount = warningCount;
+           DangerousCount = dangerousCount;
+           DeathCount = deathCount;
+           OutsideCount = outsideCount;
+           TotalTracked = totalTracked;
+        }
     }
 
     /// <summary>

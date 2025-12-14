@@ -1,3 +1,7 @@
+using System;
+
+using Core.AI.Sheep.Event;
+using Core.Events;
 using Core.Shared.Utilities;
 using Gameplay.HealthSystem;
 using UI;
@@ -82,8 +86,17 @@ namespace Gameplay.Player
             config.OnValueChanged += UpdateConfigValues;
 
             vignetteEffect.Initialize();
+
+            EventManager.AddListener<SanityChangeEvent>(OnSanityChanged);
         }
 
+        private void OnSanityChanged(SanityChangeEvent evt)
+        {
+            if (evt.Percentage <= 0)
+            {
+                Die();
+            }
+        }
 
         private void UpdateConfigValues(PlayerConfig config)
         {
@@ -98,6 +111,7 @@ namespace Gameplay.Player
 
         public void Die()
         {
+            Debug.Log("Player died.");
             DeathEvent?.Invoke();
         }
 
