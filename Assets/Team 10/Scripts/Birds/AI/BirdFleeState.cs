@@ -48,14 +48,19 @@ namespace Birds.AI
             // We check local Y position relative to where they started, or absolute Y
             if (controller.VisualRoot.localPosition.y > config.FlightHeight) 
             {
+                // Now that they are high up and out of sight, we turn them off
+                controller.DestroyFlock();
                 controller.SetState(new BirdReturnState(controller, config));
             }
         }
 
+        /// <summary>
+        /// Method to handle the exit behavior of an entity
+        /// This is called when the entity needs to be removed or disabled from the scene
+        /// </summary>
         public override void Exit()
         {
-            // Now that they are high up and out of sight, we turn them off
-            controller.SetVisualsActive(false);
+            
         }
     }
 }

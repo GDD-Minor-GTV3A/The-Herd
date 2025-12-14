@@ -51,9 +51,14 @@ namespace Birds.AI
             currentState.Enter();
         }
 
-        public void SetVisualsActive(bool isActive)
+        // public void SetVisualsActive(bool isActive)
+        // {
+        //     visualRoot.gameObject.Destroy(isActive);
+        // }
+
+        public void DestroyFlock()
         {
-            visualRoot.gameObject.SetActive(isActive);
+            Destroy(gameObject);
         }
 
         private void OnTriggerEnter(Collider other)
