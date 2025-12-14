@@ -74,7 +74,7 @@ namespace Gameplay
             }
             footstepSource.clip = clip;
             footstepSource.volume = Random.Range(0.02f, 0.05f);
-            footstepSource.pitch = Random.Range(0.8f, 1.2f);
+            footstepSource.pitch = Random.Range(0.4f, 0.6f);
             footstepSource.Play();
         }
 
