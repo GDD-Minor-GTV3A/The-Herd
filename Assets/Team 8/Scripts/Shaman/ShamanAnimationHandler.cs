@@ -2,12 +2,22 @@ using UnityEngine;
 
 public class ShamanAnimationHandler : MonoBehaviour
 {
-    public float patrolDistance = 5f;   // How far forward from start
-    public float speed = 2f;            // Movement speed
-    public float turnSpeed = 180f;      // Degrees per second during turn
+    [Header("Animator")]
+    public Animator shamanAnimator;
+
+    [Header("Patrol Settings")]
+    public float patrolDistance = 5f;
+    public float speed = 2f;
+    public float turnSpeed = 180f;
+
+    [Header("Audio Settings")]
+    public AudioSource shamanAudioSource;   
+    public AudioClip walkingClip;           
+    public AudioClip talkingClip;           
 
     private Vector3 startPos;
     private Vector3 endPos;
+
     private bool movingForward = true;
     private bool isTurning = false;
     private float turnAngle = 0f;
@@ -20,43 +30,96 @@ public class ShamanAnimationHandler : MonoBehaviour
 
     void Update()
     {
-        if (!isTurning)
+        bool isTalking = shamanAnimator.GetBool("isTalking");
+
+        if (isTalking)
         {
-            Move();
+            Idle();
+            PlayAudio(talkingClip, true); 
+            return;
         }
         else
         {
-            Turn();
+            PlayAudio(walkingClip, true); // loop walking clip while moving
         }
+
+        if (isTurning)
+            Turn();
+        else
+            Move();
     }
+
+    // ---------------- MOVEMENT ----------------
 
     void Move()
     {
         Vector3 target = movingForward ? endPos : startPos;
+        Vector3 direction = (target - transform.position);
+        direction.y = 0f;
 
-        // Move toward target
-        transform.position = Vector3.MoveTowards(transform.position, target, speed * Time.deltaTime);
+        if (direction.sqrMagnitude > 0.01f)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(direction.normalized);
+            transform.rotation = Quaternion.Slerp(
+                transform.rotation,
+                targetRotation,
+                8f * Time.deltaTime
+            );
+        }
 
-        // Check if reached target
-        if (Vector3.Distance(transform.position, target) < 0.01f)
+        transform.position += transform.forward * speed * Time.deltaTime;
+
+        if (Vector3.Distance(transform.position, target) < 0.1f)
         {
             isTurning = true;
-            turnAngle = 0f; // start turn
+            turnAngle = 0f;
         }
     }
 
     void Turn()
     {
-        // Rotate around Y-axis
         float step = turnSpeed * Time.deltaTime;
         transform.Rotate(0f, step, 0f);
         turnAngle += step;
 
-        // Finish turn after 360°
         if (turnAngle >= 180f)
         {
             isTurning = false;
-            movingForward = !movingForward; // switch direction
+            movingForward = !movingForward;
         }
+    }
+
+    // ---------------- IDLE ----------------
+
+    void Idle()
+    {
+        GameObject player = GameObject.FindWithTag("Player");
+        if (player == null) return;
+
+        Vector3 lookDir = player.transform.position - transform.position;
+        lookDir.y = 0f;
+
+        if (lookDir.sqrMagnitude < 0.01f) return;
+
+        Quaternion lookRot = Quaternion.LookRotation(lookDir);
+        transform.rotation = Quaternion.Slerp(
+            transform.rotation,
+            lookRot,
+            5f * Time.deltaTime
+        );
+    }
+
+    // ---------------- AUDIO ----------------
+
+    void PlayAudio(AudioClip clip, bool loop)
+    {
+        if (shamanAudioSource == null || clip == null) return;
+
+        if (shamanAudioSource.clip == clip && shamanAudioSource.isPlaying) return;
+
+        shamanAudioSource.Stop();
+        shamanAudioSource.clip = clip;
+        shamanAudioSource.loop = loop;
+        shamanAudioSource.Play();
     }
 }
