@@ -30,7 +30,7 @@ namespace Team_7.Scripts.AI.Drekavac.States
                 _manager.GetStats().despawnDistance)
             {
                 _manager.ReleaseGrabbedObject();
-                _manager.SetState<BigState>();
+                _manager.DestroySelf();
                 return;
             }
 

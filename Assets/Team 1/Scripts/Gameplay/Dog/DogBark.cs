@@ -22,14 +22,16 @@ namespace Gameplay.Dog
 
         private DogConfig config;
         private float lastBarkTime;
+        private DogStateManager manager;
 
 
         /// <summary>
         /// Initialization method.
         /// </summary>
         /// <param name="config">Config of the dog.</param>
-        public void Initialize(DogConfig config)
+        public void Initialize(DogConfig config, DogStateManager manager)
         {
+            this.manager = manager;
             this.config = config;
         }
 
@@ -55,6 +57,12 @@ namespace Gameplay.Dog
         /// </summary>
         public void TryBark()
         {
+            if (manager.HerdZone.IsFreeSheepToHeard())
+            {
+                Debug.Log("Found free sheep");
+                manager.SetState<TryToHerdSheep>();
+            }
+
             if (Time.time - lastBarkTime < config.BarkCooldown)
                 return;
 
