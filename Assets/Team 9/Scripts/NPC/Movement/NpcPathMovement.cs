@@ -89,7 +89,7 @@ public class NpcPathMovement : MonoBehaviour
 
             await WaitUntilReached(_agent, reachThreshold, token);
 
-            await Task.Delay(50, token);
+            await Task.Delay(10, token);
         }
 
         if (path.IsOneShot)
