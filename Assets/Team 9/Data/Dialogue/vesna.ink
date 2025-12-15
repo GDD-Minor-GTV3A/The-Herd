@@ -37,97 +37,33 @@ EXTERNAL CompleteObjective(string, string)
 
 = intro_dialogue
 #speaker:Vesna
-Oh, hello there. You must be the newcomer to our Village? It is nice to meet you.
+Hello, there. You look like a newcomer. What brings you here? 
 
 #speaker:Player
-Yes, hello. I’ve recently just arrived. 
+I was told by your so-called Shaman to gather sheep from here. Where can I find them? 
 
 #speaker:Vesna
-I see. Did you come here by accident or were you running from something like most of us?
-
-+ [I don’t think that’s any of your business.]
-    #speaker:Vesna
-    Forgive me, you are right. Your reasons are your reasons alone and I will respect that. 
-+ [My past.]
-    #speaker:Vesna
-    Ah, this is the sad reality of so many of us. I am sorry that you’ve felt the need to do that. 
-+ [Don’t say anything.]
-    #speaker:Vesna
-    I understand your silence, forgive me for my bluntness. 
--
-
-#speaker:Vesna
-Is there anything I can help you with?
+The Shaman? Sheep? Here? I’m afraid you might have misunderstood him, there are no sheep here.
 
 #speaker:Player
-No. I have come here to seek refuge, not ask for help from strangers.
+How come? I was instructed to collect sheep from here, was I lied to?
 
 #speaker:Vesna
-I see. Seek refuge from yourself or from the war? You look like a soldier to me.
+I’m sorry to hear that but I can promise you there are no sheep here. I do know where you might find some.
 
 #speaker:Player
-…
+And where would that be?
 
 #speaker:Vesna
-Soldiers aren’t generally welcome here. The inhabitants of our Village have been through way too much and don’t trust your kind. 
+Go to the nearby ruins outside the village. It hasn’t been explored or set foot in for a long time so there should be something interesting there. 
 
 #speaker:Player
-I am not proud of the acts I’ve committed but that’s behind me now. 
-
-#speaker:Player
-Do not condemn me for things you know nothing of. 
-
-#speaker:Vesna
-I am not condemning you but I cannot say the same for the rest of our Village.
-
-#speaker:Vesna
-If you want to be welcomed here, you must prove to us that you are a different person than those monsters outside.
-
-#speaker:Player
-And how do you suppose I should do that?
-
-#speaker:Vesna
-Before I came here, I had a companion with me. A beautiful stag that I shared life with.
-
-#speaker:Vesna
-But the war was just as merciless to him as it was to everyone else and he got shot as I was fleeing. His corpse is still where I left it.
-
-#speaker:Vesna
-I want to try and revive him but I will need protection while I use my magic. You could be the one I’ve been waiting for.
-
-#speaker:Player
-And what exactly makes you think I’m your so-called hero?
-
-#speaker:Vesna
-You are an ex soldier. You have good endurance and have killed before. Those skills will be very useful in this case.
-
-#speaker:Vesna
-And, this might be your opportunity to show us we can trust you. I am well-known in The Village so it will give a good impression.
-
-#speaker:Player
-Why must I prove myself to people I do not even know? How come no one else is doing this.
-
-#speaker:Vesna
-Everyone has been scarred by this war. People are scared of soldiers and you used to be one.
-
-#speaker:Vesna
-Use this chance to show us you are different from them. That you are a better man.
-
-+ [(Accept Quest) i will do it]
-    ~ QUEST_001_accepted = true
-    ~ QUEST_001_declined = false
-    ~ StartQuest("QUEST_001")
-    
-    #speaker:Vesna
-    Very well. I will be waiting for you by the entrance to [Lvl2].
-+ [(Decline Quest) i need time to think]
-    ~ QUEST_001_accepted = false
-    ~ QUEST_001_declined = true
-    
-    #speaker:Vesna
-    I will be waiting here.
--
+I can show you the way. Follow me.
+~ QUEST_001_accepted = true
+~ QUEST_001_declined = false
+~ StartQuest("QUEST_001")
 -> END
+
 = quest_declined_followup_dialogue
 #speaker:Vesna
 Are you ready to head out now?
@@ -150,17 +86,7 @@ Are you ready to head out now?
 
 = quest_in_progress_dialogue
 #speaker:Vesna
-This is it. This is where my beloved companion was killed by these monsters and I had to leave him behind.
-
-#speaker:Vesna
-I will start the ritual now, dear Shepherd. It is very important that I am not interrupted or disturbed in any way during the process.
-
-#speaker:Vesna
-Will that be doable for you?
-
-#speaker:Player
-Yes. I have done far worse than shooting at a few enemies.
-
+From here on you can make your own way, I’m sure. Just go in the general direction of where we were going and you’ll be fine.
 -> END
 
 = quest_completed_dialogue

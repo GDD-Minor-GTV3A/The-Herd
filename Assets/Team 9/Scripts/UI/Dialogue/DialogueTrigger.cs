@@ -17,10 +17,7 @@ public class DialogueTrigger : MonoBehaviour
 
     private const string PLAYER_TAG = "Player";
 
-    /// <summary>
-    /// When the player enters the trigger zone, a text will appear saying "Press E to interact"
-    /// </summary>
-    /// <param name="other"></param>
+    // ... (OnTriggerEnter is unchanged) ...
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag(PLAYER_TAG))
@@ -43,33 +40,40 @@ public class DialogueTrigger : MonoBehaviour
     {
         if (!other.CompareTag(PLAYER_TAG)) return;
         if (!DialogueManager.GetInstance()) return;
+        
+        // 1. If dialogue is already playing, hide the interaction prompt and return
         if (DialogueManager.GetInstance().IsDialoguePlaying)
         {
             if (!_interText) return;
             _interText.enabled = false;
             return;
         }
+        
+        // 2. Otherwise, make sure the prompt is visible
         if (_interText && !_interText.enabled)
         {
             _interText.enabled = true;
         }
+        
+        // 3. Handle interaction input
         if (Input.GetKey(KeyCode.E))
         {
+            // Complete any objectives associated with starting this dialogue (if needed)
             foreach(var id in questID)
             {
+                // NOTE: It is unusual to complete an objective *before* the dialogue begins, 
+                // but following your existing logic:
                 EventManager.Broadcast(new CompleteObjectiveEvent(id, objectiveID));
             }
-            DialogueManager.GetInstance().EnterDialogueMode(_inkJSON);
+            
+            // --- CRITICAL CHANGE HERE ---
+            // We pass 'this.gameObject' (the NPC) as the speakerObject
+            DialogueManager.GetInstance().EnterDialogueMode(_inkJSON, this.gameObject);
         }
-        //INPUT
-        //FURTHER STUFF
     }
 
 
-    /// <summary>
-    /// When the player exits the trigger zone, the interact text will disappear.
-    /// </summary>
-    /// <param name="other"></param>
+    // ... (OnTriggerExit is unchanged) ...
     private void OnTriggerExit(Collider other)
     {
         if (other.CompareTag(PLAYER_TAG))
