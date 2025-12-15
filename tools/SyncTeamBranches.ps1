@@ -28,6 +28,15 @@ foreach ($remote in $remoteBranches) {
 		git reset --hard $remote | Write-Host
 	}
 
+	Write-Host "Cleaning up unnecessary files from $branch..."
+	git rm --cached .DS_Store
+	git rm --cached *.sln
+	git rm --cached *.csproj
+	git rm --cached *.xml
+	git add *
+	git commit -m "cleanup for PR"
+	git push origin $branch | Write-Host "Pushed cleanup changes to remote."
+
 	Write-Host "Merging $MainRef into $branch..."
 	git merge $MainRef | Write-Host
 	if ($LASTEXITCODE -ne 0) {
