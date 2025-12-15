@@ -15,6 +15,7 @@ namespace Core.AI.Sheep.Config
         [SerializeField] private float _idleWanderRadius = 1.0f;
         [SerializeField] private float _followDistance = 1.8f;
         [SerializeField] private float _gettingLostChance = 0.005f;
+        [SerializeField] private float _minDistanceFromPlayer = 2f;
 
         [Header("Animation Overrides")]
         [SerializeField] private AnimatorOverrideController _animationOverrides;
@@ -24,7 +25,8 @@ namespace Core.AI.Sheep.Config
         [Header("Sounds")]
         [Tooltip("Sound clips for the bleat sound.")] [SerializeField]
         public AudioClip[] BleatSounds;
-
+        public AudioClip JoinHerdSound;
+        public AudioClip LeaveHerdSound;
         public AudioClip DeathSound;
 
         [Header("Grazing interval in seconds")]
@@ -37,13 +39,16 @@ namespace Core.AI.Sheep.Config
         [SerializeField]
         private PersonalityType _personalityType = PersonalityType.Normal;
 
+        [Header("Interaction")] [SerializeField]
+        public AudioClip PettingSound;
+
         //Getters
         public int MaxHealth => _maxHealth;
         public float Skittishness => _skittishness;
         public float IdleWanderRadius => _idleWanderRadius;
         public float FollowDistance => _followDistance;
         public float GettingLostChance => _gettingLostChance;
-
+        public float MinDistanceFromPlayer => _minDistanceFromPlayer;
         public float GrazeIntervalMin => _grazeIntervalMin;
         public float GrazeIntervalMax => _grazeIntervalMax;
 
@@ -61,6 +66,12 @@ namespace Core.AI.Sheep.Config
                 PersonalityType.Energetic => new EnergeticPersonality(sheep),
                 PersonalityType.Nervous => new NervousPersonality(sheep),
                 PersonalityType.Stubborn => new StubbornPersonality(sheep),
+                PersonalityType.Sonja => new SonjaPersonality(sheep),
+                PersonalityType.Andela => new AndelaPersonality(sheep),
+                PersonalityType.Ivana => new IvanaPersonality(sheep),
+                PersonalityType.Nino => new NinoPersonality(sheep),
+                PersonalityType.Yaro => new YaroPersonality(sheep),
+                PersonalityType.Tihomir => new TihomirPersonality(sheep),
                 _ => new NormalPersonality(sheep)
             };
         }
@@ -75,6 +86,12 @@ namespace Core.AI.Sheep.Config
         Lazy,
         Energetic,
         Nervous,
-        Stubborn
+        Stubborn,
+        Sonja,
+        Andela,
+        Nino,
+        Ivana,
+        Yaro,
+        Tihomir
     }
 }

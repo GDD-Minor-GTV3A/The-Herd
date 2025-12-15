@@ -1,5 +1,4 @@
 using Core.Shared.StateMachine;
-using UnityEngine;
 
 namespace Gameplay.Player
 {
@@ -8,15 +7,17 @@ namespace Gameplay.Player
     /// </summary>
     public abstract class PlayerState : IState
     {
-        protected readonly PlayerStateManager _manager;
-        protected readonly PlayerMovement _playerMovement;
+        protected readonly PlayerStateManager manager;
+        protected readonly PlayerMovement playerMovement;
+        protected readonly PlayerAnimator animator;
 
 
         /// <param name="manager">Manager which uses this state.</param>
         public PlayerState(PlayerStateManager manager)
         {
-            _manager = manager;
-            _playerMovement = _manager.MovementController as PlayerMovement;
+            this.manager = manager;
+            playerMovement = this.manager.MovementController as PlayerMovement;
+            animator = this.manager.AnimatorController as PlayerAnimator;
         }
 
 

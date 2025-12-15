@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class AudioManager : MonoBehaviour
 {
@@ -7,17 +8,28 @@ public class AudioManager : MonoBehaviour
     [Header("Audio Sources")]
     public AudioSource musicSource;
     public AudioSource sfxSource;
+    public AudioSource TorchSfx;
+    public AudioSource sfxSource2;
+
 
     [Header("3D Sound Boxes")]
-    public AudioSource[] soundBoxes; // Assign these in Inspector, place them in the scene
+    public AudioSource[] soundBoxes; 
 
     [Header("Audio Clips")]
     public AudioClip[] sfxClips;
     public AudioClip windClip;
+    public AudioClip IntroMusic;
+    public AudioClip Candle;
+    public AudioClip Torch;
 
     [Header("Settings")]
     [Range(0f, 1f)]
     public float windVolume = 0.5f;
+    public float IntroVolume = 0.5f;
+    public float CandleVolume = 2f;
+    public float TorchVolume = 2f;
+
+    public GameObject EndTrigger;
 
     void Awake()
     {
@@ -35,12 +47,36 @@ public class AudioManager : MonoBehaviour
 
     void Start()
     {
-        if (windClip != null && musicSource != null)
+        if (windClip != null && sfxSource != null)
         {
-            musicSource.clip = windClip;
-            musicSource.volume = windVolume;
-            musicSource.loop = true;
+            sfxSource.clip = windClip;
+            sfxSource.volume = windVolume;
+            sfxSource.loop = true;
+            sfxSource.Play();
+        }
+
+        if (IntroMusic != null && musicSource != null)
+        {
+            musicSource.clip = IntroMusic;
+            musicSource.volume = IntroVolume;
+            musicSource.loop = false;
             musicSource.Play();
+        }
+
+        if (Torch != null && TorchSfx != null)
+        {
+            TorchSfx.clip = Torch;
+            TorchSfx.volume = TorchVolume;
+            TorchSfx.loop = true;
+            TorchSfx.Play();
+        }
+
+        if (Candle != null && sfxSource2 != null)
+        {
+            sfxSource2.clip = Candle;
+            sfxSource2.volume = CandleVolume;
+            sfxSource2.loop = true;
+            sfxSource2.Play();
         }
 
         // Ensure sound boxes are properly set for 3D
@@ -75,5 +111,48 @@ public class AudioManager : MonoBehaviour
         if (box == null) return;
 
         box.PlayOneShot(sfxClips[clipIndex], volume);
+    }
+
+    public void PlayFadeOut()
+    {
+        StartCoroutine(FadeOutMusic(5f));
+    }
+
+    public void PlayCandleBlowOut()
+    {
+        StartCoroutine(PlayCandle(1f));
+    }
+
+    public IEnumerator PlayCandle(float duration)
+    {
+        float startVolume = sfxSource2.volume;
+        float time = 0f;
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+            sfxSource2.volume = Mathf.Lerp(startVolume, 0f, time / duration);
+            yield return null;
+        }
+
+        sfxSource2.volume = 0f;
+        sfxSource2.Stop();
+    }
+
+    public IEnumerator FadeOutMusic(float duration)
+    {
+        float startVolume = musicSource.volume;
+        float time = 0f;
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+            musicSource.volume = Mathf.Lerp(startVolume, 0f, time / duration);
+            yield return null;
+            Debug.Log("Fade out begins");
+        }
+
+        musicSource.volume = 0f;
+        musicSource.Stop();
     }
 }

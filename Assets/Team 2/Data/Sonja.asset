@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6df2f7408168eb04d8edd4e41c9652a2, type: 3}
+  m_Name: Sonja
+  m_EditorClassIdentifier: 
+  _maxHealth: 100
+  _skittishness: 0
+  _idleWanderRadius: 1
+  _followDistance: 1.5
+  _gettingLostChance: 0.005
+  _minDistanceFromPlayer: 2
+  _animationOverrides: {fileID: 0}
+  BleatSounds:
+  - {fileID: 8300000, guid: eaaa4578b5989a441998a77052548831, type: 3}
+  - {fileID: 8300000, guid: 8348c9d88f6e35141a1e4463e70cad36, type: 3}
+  - {fileID: 8300000, guid: 31b753c79dc84c0479fff6b3e8077630, type: 3}
+  JoinHerdSound: {fileID: 8300000, guid: cf90a47d2cd557a45b3c93aeb5c69881, type: 3}
+  LeaveHerdSound: {fileID: 8300000, guid: b7a0eaaf23444c44bafb9e2c9c0bf254, type: 3}
+  DeathSound: {fileID: 8300000, guid: 8661b90e723eaf846a36e6d2ec2ba584, type: 3}
+  _grazeIntervalMin: 3
+  _grazeIntervalMax: 5
+  _personalityType: 5
+  PettingSound: {fileID: 8300000, guid: 074c029619b011441bef5f9f7644601d, type: 3}
