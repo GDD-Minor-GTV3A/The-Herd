@@ -18,8 +18,6 @@ public class GroundCheck : MonoBehaviour
         int textureIndex = GetMainTexture(transform.position);
 
         GroundType _currentGroundType = groundTypes.Find(x => x.TextureIndex == textureIndex);
-
-        //Debug.Log($"Standing on {_currentGroundType.GroundSurface}");
     }
 
     int GetMainTexture(Vector3 worldPos)
