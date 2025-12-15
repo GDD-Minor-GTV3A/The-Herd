@@ -1,19 +1,17 @@
 using System;
 using System.Collections.Generic;
-
 using UnityEngine;
 
 public class GroundCheck : MonoBehaviour
 {
-    public Terrain terrain;  // Assign in inspector
+    [SerializeField]
+    private Terrain terrain;  // Assign in inspector
 
     [SerializeField]
     private List<GroundType> groundTypes = new List<GroundType>();
 
     [SerializeField]
     private GroundType currentGroundType;
-
-    public GroundType CurrentGroundType => currentGroundType;
 
     void Update()
     {

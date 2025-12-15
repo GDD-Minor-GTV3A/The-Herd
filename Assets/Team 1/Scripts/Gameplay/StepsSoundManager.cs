@@ -15,17 +15,21 @@ namespace Gameplay
         ///Use Tooltips for SerializeFiled
         [SerializeField, Tooltip("Sound clips for steps sounds.")]
         private List<AudioClip> snowFS; /// for private use camelCase naming, for public PascalCase
+        
         [SerializeField, Tooltip("Sound clips for steps sounds.")]
         private List<AudioClip> dirtFS;
+        
         [SerializeField, Tooltip("Sound clips for steps sounds.")]
         private List<AudioClip> rockFS;
+        
         [SerializeField, Tooltip("Sound clips for steps sounds.")]
         private List<AudioClip> iceFS;
 
         [SerializeField, Tooltip("Sound source for steps."), Required]
         private AudioSource footstepSource;
 
-        [SerializeField] private GroundCheck groundCheck;
+        [SerializeField, Required] 
+        private GroundCheck groundCheck;
 
         
         /// <summary>
@@ -51,21 +55,21 @@ namespace Gameplay
             {
                 case GroundSurface.Snow:
                     clip = snowFS[Random.Range(0, snowFS.Count)];
-                    Debug.Log("Play snow footsteps");
+                    //Debug.Log("Play snow footsteps");
                     break;
 
                 case GroundSurface.Dirt:
                     clip = dirtFS[Random.Range(0, dirtFS.Count)];
-                    Debug.Log("Play dirt footsteps");
+                    //Debug.Log("Play dirt footsteps");
                     break;
 
                 case GroundSurface.Rock:
                     clip = rockFS[Random.Range(0, rockFS.Count)];
-                    Debug.Log("Play rock footsteps");
+                    //Debug.Log("Play rock footsteps");
                     break;
                 case GroundSurface.Ice:
                     clip = iceFS[Random.Range(0, iceFS.Count)];
-                    Debug.Log("Play ice footsteps");
+                    //Debug.Log("Play ice footsteps");
                     break;
 
                 default:
@@ -77,7 +81,5 @@ namespace Gameplay
             footstepSource.pitch = Random.Range(0.45f, 0.55f);
             footstepSource.Play();
         }
-
-    
     }
 }
