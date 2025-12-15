@@ -43,7 +43,7 @@ namespace Gameplay.Dog
         public override void OnUpdate()
         {
             if (manager.HerdZone.IsFreeSheepToHeard())
-                manager.SetState<DogMoveToSheep>();
+                manager.SetState<TryToHerdSheep>();
 
 
             if (Vector3.Distance(manager.MovementController.transform.position, playerTransform.position) > distanceToStartFollow && delayCoroutine == null)

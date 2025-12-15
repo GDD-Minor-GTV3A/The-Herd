@@ -30,6 +30,7 @@ namespace Gameplay.CameraSettings
         private CinemachinePositionComposer composer;
         private CinemachineBasicMultiChannelPerlin cameraNoise;
         private Coroutine shakeRoutine;
+        private bool isShakingContinuously = false;
 
 
         /// <summary>
@@ -38,11 +39,37 @@ namespace Gameplay.CameraSettings
         /// <param name="time">How long camera will be shaking.</param>
         public void ShakeCamera(float time)
         {
-            if (shakeRoutine != null)
-                StopCoroutine(shakeRoutine);
+            if (isShakingContinuously) return;
+            StopShakes();
             shakeRoutine = StartCoroutine(ShakeCameraRoutine(time));
         }
 
+        /// <summary>
+        /// Shakes camera Continuously 
+        /// </summary>
+        public void SetContinuousCameraShakes(bool active, float strength = 1.0f)
+        {
+            isShakingContinuously = active;
+
+            if (active)
+            {
+                StopShakes();
+                cameraNoise.AmplitudeGain = strength;
+            }
+            else
+            {
+                cameraNoise.AmplitudeGain = 0;
+            }
+        }
+
+        private void StopShakes()
+        {
+            if (shakeRoutine != null)
+            {
+                StopCoroutine(shakeRoutine);
+                cameraNoise.AmplitudeGain = 0;
+            }
+        }
 
         private void UpdateCameraSettings(CameraConfig newConfig)
         {
