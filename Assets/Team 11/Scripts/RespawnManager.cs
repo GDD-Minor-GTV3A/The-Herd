@@ -5,8 +5,7 @@ public class RespawnManager : MonoBehaviour
 {
     public static RespawnManager Instance { get; private set; }
 
-    [SerializeField]
-    [Tooltip("If true, prints debug logs to the Console.")]
+    [SerializeField, Tooltip("If true, prints debug logs to the Console.")]
     private bool debugLogs = false;
 
     private readonly List<SpawnPoint> allPoints = new List<SpawnPoint>();
@@ -19,7 +18,6 @@ public class RespawnManager : MonoBehaviour
     {
         if (Instance != null && Instance != this)
         {
-            Debug.LogWarning("[RespawnManager] Multiple instances detected. Destroying the newest one.");
             Destroy(gameObject);
             return;
         }
@@ -27,47 +25,26 @@ public class RespawnManager : MonoBehaviour
         Instance = this;
     }
 
-    public void RegisterPoint(SpawnPoint point)
+    public void RegisterPoint(SpawnPoint p)
     {
-        if (point == null) return;
+        if (p == null) return;
 
-        if (!allPoints.Contains(point))
-        {
-            allPoints.Add(point);
+        if (!allPoints.Contains(p))
+            allPoints.Add(p);
 
-            if (point.discovered)
-            {
-                AddDiscoveredPoint(point);
-            }
-
-            if (debugLogs)
-            {
-                Debug.Log($"[RespawnManager] Registered point '{point.name}' ({point.type}).");
-            }
-        }
+        if (p.discovered && !discoveredPoints.Contains(p))
+            discoveredPoints.Add(p);
     }
 
-    private void AddDiscoveredPoint(SpawnPoint point)
+    public void UnregisterPoint(SpawnPoint p)
     {
-        if (!discoveredPoints.Contains(point))
-        {
-            discoveredPoints.Add(point);
-        }
+        if (p == null) return;
 
-        // Simple rule: last discovered becomes the current respawn
-        currentRespawnPoint = point;
+        allPoints.Remove(p);
+        discoveredPoints.Remove(p);
 
-        if (debugLogs)
-        {
-            Debug.Log($"[RespawnManager] Discovered point '{point.name}'.");
-        }
-    }
-
-    public void OnAnchorDiscovered(SpawnPoint point)
-    {
-        if (point == null) return;
-        point.discovered = true;
-        AddDiscoveredPoint(point);
+        if (currentEntrancePoint == p) currentEntrancePoint = null;
+        if (currentRespawnPoint == p) currentRespawnPoint = null;
     }
 
     public void SetEntrancePoint(SpawnPoint entrance)
@@ -76,55 +53,76 @@ public class RespawnManager : MonoBehaviour
 
         currentEntrancePoint = entrance;
 
+        // entrances should always be valid
         entrance.discovered = true;
-        AddDiscoveredPoint(entrance);
+        if (!discoveredPoints.Contains(entrance))
+            discoveredPoints.Add(entrance);
 
+        // if we don't have any respawn yet, use entrance
         if (currentRespawnPoint == null)
-        {
             currentRespawnPoint = entrance;
-        }
 
         if (debugLogs)
-        {
-            Debug.Log($"[RespawnManager] Entrance point set to '{entrance.name}'.");
-        }
+            Debug.Log($"[RespawnManager] Entrance set to '{entrance.name}' (entryId='{entrance.entryId}')");
+    }
+
+    public void OnAnchorDiscovered(SpawnPoint anchor)
+    {
+        if (anchor == null) return;
+
+        anchor.discovered = true;
+
+        if (!discoveredPoints.Contains(anchor))
+            discoveredPoints.Add(anchor);
+
+        currentRespawnPoint = anchor;
+
+        if (debugLogs)
+            Debug.Log($"[RespawnManager] Anchor discovered -> current respawn = '{anchor.name}'");
     }
 
     /// <summary>
-    /// Returns the nearest discovered respawn point from a given position.
-    /// If none are discovered, falls back to the current entrance point.
+    /// Chooses the closest discovered SpawnPoint to a given position.
     /// </summary>
     public SpawnPoint GetBestRespawn(Vector3 fromPosition)
     {
-        if (discoveredPoints.Count == 0)
-        {
-            if (debugLogs)
-            {
-                Debug.LogWarning("[RespawnManager] No discovered points. Falling back to entrance.");
-            }
-            return currentEntrancePoint;
-        }
+        SpawnPoint best = null;
+        float bestDist = float.MaxValue;
 
-        SpawnPoint best = discoveredPoints[0];
-        float bestDist = Vector3.SqrMagnitude(best.transform.position - fromPosition);
-
-        for (int i = 1; i < discoveredPoints.Count; i++)
+        // Prefer discovered points
+        for (int i = 0; i < discoveredPoints.Count; i++)
         {
-            SpawnPoint candidate = discoveredPoints[i];
-            float d = Vector3.SqrMagnitude(candidate.transform.position - fromPosition);
+            var p = discoveredPoints[i];
+            if (p == null) continue;
+
+            float d = Vector3.Distance(fromPosition, p.transform.position);
             if (d < bestDist)
             {
-                best = candidate;
                 bestDist = d;
+                best = p;
             }
         }
 
-        currentRespawnPoint = best;
+        // Fallbacks
+        if (best == null && currentEntrancePoint != null)
+            best = currentEntrancePoint;
 
-        if (debugLogs)
+        if (best == null)
         {
-            Debug.Log($"[RespawnManager] Best respawn from {fromPosition} is '{best.name}'.");
+            // Try default spawn
+            for (int i = 0; i < allPoints.Count; i++)
+            {
+                var p = allPoints[i];
+                if (p != null && p.isDefault)
+                {
+                    best = p;
+                    break;
+                }
+            }
         }
+
+        if (debugLogs && best != null)
+            Debug.Log($"[RespawnManager] Best respawn from {fromPosition} is '{best.name}'");
 
         return best;
     }
