@@ -13,11 +13,15 @@ namespace Birds.AI
         [Tooltip("The Transform holding the sphere models")]
         [SerializeField] private Transform visualRoot;
         
+        [Tooltip("Reference to the Sound GameObject")]
+        [SerializeField] private GameObject soundObject;
+
         // State Management
         private BirdState currentState;
 
         // Exposed properties for States to use
         public Transform VisualRoot => visualRoot;
+
         public Transform PlayerTransform { get; private set; }
 
         public BirdAnimator Animator { get; private set; } 
@@ -66,6 +70,7 @@ namespace Birds.AI
             // Only scare if it is the Player and we are currently Idle
             if ((other.CompareTag("Player") || other.CompareTag("Dog")) && currentState is BirdIdleState)
             {
+                soundObject.SetActive(true);
                 PlayerTransform = other.transform;
                 SetState(new BirdFleeState(this, config));
             }
