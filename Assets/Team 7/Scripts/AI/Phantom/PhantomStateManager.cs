@@ -3,18 +3,24 @@ using System.Collections.Generic;
 using Core.Shared.StateMachine;
 using Core.Shared.Utilities;
 
+using Gameplay.Dog;
+using Gameplay.HealthSystem;
+using Gameplay.ToolsSystem.Tools.Rifle;
+
 using Team_7.Scripts.AI.Phantom.States;
 
 using Unity.VisualScripting;
 
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.UIElements;
 
 using IState = Core.Shared.StateMachine.IState;
 using Random = UnityEngine.Random;
 
 namespace Team_7.Scripts.AI.Phantom
 {
-    public class PhantomStateManager : CharacterStateManager<IState>
+    public class PhantomStateManager : CharacterStateManager<IState>, IScareable, IDamageable
     {
         [SerializeField][Required] private PhantomStats stats;
         [SerializeField] private GameObject projectileSpawn;
@@ -28,7 +34,10 @@ namespace Team_7.Scripts.AI.Phantom
         private float _startedLooking;
         private float _lastCloneSpawn;
         private List<PhantomFake> _clones = new();
+        private int _shotCounter;
 
+        public UnityEvent DamageEvent { get; set; }
+        
         public void Initialize()
         {
             // Get the movement controller
@@ -77,6 +86,7 @@ namespace Team_7.Scripts.AI.Phantom
             if (stats.damage > 0 )
                 SpawnClones(stats.initialCloneAmount);
             
+            ToggleVisibility(false);
             SetState<WanderingState>();
         }
 
@@ -86,7 +96,8 @@ namespace Team_7.Scripts.AI.Phantom
 
             if (!GetComponent<PhantomFake>())
             {
-                if (_lastCloneSpawn + stats.cloneSpawnDelay < Time.time && _lastCloneSpawn != 0)
+                if (_lastCloneSpawn + stats.cloneSpawnDelay < Time.time &&
+                    _clones.Count < stats.maxCloneAmount)
                 {
                     SpawnClones(1);
                 }
@@ -94,7 +105,7 @@ namespace Team_7.Scripts.AI.Phantom
             
             //TODO move this logic somewhere else(PhantomClone.cs)
             // Only make the enemy take damage from being looked at if stunned and a clone
-            if (stats.damage <= 0 || _currentState is not StunnedState)
+            /*if (stats.damage <= 0 || _currentState is not StunnedState)
                 return;
             
             _playerTransform = _playerObject.transform;
@@ -119,7 +130,7 @@ namespace Team_7.Scripts.AI.Phantom
                     Respawn();
                 else
                     Destroy(gameObject);
-            }
+            }*/
         }
 
         protected override void InitializeStatesMap()
@@ -128,6 +139,7 @@ namespace Team_7.Scripts.AI.Phantom
             {
                 { typeof(WanderingState), new WanderingState(this, _enemyMovementController, stats, _phantomAnimatorController, _audioController) },
                 { typeof(ShootingState), new ShootingState(this, _enemyMovementController, stats, _phantomAnimatorController, _audioController) },
+                { typeof(StunnedState), new StunnedState(this, _enemyMovementController, stats, _phantomAnimatorController, _audioController) },
             };
         }
 
@@ -139,7 +151,7 @@ namespace Team_7.Scripts.AI.Phantom
         public PhantomProjectile StartCharging()
         {
             _chargingProjectile = Instantiate(stats.projectile, projectileSpawn.transform.position, transform.rotation, transform);
-            _chargingProjectile.Init(stats.chargeDuration, stats.projectileSpeed, stats.maxProjectileScale, stats.projectileRange, stats.damage);
+            _chargingProjectile.Init(stats.chargeDuration, stats.projectileSpeed, stats.maxProjectileScale, stats.projectileRange, stats.damage, _playerObject, stats.homingStrength);
             _audioController.PlayClip(stats.projectileChargeSound);
             
             return _chargingProjectile;
@@ -147,9 +159,11 @@ namespace Team_7.Scripts.AI.Phantom
 
         public void CancelCharging()
         {
-            if (!_chargingProjectile.IsLaunched() && _chargingProjectile != null)
-                Destroy(_chargingProjectile.gameObject);
-            
+            if (_chargingProjectile is not null && !_chargingProjectile.IsDestroyed())
+            {
+                if (!_chargingProjectile.IsLaunched())
+                    Destroy(_chargingProjectile.gameObject);
+            }
             _audioController.StopClip();
             _chargingProjectile = null;
         }
@@ -177,14 +191,38 @@ namespace Team_7.Scripts.AI.Phantom
             return randomDirection * randomDistance;
         }
 
-        //TODO Replace this with a listener for dog barking
-        private void OnCollisionEnter(Collision collision)
+        private void OnCollisionEnter(Collision other)
         {
-            if (stats.damage <= 0)
+            if (stats.damage != 0)
                 return;
             
-            // TODO && _currentState is StunnedState, add this to the if statement once dog barking is added and the ghost can be stunned by the barking.
-            if (collision.gameObject.CompareTag("Player")) //Change this to a "Dog" tag if it's added to the dog, or if the dog's bark is added please contact me so I can 
+            if (other.gameObject.CompareTag("Player") && _currentState is StunnedState)
+            {
+                _currentHealth -= 1;
+                if (_currentHealth > 0)
+                    Respawn();
+                else
+                {
+                    DestroyClones();
+                    _audioController.PlayClip(stats.screechSound);
+                    Destroy(gameObject);
+                }
+            }
+        }
+        
+        private void OnTriggerEnter(Collider other)
+        {
+            // TODO Make the bullet collide with the Phantom instead of having to do it like this
+            if (other.TryGetComponent<Bullet>(out var bullet))
+            {
+                TakeDamage(1);
+                return;
+            }
+            
+            if (stats.damage != 0)
+                return;
+            
+            if (other.gameObject.CompareTag("Player") && _currentState is StunnedState)
             {
                 _currentHealth -= 1;
                 if (_currentHealth > 0)
@@ -198,6 +236,10 @@ namespace Team_7.Scripts.AI.Phantom
             }
         }
 
+        /// <summary>
+        ///     Spawns a certain amount of fake clones.
+        /// </summary>
+        /// <param name="amount">The amount of clones to spawn</param>
         public void SpawnClones(int amount)
         {
             for (int i = 0; i < amount; i++)
@@ -210,8 +252,12 @@ namespace Team_7.Scripts.AI.Phantom
             _lastCloneSpawn = Time.time;
         }
 
+        /// <summary>
+        ///     Destroy all clones created by the enemy.
+        /// </summary>
         public void DestroyClones()
         {
+            _clones.RemoveAll(clone => clone == null);
             foreach (var clone in _clones)
             {
                 if (!clone.gameObject.IsDestroyed()){
@@ -231,6 +277,57 @@ namespace Team_7.Scripts.AI.Phantom
         public bool IsBeingLookedAt()
         {
             return _startedLooking != 0;
+        }
+
+        public void OnScared(Vector3 fromPosition, float intensity, ScareType scareType)
+        {
+            if (_currentState is not StunnedState)
+                SetState<StunnedState>();
+        }
+        
+        public void TakeDamage(float damage)
+        {
+            if (_currentState is not StunnedState)
+                return;
+            
+            _currentHealth -= 1;
+            if (_currentHealth > 0)
+                Respawn();
+            else
+            {
+                DestroyClones();
+                _audioController.PlayClip(stats.screechSound);
+                Destroy(gameObject);
+            }
+        }
+
+        public void StartWandering()
+        {
+            SetState<WanderingState>();
+        }
+
+        public void ToggleVisibility(bool visible)
+        {
+            foreach (var meshRenderer in gameObject.GetComponentsInChildren<SkinnedMeshRenderer>())
+            {
+                meshRenderer.enabled = visible;
+            }
+        }
+        
+        
+        public void IncreaseShotCounter()
+        {
+            _shotCounter++;
+        }
+
+        public void ResetShotCounter()
+        {
+            _shotCounter = 0;
+        }
+        
+        public int GetShotCounter()
+        {
+            return _shotCounter;
         }
     }
 }

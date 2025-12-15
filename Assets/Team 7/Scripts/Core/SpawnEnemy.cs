@@ -23,7 +23,7 @@ namespace Team_7.Scripts.Core
             {
                 Spawn(Drekavac);
             }
-            else if (Input.GetKeyDown("r"))
+            else if (Input.GetKeyDown("f"))
             {
                 Spawn(Phantom);
             }

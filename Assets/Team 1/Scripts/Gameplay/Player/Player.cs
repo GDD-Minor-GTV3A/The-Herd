@@ -1,9 +1,10 @@
 using Core.Shared.Utilities;
-
 using Gameplay.Effects;
 using Gameplay.HealthSystem;
+using Gameplay.Inventory;
+using Gameplay.Map;
 using Gameplay.ToolsSystem;
-
+using UI;
 using UI.Effects;
 using UnityEngine;
 using UnityEngine.Events;
@@ -15,140 +16,139 @@ namespace Gameplay.Player
     /// Base player script.
     /// </summary>
     [RequireComponent(typeof(PlayerMovement), typeof(PlayerStateManager))]
-    [RequireComponent(typeof(PlayerInput), typeof(ToolSlotsController), typeof(CharacterController))]
+    [RequireComponent(typeof(PlayerInput), typeof(CharacterController))]
     public class Player : MonoBehaviour, IDamageable, IHealable, IKillable
     {
         [Header("Animations")]
-        [Tooltip("Animator of the player.")]
-        [SerializeField] private Animator animator;
-        [SerializeField] private PlayerAnimationConstraints animationConstrains;
+        [SerializeField, Tooltip("Animator of the player.")]
+        private Animator animator;
+
+        [SerializeField, Tooltip("Animation constraints from AnimationRigging of the player.")]
+        private PlayerAnimationConstraints animationConstrains;
+
+        [Space, Header("Effects")]
+        [SerializeField, Required, Tooltip("Reference to damage effect component.")]
+        private DamageEffect dmgEffect;
+
+        [SerializeField, Required, Tooltip("Reference to player vignette effect component.")]
+        private PlayerVignetteEffect vignetteEffect;
+
+        [Space, Header("UI")]
+        [SerializeField, Required, Tooltip("Reference for HP bar component.")] 
+        private HPBarUI hpBar;
+        [SerializeField, Required, Tooltip("Reference for InventoryToggle component.")] 
+        private InventoryToggle inventoryButton;
+        [SerializeField, Tooltip("Reference for MapToggle component.")] 
+        private MapToggle mapToggle;
 
         [Space]
-        [Header("Effects")]
-        [Tooltip("Reference to damage effect component.")]
-        [SerializeField, Required] private DamageEffect dmgEffect;
-        [Tooltip("Reference to player vignette effect component.")]
-        [SerializeField, Required] private PlayerVignetteEffect vignetteEffect;
+        [SerializeField, Tooltip("Manager of step sounds.")]
+        private StepsSoundManager stepsSoundManager;
 
-        [Space]
-        [Header("UI")]
-        [SerializeField, Required] private HPBar hpBar;
+        [SerializeField, Tooltip("Reference to input actions map.")]
+        private InputActionAsset inputActions;
 
-        [Space]
-        [Tooltip("Manager of step sounds.")]
-        [SerializeField] private StepsSoundManager stepsSoundManager;
-        [Tooltip("Reference to input actions map.")]
-        [SerializeField] private InputActionAsset inputActions;
-        [Tooltip("Reference to player config.")]
-        [SerializeField] private PlayerConfig config;
+        [SerializeField, Tooltip("Reference to player config.")]
+        private PlayerConfig config;
 
 
-        private PlayerMovement _movementController;
-        private Health _health;
+        [field: Space, Header("Events")]
+        [field: SerializeField, Tooltip("Invokes when player gets damage.")]
+        public UnityEvent DamageEvent { get; set; }
 
-        [Space]
-        [Header("Events")]
-        public UnityEvent OnDamageTaken;
-        public UnityEvent OnHealed;
-        public UnityEvent OnDied;
+        [field: SerializeField, Tooltip("Invokes when player gets healed.")]
+        public UnityEvent HealEvent { get; set; }
 
-
-        public UnityEvent DamageEvent { get => OnDamageTaken; set => OnDamageTaken = value; }
-        public UnityEvent HealEvent { get => OnHealed; set => OnHealed = value; }
-        public UnityEvent DeathEvent { get => OnDied; set => OnDied = value; }
+        [field: SerializeField, Tooltip("Invokes when player dies.")]
+        public UnityEvent DeathEvent { get; set; }
 
 
-        // for test, needs to be moved to bootstrap
-        private void Start()
-        {
-            Initialize();
-        }
+        private PlayerMovement movementController;
+        private Health health;
+
 
         /// <summary>
         /// Initialization method.
         /// </summary>
         public void Initialize()
         {
-            Vector3 forward = Camera.main.transform.forward;
+            Vector3 _forward = Camera.main.transform.forward;
 
-            forward.y = 0f;
+            _forward.y = 0f;
 
-            forward.Normalize();
+            _forward.Normalize();
 
-            transform.forward = forward;
-
-
-            _movementController = GetComponent<PlayerMovement>();
-            PlayerStateManager stateManager = GetComponent<PlayerStateManager>();
-            PlayerInput playerInput = GetComponent<PlayerInput>();
-            ToolSlotsController slotsController = GetComponent<ToolSlotsController>();
-
-            playerInput.Initialize(inputActions);
+            transform.forward = _forward;
 
 
-            CharacterController characterController = GetComponent<CharacterController>();
-            _movementController.Initialize(characterController, config);
+            movementController = GetComponent<PlayerMovement>();
+            PlayerStateManager _stateManager = GetComponent<PlayerStateManager>();
+            PlayerInput _playerInput = GetComponent<PlayerInput>();
+            ToolSlotsController _slotsController = GetComponent<ToolSlotsController>();
+
+            _playerInput.Initialize(inputActions);
+
+
+            CharacterController _characterController = GetComponent<CharacterController>();
+            movementController.Initialize(_characterController, config);
 
 
             stepsSoundManager.Initialize();
-            PlayerAnimator playerAnimator = new PlayerAnimator(animator, transform, animationConstrains);
-            stateManager.Initialize(playerInput, _movementController, playerAnimator);
+            PlayerAnimator _playerAnimator = new PlayerAnimator(animator, this, transform, animationConstrains);
+            _stateManager.Initialize(_playerInput, movementController, _playerAnimator);
+
+            inventoryButton.Initialize(_playerInput.Inventory);
+            if (mapToggle != null)
+                mapToggle.Initialize(_playerInput);
 
             // Init health
-            _health = new Health(
-                config.MaxHealth,
-                config.CurrentHealth,
-                config.CanTakeDamage,
-                config.CanBeHealed,
-                config.CanDie
-            );
+            health = new Health(config);
+
             config.OnValueChanged += UpdateConfigValues;
 
-            slotsController.Initialize(playerInput, playerAnimator, 2);
+            if (_slotsController != null)
+                _slotsController.Initialize(_playerInput, _playerAnimator, 2);
             
             dmgEffect.Initialize();
             vignetteEffect.Initialize();
-            hpBar.Initialize(_health);
+            hpBar.Initialize(health);
         }
 
 
-        /// <summary>
-        /// Update values according to config.
-        /// </summary>
-        /// <param name="config">Config of the player.</param>
         private void UpdateConfigValues(PlayerConfig config)
         {
-            _movementController.UpdateValues(config);
+            movementController.UpdateValues(config);
+            health.UpdateValuesFromConfig(config);
+        }
+
+
+        public void TakeDamage(float damage)
+        {
+            if (!health.CanTakeDamage && damage <= 0) return;
+            health.ChangeCurrentHealth(-damage);
+            DamageEvent?.Invoke();
+
+            if (health.CurrentHealth == 0)
+                Die();
+        }
+
+        public void Heal(float amount)
+        {
+            if (!health.CanBeHealed && amount <= 0) return;
+            health.ChangeCurrentHealth(amount);
+            HealEvent?.Invoke();
+        }
+
+        public void Die()
+        {
+            DeathEvent?.Invoke();
+            health.ResetHealth();
         }
 
 
         private void OnDestroy()
         {
             config.OnValueChanged -= UpdateConfigValues;
-        }
-
-
-        public void TakeDamage(float damage)
-        {
-            if (!_health.CanTakeDamage && damage <= 0) return;
-            _health.ChangeCurrentHealth(-damage);
-            OnDamageTaken?.Invoke();
-
-            if (_health.CurrentHealth == 0)
-                Die();
-        }
-
-        public void Heal(float amount)
-        {
-            if (!_health.CanBeHealed && amount <= 0) return;
-            _health.ChangeCurrentHealth(amount);
-            OnHealed?.Invoke();
-        }
-
-        public void Die()
-        {
-            OnDied?.Invoke();
-            Debug.Log("Died!");
         }
     }
 }
