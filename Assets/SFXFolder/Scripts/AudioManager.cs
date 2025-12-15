@@ -157,8 +157,14 @@ public class AudioManager : MonoBehaviour
         sfxSource.volume = 0.01f;
         musicSource.volume = 0f;
         musicSource.Stop();
-        
 
+        StartCoroutine(PlayMaze(5f));
+    }
+
+    public IEnumerator PlayMaze(float duration)
+    {
         MazeMusic.Play();
+
+        yield return null;
     }
 }
