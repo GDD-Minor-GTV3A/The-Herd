@@ -15,6 +15,7 @@ public class GroundCheck : MonoBehaviour
 
     void Update()
     {
+        if (terrain == null) return;
         int textureIndex = GetMainTexture(transform.position);
 
         GroundType _currentGroundType = groundTypes.Find(x => x.TextureIndex == textureIndex);
@@ -22,6 +23,8 @@ public class GroundCheck : MonoBehaviour
 
     int GetMainTexture(Vector3 worldPos)
     {
+        if (terrain == null) return -1;
+
         TerrainData terrainData = terrain.terrainData;
 
         // Convert world position to terrain map coordinates
@@ -48,6 +51,8 @@ public class GroundCheck : MonoBehaviour
     }
     public GroundSurface GetGroundType()
     {
+        if (terrain == null) return GroundSurface.Dirt;
+
         int textureIndex = GetMainTexture(transform.position);
 
         foreach (var groundType in groundTypes)
