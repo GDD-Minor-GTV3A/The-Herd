@@ -1,19 +1,19 @@
-using Core.AI.Sheep;
-
+using Gameplay.CameraSettings;
+using Gameplay.Player;
 using UnityEngine;
 
 public class EffectsTest : MonoBehaviour
 {
+    public CameraManager CameraManager;
+
+    private bool isActive = false;
+
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.M))
         {
-            SanityTracker.RemoveSanityPoints(16);
-        }
-
-        if (Input.GetKeyDown(KeyCode.N))
-        {
-            SanityTracker.AddSanityPoints(16);
+            isActive = !isActive;
+            CameraManager.SetContinuousCameraShakes(isActive, 2.0f);
         }
     }
 }

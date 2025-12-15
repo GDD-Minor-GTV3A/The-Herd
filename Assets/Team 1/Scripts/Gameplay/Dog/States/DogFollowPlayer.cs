@@ -33,9 +33,6 @@ namespace Gameplay.Dog
 
         public override void OnUpdate()
         {
-            if (manager.HerdZone.IsFreeSheepToHeard())
-                manager.SetState<DogMoveToSheep>();
-
             movement.MoveTo(CalculateFollowPoint());
             float _currentSpeed = movement.CalculateSpeedToPlayer();
             animator.CalculateWalkingSpeedMultiplier(_currentSpeed);

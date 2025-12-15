@@ -114,6 +114,7 @@ namespace Gameplay.Player
         private void LateUpdate()
         {
             if (isPaused) return;
+            if (!lookAction.enabled) return;
             Ray ray = mainCamera.ScreenPointToRay(lookAction.ReadValue<Vector2>());
 
             Vector3 worldCursorPosition;
