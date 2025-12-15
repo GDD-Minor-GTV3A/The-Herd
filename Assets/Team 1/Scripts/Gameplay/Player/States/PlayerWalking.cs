@@ -14,7 +14,6 @@ namespace Gameplay.Player
 
         public override void OnStart()
         {
-            animator.SetAnimationRotation(true);
         }
 
         public override void OnStop()
@@ -42,11 +41,10 @@ namespace Gameplay.Player
             Vector3 movementTarget = playerMovement.CalculateMovementTargetFromInput(playerInput, false);
             playerMovement.MoveTo(movementTarget);
 
-            // Rotate based on current rotation mode (movement or mouse)z
-            //_manager.Rotation.Rotate(playerInput, _manager.Input.Look.Value);
-            animator.RotateCharacterBody(manager.Input.Look.Value);
+            playerMovement.Rotate(playerInput);
 
-            animator.Walking(manager.Input.Move);
+            animator.Walking(true);
+            animator.RotateHead(manager.Input.Look.Value);
         }
     }
 }

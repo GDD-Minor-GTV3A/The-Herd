@@ -12,7 +12,7 @@ namespace Gameplay.Player
         /// <summary>
         /// Player input.
         /// </summary>
-        public PlayerInput Input { get; private set; }
+        public PlayerInputHandler Input { get; private set; }
 
 
         /// <summary>
@@ -21,7 +21,7 @@ namespace Gameplay.Player
         /// <param name="input">Player input class.</param>
         /// <param name="movement">Player movement class.</param>
         /// <param name="playerRotation">Player rotation class.</param>
-        public void Initialize(PlayerInput input, PlayerMovement movement, PlayerAnimator animator)
+        public void Initialize(PlayerInputHandler input, PlayerMovement movement, PlayerAnimator animator)
         {
             Input = input;
             _movementController = movement;
