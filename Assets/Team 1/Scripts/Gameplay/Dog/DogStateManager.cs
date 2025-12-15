@@ -60,7 +60,6 @@ namespace Gameplay.Dog
                 { typeof(DogIdle), new DogIdle(this, playerTransform, distanceToPlayer) },
                 { typeof(DogFollowPlayer), new DogFollowPlayer(this, playerTransform, distanceToPlayer) },
                 { typeof(DogMove), new DogMove(this) },
-                {typeof(TryToHerdSheep), new TryToHerdSheep(this) }
             };
         }
 

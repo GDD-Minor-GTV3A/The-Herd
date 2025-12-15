@@ -1,26 +1,30 @@
 using System;
 using System.Collections.Generic;
-
 using UnityEngine;
 
 public class GroundCheck : MonoBehaviour
 {
-    public Terrain terrain;  // Assign in inspector
+    [SerializeField]
+    private Terrain terrain;  // Assign in inspector
 
     [SerializeField]
     private List<GroundType> groundTypes = new List<GroundType>();
 
+    [SerializeField]
+    private GroundType currentGroundType;
+
     void Update()
     {
+        if (terrain == null) return;
         int textureIndex = GetMainTexture(transform.position);
 
         GroundType _currentGroundType = groundTypes.Find(x => x.TextureIndex == textureIndex);
-
-        Debug.Log($"Standing on {_currentGroundType.GroundSurface}");
     }
 
     int GetMainTexture(Vector3 worldPos)
     {
+        if (terrain == null) return -1;
+
         TerrainData terrainData = terrain.terrainData;
 
         // Convert world position to terrain map coordinates
@@ -45,23 +49,40 @@ public class GroundCheck : MonoBehaviour
 
         return dominant;
     }
-}
+    public GroundSurface GetGroundType()
+    {
+        if (terrain == null) return GroundSurface.Dirt;
+
+        int textureIndex = GetMainTexture(transform.position);
+
+        foreach (var groundType in groundTypes)
+        {
+            if (groundType.TextureIndex == textureIndex)
+            {
+                currentGroundType = groundType;
+                return groundType.GroundSurface;
+            }
+        }
+        Debug.LogWarning($"No GroundType found for texture index {textureIndex}");
+        return GroundSurface.Dirt;
+    }
 
 
-[Serializable]
-public struct GroundType
-{
-    [field: SerializeField]
-    public int TextureIndex { get; private set; }
+    [Serializable]
+    public struct GroundType
+    {
+        [field: SerializeField]
+        public int TextureIndex { get; private set; }
 
-    [field: SerializeField]
-    public GroundSurface GroundSurface { get; private set; }
-}
+        [field: SerializeField]
+        public GroundSurface GroundSurface { get; private set; }
+    }
 
-public enum GroundSurface
-{
-    Dirt,
-    Snow,
-    Rock,
-    Ice
+    public enum GroundSurface
+    {
+        Dirt,
+        Snow,
+        Rock,
+        Ice
+    }
 }
