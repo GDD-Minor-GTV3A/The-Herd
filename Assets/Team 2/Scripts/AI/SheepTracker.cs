@@ -1,3 +1,4 @@
+// SheepTracker.cs
 using System;
 
 using UnityEngine;
@@ -61,12 +62,9 @@ namespace Core.AI.Sheep
             foreach (var sheep in SheepStateManager.AllSheep)
             {
                 if (!sheep) continue;
-                if (!sheep.isActiveAndEnabled) continue;
                 
-                var health = sheep.GetComponent<SheepHealth>();
-                if (health != null && health.IsDead) continue;
-
-                _aliveSheep.Add(sheep);
+                // NOTE: We only track sheep that are "in herd" via the join/leave events.
+                // Bootstrap does not force-add anything, to avoid changing existing logic.
             }
         }
 
@@ -74,6 +72,11 @@ namespace Core.AI.Sheep
         {
             if (evt.Sheep != null)
             {
+                // Persist herd sheep across scene loads so we keep the same instances.
+                // Note: DontDestroyOnLoad works on root GameObjects.
+                var root = evt.Sheep.transform.root.gameObject;
+                DontDestroyOnLoad(root);
+
                 _aliveSheep.Add(evt.Sheep);
             }
         }
@@ -94,24 +97,52 @@ namespace Core.AI.Sheep
             }
         }
         
+        /// <summary>
+        /// Sheep that are currently considered part of the herd (joined + not left + not dead).
+        /// </summary>
+        public IReadOnlyCollection<SheepStateManager> AliveSheep => _aliveSheep;
+
+        /// <summary>
+        /// Moves all alive herd sheep near the given player transform.
+        /// This is used after player respawn and after scene transitions.
+        /// </summary>
+        public void PullAliveSheepTo(Transform player, float radius = 2.5f)
+        {
+            if (player == null) return;
+
+            int i = 0;
+            foreach (var sheep in _aliveSheep)
+            {
+                if (!sheep) continue;
+
+                // Evenly spread around the player in a circle.
+                float angle = (i * 137.5f) * Mathf.Deg2Rad; // golden angle
+                float t = Mathf.Clamp01((i % 16) / 15f);
+                float r = radius * (0.35f + 0.65f * Mathf.Sqrt(t));
+                Vector3 offset = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * r;
+
+                sheep.WarpTo(player.position + offset);
+                sheep.SummonToHerd();
+                i++;
+            }
+        }
+
         public IReadOnlyList<SheepStateManager> GetOrderedSheepList()
         {
             _orderedSheep.Clear();
 
-            foreach (var type in FAMILY_ORDER)
+            // Add the family members in order, if they're alive and exist.
+            foreach (var personalityType in FAMILY_ORDER)
             {
-                SheepStateManager member = null;
-
-                foreach (var sheep in _aliveSheep)
-                {
-                    var archetype = sheep.Archetype;
-                    if (archetype != null && archetype.PersonalityType == type)
+                var member = _aliveSheep
+                    .FirstOrDefault(s =>
                     {
-                        member = sheep;
-                        break;
-                    }
-                }
-                
+                        if (!s) return false;
+                        var archetype = s.Archetype;
+                        if (archetype == null) return false;
+                        return archetype.PersonalityType == personalityType;
+                    });
+
                 if (member != null)
                     _orderedSheep.Add(member);
             }

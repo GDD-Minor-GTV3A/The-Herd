@@ -7,55 +7,27 @@ public class SpawnPointRouter : MonoBehaviour
 
     private IEnumerator Start()
     {
-        // Wait a frame so RespawnManager + SpawnPoints Awake/OnEnable have run.
         yield return null;
 
         var player = GameObject.FindGameObjectWithTag(playerTag);
         if (!player) yield break;
 
         var points = FindObjectsOfType<SpawnPoint>(true);
+        if (points == null || points.Length == 0) yield break;
 
-        string desiredEntryId = TransitionMemory.LastExitId;
         SpawnPoint target = null;
 
-        // 1) Exact match by entryId among LevelEntrances
-        if (!string.IsNullOrEmpty(desiredEntryId))
+        var lastExitId = TransitionMemory.LastExitId;
+        if (!string.IsNullOrEmpty(lastExitId))
         {
-            for (int i = 0; i < points.Length; i++)
+            foreach (var p in points)
             {
-                if (points[i] != null &&
-                    points[i].type == SpawnPointType.LevelEntrance &&
-                    points[i].entryId == desiredEntryId)
-                {
-                    target = points[i];
-                    break;
-                }
-            }
-        }
+                if (p == null) continue;
+                if (p.type != SpawnPointType.LevelEntrance) continue;
 
-        // 2) Default entrance
-        if (target == null)
-        {
-            for (int i = 0; i < points.Length; i++)
-            {
-                if (points[i] != null &&
-                    points[i].type == SpawnPointType.LevelEntrance &&
-                    points[i].isDefault)
+                if (string.Equals(p.entryId, lastExitId, System.StringComparison.Ordinal))
                 {
-                    target = points[i];
-                    break;
-                }
-            }
-        }
-
-        // 3) Any entrance
-        if (target == null)
-        {
-            for (int i = 0; i < points.Length; i++)
-            {
-                if (points[i] != null && points[i].type == SpawnPointType.LevelEntrance)
-                {
-                    target = points[i];
+                    target = p;
                     break;
                 }
             }
@@ -63,11 +35,37 @@ public class SpawnPointRouter : MonoBehaviour
 
         if (target == null)
         {
-            Debug.LogWarning("[SpawnPointRouter] No SpawnPoint found to place player.");
-            yield break;
+            foreach (var p in points)
+            {
+                if (p == null) continue;
+                if (p.type != SpawnPointType.LevelEntrance) continue;
+
+                if (p.discovered)
+                {
+                    target = p;
+                    break;
+                }
+            }
         }
 
-        // CharacterController teleport fix
+        if (target == null)
+        {
+            foreach (var p in points)
+            {
+                if (p == null) continue;
+                if (p.discovered)
+                {
+                    target = p;
+                    break;
+                }
+            }
+        }
+
+        if (target == null)
+            target = points[0];
+
+        if (target == null) yield break;
+
         var cc = player.GetComponent<CharacterController>();
         if (cc != null) cc.enabled = false;
 
@@ -78,6 +76,11 @@ public class SpawnPointRouter : MonoBehaviour
 
         if (RespawnManager.Instance != null)
             RespawnManager.Instance.SetEntrancePoint(target);
+
+        // ensure dog + same sheep instances end up near the player after a transition
+        var prh = player.GetComponent<PlayerRespawnHandler>();
+        if (prh != null)
+            prh.RepositionFollowersNow();
 
         TransitionMemory.LastExitId = null;
     }
