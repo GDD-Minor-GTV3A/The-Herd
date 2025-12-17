@@ -8,8 +8,8 @@ public class AudioManager : MonoBehaviour
     [Header("Audio Sources")]
     public AudioSource musicSource;
     public AudioSource sfxSource;
-    public AudioSource TorchSfx;
     public AudioSource sfxSource2;
+    public AudioSource MazeMusic;
 
 
     [Header("3D Sound Boxes")]
@@ -20,16 +20,17 @@ public class AudioManager : MonoBehaviour
     public AudioClip windClip;
     public AudioClip IntroMusic;
     public AudioClip Candle;
-    public AudioClip Torch;
+    public AudioClip MazeSong;
 
     [Header("Settings")]
     [Range(0f, 1f)]
     public float windVolume = 0.5f;
     public float IntroVolume = 0.5f;
     public float CandleVolume = 2f;
-    public float TorchVolume = 2f;
+    public float MazeVolume = 30f;
 
     public GameObject EndTrigger;
+
 
     void Awake()
     {
@@ -63,20 +64,20 @@ public class AudioManager : MonoBehaviour
             musicSource.Play();
         }
 
-        if (Torch != null && TorchSfx != null)
-        {
-            TorchSfx.clip = Torch;
-            TorchSfx.volume = TorchVolume;
-            TorchSfx.loop = true;
-            TorchSfx.Play();
-        }
-
         if (Candle != null && sfxSource2 != null)
         {
             sfxSource2.clip = Candle;
             sfxSource2.volume = CandleVolume;
             sfxSource2.loop = true;
             sfxSource2.Play();
+        }
+
+        if (MazeSong != null && MazeMusic != null)
+        {
+            MazeMusic.clip = MazeSong;
+            MazeMusic.volume = MazeVolume;
+            MazeMusic.loop = false;
+            MazeMusic.playOnAwake = false;
         }
 
         // Ensure sound boxes are properly set for 3D
@@ -91,6 +92,7 @@ public class AudioManager : MonoBehaviour
             }
         }
     }
+
 
     // Play 2D SFX (UI clicks, global sounds, etc.)
     public void PlaySFX(int index, float volume = 1f)
@@ -148,11 +150,20 @@ public class AudioManager : MonoBehaviour
         {
             time += Time.deltaTime;
             musicSource.volume = Mathf.Lerp(startVolume, 0f, time / duration);
+            sfxSource.volume = Mathf.Lerp(startVolume, 0f, time / duration);
             yield return null;
             Debug.Log("Fade out begins");
         }
 
+        sfxSource.volume = 0.01f;
         musicSource.volume = 0f;
         musicSource.Stop();
+    }
+
+    public IEnumerator PlayMaze(float duration)
+    {
+        MazeMusic.Play();
+
+        yield return null;
     }
 }
