@@ -1,9 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-
+using Core.Events;
+using Core.AI.Sheep;
+using Core.AI.Sheep.Event;
 using UnityEngine;
 
-public enum EnemyState
+public enum ScarecrowStateId
 {
     Idle,
     Stalking
@@ -16,7 +18,7 @@ public enum EnemyState
 public class ScareCrowStateMachine : MonoBehaviour
 {
     [Header("High-Level State (Debug)")]
-    public EnemyState currentStateEnum = EnemyState.Idle; // only for inspector/debug
+    public ScarecrowStateId currentStateEnum = ScarecrowStateId.Idle; // only for inspector/debug
 
     [Header("Player Reference")]
     public Transform player;
@@ -30,7 +32,20 @@ public class ScareCrowStateMachine : MonoBehaviour
     private FieldOfView fieldOfView;
     private NEWInCameraDetector cameraDetector;
 
+    [Header("Rotation")]
+    public float rotationSpeed = 6f;
+
+    [Header("Sheep Scare (Event System)")]
+    [SerializeField] private float scareAmountPerTick = 1f;
+    [SerializeField] private float scareTickInterval = 0.25f; // seconds between scare ticks
+
+    private float _nextScareTickTime = 0f;
+
     [Header("Animator / Attack")]
+    [SerializeField] private float sheepAttackWindup = 0.75f; // 0.5–1s
+    private float sheepAttackTimer = 0f;
+    private float _sheepAttackWindupTimer = 0f;
+    private bool _sheepAttackArmed = false;
     [SerializeField] private DetectSheep sheepDetector;
     [SerializeField] private Animator animator;
     [SerializeField] private string sheepAttackBoolName = "Attack";
@@ -70,8 +85,8 @@ public class ScareCrowStateMachine : MonoBehaviour
     internal Node currentNode;
     internal Node lastNode;
 
-    internal float stalkTimer = 0f;      // used by StalkingState
-    internal float visibleTimer = 0f;    // used by StalkingState
+    internal float stalkTimer = 0f;      
+    internal float visibleTimer = 0f;    
     internal float idleTimer = 0f;
 
     internal float teleportCooldownTimer = 0f;
@@ -150,14 +165,14 @@ public class ScareCrowStateMachine : MonoBehaviour
             idleTimer = 0f;
         }
 
-        // Sheep attack logic stays as global behaviour (independent of Idle/Stalking)
+        ProcessLookTeleport();  
+        HandleSheepAttack();
         HandleSheepAttack();
     }
 
-    // =========================================================
-    //                   STATE MACHINE API
-    // =========================================================
-
+   
+    //                   STATE MACHINE 
+    
     public void SwitchState(IMonster1State newState)
     {
         if (newState == null)
@@ -169,17 +184,17 @@ public class ScareCrowStateMachine : MonoBehaviour
 
         // Update enum for inspector/debug
         if (currentState == idleState)
-            currentStateEnum = EnemyState.Idle;
+            currentStateEnum = ScarecrowStateId.Idle;
         else if (currentState == stalkingState)
-            currentStateEnum = EnemyState.Stalking;
+            currentStateEnum = ScarecrowStateId.Stalking;
 
         // Audio per high-level state (same as old OnStateChanged)
         switch (currentStateEnum)
         {
-            case EnemyState.Idle:
+            case ScarecrowStateId.Idle:
                 PlayStateSound(idleSound, loop: true);
                 break;
-            case EnemyState.Stalking:
+            case ScarecrowStateId.Stalking:
                 PlayStateSound(stalkingSound, loop: true);
                 break;
         }
@@ -187,9 +202,35 @@ public class ScareCrowStateMachine : MonoBehaviour
         Debug.Log($"[Monster1AI] Switched state -> {currentStateEnum}");
     }
 
-    // =========================================================
+    private void ProcessLookTeleport()
+    {
+        if (player == null) return;
+
+        var fov = GetComponent<FieldOfView>();
+        var camDet = GetComponent<NEWInCameraDetector>();
+
+        bool canSee = (fov != null) && fov.canSeePlayer;
+        bool isVisible = (camDet != null) && camDet.IsVisible;
+
+        if (canSee && isVisible)
+        {
+            visibleTimer += Time.deltaTime;
+
+            if (visibleTimer >= timeToVanish && stalkTimer <= 0f)
+            {
+                TryTeleport(excludeNode: currentNode, allowDuringAttack: true);
+                visibleTimer = 0f;
+                stalkTimer = stalkCooldown;
+            }
+        }
+        else
+        {
+            visibleTimer = 0f;
+        }
+    }
+
     //                   SHEEP ATTACK
-    // =========================================================
+
 
     private void HandleSheepAttack()
     {
@@ -205,32 +246,75 @@ public class ScareCrowStateMachine : MonoBehaviour
             if (!_isAttackingSheep)
             {
                 _isAttackingSheep = true;
+                _sheepAttackWindupTimer = 0f;
+                _sheepAttackArmed = false;
+                _nextScareTickTime = Time.time + scareTickInterval; // avoid instant tick
+
                 animator.SetBool(sheepAttackBoolName, true);
+                vfx?.TriggerVFX();
+            }
 
-                if (vfx != null)
-                    vfx.TriggerVFX();
+            
+            if (!_sheepAttackArmed)
+            {
+                _sheepAttackWindupTimer += Time.deltaTime;
+                if (_sheepAttackWindupTimer >= sheepAttackWindup)
+                    _sheepAttackArmed = true;
+            }
 
-                Debug.Log("[Monster1AI] Sheep detected -> start attack.");
+          
+            if (_sheepAttackArmed && Time.time >= _nextScareTickTime)
+            {
+                _nextScareTickTime = Time.time + scareTickInterval;
+
+                foreach (Transform t in sheepDetector.visibleTargets)
+                {
+                    if (t == null) continue;
+
+                    var sheep =
+                        t.GetComponent<SheepStateManager>() ??
+                        t.GetComponentInParent<SheepStateManager>() ??
+                        t.GetComponentInChildren<SheepStateManager>();
+
+                    if (sheep != null)
+                    {
+                        EventManager.Broadcast(new SheepScareEvent(
+                            sheep,
+                            scareAmountPerTick,
+                            transform.position
+                        ));
+                    }
+                }
             }
         }
         else
         {
+            _nextScareTickTime = 0f;
+            _sheepAttackArmed = false;
+            _sheepAttackWindupTimer = 0f;
+
             if (_isAttackingSheep)
             {
                 _sheepLostTimer += Time.deltaTime;
-
                 if (_sheepLostTimer >= sheepLoseDelay)
-                {
-                    _isAttackingSheep = false;
-                    animator.SetBool(sheepAttackBoolName, false);
-                    Debug.Log("[Monster1AI] Sheep gone -> stop attack.");
-                }
+                    ResetSheepAttack();
             }
             else
             {
                 _sheepLostTimer = 0f;
             }
         }
+    }
+    private void ResetSheepAttack()
+    {
+        _isAttackingSheep = false;
+        _sheepAttackArmed = false;
+        _sheepAttackWindupTimer = 0f;
+        _sheepLostTimer = 0f;
+        _nextScareTickTime = 0f;
+
+        if (animator != null)
+            animator.SetBool(sheepAttackBoolName, false);
     }
 
     public void FreezePose()
@@ -241,9 +325,9 @@ public class ScareCrowStateMachine : MonoBehaviour
         Debug.Log("Monster forced to final attack frame.");
     }
 
-    // =========================================================
+    
     //                TELEPORT SELECTION / LOGIC
-    // =========================================================
+   
 
     public void TryTeleport(Node excludeNode, bool allowDuringAttack = false)
     {
@@ -399,7 +483,15 @@ public class ScareCrowStateMachine : MonoBehaviour
             Vector3 to = nextTeleportTarget.transform.position;
 
             transform.position = to;
+            if (player != null)
+            {
+                Vector3 dir = player.position - transform.position;
+                dir.y = 0f;
+                if (dir.sqrMagnitude > 0.001f)
+                    transform.rotation = Quaternion.LookRotation(dir);
+            }
 
+            ResetSheepAttack();
             lastNode = currentNode;
             currentNode = nextTeleportTarget;
 

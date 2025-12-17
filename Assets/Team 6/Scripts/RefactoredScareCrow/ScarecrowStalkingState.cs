@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Monster1StalkingState : IMonster1State
 {
@@ -17,8 +17,6 @@ public class Monster1StalkingState : IMonster1State
 
     public void Tick()
     {
-        // Old StalkingBehavior logic:
-
         ctx.stalkTimer -= Time.deltaTime;
 
         bool canSee = false;
@@ -33,24 +31,50 @@ public class Monster1StalkingState : IMonster1State
         if (camDet != null)
             isVisible = camDet.IsVisible;
 
-        if (canSee && isVisible)
+
+        if (ctx.player != null && !ctx.isTeleporting)
         {
-            ctx.visibleTimer += Time.deltaTime;
-            if (ctx.visibleTimer >= ctx.timeToVanish && ctx.stalkTimer <= 0f)
+            Vector3 dir = ctx.player.position - ctx.transform.position;
+            dir.y = 0f;
+
+            if (dir.sqrMagnitude > 0.001f)
             {
-                Debug.Log("[Monster1StalkingState] Player stared too long -> teleporting!");
-                ctx.TryTeleport(excludeNode: ctx.currentNode, allowDuringAttack: true);
-                ctx.visibleTimer = 0f;
-                ctx.stalkTimer = ctx.stalkCooldown;
+                dir.Normalize();
+                float facingDot = Vector3.Dot(ctx.transform.forward, dir); // 1=looking at player, -1=backwards
+                bool facingPlayerEnough = facingDot > 0.5f; // ~60 degrees cone
+
+                // rotate if not visible OR visible but facing wrong way
+                if (!isVisible || !facingPlayerEnough)
+                {
+                    Quaternion targetRot = Quaternion.LookRotation(dir);
+                    ctx.transform.rotation = Quaternion.Slerp(
+                        ctx.transform.rotation,
+                        targetRot,
+                        ctx.rotationSpeed * Time.deltaTime
+                    );
+                }
             }
         }
-        else
-        {
-            ctx.visibleTimer = 0f;
-        }
 
+        //if (canSee && isVisible)
+        //{
+        //    ctx.visibleTimer += Time.deltaTime;
+        //    if (ctx.visibleTimer >= ctx.timeToVanish && ctx.stalkTimer <= 0f)
+        //    {
+        //        Debug.Log("[Monster1StalkingState] Player stared too long -> teleporting!");
+        //        ctx.TryTeleport(excludeNode: ctx.currentNode, allowDuringAttack: true);
+        //        ctx.visibleTimer = 0f;
+        //        ctx.stalkTimer = ctx.stalkCooldown;
+        //    }
+        //}
+        //else
+        //{
+        //    ctx.visibleTimer = 0f;
+        //}
+
+        float tooFarSqr = ctx.playerTooFarDistance * ctx.playerTooFarDistance;
         if (ctx.player != null &&
-            Vector3.Distance(ctx.player.position, ctx.transform.position) > ctx.playerTooFarDistance &&
+            (ctx.player.position - ctx.transform.position).sqrMagnitude > tooFarSqr &&
             ctx.stalkTimer <= 0f)
         {
             Debug.Log("[Monster1StalkingState] Player is too far -> teleporting closer.");
