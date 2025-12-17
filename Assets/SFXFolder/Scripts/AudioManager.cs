@@ -150,6 +150,7 @@ public class AudioManager : MonoBehaviour
         {
             time += Time.deltaTime;
             musicSource.volume = Mathf.Lerp(startVolume, 0f, time / duration);
+            sfxSource.volume = Mathf.Lerp(startVolume, 0f, time / duration);
             yield return null;
             Debug.Log("Fade out begins");
         }
@@ -157,8 +158,6 @@ public class AudioManager : MonoBehaviour
         sfxSource.volume = 0.01f;
         musicSource.volume = 0f;
         musicSource.Stop();
-
-        StartCoroutine(PlayMaze(5f));
     }
 
     public IEnumerator PlayMaze(float duration)
