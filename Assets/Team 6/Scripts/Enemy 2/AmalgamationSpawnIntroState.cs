@@ -3,210 +3,105 @@ using UnityEngine.AI;
 
 public class AmalgamationSpawnIntroState : IAmalgamationState
 {
-    private readonly AmalgamationStateMachine ctx;
+    private readonly AmalgamationStateMachine sm;
     private readonly NavMeshAgent agent;
 
-    private enum Phase
+    private bool waiting;          // are we currently in the "wait at box" phase?
+    private float waitRemaining;   // countdown timer
+
+    public AmalgamationSpawnIntroState(AmalgamationStateMachine stateMachine, NavMeshAgent navAgent)
     {
-        FollowPlayer,   // follow the player
-        MoveToBox,      // then go straight to the box collider object
-        WaitAtBox       // stop for a few seconds, then go to PATROL
-    }
-
-    private Phase phase;
-    private float waitTimer;
-
-    private readonly string logPrefix;
-
-    public AmalgamationSpawnIntroState(AmalgamationStateMachine ctx, NavMeshAgent agent)
-    {
-        this.ctx = ctx;
-        this.agent = agent;
-
-        logPrefix = "[Amalgamation " + ctx.gameObject.name + "][SPAWN] ";
+        sm = stateMachine;
+        agent = navAgent;
     }
 
     public void Enter()
     {
-        if (agent == null || !agent.enabled)
-        {
-            DebugLog("Cannot ENTER spawn intro: missing or disabled NavMeshAgent.");
-            return;
-        }
+        // Reset the trigger flag so this intro works cleanly every time
+        sm.spawnIntroTriggerHit = false;
 
-        if (ctx.player == null)
-        {
-            DebugLog("No player reference; falling back to PATROL.");
-            ctx.SwitchState(ctx.PatrolState);
-            return;
-        }
+        waiting = false;
+        waitRemaining = sm.spawnWaitAtBoxTime;
 
-        if (ctx.spawnBoxTarget == null)
-        {
-            DebugLog("No spawnBoxTarget assigned; falling back to PATROL.");
-            ctx.SwitchState(ctx.PatrolState);
-            return;
-        }
+        // Configure movement for intro-follow
+        agent.isStopped = false;
+        agent.speed = sm.spawnIntroSpeed;
+        agent.updateRotation = true;
 
-        ctx.anim?.PlayRunImmediate();
-
-        agent.isStopped       = false;
-        agent.updateRotation  = true;
-        agent.speed           = ctx.spawnIntroSpeed;
-
-        phase     = Phase.FollowPlayer;
-        waitTimer = 0f;
-
-        DebugLog("Entering SPAWN INTRO state. Phase = FollowPlayer.");
-        SetDestinationToPlayer();
-    }
-
-    public void Tick()
-    {
-        if (agent == null || !agent.enabled)
-            return;
-
-        switch (phase)
-        {
-            case Phase.FollowPlayer:
-                TickFollowPlayer();
-                break;
-            case Phase.MoveToBox:
-                TickMoveToBox();
-                break;
-            case Phase.WaitAtBox:
-                TickWaitAtBox();
-                break;
-        }
+        DebugLog("Entering SPAWN INTRO state. Following player until trigger is entered.");
     }
 
     public void Exit()
     {
-        DebugLog("Exiting SPAWN INTRO state.");
-        // Patrol/Chase states will reconfigure agent.isStopped / updateRotation as needed.
+        // Nothing required, but we can stop spamming movement updates if you want
+        // agent.ResetPath();
     }
 
-    // ---------------------------------------------------------
-    //  PHASE 1 – FOLLOW THE PLAYER
-    // ---------------------------------------------------------
-
-    private void TickFollowPlayer()
+    public void Tick()
     {
-        if (ctx.player == null || ctx.spawnBoxTarget == null)
+        if (sm.player == null)
+            return;
+
+        // Phase 1: follow player until the intro trigger is hit
+        if (!sm.spawnIntroTriggerHit && !waiting)
         {
-            DebugLog("Lost references in FollowPlayer; switching to PATROL.");
-            ctx.SwitchState(ctx.PatrolState);
+            FollowPlayer();
             return;
         }
 
-        agent.speed = ctx.spawnIntroSpeed;
-
-        SetDestinationToPlayer();
-        RotateTowards(ctx.player.position);
-
-        // Distance from enemy to the box collider object
-        float distToBox = Vector3.Distance(agent.transform.position, ctx.spawnBoxTarget.position);
-
-        if (distToBox <= ctx.spawnBoxTriggerRadius)
+        // Phase 2: trigger hit -> wait once -> then switch to patrol
+        if (!waiting)
         {
-            phase = Phase.MoveToBox;
+            waiting = true;
+            waitRemaining = sm.spawnWaitAtBoxTime;
 
-            DebugLog($"Switching to MoveToBox phase (dist to box = {distToBox:F2}, " +
-                     $"triggerRadius = {ctx.spawnBoxTriggerRadius:F2}).");
-
-            SetDestinationToBox();
-        }
-    }
-
-    // ---------------------------------------------------------
-    //  PHASE 2 – MOVE TO BOX COLLIDER OBJECT
-    // ---------------------------------------------------------
-
-    private void TickMoveToBox()
-    {
-        if (ctx.spawnBoxTarget == null)
-        {
-            DebugLog("No spawnBoxTarget in MoveToBox; switching to PATROL.");
-            ctx.SwitchState(ctx.PatrolState);
-            return;
-        }
-
-        agent.speed = ctx.spawnIntroSpeed;
-
-        SetDestinationToBox();
-        RotateTowards(ctx.spawnBoxTarget.position);
-
-        // When we’re close enough, stop and wait
-        if (!agent.pathPending && agent.remainingDistance <= ctx.spawnBoxArriveDistance)
-        {
-            phase      = Phase.WaitAtBox;
-            waitTimer  = ctx.spawnWaitAtBoxTime;
-
+            // Stop moving while waiting at the box/trigger area
             agent.isStopped = true;
             agent.ResetPath();
 
-            ctx.anim?.PlayIdleImmediate();
-
-            DebugLog($"Reached box target. Waiting for {waitTimer:F2} seconds before switching to PATROL.");
+            DebugLog($"Trigger entered. Waiting for {sm.spawnWaitAtBoxTime:0.00} seconds before switching to PATROL.");
         }
-    }
 
-    // ---------------------------------------------------------
-    //  PHASE 3 – WAIT, THEN HAND OVER TO PATROL
-    // ---------------------------------------------------------
+        // Count down (NOTE: if Time.timeScale == 0, this will never finish)
+        waitRemaining -= Time.deltaTime;
 
-    private void TickWaitAtBox()
-    {
-        waitTimer -= Time.deltaTime;
-        if (waitTimer <= 0f)
+        if (waitRemaining <= 0f)
         {
-            DebugLog("Wait time finished. Switching to PATROL.");
-            ctx.SwitchState(ctx.PatrolState);
+            DebugLog("Wait finished. Switching to PATROL.");
+            sm.SwitchState(sm.PatrolState);
         }
     }
 
-    // ---------------------------------------------------------
-    //  HELPERS
-    // ---------------------------------------------------------
-
-    private void SetDestinationToPlayer()
+    private void FollowPlayer()
     {
-        if (ctx.player == null) return;
-        if (!agent.pathPending)
-        {
-            agent.SetDestination(ctx.player.position);
-        }
-    }
-
-    private void SetDestinationToBox()
-    {
-        if (ctx.spawnBoxTarget == null) return;
-        if (!agent.pathPending)
-        {
-            agent.SetDestination(ctx.spawnBoxTarget.position);
-        }
-    }
-
-    private void RotateTowards(Vector3 worldTarget)
-    {
-        Vector3 dir = worldTarget - agent.transform.position;
-        dir.y = 0f;
-
-        if (dir.sqrMagnitude < 0.0001f)
+        // Keep pushing destination toward player
+        // (If your player is moving, this makes the enemy keep tracking.)
+        if (!agent.isOnNavMesh)
             return;
 
-        // Re-use chaseRotationSpeed for nice turning speed
-        Quaternion targetRot = Quaternion.LookRotation(dir, Vector3.up);
-        agent.transform.rotation = Quaternion.Slerp(
-            agent.transform.rotation,
-            targetRot,
-            ctx.chaseRotationSpeed * Time.deltaTime
-        );
+        agent.isStopped = false;
+
+        // Optional: you can stop within some radius instead of face-hugging
+        // float stopRadius = 1.5f;
+        // if (Vector3.Distance(agent.transform.position, sm.player.position) <= stopRadius) { agent.isStopped = true; return; }
+
+        agent.SetDestination(sm.player.position);
+    }
+
+    public void OnTriggerEnter(Collider other)
+    {
+        // Not used in your current architecture because the StateMachine handles OnTriggerEnter,
+        // but included to satisfy interface consistency.
+    }
+
+    public void OnTriggerExit(Collider other)
+    {
+        // Not needed.
     }
 
     private void DebugLog(string msg)
     {
-        if (!ctx.debugLogs) return;
-        Debug.Log(logPrefix + msg);
+        if (!sm.debugLogs) return;
+        Debug.Log($"[Amalgamation {sm.gameObject.name}][SPAWN] {msg}");
     }
 }

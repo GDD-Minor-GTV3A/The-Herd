@@ -1903,10 +1903,8 @@ MonoBehaviour:
   - {fileID: 6617376388208219788}
   vision: {fileID: 5903798430956308949}
   useSpawnIntroState: 1
-  spawnBoxTarget: {fileID: 0}
+  spawnIntroEndTrigger: {fileID: 0}
   spawnIntroSpeed: 4
-  spawnBoxTriggerRadius: 12
-  spawnBoxArriveDistance: 0.75
   spawnWaitAtBoxTime: 2
   interceptChance: 0.583
   nodeReachThreshold: 3
@@ -5633,6 +5631,7 @@ GameObject:
   - component: {fileID: 1969272525622458939}
   - component: {fileID: 2516056277489432118}
   - component: {fileID: 3989149294283346583}
+  - component: {fileID: 1835128574075330797}
   m_Layer: 0
   m_Name: Shooting amalgamation
   m_TagString: Untagged
@@ -5743,10 +5742,8 @@ MonoBehaviour:
   - {fileID: 6617376388208219788}
   vision: {fileID: 4127638983817422346}
   useSpawnIntroState: 1
-  spawnBoxTarget: {fileID: 0}
+  spawnIntroEndTrigger: {fileID: 0}
   spawnIntroSpeed: 4
-  spawnBoxTriggerRadius: 12
-  spawnBoxArriveDistance: 0.75
   spawnWaitAtBoxTime: 2
   interceptChance: 0.583
   nodeReachThreshold: 3
@@ -5870,6 +5867,33 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2.5, y: 2.89, z: 1}
   m_Center: {x: 0.5, y: 1.5, z: 0.2}
+--- !u!54 &1835128574075330797
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9111127480312318530}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &9180313549127324532
 GameObject:
   m_ObjectHideFlags: 0
