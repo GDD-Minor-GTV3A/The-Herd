@@ -709,6 +709,21 @@ namespace Core.AI.Sheep
                    && gameObject.activeInHierarchy;
         }
 
+        // NEW: Minimal helper so respawn/scene transition can move the SAME sheep instance safely.
+        public void WarpTo(Vector3 worldPosition)
+        {
+            if (CanControlAgent())
+            {
+                // Warp keeps NavMeshAgent happy (no path glitches)
+                Agent.Warp(worldPosition);
+            }
+            else
+            {
+                transform.position = worldPosition;
+                Physics.SyncTransforms();
+            }
+        }
+
         public void MoveToPoint(Vector3 target, float stopDistance = 0.5f)
         {
             if (StatesMap == null)
@@ -732,4 +747,3 @@ namespace Core.AI.Sheep
         public IState GetState() => _currentState;
     }
 }
-
