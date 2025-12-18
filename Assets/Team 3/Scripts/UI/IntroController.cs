@@ -16,10 +16,10 @@ namespace Project.UI.Tutorials
 
         [Header("Timings")]
         [Tooltip("Time in seconds before the fade-out starts.")]
-        [SerializeField] private float waitBeforeFade = 29f;
+        [SerializeField] private float waitBeforeFade = 32f;
 
         [Tooltip("Duration in seconds of the fade-out.")]
-        [SerializeField] private float fadeDuration = 6f;
+        [SerializeField] private float fadeDuration = 5f;
 
         [Header("Skip Intro")]
         [Tooltip("Time in seconds the spacebar must be held to skip the intro.")]
@@ -29,26 +29,17 @@ namespace Project.UI.Tutorials
         [Tooltip("Text shown to inform the player how to skip the intro.")]
         [SerializeField] private TextMeshProUGUI skipIntroText;
 
-        [Header("Player")]
-        [Tooltip("Player movement script that will be disabled and re-enabled after the intro.")]
-        [SerializeField] private MonoBehaviour playerController;
-
         private Coroutine fadeRoutine;
         private float skipHoldTimer;
         private bool isFading;
         private AudioSource introAudioSource;
 
         /// <summary>
-        /// Disables player control and starts the intro sequence.
+        /// Starts the intro sequence.
         /// </summary>
         private void Start()
         {
             introAudioSource = GetComponent<AudioSource>();
-
-            if (playerController != null)
-            {
-                playerController.enabled = false;
-            }
 
             fadeRoutine = StartCoroutine(FadeSequence());
         }
@@ -115,7 +106,7 @@ namespace Project.UI.Tutorials
         }
 
         /// <summary>
-        /// Fades out the black screen and enables player control.
+        /// Fades out the black screen.
         /// </summary>
         private IEnumerator FadeOut()
         {
@@ -139,11 +130,6 @@ namespace Project.UI.Tutorials
 
             _color.a = 0f;
             fadeImage.color = _color;
-
-            if (playerController != null)
-            {
-                playerController.enabled = true;
-            }
 
             fadeImage.gameObject.SetActive(false);
         }
