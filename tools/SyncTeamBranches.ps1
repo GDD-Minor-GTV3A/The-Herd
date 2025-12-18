@@ -34,7 +34,7 @@ foreach ($remote in $remoteBranches) {
 	git rm --cached *.csproj
 	git rm --cached *.xml
 	git add *
-	git commit -m "cleanup for PR"
+	git commit -m "cleanup branch"
 	git push origin $branch | Write-Host "Pushed cleanup changes to remote."
 
 	Write-Host "Merging $MainRef into $branch..."
