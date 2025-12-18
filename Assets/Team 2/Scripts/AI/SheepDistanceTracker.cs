@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using Core.AI.Sheep.Event;
 using Core.Events;
 
-using UnityEditor.Search;
+//using UnityEditor.Search; <- Chris: Do not use UnityEditor on scripts that run in build!
 
 namespace Core.AI.Sheep
 {
