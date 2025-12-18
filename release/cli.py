@@ -30,6 +30,7 @@ async def test_gh_cli() -> None:
     try:
         _, _ = await run_command(command)
     except RuntimeError as e:
-        msg = "GH CLI is not installed or authenticated. Install and authenticate it: https://cli.github.com/"
+        msg = "GH CLI is not installed or authenticated. Install and authenticate it: https://cli.github.com/\n" \
+                "or run the commands `winget install GitHub.cli; gh auth login`"
         raise RuntimeError(msg) from e
     logger.debug("GH CLI is installed and authenticated.")
