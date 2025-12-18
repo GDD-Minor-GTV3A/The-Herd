@@ -26,8 +26,6 @@ public class DeathScreenUI : MonoBehaviour
         Time.timeScale = 0f;
         if (deathPanel != null) deathPanel.SetActive(true);
 
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
     }
 
     public void OnRetry()
@@ -38,9 +36,6 @@ public class DeathScreenUI : MonoBehaviour
 
         isOpen = false;
         if (deathPanel != null) deathPanel.SetActive(false);
-
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
 
         if (respawnHandler == null)
         {
