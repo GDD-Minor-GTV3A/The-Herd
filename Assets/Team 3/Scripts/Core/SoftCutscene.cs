@@ -25,11 +25,14 @@ public class SoftCutscene : MonoBehaviour
 
     IEnumerator ReadText()
     {
-        textDisplay.text = dialogue[currentLine];
+        if (!(currentLine >= maxLines))
+            textDisplay.text = dialogue[currentLine];
         currentLine++;
         yield return new WaitForSeconds(readTime);
         if (currentLine >= maxLines)
+        { 
             Destroy(this.gameObject);
+        }
         StartCoroutine(ReadText());
     }
 

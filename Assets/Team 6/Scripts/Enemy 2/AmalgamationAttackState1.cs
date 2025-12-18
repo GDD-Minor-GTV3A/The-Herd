@@ -1,4 +1,5 @@
-using Gameplay.Player;      // for Player.TakeDamage
+using Core.AI.Sheep;
+using Gameplay.Player;      // still used by other attacks
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -15,17 +16,18 @@ public class AmalgamationAttackState : IAmalgamationState
     private readonly NavMeshAgent agent;
     private readonly Transform player;
 
-    private readonly string logPrefix;
-
-    // Attack selection (never 3 of the same)
-    private AttackType currentAttackType;
-    private AttackType lastAttackType = AttackType.SlamCone;
-    private int sameAttackCount = 0;
-
-    // Separate helpers for each attack
     private readonly AmalgamationSlamAttack slamAttack;
     private readonly AmalgamationSecondAttack secondAttack;
     private readonly AmalgamationShootAttack shootAttack;
+
+    private readonly string logPrefix;
+
+    private AttackType currentAttackType;
+
+    private static AttackType lastAttackType = AttackType.SlamCone;
+    private static int sameAttackCount = 0;
+
+    private Transform currentSheepTarget;
 
     public AmalgamationAttackState(
         AmalgamationStateMachine ctx,
@@ -38,21 +40,19 @@ public class AmalgamationAttackState : IAmalgamationState
 
         logPrefix = "[Amalgamation " + ctx.gameObject.name + "][ATTACK] ";
 
-        slamAttack   = new AmalgamationSlamAttack(ctx, agent, player, logPrefix);
+        slamAttack = new AmalgamationSlamAttack(ctx, agent, player, logPrefix);
         secondAttack = new AmalgamationSecondAttack(ctx, agent, player, logPrefix);
         shootAttack = new AmalgamationShootAttack(ctx, agent, player, logPrefix);
-
     }
 
     public void Enter()
     {
         if (player == null || agent == null || !agent.enabled)
-        {
-            DebugLog("Cannot ENTER ATTACK: missing agent or player.");
             return;
-        }
 
-        // Pick which attack to use this time (never 3 identical in a row)
+        // Pick a random sheep when we enter attack state (used by SLAM)
+        currentSheepTarget = FindRandomAliveSheep();
+
         currentAttackType = ChooseNextAttackType();
 
         DebugLog($"Entering ATTACK state. Chosen attack type = {currentAttackType}.");
@@ -62,13 +62,18 @@ public class AmalgamationAttackState : IAmalgamationState
         agent.updateRotation = false;
         agent.updatePosition = true;
         agent.stoppingDistance = 0f;
-        agent.speed = ctx.attackSpeed; // Slam will keep this, SecondAttack overrides with its own speed
+        agent.speed = ctx.attackSpeed;
+
+        Debug.Log(
+            $"[ATTACK DEBUG] {ctx.name} chose ATTACK = {currentAttackType}"
+        );
 
         // Start specific attack behaviour
         switch (currentAttackType)
         {
             case AttackType.SlamCone:
-                slamAttack.Begin();
+                // Slam now prefers sheep; if none exist, it can fallback inside SlamAttack
+                slamAttack.Begin(currentSheepTarget);
                 break;
 
             case AttackType.SecondAttack:
@@ -77,11 +82,12 @@ public class AmalgamationAttackState : IAmalgamationState
 
             case AttackType.ShootLine:
                 shootAttack.Begin();
+                DebugLog($"Attack Enter: sheepTarget={(currentSheepTarget ? currentSheepTarget.name : "NULL")} player={(player ? player.name : "NULL")}");
                 break;
         }
     }
 
-    public void Tick()
+   public void Tick()
     {
         if (player == null || agent == null || !agent.enabled)
             return;
@@ -93,27 +99,26 @@ public class AmalgamationAttackState : IAmalgamationState
                 break;
 
             case AttackType.SecondAttack:
-                secondAttack.Tick();
+                secondAttack.Tick();   // ✅ ONLY Tick here
                 break;
 
             case AttackType.ShootLine:
                 shootAttack.Tick();
                 break;
         }
-    }
+    }       
+
 
     public void Exit()
     {
         DebugLog("Exiting ATTACK state.");
 
-        // Let both attacks clean themselves up; only the active one will actually matter
         slamAttack.Cancel();
         secondAttack.Cancel();
         shootAttack.Cancel();
 
         if (agent != null && agent.enabled)
         {
-            // Restore navmesh control so Chase can work normally
             agent.updatePosition = true;
             agent.isStopped = false;
             agent.ResetPath();
@@ -132,7 +137,6 @@ public class AmalgamationAttackState : IAmalgamationState
 
     private AttackType ChooseNextAttackType()
     {
-        // Distance to player at the moment we decide the attack
         float distToPlayer = (player != null)
             ? Vector3.Distance(ctx.transform.position, player.position)
             : Mathf.Infinity;
@@ -141,16 +145,13 @@ public class AmalgamationAttackState : IAmalgamationState
             distToPlayer >= ctx.shootLineMinDistance &&
             distToPlayer <= ctx.shootLineMaxDistance;
 
-        AttackType candidate;
+        bool mustSwitch = (sameAttackCount >= 2);
 
-        bool mustSwitch = sameAttackCount >= 2; // "no 3 in a row" rule stays
+        AttackType candidate;
 
         if (!inShootRange)
         {
-            // ---------- CLOSE / MID RANGE ----------
-            // Behaviour 100% stays in your teammates' world:
-            // only SlamCone / SecondAttack, no ShootLine here.
-
+            // close range: slam or second only
             if (mustSwitch)
             {
                 candidate = (lastAttackType == AttackType.SlamCone)
@@ -159,48 +160,33 @@ public class AmalgamationAttackState : IAmalgamationState
             }
             else
             {
-                // 50/50 between Slam and Second
-                candidate = (Random.value < 0.5f)
-                    ? AttackType.SlamCone
-                    : AttackType.SecondAttack;
+                candidate = (Random.value < 0.5f) ? AttackType.SlamCone : AttackType.SecondAttack;
             }
         }
         else
         {
-            // ---------- LONG RANGE ----------
-            // Now ShootLine is allowed.
-
+            // long range: slam / second / shoot
             AttackType[] options;
 
             if (mustSwitch)
             {
-                // Can't repeat same attack 3x; build a list that excludes lastAttackType
                 if (lastAttackType == AttackType.SlamCone)
                     options = new[] { AttackType.SecondAttack, AttackType.ShootLine };
                 else if (lastAttackType == AttackType.SecondAttack)
                     options = new[] { AttackType.SlamCone, AttackType.ShootLine };
-                else // lastAttackType == AttackType.ShootLine
+                else
                     options = new[] { AttackType.SlamCone, AttackType.SecondAttack };
             }
             else
             {
-                // All three are possible
-                options = new[]
-                {
-                AttackType.SlamCone,
-                AttackType.SecondAttack,
-                AttackType.ShootLine
-            };
+                options = new[] { AttackType.SlamCone, AttackType.SecondAttack, AttackType.ShootLine };
             }
 
             candidate = options[Random.Range(0, options.Length)];
         }
 
-        // ---- bookkeeping for "no 3 same in a row" ----
         if (candidate == lastAttackType)
-        {
             sameAttackCount++;
-        }
         else
         {
             lastAttackType = candidate;
@@ -215,9 +201,45 @@ public class AmalgamationAttackState : IAmalgamationState
             );
         }
 
+        DebugLog(
+            $"ATTACK PICK: candidate={candidate} dist={distToPlayer:F2} " +
+            $"shootRange=[{ctx.shootLineMinDistance},{ctx.shootLineMaxDistance}] inShootRange={inShootRange} " +
+            $"mustSwitch={mustSwitch} lastAttackType={lastAttackType} sameAttackCount={sameAttackCount}"
+        );
+
         return candidate;
     }
 
+    // =========================================
+    //   SHEEP TARGETING
+    // =========================================
+
+    private Transform FindRandomAliveSheep()
+    {
+        var all = SheepStateManager.AllSheep;
+        if (all == null || all.Count == 0)
+            return null;
+
+        var candidates = new System.Collections.Generic.List<SheepStateManager>();
+
+        for (int i = 0; i < all.Count; i++)
+        {
+            var s = all[i];
+            if (!s) continue;
+            if (!s.isActiveAndEnabled) continue;
+
+            var hp = s.GetComponent<SheepHealth>();
+            if (hp != null && hp.IsDead) continue;
+
+            candidates.Add(s);
+        }
+
+        if (candidates.Count == 0)
+            return null;
+
+        var pick = candidates[Random.Range(0, candidates.Count)];
+        return pick != null ? pick.transform : null;
+    }
 
     private void DebugLog(string message)
     {

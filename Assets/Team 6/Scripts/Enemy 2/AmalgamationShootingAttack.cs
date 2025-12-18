@@ -1,5 +1,5 @@
 using System.Collections;
-
+using Core.AI.Sheep;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -14,6 +14,10 @@ public class AmalgamationShootAttack
     private Coroutine routine;
 
     private AmalgamationLineTelegraph lineTelegraph;
+
+    private Transform target; // sheep target (preferred), fallback player
+
+    public bool IsFinished { get; private set; }
 
     public AmalgamationShootAttack(
         AmalgamationStateMachine ctx,
@@ -32,28 +36,48 @@ public class AmalgamationShootAttack
 
     public void Begin()
     {
-        if (agent == null || player == null || !agent.enabled)
+        if (agent == null || !agent.enabled)
         {
-            DebugLog("ShootLine BEGIN failed: missing agent or player.");
+            DebugLog("ShootLine BEGIN failed: missing agent.");
+            IsFinished = true;
             return;
         }
 
         if (ctx.lineFirePoint == null || ctx.lineBulletPrefab == null)
         {
             DebugLog("ShootLine BEGIN failed: no firePoint or bullet prefab.");
+            IsFinished = true;
             return;
         }
+
+        // Pick a new sheep every time this attack begins
+        target = FindRandomAliveSheep();
+        if (target == null)
+            target = player; // fallback
+        
+        if (target == null)
+        {
+            DebugLog("ShootLine BEGIN failed: no sheep and no player fallback.");
+            IsFinished = true;
+            return;
+        }
+        DebugLog($"ShootLine BEGIN: picked target={(target ? target.name : "NULL")} (playerFallback={(target==player)})");
 
         if (isRunning && routine != null)
             ctx.StopCoroutine(routine);
 
+        IsFinished = false;
         isRunning = true;
+        DebugLog($"ShootLine BEGIN: starting coroutine. isRunning was {isRunning}");
+
         routine = ctx.StartCoroutine(RunAttack());
+
+        DebugLog($"ShootLine BEGIN: targeting '{target.name}'.");
     }
 
     public void Tick()
     {
-        // Behaviour lives in coroutine; nothing needed here for now.
+        // coroutine driven
     }
 
     public void Cancel()
@@ -68,6 +92,7 @@ public class AmalgamationShootAttack
 
         HideTelegraph();
         isRunning = false;
+        IsFinished = true;
     }
 
     private IEnumerator RunAttack()
@@ -82,6 +107,14 @@ public class AmalgamationShootAttack
         // TELEGRAPH PHASE
         while (t < telegraphTime)
         {
+            // If the sheep died/despawned during telegraph, retarget once
+            if (target == null || (target.CompareTag("Sheep") && IsSheepDead(target)))
+            {
+                target = FindRandomAliveSheep();
+                if (target == null)
+                    target = player;
+            }
+
             DrawTelegraph();
             t += Time.deltaTime;
             yield return null;
@@ -98,26 +131,24 @@ public class AmalgamationShootAttack
             agent.isStopped = false;
 
         isRunning = false;
+        IsFinished = true;
         ctx.SwitchState(ctx.ChaseState);
     }
 
     private void DrawTelegraph()
     {
-        if (player == null)
+        if (target == null)
             return;
 
-        // Take enemy position as base, flatten to ground
         Vector3 enemyPos = ctx.transform.position;
 
-        // Slightly above ground so it doesn't z-fight with the floor
         Vector3 origin = enemyPos;
         origin.y += 0.05f;
 
-        // Target: player's planar position at same Y
-        Vector3 target = player.position;
-        target.y = origin.y;
+        Vector3 tgt = target.position;
+        tgt.y = origin.y;
 
-        Vector3 dir = target - origin;
+        Vector3 dir = tgt - origin;
         if (dir.sqrMagnitude < 0.001f)
             return;
 
@@ -125,15 +156,10 @@ public class AmalgamationShootAttack
         Vector3 end = origin + dir * ctx.lineIndicatorLength;
 
         if (lineTelegraph != null)
-        {
             lineTelegraph.Show(origin, end);
-        }
         else
-        {
             Debug.DrawRay(origin, dir * ctx.lineIndicatorLength, Color.red);
-        }
     }
-
 
     private void HideTelegraph()
     {
@@ -149,8 +175,15 @@ public class AmalgamationShootAttack
             return;
         }
 
+        if (target == null)
+        {
+            DebugLog("FireLine failed: no target.");
+            return;
+        }
+
         Vector3 origin = ctx.lineFirePoint.position;
-        Vector3 dir = player.position - origin;
+
+        Vector3 dir = target.position - origin;
         dir.y = 0f;
         if (dir.sqrMagnitude < 0.001f)
             dir = ctx.transform.forward;
@@ -165,19 +198,54 @@ public class AmalgamationShootAttack
         int bullets = Mathf.Max(1, ctx.lineBulletsInLine);
         float halfIndex = (bullets - 1) * 0.5f;
 
+        Quaternion rot = Quaternion.LookRotation(dir, Vector3.up);
+
         for (int i = 0; i < bullets; i++)
         {
             float offset = (i - halfIndex) * ctx.lineBulletSpacing;
             Vector3 spawnPos = origin + right * offset;
 
-            Object.Instantiate(
-                ctx.lineBulletPrefab,
-                spawnPos,
-                Quaternion.LookRotation(dir, Vector3.up)
-            );
+            Object.Instantiate(ctx.lineBulletPrefab, spawnPos, rot);
         }
 
-        DebugLog($"ShootLine FIRED {bullets} bullets.");
+        DebugLog($"ShootLine FIRED {bullets} bullets toward '{target.name}'.");
+    }
+
+    private Transform FindRandomAliveSheep()
+    {
+        var all = SheepStateManager.AllSheep;
+        if (all == null || all.Count == 0)
+            return null;
+
+        var candidates = new System.Collections.Generic.List<SheepStateManager>();
+        for (int i = 0; i < all.Count; i++)
+        {
+            var s = all[i];
+            if (!s) continue;
+            if (!s.isActiveAndEnabled) continue;
+
+            var hp = s.GetComponent<SheepHealth>();
+            if (hp != null && hp.IsDead) continue;
+
+            candidates.Add(s);
+        }
+
+        if (candidates.Count == 0)
+            return null;
+
+        return candidates[Random.Range(0, candidates.Count)].transform;
+    }
+
+    private bool IsSheepDead(Transform sheepTransform)
+    {
+        if (sheepTransform == null) return true;
+
+        var hp =
+            sheepTransform.GetComponent<SheepHealth>() ??
+            sheepTransform.GetComponentInParent<SheepHealth>() ??
+            sheepTransform.GetComponentInChildren<SheepHealth>();
+
+        return (hp != null && hp.IsDead);
     }
 
     private void DebugLog(string msg)
