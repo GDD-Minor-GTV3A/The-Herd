@@ -23,7 +23,7 @@ public class NarrativeTrigger : MonoBehaviour
     {
         if (other.CompareTag(PLAYER_TAG))
         { 
-            DialogueManager.GetInstance().EnterDialogueMode(_inkJSON);  
+            // DialogueManager.GetInstance().EnterDialogueMode(_inkJSON);  <- Chris: This is a compile error. Please consult it with Team 9
             Destroy(gameObject);
         }
     }
