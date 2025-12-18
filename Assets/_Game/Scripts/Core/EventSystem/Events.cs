@@ -195,6 +195,62 @@ namespace Core.Events
 
     #endregion FOW_EVENTS
 
+    #region PAUSE_EVENTS
+    public class RegisterNewPausableEvent : GameEvent
+    {
+        private IPausable newPausable;
+
+        public IPausable NewPausable => newPausable;
+
+
+        public RegisterNewPausableEvent(IPausable newPausable)
+        {
+            this.newPausable = newPausable;
+        }
+    }
+
+    #endregion PAUSE_EVENTS
+
+    #region COLLECTABLES_EVENTS
+    public class AddBulletsToRifleEvent : GameEvent
+    {
+        private readonly int bulletsAmount;
+
+
+        public int Amount => bulletsAmount;
+
+
+        public AddBulletsToRifleEvent(int amount)
+        {
+            bulletsAmount = amount;
+        }
+
+    }
+
+
+    public class SpawnNewBulletCollectableEvent : GameEvent 
+    {
+        private readonly Vector3 worldPosition;
+        private readonly Vector3 forward;
+        private readonly int bulletsAmount;
+
+
+        public Vector3 WorldPosition => worldPosition;
+        public Vector3 Forward => forward;
+        public int Amount => bulletsAmount;
+
+
+        public SpawnNewBulletCollectableEvent(Vector3 worldPosition, Vector3 forward, int bulletsAmount)
+        {
+            this.worldPosition = worldPosition;
+            this.forward = forward;
+            this.bulletsAmount = bulletsAmount;
+        }
+    }
+
+
+    #endregion COLLECTABLES_EVENTS
+
 
     #region QUEST_EVENTS
 
@@ -308,6 +364,17 @@ namespace Core.Events
         public CompleteObjectiveEvent(string questID, string objectiveID)
         {
             _questID = questID;
+            _objectiveID = objectiveID;
+        }
+    }
+
+    public class ObjectiveCompletedEvent : GameEvent
+    {
+        private string _objectiveID;
+        public string ObjectiveID => _objectiveID;
+        
+        public ObjectiveCompletedEvent(string objectiveID)
+        {
             _objectiveID = objectiveID;
         }
     }

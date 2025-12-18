@@ -21,12 +21,22 @@ class SemVer:
         """Convert to string."""
         return f"v{self.major}.{self.minor}.{self.patch}"
 
+    def bump_patch(self) -> SemVer:
+        """Bump the patch version."""
+        return SemVer(self.major, self.minor, self.patch + 1)
+
     def bump_minor(self) -> SemVer:
         """Bump the minor version."""
         return SemVer(self.major, self.minor + 1, 0)
 
+    def bump_major(self) -> SemVer:
+        """Bump the major version."""
+        return SemVer(self.major + 1, 0, 0)
+
     def __eq__(self, other: object) -> bool:
         """Check equality."""
+        if isinstance(other, str):
+            other = SemVer.from_str(other)
         if not isinstance(other, SemVer):
             return NotImplemented
         return (self.major, self.minor, self.patch) == (other.major, other.minor, other.patch)

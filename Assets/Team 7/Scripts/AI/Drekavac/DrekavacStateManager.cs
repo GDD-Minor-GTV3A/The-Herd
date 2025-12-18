@@ -6,6 +6,8 @@ using Core.Shared.Utilities;
 using Team_7.Scripts.AI.Drekavac.States;
 
 using UnityEngine;
+using UnityEngine.AI;
+using Core.AI.Sheep;
 
 namespace Team_7.Scripts.AI.Drekavac
 {
@@ -58,7 +60,10 @@ namespace Team_7.Scripts.AI.Drekavac
             _playerLocation = _playerObject.transform.position;
 
             _dogObject = GameObject.Find("Dog");
-            _dogLocation = _dogObject.transform.position;
+            if (_dogObject != null)
+            {
+                _dogLocation = _dogObject.transform.position;
+            }
 
             // Find sheep
             // TODO replace this
@@ -75,7 +80,6 @@ namespace Team_7.Scripts.AI.Drekavac
                 { typeof(StalkingState), new StalkingState(this, _enemyMovementController, _drekavacStats, _drekavacAnimatorController, _audioController) },
                 { typeof(DraggingState), new DraggingState(this, _enemyMovementController, _drekavacStats, _drekavacAnimatorController, _audioController) },
                 { typeof(FleeingState), new FleeingState(this, _enemyMovementController, _drekavacStats, _drekavacAnimatorController, _audioController) },
-                { typeof(BigState), new BigState(this, _enemyMovementController, _drekavacStats, _drekavacAnimatorController, _audioController) }
             };
         }
 
@@ -88,27 +92,45 @@ namespace Team_7.Scripts.AI.Drekavac
         {
             base.Update();
             _playerLocation = _playerObject.transform.position;
-            _dogLocation = _dogObject.transform.position;
-            if (_currentState is not FleeingState && _currentState is not BigState && (Vector3.Distance(transform.position, _playerLocation) <= _drekavacStats.fleeTriggerDistance || Vector3.Distance(transform.position, _dogLocation) <= _drekavacStats.fleeTriggerDistance))
+            if (_dogObject != null)
+            {
+                _dogLocation = _dogObject.transform.position;
+            }
+            if (_currentState is not FleeingState && (/*Vector3.Distance(transform.position, _playerLocation) <= _drekavacStats.fleeTriggerDistance ||*/ Vector3.Distance(transform.position, _dogLocation) <= _drekavacStats.fleeTriggerDistance))
                 Flee();
         }
-
-        private void OnCollisionEnter(Collision collision)
+        
+        void LateUpdate()
         {
-            if (_currentState is HuntingState && collision.gameObject.CompareTag("Sheep"))
+            if (_grabbedObject is not null)
             {
-                GrabObject(collision.gameObject);
+                _grabbedObject.transform.position = _grabPoint.position;
+                _grabbedObject.transform.rotation = _grabPoint.rotation;
             }
         }
-        
+
+        private void OnTriggerEnter(Collider other)
+        {
+            if (_currentState is HuntingState && other.CompareTag("Sheep"))
+            {
+                Debug.Log("triggered");
+                GrabObject(other.gameObject);
+            }
+        }
+
         private void GrabObject(GameObject grabbedObject)
         {
-            Debug.Log(gameObject.name + " is grabbing " + grabbedObject.name); // Chris: Temporary debug to check if the enemy gets the sheep
             if (grabbedObject == null) return;
-            CreateGrabPoint();
-            //IMP02 CODE FOR DISABELING SHEEP AI WHEN GRABBED
+            CreateGrabPoint(grabbedObject);
+            //CODE FOR DISABELING SHEEP AI WHEN GRABBED
+            NavMeshAgent SSM = grabbedObject.GetComponent<NavMeshAgent>();
+            SSM.enabled = false;
 
-            // 
+            /*Rigidbody rb = grabbedObject.GetComponent<Rigidbody>();
+            rb.isKinematic = false;*/
+
+            grabbedObject.TryGetComponent<SheepStateManager>(out var sheepManager);
+            sheepManager.DisableBehavior();
 
             _enemyMovementController.ResetAgent();
 
@@ -140,11 +162,13 @@ namespace Team_7.Scripts.AI.Drekavac
                 _grabbedObject.transform.position = _grabPoint.position;
             }
 
-            _grabbedObject.transform.SetParent(_grabPoint, true);
+            _grabbedObject.transform.SetParent(_grabPoint, false);
+            _grabbedObject.transform.localPosition = Vector3.zero;
+            _grabbedObject.transform.localRotation = Quaternion.identity;
 
             SetState<DraggingState>();
         }
-    
+
         private float GetColliderExtentAlongDirection(Collider col, Vector3 dir)
         {
             dir = col.transform.InverseTransformDirection(dir.normalized);
@@ -154,12 +178,18 @@ namespace Team_7.Scripts.AI.Drekavac
             return Mathf.Abs(dir.x * extents.x) + Mathf.Abs(dir.y * extents.y) + Mathf.Abs(dir.z * extents.z);
         }
 
-        public void CreateGrabPoint()
+        public void CreateGrabPoint(GameObject grabbedObject)
         {
             // Create a grab point if not assigned
             GameObject gp = new (gameObject.name + "_GrabPoint");
+            Collider grabbedCollider = grabbedObject.GetComponent<Collider>();
+            Collider grabberCollider = gameObject.GetComponent<Collider>();
+            
+            float yOffset = grabberCollider.bounds.extents.y - grabbedCollider.bounds.extents.y - 0.5f;
+            float grabbedZ = grabbedCollider.bounds.extents.z;
+            float grabberZ = grabberCollider.bounds.extents.z;
             gp.transform.SetParent(gameObject.transform);
-            gp.transform.localPosition = new Vector3(0f, 0.5f, 0.6f); //TODO replace hardcoded values with a variable
+            gp.transform.localPosition = new Vector3(0f, yOffset, grabbedZ + grabberZ);
             _grabPoint = gp.transform;
         }
 
@@ -172,7 +202,11 @@ namespace Team_7.Scripts.AI.Drekavac
         public void ReleaseGrabbedObject()
         {
             if (_grabbedObject is null) return;
+            NavMeshAgent SSM = _grabbedObject.GetComponent<NavMeshAgent>();
+            SSM.enabled = true;
 
+            Rigidbody rb = _grabbedObject.GetComponent<Rigidbody>();
+            rb.isKinematic = true;
             _grabbedObject.transform.SetParent(null, true);
 
             if (_grabbedObjectRb is not null)

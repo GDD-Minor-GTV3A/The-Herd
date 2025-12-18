@@ -25,6 +25,7 @@ namespace Gameplay.Dog
         private DogMovementController movementController;
         private DogAnimator dogAnimator;
         private DogBark bark;
+        private DogStateManager _stateManager;
 
 
         /// <summary>
@@ -41,10 +42,11 @@ namespace Gameplay.Dog
             dogAnimator = new DogAnimator(animator, config);
 
             bark = GetComponent<DogBark>();
-            bark.Initialize(config);
 
-            DogStateManager _stateManager = GetComponent<DogStateManager>();
+            _stateManager = GetComponent<DogStateManager>();
             _stateManager.Initialize(movementController, dogAnimator, herdZone, playerTransform, config);
+
+            bark.Initialize(config, _stateManager);
 
             config.OnValueChanged += UpdateValues;
             UpdateValues(config);
@@ -56,14 +58,7 @@ namespace Gameplay.Dog
             movementController.UpdateValues(config);
             dogAnimator.UpdateAnimationValues(config);
 
-            bark.Initialize(this.config);
-        }
-
-
-        // for test, needs to be moved to bootstrap
-        void Start()
-        {
-            Initialize();
+            bark.Initialize(config, _stateManager);
         }
 
 

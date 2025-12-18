@@ -118,7 +118,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3157797416413632584}
   - component: {fileID: 2512844168156540648}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Rifle.011
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -449,7 +449,7 @@ GameObject:
   m_Component:
   - component: {fileID: 748001705731985506}
   - component: {fileID: 5284183034670121087}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Rifle.006
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -672,7 +672,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8196490811346725126}
   - component: {fileID: 8489744677202097843}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Rifle.014
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -787,7 +787,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7117949389615485682}
   - component: {fileID: 2351274491217516128}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Rifle.009
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1117,7 +1117,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5338335361684836006}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Foot_R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1149,7 +1149,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3513803268450901786}
   - component: {fileID: 1616061935674950164}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Rifle.010
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1371,7 +1371,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6856349074011125404}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: UpperLeg_L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1403,7 +1403,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4364751042076045100}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Hip_R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1543,7 +1543,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2852726796417387849}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Foot_L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1682,7 +1682,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8959331630709404431}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Face.001
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1902,6 +1902,13 @@ MonoBehaviour:
   - {fileID: 2436655409199837608}
   - {fileID: 6617376388208219788}
   vision: {fileID: 5903798430956308949}
+  useSpawnIntroState: 1
+  sheepMask:
+    serializedVersion: 2
+    m_Bits: 0
+  spawnIntroEndTrigger: {fileID: 0}
+  spawnIntroSpeed: 4
+  spawnWaitAtBoxTime: 2
   interceptChance: 0.583
   nodeReachThreshold: 3
   pathPassRadius: 2
@@ -1926,6 +1933,13 @@ MonoBehaviour:
   chaseRotationSpeed: 10
   chaseSustainSpeed: 4
   chasePreferredArriveTolerance: 1
+  shootLineMinDistance: 25
+  shootLineMaxDistance: 60
+  lineFirePoint: {fileID: 0}
+  lineBulletPrefab: {fileID: 0}
+  lineBulletsInLine: 8
+  lineBulletSpacing: 1
+  lineIndicatorLength: 15
   chaseReengageMinNodeDistance: 70
   chaseReengageMaxNodeDistance: 400
   chaseReaggroCooldown: 2
@@ -1986,7 +2000,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3100682725864386882}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Shoulder_R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2019,7 +2033,7 @@ GameObject:
   m_Component:
   - component: {fileID: 704523452463987303}
   - component: {fileID: 7929283938035083390}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Rifle.007
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2244,7 +2258,7 @@ GameObject:
   - component: {fileID: 4038146146537575475}
   - component: {fileID: 3397378634035198954}
   - component: {fileID: 8272591456045394431}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2414,7 +2428,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1760681721747603765}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: LowerLeg_L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2606,7 +2620,7 @@ GameObject:
   m_Component:
   - component: {fileID: 382422316309291868}
   - component: {fileID: 8121060698018899630}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Rifle.005
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2711,6 +2725,37 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.0045388434, y: -0.004315127, z: -0.017665964}
     m_Extent: {x: 0.0035782447, y: 0.0034053354, z: 0.0010805652}
   m_DirtyAABB: 0
+--- !u!1 &2903829226029646796
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4743744681991668133}
+  m_Layer: 13
+  m_Name: linepoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4743744681991668133
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2903829226029646796}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.17, y: 0.51, z: 1.01}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6476634022763801353}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2959826997785537989
 GameObject:
   m_ObjectHideFlags: 0
@@ -2721,7 +2766,7 @@ GameObject:
   m_Component:
   - component: {fileID: 520487029212547848}
   - component: {fileID: 3791861113610667716}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Skull_LowPoly.002
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3051,7 +3096,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6037063567953151850}
   - component: {fileID: 1723168562504342467}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Rifle.012
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3165,7 +3210,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7695658709869455016}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: UpperLeg_R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3305,7 +3350,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1417787049865254561}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Hand_R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3337,7 +3382,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3444091594567113112}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: AmalgamtionEnemy 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3352,7 +3397,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3899449584225114995}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -3587,7 +3632,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1372069645746343557}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Face
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3621,7 +3666,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8999284834864527703}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: SkullBody2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3653,7 +3698,7 @@ GameObject:
   m_Component:
   - component: {fileID: 818597895371619903}
   - component: {fileID: 7236044647896475995}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Rifle.008
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3767,7 +3812,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4664376808229575423}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: SkullHead1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3799,7 +3844,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6476060013853014270}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Neck
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3834,7 +3879,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2124585570360958717}
   - component: {fileID: 6710591688651819268}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Rifle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3948,7 +3993,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5097005940486819469}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: SkullHead2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4089,7 +4134,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2068577649288963346}
   - component: {fileID: 4344352412303476836}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Rifle.001
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4312,7 +4357,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3148061155480564374}
   - component: {fileID: 3774597467887619813}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4426,7 +4471,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5242713602434206634}
   - component: {fileID: 8070246317694884682}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Rifle.002
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4541,7 +4586,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6872237975201782125}
   - component: {fileID: 3005898840824138432}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Rifle.003
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4655,7 +4700,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5140040223799454956}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Arm_L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4686,7 +4731,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3165673257570873439}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Face.003
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4717,7 +4762,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3079756609700316817}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Shoulder_L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4750,7 +4795,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1458004211791049052}
   - component: {fileID: 8149130556823545275}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Rifle.013
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4864,7 +4909,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2640464978043833874}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Armature
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4914,7 +4959,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4857015447439791160}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Face.002
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5053,7 +5098,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8412468773309723725}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: SkullBody1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5084,7 +5129,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7899560327672829935}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Sprine
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5117,7 +5162,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8192224504237346716}
   - component: {fileID: 775697987981398951}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Skull_LowPoly.003
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5230,7 +5275,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6981072157720510441}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Ankle_R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5262,7 +5307,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9153490062709575256}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: LowerLeg_R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5294,7 +5339,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3608659361700537423}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Ankle_L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5327,7 +5372,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2529045803916490155}
   - component: {fileID: 4712284375656002173}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Rifle.004
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5549,7 +5594,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1380649569654727281}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Arm_R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5582,7 +5627,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8255478784132910951}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Hip_L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5620,7 +5665,8 @@ GameObject:
   - component: {fileID: 1969272525622458939}
   - component: {fileID: 2516056277489432118}
   - component: {fileID: 3989149294283346583}
-  m_Layer: 0
+  - component: {fileID: 1835128574075330797}
+  m_Layer: 13
   m_Name: Shooting amalgamation
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5641,6 +5687,7 @@ Transform:
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 5697883043785033711}
+  - {fileID: 4743744681991668133}
   m_Father: {fileID: 3444091594567113112}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!195 &5538422731617320738
@@ -5729,6 +5776,13 @@ MonoBehaviour:
   - {fileID: 2436655409199837608}
   - {fileID: 6617376388208219788}
   vision: {fileID: 4127638983817422346}
+  useSpawnIntroState: 1
+  sheepMask:
+    serializedVersion: 2
+    m_Bits: 16384
+  spawnIntroEndTrigger: {fileID: 0}
+  spawnIntroSpeed: 15
+  spawnWaitAtBoxTime: 2
   interceptChance: 0.583
   nodeReachThreshold: 3
   pathPassRadius: 2
@@ -5753,6 +5807,13 @@ MonoBehaviour:
   chaseRotationSpeed: 10
   chaseSustainSpeed: 4
   chasePreferredArriveTolerance: 1
+  shootLineMinDistance: 5
+  shootLineMaxDistance: 60
+  lineFirePoint: {fileID: 4743744681991668133}
+  lineBulletPrefab: {fileID: 2112529213018998581, guid: 5d6028680e66acb40a1aa7caa138f7e8, type: 3}
+  lineBulletsInLine: 8
+  lineBulletSpacing: 1
+  lineIndicatorLength: 15
   chaseReengageMinNodeDistance: 70
   chaseReengageMaxNodeDistance: 400
   chaseReaggroCooldown: 2
@@ -5844,6 +5905,33 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2.5, y: 2.89, z: 1}
   m_Center: {x: 0.5, y: 1.5, z: 0.2}
+--- !u!54 &1835128574075330797
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9111127480312318530}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &9180313549127324532
 GameObject:
   m_ObjectHideFlags: 0
@@ -5853,7 +5941,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1464007165800245060}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Root
   m_TagString: Untagged
   m_Icon: {fileID: 0}

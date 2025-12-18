@@ -39,6 +39,9 @@ namespace Core.AI.Sheep.Config
         [SerializeField]
         private PersonalityType _personalityType = PersonalityType.Normal;
 
+        [Header("Interaction")] [SerializeField]
+        public AudioClip PettingSound;
+
         //Getters
         public int MaxHealth => _maxHealth;
         public float Skittishness => _skittishness;
@@ -63,6 +66,12 @@ namespace Core.AI.Sheep.Config
                 PersonalityType.Energetic => new EnergeticPersonality(sheep),
                 PersonalityType.Nervous => new NervousPersonality(sheep),
                 PersonalityType.Stubborn => new StubbornPersonality(sheep),
+                PersonalityType.Sonja => new SonjaPersonality(sheep),
+                PersonalityType.Andela => new AndelaPersonality(sheep),
+                PersonalityType.Ivana => new IvanaPersonality(sheep),
+                PersonalityType.Nino => new NinoPersonality(sheep),
+                PersonalityType.Yaro => new YaroPersonality(sheep),
+                //PersonalityType.Tihomir => new TihomirPersonality(sheep),
                 _ => new NormalPersonality(sheep)
             };
         }
@@ -77,6 +86,12 @@ namespace Core.AI.Sheep.Config
         Lazy,
         Energetic,
         Nervous,
-        Stubborn
+        Stubborn,
+        Sonja,
+        Andela,
+        Nino,
+        Ivana,
+        Yaro,
+        Tihomir
     }
 }

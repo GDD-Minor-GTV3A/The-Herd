@@ -17,6 +17,9 @@ namespace Core.AI.Sheep.Personality
     {
         protected readonly SheepStateManager _sheep;
 
+        private Vector3 _lastFinalDestination;
+        private bool _hasLastFinalDestination;
+
         protected BaseSheepPersonality(SheepStateManager sheep)
         {
             _sheep = sheep;
@@ -47,22 +50,24 @@ namespace Core.AI.Sheep.Personality
 
         public virtual Vector3 GetGrazeTarget(SheepStateManager sheep, PersonalityBehaviorContext context)
         {
-            // How far apart we want grazing spots to be
             float baseRadius   = sheep.Archetype?.IdleWanderRadius ?? 1.0f;
-            float minSpacing   = baseRadius * 0.75f;          // tweak in inspector by changing IdleWanderRadius
+            float minSpacing   = baseRadius * 0.75f;
             float minSpacingSq = minSpacing * minSpacing;
-
-            // We now graze *inside the player square*, not just around current position
+            
+            if (sheep.IsStraggler)
+            {
+                Vector2 rand = Random.insideUnitCircle * baseRadius;
+                return sheep.transform.position + new Vector3(rand.x, 0f, rand.y);
+            }
+            
             Vector3 center = context.PlayerPosition;
-            Vector3 half   = context.PlayerHalfExtents;       // X and Z extents of the herd square
+            Vector3 half   = context.PlayerHalfExtents;
 
-            var neighbours = sheep.Neighbours;                // already used in FlockingUtility
+            var neighbours = sheep.Neighbours;
 
-            // Try several random candidates and pick the first that isn't too close to other sheep
             const int MAX_ATTEMPTS = 8;
             for (int attempt = 0; attempt < MAX_ATTEMPTS; attempt++)
             {
-                // Random point inside player square
                 float x = Random.Range(-half.x, half.x);
                 float z = Random.Range(-half.z, half.z);
                 Vector3 candidate = center + new Vector3(x, 0f, z);
@@ -88,15 +93,13 @@ namespace Core.AI.Sheep.Personality
                 }
 
                 if (!tooClose)
-                {
                     return candidate;
-                }
             }
-
-            // Fallback: if all attempts are crowded, just do the old local wander
-            Vector2 randLocal = Random.insideUnitCircle * baseRadius;
-            return sheep.transform.position + new Vector3(randLocal.x, 0f, randLocal.y);
+            
+            Vector2 fallback = Random.insideUnitCircle * baseRadius;
+            return sheep.transform.position + new Vector3(fallback.x, 0f, fallback.y);
         }
+
 
         public virtual Vector3 GetWalkAwayTarget(SheepStateManager sheep, PersonalityBehaviorContext context)
         {
@@ -113,6 +116,9 @@ namespace Core.AI.Sheep.Personality
             return sheep.transform.position + playerHalf + new Vector3(rand.x, 0f, rand.y);
         }
 
+#if UNITY_EDITOR
+        private Vector3 _lastLoggedFinal;
+#endif
         public virtual void SetDestinationWithHerding(Vector3 destination, SheepStateManager sheep, PersonalityBehaviorContext context)
         {
             Vector3 goal = context.HasThreat && context.Threats.Count > 0
@@ -157,14 +163,15 @@ namespace Core.AI.Sheep.Personality
             float alignW = sheep.Config?.AlignmentWeight ?? 0.6f;
             float clamp = sheep.Config?.SteerClamp ?? 2.5f;
 
-            Vector3 flockSteer = FlockingUtility.Steering(
+            /*Vector3 flockSteer = FlockingUtility.Steering(
                 sheep.transform,
                 sheep.Neighbours,
                 sepDist,
                 sepW,
                 alignW,
                 clamp
-            );
+            );*/
+            Vector3 flockSteer = Vector3.zero;
 
             Vector3 repulsion = Vector3.zero;
             Vector3 fromPlayerToSheep = sheep.transform.position - playerPos;
@@ -181,12 +188,38 @@ namespace Core.AI.Sheep.Personality
             }
             
             Vector3 final = sheep.transform.position + desired + flockSteer + repulsion;
+#if UNITY_EDITOR
+            if ((final - _lastLoggedFinal).sqrMagnitude > 1f)
+            {
+                //Debug.Log($"[{sheep.name}] FINAL DESTINATION JUMP at frame {Time.frameCount}: {final}");
+                _lastLoggedFinal = final;
+            }
+#endif
+            const float MIN_DELTA = 0.4f;
+            const float MAX_DELTA = 1f;
+
+            if (_hasLastFinalDestination)
+            {
+                Vector3 delta = final - _lastFinalDestination;
+                float dist = delta.magnitude;
+
+                if (dist < MIN_DELTA)
+                {
+                    final =  _lastFinalDestination;
+                }
+                else if (dist > MAX_DELTA)
+                {
+                    final = _lastFinalDestination + delta.normalized * MAX_DELTA;
+                }
+            }
+
+            _lastFinalDestination = final;
+            _hasLastFinalDestination = true;
 
             if (sheep.CanControlAgent())
             {
                 float baseSpeed = sheep.Config?.BaseSpeed ?? 2.2f;
                 bool isFleeing = context.HasThreat;
-                
                 sheep.Agent.speed = isFleeing ? baseSpeed * 1.5f : baseSpeed;
                 sheep.Agent.SetDestination(final);
 
@@ -197,9 +230,7 @@ namespace Core.AI.Sheep.Personality
                     if (look.sqrMagnitude > 0.0001f)
                     {
                         var q = Quaternion.LookRotation(look);
-                        sheep.transform.rotation = Quaternion.Slerp(sheep.transform.rotation, 
-                            q,
-                            Time.deltaTime * 10f);
+                        sheep.transform.rotation = Quaternion.Slerp(sheep.transform.rotation, q, Time.deltaTime * 10f);
                     }
                 }
             }
@@ -247,6 +278,16 @@ namespace Core.AI.Sheep.Personality
             return proposedState;
         }
 
+        public virtual bool CanBePetted(string currentSceneName)
+        {
+            /*if (currentSceneName.Equals("Village", System.StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }*/
+            return true;
+            //return false;
+        }
+
         #endregion
 
 
@@ -260,6 +301,7 @@ namespace Core.AI.Sheep.Personality
 
         public virtual void OnPlayerAction(string actionType, SheepStateManager sheep, PersonalityBehaviorContext context)
         {
+            Debug.Log($"PERSONALITY ACTION: {actionType} on {sheep.name}");
             // Default behavior for player actions
             if (actionType == "whistle" || actionType == "call")
             {
@@ -273,9 +315,8 @@ namespace Core.AI.Sheep.Personality
             var clip = sheep.Archetype?.LeaveHerdSound;
             if (clip)
             {
-                SheepSoundManager.PlaySoundClip(
+                sheep.SoundDriver.PlayMiscSound(
                     clip,
-                    sheep.SoundDriver,
                     1.0f,
                     Random.Range(0.95f, 1.05f));
             }
@@ -287,9 +328,8 @@ namespace Core.AI.Sheep.Personality
             var clip = sheep.Archetype?.JoinHerdSound;
             if (clip)
             {
-                SheepSoundManager.PlaySoundClip(
+                sheep.SoundDriver.PlayMiscSound(
                     clip,
-                    sheep.SoundDriver,
                     1.0f,
                     Random.Range(0.95f, 1.05f));
             }

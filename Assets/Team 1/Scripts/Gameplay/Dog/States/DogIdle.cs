@@ -42,10 +42,6 @@ namespace Gameplay.Dog
 
         public override void OnUpdate()
         {
-            if (manager.HerdZone.IsFreeSheepToHeard())
-                manager.SetState<DogMoveToSheep>();
-
-
             if (Vector3.Distance(manager.MovementController.transform.position, playerTransform.position) > distanceToStartFollow && delayCoroutine == null)
                 delayCoroutine = manager.StartCoroutine(MoveDelayRoutine());
         }
@@ -53,9 +49,9 @@ namespace Gameplay.Dog
 
         private IEnumerator MoveDelayRoutine()
         {
-            yield return new WaitForSeconds(1.5f);
-            delayCoroutine = null;
+            yield return new WaitForSeconds(.5f);
             manager.SetState<DogFollowPlayer>();
+            delayCoroutine = null;
         }
 
 

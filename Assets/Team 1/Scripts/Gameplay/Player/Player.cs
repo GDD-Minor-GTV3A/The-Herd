@@ -1,7 +1,9 @@
+using System;
+
+using Core.AI.Sheep.Event;
+using Core.Events;
 using Core.Shared.Utilities;
-using Gameplay.Effects;
 using Gameplay.HealthSystem;
-using Gameplay.ToolsSystem;
 using UI;
 using UI.Effects;
 using UnityEngine;
@@ -14,8 +16,8 @@ namespace Gameplay.Player
     /// Base player script.
     /// </summary>
     [RequireComponent(typeof(PlayerMovement), typeof(PlayerStateManager))]
-    [RequireComponent(typeof(PlayerInput), typeof(ToolSlotsController), typeof(CharacterController))]
-    public class Player : MonoBehaviour, IDamageable, IHealable, IKillable
+    [RequireComponent(typeof(PlayerInputHandler), typeof(CharacterController))]
+    public class Player : MonoBehaviour, IKillable
     {
         [Header("Animations")]
         [SerializeField, Tooltip("Animator of the player.")]
@@ -24,10 +26,10 @@ namespace Gameplay.Player
         [SerializeField, Tooltip("Animation constraints from AnimationRigging of the player.")]
         private PlayerAnimationConstraints animationConstrains;
 
-        [Space, Header("Effects")]
-        [SerializeField, Required, Tooltip("Reference to damage effect component.")]
-        private DamageEffect dmgEffect;
+        [SerializeField, Tooltip("Animation constraints from AnimationRigging of the player.")]
+        private Whistle whistle;
 
+        [Space, Header("Effects")]
         [SerializeField, Required, Tooltip("Reference to player vignette effect component.")]
         private PlayerVignetteEffect vignetteEffect;
 
@@ -46,26 +48,12 @@ namespace Gameplay.Player
         private PlayerConfig config;
 
 
-        [field: Space, Header("Events")]
-        [field: SerializeField, Tooltip("Invokes when player gets damage.")]
-        public UnityEvent DamageEvent { get; set; }
-
-        [field: SerializeField, Tooltip("Invokes when player gets healed.")]
-        public UnityEvent HealEvent { get; set; }
-
         [field: SerializeField, Tooltip("Invokes when player dies.")]
         public UnityEvent DeathEvent { get; set; }
 
 
         private PlayerMovement movementController;
-        private Health health;
 
-
-        // for test, needs to be moved to bootstrap
-        private void Start()
-        {
-            Initialize();
-        }
 
         /// <summary>
         /// Initialization method.
@@ -75,7 +63,6 @@ namespace Gameplay.Player
             Vector3 _forward = Camera.main.transform.forward;
 
             _forward.y = 0f;
-
             _forward.Normalize();
 
             transform.forward = _forward;
@@ -83,61 +70,49 @@ namespace Gameplay.Player
 
             movementController = GetComponent<PlayerMovement>();
             PlayerStateManager _stateManager = GetComponent<PlayerStateManager>();
-            PlayerInput _playerInput = GetComponent<PlayerInput>();
-            ToolSlotsController _slotsController = GetComponent<ToolSlotsController>();
+            PlayerInputHandler _playerInput = GetComponent<PlayerInputHandler>();
 
             _playerInput.Initialize(inputActions);
-
 
             CharacterController _characterController = GetComponent<CharacterController>();
             movementController.Initialize(_characterController, config);
 
-
             stepsSoundManager.Initialize();
-            PlayerAnimator _playerAnimator = new PlayerAnimator(animator, this, transform, animationConstrains);
+            PlayerAnimator _playerAnimator = new PlayerAnimator(animator, transform, animationConstrains);
             _stateManager.Initialize(_playerInput, movementController, _playerAnimator);
 
-            // Init health
-            health = new Health(config);
+            whistle.Initialize(_playerAnimator, _playerInput);
 
             config.OnValueChanged += UpdateConfigValues;
 
-            _slotsController.Initialize(_playerInput, _playerAnimator, 2);
-            
-            dmgEffect.Initialize();
             vignetteEffect.Initialize();
-            hpBar.Initialize(health);
+
+            EventManager.AddListener<SanityChangeEvent>(OnSanityChanged);
         }
 
+        private void OnSanityChanged(SanityChangeEvent evt)
+        {
+            if (evt.Percentage <= 0)
+            {
+                Die();
+            }
+        }
 
         private void UpdateConfigValues(PlayerConfig config)
         {
             movementController.UpdateValues(config);
-            health.UpdateValuesFromConfig(config);
         }
 
 
         public void TakeDamage(float damage)
         {
-            if (!health.CanTakeDamage && damage <= 0) return;
-            health.ChangeCurrentHealth(-damage);
-            DamageEvent?.Invoke();
-
-            if (health.CurrentHealth == 0)
-                Die();
         }
 
-        public void Heal(float amount)
-        {
-            if (!health.CanBeHealed && amount <= 0) return;
-            health.ChangeCurrentHealth(amount);
-            HealEvent?.Invoke();
-        }
 
         public void Die()
         {
+            Debug.Log("Player died.");
             DeathEvent?.Invoke();
-            Debug.Log("You are Died!");
         }
 
 

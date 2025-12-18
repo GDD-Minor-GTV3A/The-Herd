@@ -1,9 +1,14 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Core.Events;
+
+using Gameplay.Player;
+
 using Ink.Runtime;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Audio; // Required for AudioMixerGroup if you use it in EnterDialogueMode
 
 /// <summary>
 /// A singleton class that manages the dialogue system,
@@ -28,11 +33,18 @@ public class DialogueManager : MonoBehaviour
     [Range(1, 3)]
     [SerializeField] private int _sanity = 2; // 1=low, 2=medium, 3=high
 
+    [Header("Sounds")]
+    [SerializeField] private AudioMixerGroup _whisperSoundMixerGroup; // The Mixer Group the whisper sound is routed through
+    
     // Private Fields
     private Story _story;
     private Animator _layoutAnimator;
     private string _pendingPortraitState;
     private System.Action _onDialogueFinished;
+    
+    // --- NEW FIELD FOR NPC AUDIO LINK ---
+    private NPCDialogueAudio _currentNPCAudio;
+    // --- END NEW FIELD ---
     
     // Variable persistence storage
     private Dictionary<string, object> _inkVariableState = new Dictionary<string, object>();
@@ -46,6 +58,13 @@ public class DialogueManager : MonoBehaviour
     private const string NARRATOR_LAYOUT_STATE = "narrator";
     private const string SHOW_CHOICES_STATE = "showChoices";
 
+    // Coroutine reference to handle stopping/skipping
+    private Coroutine _displayLineCoroutine; 
+    private bool _isTyping = false;
+    
+    [Header("Typewriter Settings")]
+    [SerializeField] private float _typingSpeed = 0.04f;
+    
     /// <summary>
     /// Gets a value indicating whether dialogue is currently playing.
     /// </summary>
@@ -82,11 +101,29 @@ public class DialogueManager : MonoBehaviour
         {
             _choicesText[i] = _choices[i].GetComponentInChildren<TextMeshProUGUI>();
         }
+        
+        DontDestroyOnLoad(this.gameObject);
     }
+
+
+    private void Awake()
+    {
+        Initialize();
+    }
+
 
     private void OnEnable()
     {
         EventManager.AddListener<QuestCompletedEvent>(OnQuestCompleted);
+        // If you were using OnObjectiveCompleted, add listener here too:
+        // EventManager.AddListener<ObjectiveCompletedEvent>(OnObjectiveCompleted);
+    }
+
+    private void OnDisable()
+    {
+        EventManager.RemoveListener<QuestCompletedEvent>(OnQuestCompleted);
+        // If you were using OnObjectiveCompleted, remove listener here too:
+        // EventManager.RemoveListener<ObjectiveCompletedEvent>(OnObjectiveCompleted);
     }
 
 
@@ -104,18 +141,26 @@ public class DialogueManager : MonoBehaviour
             _pendingPortraitState = null;
         }
 
-        // --- CHOICE KEYBOARD LOGIC ---
-        // If choices are displayed, allow number keys to select choices
+
+        if (_isTyping)
+        {
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                FinishTypingImmediately();
+            }
+            // If we are typing, do not allow choices or continuing yet
+            return; 
+        }
+        
         if (_story.currentChoices.Count > 0)
         {
             if (Input.GetKeyDown(KeyCode.Alpha1)) { MakeChoice(0); return; }
             if (Input.GetKeyDown(KeyCode.Alpha2)) { MakeChoice(1); return; }
             if (Input.GetKeyDown(KeyCode.Alpha3)) { MakeChoice(2); return; }
-            // Add more if you have more than 3 choices
+            // Since choices exist, we return here so Space doesn't trigger "ContinueStory"
             return;
         }
-
-        // Use Space for advancing text only when no choices are available
+        
         if (Input.GetKeyDown(KeyCode.Space))
         {
             ContinueStory();
@@ -127,15 +172,35 @@ public class DialogueManager : MonoBehaviour
     /// Enters dialogue mode by loading an Ink story and displaying the first line.
     /// </summary>
     /// <param name="inkJson">The Ink JSON file containing the dialogue script.</param>
+    /// <param name="speakerObject">The GameObject of the NPC currently speaking, used for audio and logic.</param>
     /// <param name="onDialogueFinished">Optional callback action when dialogue exits.</param>
-    public void EnterDialogueMode(TextAsset inkJson, System.Action onDialogueFinished = null)
+    public void EnterDialogueMode(TextAsset inkJson, GameObject speakerObject, System.Action onDialogueFinished = null)
     {
+        if (_whisperSoundMixerGroup != null)
+        {
+            _whisperSoundMixerGroup.audioMixer.SetFloat("WhisperVolume", -80); // -80 is effectively mute
+        }
+        
         if (IsDialoguePlaying)
         {
             return;
         }
 
+        //Set a different PlayerControlMap during dialogue 
+        if (PlayerInputHandler.Instance)
+        {
+            PlayerInputHandler.SwitchControlMap();
+        }
+        
         _story = new Story(inkJson.text);
+
+        // --- NEW: Set the current NPC Audio component reference ---
+        _currentNPCAudio = speakerObject?.GetComponent<NPCDialogueAudio>();
+        if (_currentNPCAudio == null && speakerObject != null)
+        {
+            _currentNPCAudio = speakerObject.GetComponentInParent<NPCDialogueAudio>();
+        }
+        // --- END NEW ---
         
         // Restore previously saved Ink variables
         RestoreInkVariables();
@@ -167,8 +232,16 @@ public class DialogueManager : MonoBehaviour
         _pendingPortraitState = null;
         _layoutAnimator?.Play(DEFAULT_LAYOUT_STATE); 
         
+        _currentNPCAudio = null; // Clear the NPC reference on exit
+        
         _onDialogueFinished?.Invoke(); 
         _onDialogueFinished = null;
+        
+        //Switch back PlayerControlMap after dialogue is finished
+        if (PlayerInputHandler.Instance)
+        {
+            PlayerInputHandler.SwitchControlMap();
+        }
     }
 
     /// <summary>
@@ -251,10 +324,83 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
+        // stop any previous typing coroutine if it exists
+        if (_displayLineCoroutine != null) 
+        {
+            StopCoroutine(_displayLineCoroutine);
+        }
+
         string line = _story.Continue();
         HandleTags(_story.currentTags);
-        _dialogueText.text = line;
-        DisplayChoices();
+        
+        // Hide choices while text is typing
+        HideChoices(); 
+
+        // Start the typewriter effect
+        _displayLineCoroutine = StartCoroutine(ShowText(line));
+    }
+    
+    private IEnumerator ShowText(string fullText)
+    {
+        _isTyping = true;
+        _dialogueText.text = fullText;
+        
+        // Ensure the mesh is generated so we know how many characters there are
+        _dialogueText.ForceMeshUpdate();
+
+        int totalVisibleCharacters = _dialogueText.textInfo.characterCount;
+        int counter = 0;
+
+        // Start with 0 characters visible
+        _dialogueText.maxVisibleCharacters = 0;
+
+        while (counter < totalVisibleCharacters)
+        {
+            int visibleCount = counter % (totalVisibleCharacters + 1);
+            _dialogueText.maxVisibleCharacters = visibleCount;
+            
+            // --- MODIFIED: Call the current NPC's audio component ---
+            if (_currentNPCAudio != null)
+            {
+                // Get the current character being displayed 
+                // We use TextMeshPro's textInfo to correctly handle rich text tags
+                char currentChar = _dialogueText.textInfo.characterInfo[counter].character;
+                _currentNPCAudio.PlayTypingSound(counter, currentChar);
+            }
+            // --- END MODIFIED ---
+            
+            counter++;
+            yield return new WaitForSeconds(_typingSpeed);
+        }
+
+        // Ensure everything is visible at the end
+        _dialogueText.maxVisibleCharacters = totalVisibleCharacters;
+        
+        FinishTypingLogic();
+    }
+
+    private void FinishTypingImmediately()
+    {
+        if (_displayLineCoroutine != null) StopCoroutine(_displayLineCoroutine);
+        
+        _dialogueText.maxVisibleCharacters = int.MaxValue; // Show everything
+        FinishTypingLogic();
+    }
+
+    private void FinishTypingLogic()
+    {
+        _isTyping = false;
+        DisplayChoices(); // Now that text is done, we show choices
+    }
+
+    // Helper to hide choices visually before typing starts
+    private void HideChoices()
+    {
+        foreach (var choice in _choices)
+        {
+            choice.SetActive(false);
+        }
+        // Don't change Animator state here, wait for DisplayChoices to handle the panel animation
     }
 
     private void HandleTags(List<string> tags)
@@ -390,21 +536,19 @@ public class DialogueManager : MonoBehaviour
 
     private void DisplayChoices()
     {
+        if (_isTyping) return;
+
         var currentChoices = _story.currentChoices;
         
-        // Use the Animator to control the visibility of the parent panel, using the corrected state name
         if (currentChoices.Count > 0)
         {
-            // Transition to an animation state that enables the choices panel
             _layoutAnimator.Play(SHOW_CHOICES_STATE);
         }
         else
         {
-            // Revert to a default layout state that disables the choices panel
             _layoutAnimator.Play(DEFAULT_LAYOUT_STATE);
         }
         
-        // The script still handles the individual choice buttons
         int i = 0;
         for (; i < currentChoices.Count && i < _choices.Length; i++)
         {
@@ -444,6 +588,18 @@ public class DialogueManager : MonoBehaviour
         EventManager.Broadcast(new CompleteObjectiveEvent(questID, objectiveID));
         Debug.Log("Completed Objective through dialogue");
     }
+
+    public void OnObjectiveCompleted(ObjectiveCompletedEvent evt)
+    {
+        string objectiveID = evt.ObjectiveID;
+        string inkVariableName = objectiveID + "_completed";
+        if (!string.IsNullOrEmpty(inkVariableName))
+        {
+            SetInkVariable(inkVariableName, true);
+            Debug.Log($"Set Ink variable '{inkVariableName}' to true for completed objective {objectiveID}");
+        }
+    }
+    
     
     /// <summary>
     /// Called through the EventSystem/Manager

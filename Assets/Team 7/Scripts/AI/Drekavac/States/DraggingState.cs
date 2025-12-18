@@ -1,3 +1,7 @@
+using Core.AI.Sheep;
+using Core.AI.Sheep.Event;
+using Core.Events;
+
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -29,8 +33,11 @@ namespace Team_7.Scripts.AI.Drekavac.States
             if (Vector3.Distance(_manager.transform.position, _manager.GetPlayerLocation()) >
                 _manager.GetStats().despawnDistance)
             {
+                _manager.GetGrabbedObject().TryGetComponent<SheepStateManager>(out var sheepManager);
+                EventManager.Broadcast(new SheepDamageEvent(sheepManager, 1000, sheepManager.transform.position, source: _manager.gameObject));
+                
                 _manager.ReleaseGrabbedObject();
-                _manager.SetState<BigState>();
+                _manager.DestroySelf();
                 return;
             }
 

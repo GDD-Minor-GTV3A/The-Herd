@@ -4,7 +4,7 @@ from __future__ import annotations
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, Namespace
 from enum import Enum
 from pathlib import Path
-from typing import TYPE_CHECKING, Generic, TypeVar
+from typing import TYPE_CHECKING, Generator, Generic, TypeVar
 
 from release.log import logger
 from release.paths import BUILD_DIR, ROOT, UNITY, UNITY_LOG, ZIP_FILE
@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Generator
 
 parser = ArgumentParser(description="Create a new GH release.", formatter_class=ArgumentDefaultsHelpFormatter)
+NULL_SEMVER = SemVer(0,0,0)
 
 class ArgumentActions(Enum):
     """Possible argument actions."""
@@ -34,6 +35,7 @@ T = TypeVar("T")
 
 class Argument(Generic[T]):
     """Helper to define arguments with argparse."""
+    internal_prefix = "_ARGUMENT_"
 
     def __init__(
         self,
@@ -55,7 +57,7 @@ class Argument(Generic[T]):
         """Set the name of the attribute to the name of the descriptor."""
         self.setup_parser_argument(name)
         self.name = name
-        self.private_name = f"__{name}"
+        self.private_name = f"{self.internal_prefix}{name}"
 
     def __get__(self, obj: object, obj_type: object) -> T:
         """Get the value of the attribute."""
@@ -95,10 +97,10 @@ class Args(Namespace):
     """Additional settings for release script."""
 
     # Control flags, on what to do during the release process.
-    compile = Argument(
+    run_unity = Argument(
         action=ArgumentActions.STORE_BOOL,
         default=False,
-        help="Compile the project using Unity.exe.",
+        help="Run Unity.exe with the given arguments UnityArgs.",
     )
     create_tag = Argument(
         action=ArgumentActions.STORE_BOOL,
@@ -117,9 +119,9 @@ class Args(Namespace):
     )
 
     # Release settings.
-    tag = Argument[SemVer](
-        SemVer,
-        default=SemVer(0, 0, 0),
+    tag = Argument[str](
+        str,
+        default=NULL_SEMVER,
         help="The git tag to create for the release.",
     )
     dist_dir = Argument(
@@ -183,7 +185,8 @@ class GithubArgs(Namespace):
         help="Mark the release as a prerelease.",
     )
     target = Argument(
-        help="Target branch or full commit SHA (default [main branch])",
+        default="main",
+        help="Target branch or full commit SHA",
     )
     title = Argument[str | None](
         help="Title for the release.",
@@ -195,7 +198,7 @@ class GithubArgs(Namespace):
 
     def generate_setting_flags(self) -> Generator[str]:
         """Generate command line flags from settings as a list of tokens."""
-        for i in GithubArgs.__annotations__:
+        for i in get_argument_names(self):
             val = getattr(self, i)
             match val:
                 # true  -> add flag
@@ -217,37 +220,37 @@ class UnityArgs(Namespace):
         default=UNITY,
         help="Path to the Unity executable.",
     )
-    buildTarget: Argument = Argument(
+    buildTarget = Argument(
         default="standalonewindows64",
         help="Build target platform.",
     )
-    projectPath: Argument = Argument(
+    projectPath = Argument(
         Path,
         default=ROOT,
         help="Path to the Unity project.",
     )
-    logFile: Argument = Argument(
+    logFile = Argument(
         Path,
         default=UNITY_LOG,
         help="Path to the Unity log file.",
     )
-    skipMissingProjectId: Argument = Argument(
+    skipMissingProjectId = Argument(
         action=ArgumentActions.STORE_BOOL,
         help="Skip missing project ID.",
     )
-    skipMissingUpid: Argument = Argument(
+    skipMissingUpid = Argument(
         action=ArgumentActions.STORE_BOOL,
         help="Skip missing UPID.",
     )
-    batchmode: Argument = Argument(
+    batchmode = Argument(
         action=ArgumentActions.STORE_BOOL,
         help="Run Unity in batch mode.",
     )
-    quit: Argument = Argument(
+    quit = Argument(
         action=ArgumentActions.STORE_BOOL,
         help="Quit Unity after executing commands.",
     )
-    executeMethod: Argument = Argument(
+    executeMethod = Argument(
         default="CommandLineBuild.BuildGame",
         help="Method to execute after launching Unity.",
     )
@@ -255,7 +258,7 @@ class UnityArgs(Namespace):
     def build_command(self) -> list[str]:
         """Generate the command line to run unity with the given arguments."""
         command = [str(self.unityPath)]
-        for arg in self.__annotations__:
+        for arg in get_argument_names(self):
             if arg == "unityPath":
                 continue
 
@@ -273,6 +276,11 @@ class UnityArgs(Namespace):
                     logger.warning("Unused unity argument type or value: %s=%r", arg, val)
         return command
 
+def get_argument_names(inst: Namespace) -> Generator[str]:
+    """Get all argument names from a Namespace instance."""
+    for i in inst.__dict__:
+        if i.startswith(Argument.internal_prefix):
+            yield i[len(Argument.internal_prefix):]
 
 args: Args = parser.parse_args(namespace=Args())
 github_args: GithubArgs = parser.parse_args(namespace=GithubArgs())
@@ -283,10 +291,10 @@ async def set_defaults() -> None:
     """Set default values for settings if not provided."""
     from release import tags
     tag = await tags.get()
-    tag = tag.bump_minor()
+    tag = tag.bump_patch()
 
     # Set default title and notes if not provided
-    args.tag = args.tag if args.tag != SemVer(0,0,0) else tag
-    github_args.title = github_args.title or f"Release {tag}"
-    github_args.notes = github_args.notes or f"Automated release of version {tag}."
+    args.tag = args.tag if args.tag != str(NULL_SEMVER) else str(tag)
+    github_args.title = github_args.title or f"Release {args.tag}"
+    github_args.notes = github_args.notes or f"Automated release of version {args.tag}."
     logger.info("Successfully set up context for release.")

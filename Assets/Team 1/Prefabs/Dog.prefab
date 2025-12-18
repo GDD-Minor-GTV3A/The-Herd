@@ -39,6 +39,7 @@ Transform:
   m_Children:
   - {fileID: 1825062133068819130}
   - {fileID: 2528842616345371690}
+  - {fileID: 7107901205487455113}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!195 &8433894266680171154
@@ -76,7 +77,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerTransform: {fileID: 0}
-  herdZone: {fileID: 0}
+  herdZone: {fileID: 7615872926369980527}
   stepsSoundManager: {fileID: 6384406999088229869}
   animator: {fileID: 3171391158692443822}
   config: {fileID: 11400000, guid: a9a53b25b4a842542b4086cfd00829cd, type: 2}
@@ -204,7 +205,7 @@ AudioSource:
   m_GameObject: {fileID: 3018951382313821739}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 355428252071530209, guid: 62d417deb6376ba4794f2c75909ee160, type: 2}
+  OutputAudioMixerGroup: {fileID: -5382235948007741130, guid: 7fd16c078350f6a43a48667b7de56d7e, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
@@ -292,6 +293,90 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!1 &6546730268194453632
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7107901205487455113}
+  - component: {fileID: 4337068539675848933}
+  - component: {fileID: 7615872926369980527}
+  - component: {fileID: 5774881264336735376}
+  m_Layer: 0
+  m_Name: DogHerdZone
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7107901205487455113
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6546730268194453632}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5830238604603834298}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!135 &4337068539675848933
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6546730268194453632}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 20
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &7615872926369980527
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6546730268194453632}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d33b6693d5f62de48852a78411bf22ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  graceAfterJoin: 3
+  sheepTag: Sheep
+--- !u!114 &5774881264336735376
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6546730268194453632}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b06847e149b594747bf0f4daf19ee3c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _player: {fileID: 0}
+  _halfExtents: {x: 12, y: 12}
+  _interval: 0.2
 --- !u!1 &7967640244434156149
 GameObject:
   m_ObjectHideFlags: 0
@@ -941,7 +1026,7 @@ AudioSource:
   m_GameObject: {fileID: 2905824903130447504}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 6564751892150614795, guid: 29e7cf1046277894a80e63fd282dcd14, type: 2}
+  OutputAudioMixerGroup: {fileID: -8079453769205531590, guid: 7fd16c078350f6a43a48667b7de56d7e, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
@@ -1041,6 +1126,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a4dc9eb49b692f468828843d1434853, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  walkingSounds:
-  - {fileID: 8300000, guid: bd176cc25e113e64e8d886ebc10245d0, type: 3}
+  snowFS: []
+  dirtFS: []
+  rockFS: []
+  iceFS: []
   footstepSource: {fileID: 6137930248348829207}
+  groundCheck: {fileID: 0}

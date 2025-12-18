@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using Core.Events;
 using Core.AI.Sheep.Event;
 
+using UnityEngine.Serialization;
+
 namespace Core.AI.Sheep
 {
     /// <summary>
@@ -48,6 +50,9 @@ namespace Core.AI.Sheep
         [SerializeField]
         [Tooltip("Offset from player for spawn position")]
         private Vector3 _spawnOffset = new Vector3(2f, 2f, 0f);
+
+        [FormerlySerializedAs("_demoScoreAmount")] [SerializeField] [Tooltip("Amount of scare score to apply")]
+        private float _demoScareAmount = 10f;
 
         [Header("Sanity Settings")]
         [SerializeField]
@@ -109,6 +114,13 @@ namespace Core.AI.Sheep
                     case KeyCode.J:
                         SpawnSheep();
                         break;
+                    case KeyCode.V:
+                        TriggerPetSheep();
+                        break;
+                    case KeyCode.L:
+                        TriggerScareSheep();
+                        break;
+                        
 
                     // Sanity Control
                     case KeyCode.Equals:
@@ -123,6 +135,10 @@ namespace Core.AI.Sheep
 
                     case KeyCode.H:
                         ShowHelp();
+                        break;
+                    
+                    case KeyCode.O:
+                        PrintOrderedHerd();
                         break;
                 }
             }
@@ -300,6 +316,33 @@ namespace Core.AI.Sheep
             }
         }
 
+        private void TriggerPetSheep()
+        {
+            if (_selectedSheep == null)
+            {
+                DisplayEventFeedback("<color=red> No sheep selected</color>\nPress Tab to select a sheep");
+                return;
+            }
+            
+            EventManager.Broadcast(new RequestPetSheepEvent(_selectedSheep));
+            
+            DisplayEventFeedback($"<color=#00FF00FF>Petting request</color>\nSheep: {_selectedSheep.name}");
+            Debug.Log($"[EventDemo] Petting requested for {_selectedSheep.name}");
+        }
+
+        private void TriggerScareSheep()
+        {
+            if (_selectedSheep == null)
+            {
+                DisplayEventFeedback("<color=red>No sheep selected!</color>\nPress Tab to select a sheep");
+                return;
+            }
+
+            Vector3 sourcePos = _selectedSheep.transform.position - _selectedSheep.transform.forward * 2f;
+            EventManager.Broadcast(new SheepScareEvent(_selectedSheep, _demoScareAmount, sourcePos));
+            DisplayEventFeedback($"<color=orange>Scare Triggered</color>\nSheep: {_selectedSheep.name}\nAmount: {_demoScareAmount}");
+        }
+
         #endregion
 
         #region Sanity Control
@@ -332,6 +375,9 @@ namespace Core.AI.Sheep
 <color=yellow>T</color> - Threat Detected
 <color=yellow>K</color> - Kill Sheep (Death Event)
 <color=yellow>J</color> - Spawn Sheep (Join Event)
+<color=yellow>V</color> - Pet Sheep (RequestPetSheepEvent)
+<color=yellow>L</color> - Scare Sheep (Trigger Panic)
+<color=yellow>O</color> - Get sheep in herd
 
 <b><color=#00FFFFFF>SANITY CONTROL</color></b>
 <color=yellow>+</color> - Increase Sanity Points
@@ -341,6 +387,28 @@ namespace Core.AI.Sheep
 
             DisplayEventFeedback(help, 15f);
             Debug.Log("[EventDemo] Help displayed");
+        }
+        
+        private void PrintOrderedHerd()
+        {
+            if (SheepTracker.Instance == null)
+            {
+                DisplayEventFeedback("<color=red>No SheepTracker found!</color>");
+                return;
+            }
+
+            var ordered = SheepTracker.Instance.GetOrderedSheepList();
+
+            string msg = "<b><color=#00FFFFFF>Ordered Herd List</color></b>\n";
+
+            for (int i = 0; i < ordered.Count; i++)
+            {
+                var s = ordered[i];
+                msg += $"{i+1}. {s.name} ({s.Archetype.PersonalityType})\n";
+            }
+
+            DisplayEventFeedback(msg, 5f);
+            Debug.Log("[EventDemo] Ordered herd:\n" + msg.Replace("<br>", "\n"));
         }
 
         private void DisplayEventFeedback(string message, float duration = -1f)
@@ -367,7 +435,7 @@ namespace Core.AI.Sheep
         private void OnDisable()
         {
             // Remove all highlights
-            var copy = _originalMaterials.Keys;
+            List<SheepStateManager> copy = new(_originalMaterials.Keys);
             foreach (var sheep in copy)
             {
                 RemoveHighlight(sheep);

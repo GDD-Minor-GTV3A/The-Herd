@@ -1,11 +1,8 @@
-using Gameplay.Player;      // for Player.TakeDamage
+using Core.AI.Sheep;
+using Gameplay.Player;      // kept for fallback if no sheep exist
 using UnityEngine;
 using UnityEngine.AI;
 
-/// <summary>
-/// Handles the slam cone attack: approach, telegraph, and damage.
-/// The AttackState just calls Begin/Tick/Cancel on this.
-/// </summary>
 public class AmalgamationSlamAttack
 {
     private enum Phase
@@ -17,14 +14,15 @@ public class AmalgamationSlamAttack
 
     private readonly AmalgamationStateMachine ctx;
     private readonly NavMeshAgent agent;
-    private readonly Transform player;
+    private readonly Transform player;      // fallback target if no sheep
     private readonly string logPrefix;
 
-    // State
+    // NEW: sheep target (preferred)
+    private Transform target;
+
     private Phase currentPhase = Phase.Idle;
     private float phaseTimer;
 
-    // Cached pose for slam (where/rotation when attack fires)
     private Vector3 attackOrigin;
     private Quaternion attackRotation;
     private Vector3 attackForward;
@@ -41,24 +39,28 @@ public class AmalgamationSlamAttack
         this.logPrefix = logPrefix;
     }
 
-    /// <summary>
-    /// Start the slam-attack behaviour (called from AttackState.Enter when Slam is chosen).
-    /// </summary>
-    public void Begin()
+    // NEW overload: Begin with sheep target
+    public void Begin(Transform sheepTarget)
     {
-        currentPhase = Phase.Approach;
-        phaseTimer = 0f;
+        target = sheepTarget != null ? sheepTarget : player; // fallback
+        Begin();
     }
 
-    /// <summary>
-    /// Per-frame update for the slam (called from AttackState.Tick).
-    /// </summary>
+    // Original begin still exists so your old code style still works
+    public void Begin()
+    {
+        if (target == null) target = player;
+
+        currentPhase = Phase.Approach;
+        phaseTimer = 0f;
+
+        if (ctx.debugLogs)
+            DebugLog("Slam BEGIN -> Approach");
+    }
+
     public void Tick()
     {
-        if (currentPhase == Phase.Idle)
-            return;
-
-        if (player == null || agent == null || !agent.enabled)
+        if (target == null || agent == null || !agent.enabled)
             return;
 
         switch (currentPhase)
@@ -73,40 +75,33 @@ public class AmalgamationSlamAttack
         }
     }
 
-    /// <summary>
-    /// Called from AttackState.Exit to clean up visuals if we leave the state early.
-    /// </summary>
     public void Cancel()
     {
         currentPhase = Phase.Idle;
-        phaseTimer = 0f;
 
         if (ctx.slamTelegraph != null)
             ctx.slamTelegraph.Hide();
     }
 
-    // =========================================
-    //              PHASES
-    // =========================================
-
     private void UpdateApproach()
     {
-        // Move + rotate while closing in to the desired distance
-        SetAttackDestination();
-        RotateTowardsPlayer();
+        phaseTimer += Time.deltaTime;
 
-        float distToPlayer = Vector3.Distance(agent.transform.position, player.position);
+        SetAttackDestination();
+        RotateTowardsTarget();
 
         float maxAllowedDist = ctx.attackApproachDistance + ctx.attackArriveThreshold;
-        bool closeByDistance = distToPlayer <= maxAllowedDist;
+
+        float distToTarget = Vector3.Distance(agent.transform.position, target.position);
+        bool closeByDistance = distToTarget <= maxAllowedDist;
 
         bool closeByPath =
             !agent.pathPending &&
+            agent.hasPath &&
             agent.remainingDistance <= ctx.attackArriveThreshold;
 
         if (closeByDistance || closeByPath)
         {
-            // Lock in the pose for the slam
             attackOrigin = agent.transform.position;
             attackRotation = agent.transform.rotation;
             attackForward = attackRotation * Vector3.forward;
@@ -118,269 +113,167 @@ public class AmalgamationSlamAttack
             if (ctx.debugLogs)
             {
                 DebugLog(
-                    $"Slam APPROACH complete. distToPlayer={distToPlayer:F2}, " +
+                    $"Slam APPROACH complete. distToTarget={distToTarget:F2}, " +
                     $"remainingDist={agent.remainingDistance:F2}. Locking pose and telegraphing."
                 );
             }
 
-            // Freeze navmesh movement
             agent.isStopped = true;
             agent.ResetPath();
             agent.velocity = Vector3.zero;
             agent.updatePosition = false;
 
-            // Ensure we stay exactly at the cached pose
             agent.transform.position = attackOrigin;
             agent.transform.rotation = attackRotation;
 
-            StartTelegraph();
-
             currentPhase = Phase.Telegraph;
             phaseTimer = 0f;
+
+            float outerRadius = ctx.slamRange;
+            float innerRadius = outerRadius * ctx.slamInnerRadiusFactor;
+
+            if (ctx.slamTelegraph != null)
+            {
+                ctx.slamTelegraph.transform.position = attackOrigin;
+                ctx.slamTelegraph.transform.rotation = attackRotation;
+                ctx.slamTelegraph.Show(outerRadius, innerRadius, ctx.slamAngle);
+            }
+
+            if (ctx.anim != null)
+                ctx.anim.TriggerSlam();
         }
     }
 
     private void UpdateTelegraph()
     {
-        // Completely frozen: no movement, no rotation
-        agent.isStopped = true;
-        agent.velocity = Vector3.zero;
-        agent.transform.position = attackOrigin;
-        agent.transform.rotation = attackRotation;
-
         phaseTimer += Time.deltaTime;
+
+        // keep facing target during telegraph
+        RotateTowardsTarget();
+
         if (phaseTimer >= ctx.slamTelegraphTime)
         {
-            // Actually deal damage now from the cached pose
             DoDamage();
 
             if (ctx.slamTelegraph != null)
                 ctx.slamTelegraph.Hide();
 
+            agent.updatePosition = true;
+            agent.isStopped = false;
+
             currentPhase = Phase.Idle;
 
-            // Immediately go back to CHASE; chase will resume ring logic
+            // Slam finishes by returning to chase (your project’s pattern)
             ctx.SwitchState(ctx.ChaseState);
         }
     }
 
-    // =========================================
-    //              VISUALS
-    // =========================================
-
-    private void StartTelegraph()
-    {
-        if (ctx.slamTelegraph == null)
-        {
-            DebugLog("No ConeTelegraph assigned on state machine for slam.");
-            return;
-        }
-
-        float outerRadius = ctx.slamRange;
-        float innerRadius = outerRadius * ctx.slamInnerRadiusFactor;
-
-        // Place telegraph at locked pose
-        ctx.slamTelegraph.transform.position = attackOrigin;
-        ctx.slamTelegraph.transform.rotation = attackRotation;
-
-        ctx.slamTelegraph.Show(outerRadius, innerRadius, ctx.slamAngle);
-    }
-
-    // =========================================
-    //              DAMAGE
-    // =========================================
-
     private void DoDamage()
     {
-        // Planar origin/forward for distance & angle math
-        Vector3 originPlanar  = attackOrigin;
+        Vector3 originPlanar = attackOrigin;
         Vector3 forwardPlanar = attackForward;
 
-        originPlanar.y  = 0f;
+        originPlanar.y = 0f;
         forwardPlanar.y = 0f;
         if (forwardPlanar.sqrMagnitude < 0.0001f)
             forwardPlanar = Vector3.forward;
         forwardPlanar.Normalize();
 
-        float maxRadius   = ctx.slamRange;
+        float maxRadius = ctx.slamRange;
         float innerRadius = maxRadius * ctx.slamInnerRadiusFactor;
-        float halfAngle   = ctx.slamAngle * 0.5f;
+        float halfAngle = ctx.slamAngle * 0.5f;
 
-        // --------------------------
-        // PLAYER DAMAGE  (same logic as before)
-        // --------------------------
-        if (ctx.player != null)
-        {
-            Transform playerTransform = ctx.player;
+        // Only detect sheep layer (as requested)
+        int mask = (ctx.sheepMask.value != 0) ? ctx.sheepMask.value : ~0;
 
-            Vector3 playerPlanar = playerTransform.position;
-            playerPlanar.y = 0f;
-
-            Vector3 toPlayer = playerPlanar - originPlanar;
-            float   dist     = toPlayer.magnitude;
-
-            if (dist > 0.001f && dist <= maxRadius)
-            {
-                Vector3 dir   = toPlayer / dist;
-                float   angle = Vector3.Angle(forwardPlanar, dir);
-
-                if (angle <= halfAngle)
-                {
-                    // Search on root, parents, and children – this is what worked before
-                    Player playerComp =
-                        playerTransform.GetComponent<Player>() ??
-                        playerTransform.GetComponentInParent<Player>() ??
-                        playerTransform.GetComponentInChildren<Player>();
-
-                    if (playerComp != null)
-                    {
-                        float damage =
-                            (dist <= innerRadius)
-                            ? ctx.slamInnerDamage      // inner cone
-                            : ctx.slamOuterDamage;     // outer cone
-
-                        playerComp.TakeDamage(damage);
-
-                        if (ctx.debugLogs)
-                        {
-                            Debug.Log(
-                                $"{logPrefix} Slam HIT PLAYER: dist={dist:F2}, angle={angle:F1}, dmg={damage}."
-                            );
-                        }
-                    }
-                    else if (ctx.debugLogs)
-                    {
-                        Debug.LogWarning(
-                            $"{logPrefix} Slam tried to hit player but no Player component was found on '{playerTransform.name}'."
-                        );
-                    }
-                }
-                else if (ctx.debugLogs)
-                {
-                    Debug.Log(
-                        $"{logPrefix} Slam player OUT OF ANGLE: dist={dist:F2}, angle={angle:F1}."
-                    );
-                }
-            }
-            else if (ctx.debugLogs)
-            {
-                Debug.Log(
-                    $"{logPrefix} Slam player OUT OF RANGE: dist={dist:F2}, maxRadius={maxRadius:F2}."
-                );
-            }
-        }
-
-        // --------------------------
-        // SHEEP INSTA-KILL (INNER CONE)
-        // --------------------------
-
-        // Use REAL attackOrigin height and INCLUDE triggers, then filter by inner cone
         Collider[] hits = Physics.OverlapSphere(
             attackOrigin,
-            maxRadius,                      // full cone radius
-            ~0,
-            QueryTriggerInteraction.Collide // includes trigger colliders
+            maxRadius,
+            mask,
+            QueryTriggerInteraction.Collide
         );
 
         if (ctx.debugLogs)
         {
-            Debug.Log($"{logPrefix} Checking {hits.Length} colliders for SHEEP kills " +
-                      $"(innerRadius={innerRadius:F2}, halfAngle={halfAngle:F1}).");
+            Debug.Log(
+                $"{logPrefix} Slam checking {hits.Length} colliders for SHEEP damage " +
+                $"(innerRadius={innerRadius:F2}, maxRadius={maxRadius:F2}, halfAngle={halfAngle:F1})."
+            );
         }
+
+        var damaged = new System.Collections.Generic.HashSet<SheepStateManager>();
 
         foreach (Collider col in hits)
         {
-            Transform t         = col.transform;
-            Transform sheepRoot = null;
+            // Must be on a Sheep root tagged "Sheep"
+            Transform t = col.transform;
+            SheepStateManager sheepRoot = null;
 
-            // Walk up the hierarchy until we find something tagged "Sheep"
             while (t != null)
             {
                 if (t.CompareTag("Sheep"))
                 {
-                    sheepRoot = t;
+                    sheepRoot = t.GetComponent<SheepStateManager>();
+                    if (sheepRoot == null) sheepRoot = t.GetComponentInParent<SheepStateManager>();
                     break;
                 }
-
                 t = t.parent;
             }
 
-            if (sheepRoot == null)
-            {
-                if (ctx.debugLogs)
-                {
-                    Debug.Log($"{logPrefix} Overlap hit '{col.name}' but no ancestor with tag 'Sheep' was found.");
-                }
-                continue;
-            }
+            if (sheepRoot == null) continue;
+            if (damaged.Contains(sheepRoot)) continue;
 
-            Vector3 sheepPlanar = sheepRoot.position;
+            SheepHealth hp = sheepRoot.GetComponent<SheepHealth>();
+            if (hp == null || hp.IsDead) continue;
+
+            Vector3 sheepPlanar = sheepRoot.transform.position;
             sheepPlanar.y = 0f;
 
-            Vector3 toSheep   = sheepPlanar - originPlanar;
-            float   distSheep = toSheep.magnitude;
+            Vector3 toSheep = sheepPlanar - originPlanar;
+            float distSheep = toSheep.magnitude;
 
-            // Must be in INNER radius
-            if (distSheep <= 0.001f || distSheep > innerRadius)
-            {
-                if (ctx.debugLogs)
-                {
-                    Debug.Log(
-                        $"{logPrefix} Sheep '{sheepRoot.name}' OUT OF INNER RADIUS " +
-                        $"(dist={distSheep:F2}, innerRadius={innerRadius:F2})."
-                    );
-                }
+            if (distSheep <= 0.001f || distSheep > maxRadius)
                 continue;
-            }
 
-            Vector3 dirSheep   = toSheep / distSheep;
-            float   angleSheep = Vector3.Angle(forwardPlanar, dirSheep);
+            Vector3 dirSheep = toSheep / distSheep;
+            float angleSheep = Vector3.Angle(forwardPlanar, dirSheep);
 
-            if (angleSheep <= halfAngle)
-            {
-                Object.Destroy(sheepRoot.gameObject);
+            if (angleSheep > halfAngle)
+                continue;
 
-                if (ctx.debugLogs)
-                {
-                    Debug.Log(
-                        $"{logPrefix} Slam KILLED SHEEP '{sheepRoot.name}': " +
-                        $"dist={distSheep:F2}, angle={angleSheep:F1}."
-                    );
-                }
-            }
-            else if (ctx.debugLogs)
+            // Inner zone = stronger damage
+            float damage = (distSheep <= innerRadius) ? ctx.slamInnerDamage : ctx.slamOuterDamage;
+
+            hp.ApplyDamage(damage);
+            damaged.Add(sheepRoot);
+
+            if (ctx.debugLogs)
             {
                 Debug.Log(
-                    $"{logPrefix} Sheep '{sheepRoot.name}' OUT OF ANGLE " +
-                    $"(dist={distSheep:F2}, angle={angleSheep:F1}, halfAngle={halfAngle:F1})."
+                    $"{logPrefix} Slam HIT SHEEP '{sheepRoot.name}': dist={distSheep:F2}, angle={angleSheep:F1}, dmg={damage}."
                 );
             }
         }
     }
 
-    // =========================================
-    //              HELPERS
-    // =========================================
-
     private void SetAttackDestination()
     {
-        Vector3 enemyPos  = agent.transform.position;
-        Vector3 playerPos = player.position;
+        Vector3 enemyPos = agent.transform.position;
+        Vector3 targetPos = target.position;
 
-        Vector3 fromPlayerToEnemy = enemyPos - playerPos;
-        fromPlayerToEnemy.y = 0f;
+        Vector3 fromTargetToEnemy = enemyPos - targetPos;
+        fromTargetToEnemy.y = 0f;
 
-        if (fromPlayerToEnemy.sqrMagnitude < 0.01f)
+        if (fromTargetToEnemy.sqrMagnitude < 0.01f)
         {
-            // on top of the player, just pick some direction
-            fromPlayerToEnemy = -player.forward;
+            fromTargetToEnemy = agent.transform.forward;
+            fromTargetToEnemy.y = 0f;
         }
 
-        fromPlayerToEnemy.Normalize();
+        fromTargetToEnemy.Normalize();
 
-        // like chase ring, but using attackApproachDistance
         float desiredDist = Mathf.Max(0f, ctx.attackApproachDistance);
-        Vector3 desiredPos = playerPos + fromPlayerToEnemy * desiredDist;
+        Vector3 desiredPos = targetPos + fromTargetToEnemy * desiredDist;
 
         if (NavMesh.SamplePosition(desiredPos, out NavMeshHit hit, 2f, NavMesh.AllAreas))
         {
@@ -389,14 +282,15 @@ public class AmalgamationSlamAttack
         }
         else if (!agent.pathPending)
         {
-            // fallback: just run directly to the player
-            agent.SetDestination(playerPos);
+            agent.SetDestination(targetPos);
         }
     }
 
-    private void RotateTowardsPlayer()
+    private void RotateTowardsTarget()
     {
-        Vector3 dir = player.position - agent.transform.position;
+        if (target == null) return;
+
+        Vector3 dir = target.position - agent.transform.position;
         dir.y = 0f;
 
         if (dir.sqrMagnitude < 0.0001f)

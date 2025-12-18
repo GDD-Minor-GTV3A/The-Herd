@@ -11,6 +11,26 @@ public class AmalgamationStateMachine : MonoBehaviour
     public List<Transform> patrolNodes;   // All the nodes in your maze
     public AmalgamationVision vision;     // Vision component on this enemy
 
+    [Header("Spawn / Intro State")]
+    [Tooltip("If true, Amalgamation will use the spawn intro (follow player -> enter trigger -> then patrol).")]
+    public bool useSpawnIntroState = true;
+
+    [Header("Targeting (Sheep)")]
+    [Tooltip("LayerMask used by attacks to find Sheep-layer colliders.")]
+    public LayerMask sheepMask; // set this to the Sheep layer in the Inspector
+
+    [Tooltip("BoxCollider (set as Trigger) that ends the spawn intro when the Amalgamation enters it.")]
+    public Collider spawnIntroEndTrigger;
+
+    [Tooltip("Speed while following the player during the spawn intro.")]
+    public float spawnIntroSpeed = 4f;
+
+    [Tooltip("How long to wait at the box before switching into the normal PATROL behaviour.")]
+    public float spawnWaitAtBoxTime = 2f;
+
+    // Set true when the enemy enters the trigger collider
+    [System.NonSerialized] public bool spawnIntroTriggerHit = false;
+
     [Header("Patrol Settings")]
     [Range(0f, 1f)] public float interceptChance = 0.6f;  // Chance to try to intersect player
     public float nodeReachThreshold = 0.5f;               // How close is "reached" a node?
@@ -50,6 +70,15 @@ public class AmalgamationStateMachine : MonoBehaviour
     public float chaseRotationSpeed = 10f;        // how fast we rotate to look at the player
     public float chaseSustainSpeed = 6f;          // sustained chase speed once we've reached the ring
     public float chasePreferredArriveTolerance = 1f;
+
+    [Header("ShootLine (Teo) Attack Distance")]
+    public float shootLineMinDistance = 25f;   // start using ShootLine at/after this distance
+    public float shootLineMaxDistance = 60f;   // optional; don't use if player is insanely far
+    public Transform lineFirePoint;          // spawn origin
+    public GameObject lineBulletPrefab;      // bullet prefab
+    public int lineBulletsInLine = 8;        // number of bullets
+    public float lineBulletSpacing = 1f;     // spread between bullets
+    public float lineIndicatorLength = 15f;
 
     // When losing aggro, we want to go back to a patrol node near (but not too close to) the player
     public float chaseReengageMinNodeDistance = 15f;
@@ -131,18 +160,20 @@ public class AmalgamationStateMachine : MonoBehaviour
     [HideInInspector] public Transform forcedFirstPatrolNode;
 
     // When did we last lose aggro? Used for re-aggro cooldown.
-    [System.NonSerialized, HideInInspector] 
+    [System.NonSerialized, HideInInspector]
     public float lastAggroLostTime = -999f;
 
     private IAmalgamationState currentState;
     private AmalgamationPatrolState patrolState;
     private AmalgamationChaseState chaseState;
     private AmalgamationAttackState attackState;
+    private AmalgamationSpawnIntroState spawnIntroState;
 
     // Expose states to other states (so Chase / Attack can switch)
     public AmalgamationPatrolState PatrolState => patrolState;
     public AmalgamationChaseState ChaseState => chaseState;
     public AmalgamationAttackState AttackState => attackState;
+    public AmalgamationSpawnIntroState SpawnIntroState => spawnIntroState;
 
     private void Awake()
     {
@@ -152,19 +183,38 @@ public class AmalgamationStateMachine : MonoBehaviour
         if (vision == null)
             vision = GetComponent<AmalgamationVision>();
 
-        if (anim == null)   
-            anim   = GetComponentInChildren<AmalgamationAnimBridge>(true);
+        if (anim == null)
+            anim = GetComponentInChildren<AmalgamationAnimBridge>(true);
+
         lastAggroLostTime = -999f;
-            
+
         // Create states
         patrolState = new AmalgamationPatrolState(this, agent, player, patrolNodes);
-        chaseState  = new AmalgamationChaseState(this, agent, player, patrolNodes);
+        chaseState = new AmalgamationChaseState(this, agent, player, patrolNodes);
         attackState = new AmalgamationAttackState(this, agent, player);
+        spawnIntroState = new AmalgamationSpawnIntroState(this, agent);
     }
 
     private void Start()
     {
-        SwitchState(patrolState);
+        // If we want to use the spawn intro and we have the required references, start there
+        if (useSpawnIntroState && spawnIntroEndTrigger != null && player != null)
+        {
+            if (debugLogs)
+            {
+                Debug.Log($"[Amalgamation {gameObject.name}] Starting in SPAWN INTRO state.");
+            }
+            SwitchState(spawnIntroState);
+        }
+        else
+        {
+            if (debugLogs)
+            {
+                Debug.Log($"[Amalgamation {gameObject.name}] Starting directly in PATROL " +
+                          "(spawn intro disabled or missing player/intro trigger).");
+            }
+            SwitchState(patrolState);
+        }
     }
 
     private void Update()
@@ -176,7 +226,7 @@ public class AmalgamationStateMachine : MonoBehaviour
         {
             // If lastAggroLostTime < 0, it means we've NEVER lost aggro yet -> no cooldown
             bool canReaggro = (lastAggroLostTime < 0f) ||
-                            (Time.time >= lastAggroLostTime + chaseReaggroCooldown);
+                              (Time.time >= lastAggroLostTime + chaseReaggroCooldown);
 
             if (canReaggro)
             {
@@ -195,9 +245,29 @@ public class AmalgamationStateMachine : MonoBehaviour
         // CHASE -> PATROL is handled inside AmalgamationChaseState.
     }
 
+    // NEW: detect when we enter the dragged intro trigger collider
+    private void OnTriggerEnter(Collider other)
+    {
+        if (!useSpawnIntroState) return;
+        if (spawnIntroEndTrigger == null) return;
+
+        if (other == spawnIntroEndTrigger)
+        {
+            spawnIntroTriggerHit = true;
+
+            if (debugLogs)
+                Debug.Log($"[Amalgamation {gameObject.name}] Spawn intro trigger ENTERED: {other.name}");
+        }
+    }
 
     public void SwitchState(IAmalgamationState newState)
     {
+        if (debugLogs)
+        {
+            string from = currentState != null ? currentState.GetType().Name : "NONE";
+            string to = newState != null ? newState.GetType().Name : "NULL";
+            Debug.Log($"[Amalgamation {gameObject.name}] SWITCH {from} -> {to}  (t={Time.time:F2})");
+        }
         currentState?.Exit();
         currentState = newState;
         currentState?.Enter();
