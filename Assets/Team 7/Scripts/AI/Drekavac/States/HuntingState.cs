@@ -20,14 +20,20 @@ namespace Team_7.Scripts.AI.Drekavac.States
         public override void OnUpdate()
         {
             var sheepObjects = _manager.GetSheep();
-            if (sheepObjects.Length == 0)
+            if (sheepObjects.Count == 0)
+            {
+                _manager.Flee();
                 return;
+            }
 
             GameObject? closestSheep = null;
             float closestDist = Mathf.Infinity;
 
             foreach (GameObject sheep in sheepObjects)
             {
+                if (sheep == null)
+                    continue;
+                
                 if (sheep.TryGetComponent<Grabbed>(out _))
                     continue;
                 

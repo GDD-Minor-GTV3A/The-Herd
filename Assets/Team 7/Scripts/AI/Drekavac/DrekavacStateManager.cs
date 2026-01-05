@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+
 using Core.Shared.StateMachine;
 using Core.Shared.Utilities;
 
@@ -8,6 +10,8 @@ using Team_7.Scripts.AI.Drekavac.States;
 using UnityEngine;
 using UnityEngine.AI;
 using Core.AI.Sheep;
+using Core.Events;
+using Team_7.Scripts.AI.Events;
 
 namespace Team_7.Scripts.AI.Drekavac
 {
@@ -29,7 +33,7 @@ namespace Team_7.Scripts.AI.Drekavac
         private GameObject _grabbedObject;
         private Rigidbody _grabbedObjectRb;
         private bool _grabbedObjectOriginalKinematic;
-        private GameObject[] _sheep = { }; // All the sheep in the scene
+        private List<GameObject> _sheep = new(); // All the sheep in the scene
 
         public void Initialize()
         {
@@ -67,8 +71,9 @@ namespace Team_7.Scripts.AI.Drekavac
 
             // Find sheep
             // TODO replace this
-            _sheep = GameObject.FindGameObjectsWithTag("Sheep");
-
+            _sheep = GameObject.FindGameObjectsWithTag("Sheep").ToList();
+            
+            EventManager.AddListener<KillSheepEvent>(OnSheepKilled);
             SetState<StalkingState>();
         }
         
@@ -193,12 +198,6 @@ namespace Team_7.Scripts.AI.Drekavac
             _grabPoint = gp.transform;
         }
 
-        public void Despawn()
-        {
-            //Destroy(_grabbedObject);
-            Destroy(gameObject);
-        }
-    
         public void ReleaseGrabbedObject()
         {
             if (_grabbedObject is null) return;
@@ -222,8 +221,13 @@ namespace Team_7.Scripts.AI.Drekavac
             _grabbedObject = null;
             _grabbedObjectRb = null;
         }
+        
+        void OnSheepKilled(KillSheepEvent evt)
+        {
+            _sheep.Remove(evt.Sheep.gameObject);
+        }
     
-        private void Flee()
+        public void Flee()
         {
             SetState<FleeingState>();
         }
@@ -243,7 +247,7 @@ namespace Team_7.Scripts.AI.Drekavac
             return _playerLocation;
         }
 
-        public GameObject[] GetSheep()
+        public List<GameObject> GetSheep()
         {
             return _sheep;
         }

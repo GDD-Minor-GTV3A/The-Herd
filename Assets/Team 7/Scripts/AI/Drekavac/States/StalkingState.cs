@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -14,8 +16,7 @@ namespace Team_7.Scripts.AI.Drekavac.States
         private float _nextSwitchTime;                      // Next time to switch circling direction
         private bool _isSettled;                            // True when enemy reached circle radius
         private float _stalkEndTime;                        // When to stop stalking and start hunting
-        private GameObject[] _sheep = { };
-        
+        private List<GameObject> _sheep = new();
         public StalkingState(DrekavacStateManager manager, EnemyMovementController movement, DrekavacStats stats, DrekavacAnimatorController animator, AudioController audio)
             : base(manager, movement, stats, animator, audio) { }
 
@@ -25,18 +26,18 @@ namespace Team_7.Scripts.AI.Drekavac.States
         
             // --- Compute initial circle center from sheep ---
             _sheep = _manager.GetSheep();
-            if (_sheep.Length > 0)
+            if (_sheep.Count > 0)
             {
                 Vector3 avgPos = Vector3.zero;
                 foreach (GameObject sheep in _sheep)
                     avgPos += sheep.transform.position;
-                avgPos /= _sheep.Length;
+                avgPos /= _sheep.Count;
                 _circleCenter = avgPos;
             }
             else
             {
-                // Fallback to player if no sheep exist
-                _circleCenter = _manager.GetPlayerLocation();
+                _manager.Flee();
+                Debug.LogWarning("Drekavac could not find a sheep");
             }
         
             // Position enemy at nearest point on the circle radius around the center
@@ -57,12 +58,20 @@ namespace Team_7.Scripts.AI.Drekavac.States
         public override void OnUpdate()
         {
             // Compute the average position of all sheep to use as circle center
-            if (_sheep.Length > 0)
+            if (_sheep.Count > 0)
             {
                 Vector3 avgPos = Vector3.zero;
+                var livingSheep = 0;
                 foreach (GameObject sheep in _sheep)
+                {
+                    if (sheep == null)
+                        continue;
+
+                    livingSheep++;
                     avgPos += sheep.transform.position;
-                avgPos /= _sheep.Length;
+                }
+
+                avgPos /= livingSheep;
                 _circleCenter = avgPos; // Update circle center each frame
             }
 

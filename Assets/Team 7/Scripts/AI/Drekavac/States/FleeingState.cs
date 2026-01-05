@@ -52,7 +52,7 @@ namespace Team_7.Scripts.AI.Drekavac.States
             if (!_movement.Agent.pathPending && 
                 _movement.Agent.hasPath &&
                 _movement.Agent.remainingDistance <= _movement.Agent.stoppingDistance + 0.5f) //TODO replace hardcoded value with variable
-                _manager.Despawn();
+                _manager.DestroySelf();
         }
     }
 }

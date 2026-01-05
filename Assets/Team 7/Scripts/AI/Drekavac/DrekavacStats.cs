@@ -13,7 +13,7 @@ namespace Team_7.Scripts.AI.Drekavac
         public float circleRadius = 10f;
         public float moveSpeed = 7f;
         public float sprintSpeed = 15f;
-        public float dragSpeed = 1.2f;
+        public float dragSpeed = 4f;
         public float circleSpeed = 7f;
         public float bigChargeSpeed = 20;
 
@@ -28,7 +28,7 @@ namespace Team_7.Scripts.AI.Drekavac
         [Header("Flee Settings")]
         public float fleeDistance = 30f;
         public float fleeSpeed = 15f;
-        public float fleeTriggerDistance = 3f;
+        public float fleeTriggerDistance = 5f;
     
         [Header("Audio Settings")]
         public AudioClip screechSound;

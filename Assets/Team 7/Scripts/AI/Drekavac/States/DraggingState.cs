@@ -2,6 +2,8 @@ using Core.AI.Sheep;
 using Core.AI.Sheep.Event;
 using Core.Events;
 
+using Team_7.Scripts.AI.Events;
+
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -34,10 +36,11 @@ namespace Team_7.Scripts.AI.Drekavac.States
                 _manager.GetStats().despawnDistance)
             {
                 _manager.GetGrabbedObject().TryGetComponent<SheepStateManager>(out var sheepManager);
+                EventManager.Broadcast(new KillSheepEvent(_manager.GetGrabbedObject()));
                 EventManager.Broadcast(new SheepDamageEvent(sheepManager, 1000, sheepManager.transform.position, source: _manager.gameObject));
-                
+
                 _manager.ReleaseGrabbedObject();
-                _manager.DestroySelf();
+                _manager.Flee();
                 return;
             }
 
@@ -47,6 +50,9 @@ namespace Team_7.Scripts.AI.Drekavac.States
             int count = 0;
             foreach (GameObject sheep in _manager.GetSheep())
             {
+                if (sheep == null)
+                    continue;
+                
                 if (sheep == _manager.GetGrabbedObject())
                     continue;
 
