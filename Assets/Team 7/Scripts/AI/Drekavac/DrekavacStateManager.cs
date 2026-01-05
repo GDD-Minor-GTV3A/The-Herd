@@ -113,6 +113,7 @@ namespace Team_7.Scripts.AI.Drekavac
         {
             if (_currentState is HuntingState && other.CompareTag("Sheep"))
             {
+                if (other.gameObject.TryGetComponent<Grabbed>(out _)) return;
                 Debug.Log("triggered");
                 GrabObject(other.gameObject);
             }

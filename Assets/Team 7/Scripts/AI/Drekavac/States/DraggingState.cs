@@ -49,6 +49,8 @@ namespace Team_7.Scripts.AI.Drekavac.States
             {
                 if (sheep == _manager.GetGrabbedObject())
                     continue;
+                if (sheep is null)
+                    continue;
 
                 sheepCenter += sheep.transform.position;
                 count++;

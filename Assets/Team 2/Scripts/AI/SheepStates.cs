@@ -156,6 +156,7 @@ namespace Core.AI.Sheep
             var agent = _stateManager.Agent;
             if (agent == null) return false;
             if(agent.pathPending) return false;
+            if(!agent.enabled) return false;
             return agent.remainingDistance <= REACH_THRESHOLD;
         }
     }
