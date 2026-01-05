@@ -61,7 +61,10 @@ namespace Team_7.Scripts.AI.Drekavac.States
             {
                 Vector3 avgPos = Vector3.zero;
                 foreach (GameObject sheep in _sheep)
+                {
+                    if (sheep == null) continue; // Skip null references
                     avgPos += sheep.transform.position;
+                }
                 avgPos /= _sheep.Length;
                 _circleCenter = avgPos; // Update circle center each frame
             }
