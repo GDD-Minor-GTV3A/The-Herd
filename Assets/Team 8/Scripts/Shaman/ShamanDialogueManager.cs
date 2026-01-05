@@ -10,7 +10,7 @@ public class ShamanDialogueManager : MonoBehaviour
     public GameObject dialoguePanel;
     public TMP_Text dialogueText;
     public TMP_Text speakerNameText;
-    public GameObject choiceButtons; 
+    public GameObject choiceButtons;
     public Image portraitFrame;
 
     [Header("Portraits")]
@@ -19,6 +19,7 @@ public class ShamanDialogueManager : MonoBehaviour
 
     private int index = 0;
     private bool inDialogue = false;
+    private bool choicesActive = false;
 
     [System.Serializable]
     public class DialogueChoice
@@ -33,7 +34,6 @@ public class ShamanDialogueManager : MonoBehaviour
         public string speaker;
         public string text;
         public DialogueChoice[] choices;
-        
         public int nextAfterThis = -1;
     }
 
@@ -44,18 +44,31 @@ public class ShamanDialogueManager : MonoBehaviour
     {
         dialoguePanel.SetActive(false);
         choiceButtons.SetActive(false);
+        choicesActive = false;
     }
 
     void Update()
     {
         if (!inDialogue) return;
 
+        // Handle choice selection with number keys
+        if (choicesActive)
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                ChooseChoiceByIndex(0);
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha2))
+            {
+                ChooseChoiceByIndex(1);
+            }
+            return;
+        }
+
+        // Advance dialogue normally
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
         {
-            if (lines[index].choices == null || lines[index].choices.Length == 0)
-            {
-                NextLine();
-            }
+            NextLine();
         }
     }
 
@@ -92,19 +105,23 @@ public class ShamanDialogueManager : MonoBehaviour
         if (line.choices != null && line.choices.Length > 0)
         {
             choiceButtons.SetActive(true);
+            choicesActive = true;
 
             for (int i = 0; i < choiceButtons.transform.childCount; i++)
             {
-                var button = choiceButtons.transform.GetChild(i).GetComponent<Button>();
-                var buttonText = button.GetComponentInChildren<TMP_Text>();
+                Button button = choiceButtons.transform.GetChild(i).GetComponent<Button>();
+                TMP_Text buttonText = button.GetComponentInChildren<TMP_Text>();
 
                 if (i < line.choices.Length)
                 {
                     button.gameObject.SetActive(true);
                     buttonText.text = line.choices[i].text;
+
                     int choiceIndex = i;
                     button.onClick.RemoveAllListeners();
-                    button.onClick.AddListener(() => Choose(line.choices[choiceIndex].nextLineIndex));
+                    button.onClick.AddListener(() =>
+                        Choose(line.choices[choiceIndex].nextLineIndex)
+                    );
                 }
                 else
                 {
@@ -115,13 +132,24 @@ public class ShamanDialogueManager : MonoBehaviour
         else
         {
             choiceButtons.SetActive(false);
+            choicesActive = false;
         }
+    }
+
+    void ChooseChoiceByIndex(int choiceIndex)
+    {
+        DialogueLine line = lines[index];
+
+        if (line.choices == null) return;
+        if (choiceIndex >= line.choices.Length) return;
+
+        Choose(line.choices[choiceIndex].nextLineIndex);
     }
 
     public void NextLine()
     {
         DialogueLine line = lines[index];
-        
+
         if (line.nextAfterThis >= 0)
         {
             index = line.nextAfterThis;
@@ -145,7 +173,9 @@ public class ShamanDialogueManager : MonoBehaviour
         dialoguePanel.SetActive(false);
         choiceButtons.SetActive(false);
         inDialogue = false;
-        if (shamanSpawner.Triggered == true)
+        choicesActive = false;
+
+        if (shamanSpawner != null && shamanSpawner.Triggered)
         {
             shamanSpawner.InterText.enabled = true;
         }
