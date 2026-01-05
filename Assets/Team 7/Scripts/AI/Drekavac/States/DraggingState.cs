@@ -26,7 +26,9 @@ namespace Team_7.Scripts.AI.Drekavac.States
 
         public override void OnUpdate()
         {
-            if (_manager.GetGrabbedObject() is null)
+            var grabbingObject = _manager.TryGetGrabbedObject(out var grabbedObject);
+            
+            if (!grabbingObject)
             {
                 _manager.SetState<HuntingState>();
                 return;
@@ -35,27 +37,24 @@ namespace Team_7.Scripts.AI.Drekavac.States
             if (Vector3.Distance(_manager.transform.position, _manager.GetPlayerLocation()) >
                 _manager.GetStats().despawnDistance)
             {
-                _manager.GetGrabbedObject().TryGetComponent<SheepStateManager>(out var sheepManager);
-                EventManager.Broadcast(new KillSheepEvent(_manager.GetGrabbedObject()));
-                EventManager.Broadcast(new SheepDamageEvent(sheepManager, 1000, sheepManager.transform.position, source: _manager.gameObject));
+                grabbedObject.TryGetComponent<SheepStateManager>(out var sheepManager);
+                EventManager.Broadcast(new KillSheepEvent(grabbedObject));
 
-                _manager.ReleaseGrabbedObject();
+                //EventManager.Broadcast(new SheepDamageEvent(sheepManager, 1000, sheepManager.transform.position, source: _manager.gameObject));
+                //_manager.ReleaseGrabbedObject();
                 _manager.Flee();
                 return;
             }
-
 
             // Compute average position of remaining sheep (excluding grabbed sheep)
             Vector3 sheepCenter = Vector3.zero;
             int count = 0;
             foreach (GameObject sheep in _manager.GetSheep())
             {
-                if (sheep == null)
+                if (sheep is null)
                     continue;
                 
-                if (sheep == _manager.GetGrabbedObject())
-                    continue;
-                if (sheep is null)
+                if (sheep == grabbedObject)
                     continue;
 
                 sheepCenter += sheep.transform.position;

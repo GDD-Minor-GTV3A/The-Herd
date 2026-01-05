@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 using Core.Shared.StateMachine;
@@ -22,6 +23,7 @@ namespace Team_7.Scripts.AI.Drekavac
     public class DrekavacStateManager : CharacterStateManager<IState>
     {
         [SerializeField][Required] private DrekavacStats _drekavacStats;
+        [SerializeField][Required] private GrabPoint _grabPoint;
         private AudioController _audioController;
         private EnemyMovementController _enemyMovementController;
         private DrekavacAnimatorController _drekavacAnimatorController;
@@ -29,7 +31,6 @@ namespace Team_7.Scripts.AI.Drekavac
         private GameObject _dogObject;
         private Vector3 _playerLocation;
         private Vector3 _dogLocation;
-        private Transform _grabPoint = null!;
         private GameObject _grabbedObject;
         private Rigidbody _grabbedObjectRb;
         private bool _grabbedObjectOriginalKinematic;
@@ -101,16 +102,22 @@ namespace Team_7.Scripts.AI.Drekavac
             {
                 _dogLocation = _dogObject.transform.position;
             }
-            if (_currentState is not FleeingState && (/*Vector3.Distance(transform.position, _playerLocation) <= _drekavacStats.fleeTriggerDistance ||*/ Vector3.Distance(transform.position, _dogLocation) <= _drekavacStats.fleeTriggerDistance))
+
+            if (_currentState is not FleeingState &&
+                ( /*Vector3.Distance(transform.position, _playerLocation) <= _drekavacStats.fleeTriggerDistance ||*/
+                    Vector3.Distance(transform.position, _dogLocation) <= _drekavacStats.fleeTriggerDistance))
+            {
+                ReleaseGrabbedObject();
                 Flee();
+            }
         }
         
         void LateUpdate()
         {
             if (_grabbedObject is not null)
             {
-                _grabbedObject.transform.position = _grabPoint.position;
-                _grabbedObject.transform.rotation = _grabPoint.rotation;
+                _grabbedObject.transform.position = _grabPoint.transform.position;
+                _grabbedObject.transform.rotation = _grabPoint.transform.rotation;
             }
         }
 
@@ -126,9 +133,9 @@ namespace Team_7.Scripts.AI.Drekavac
 
         private void GrabObject(GameObject grabbedObject)
         {
-            if (grabbedObject == null) return;
-            CreateGrabPoint(grabbedObject);
-            //CODE FOR DISABELING SHEEP AI WHEN GRABBED
+            if (grabbedObject == null) 
+                return;
+            
             NavMeshAgent SSM = grabbedObject.GetComponent<NavMeshAgent>();
             SSM.enabled = false;
 
@@ -165,10 +172,10 @@ namespace Team_7.Scripts.AI.Drekavac
             }
             else
             {
-                _grabbedObject.transform.position = _grabPoint.position;
+                _grabbedObject.transform.position = _grabPoint.transform.position;
             }
 
-            _grabbedObject.transform.SetParent(_grabPoint, false);
+            _grabbedObject.transform.SetParent(_grabPoint.transform, true);
             _grabbedObject.transform.localPosition = Vector3.zero;
             _grabbedObject.transform.localRotation = Quaternion.identity;
             _grabbedObject.AddComponent<Grabbed>();
@@ -184,7 +191,7 @@ namespace Team_7.Scripts.AI.Drekavac
             return Mathf.Abs(dir.x * extents.x) + Mathf.Abs(dir.y * extents.y) + Mathf.Abs(dir.z * extents.z);
         }
 
-        public void CreateGrabPoint(GameObject grabbedObject)
+        /*public void CreateGrabPoint(GameObject grabbedObject)
         {
             // Create a grab point if not assigned
             GameObject gp = new (gameObject.name + "_GrabPoint");
@@ -197,7 +204,7 @@ namespace Team_7.Scripts.AI.Drekavac
             gp.transform.SetParent(gameObject.transform);
             gp.transform.localPosition = new Vector3(0f, yOffset, grabbedZ + grabberZ);
             _grabPoint = gp.transform;
-        }
+        }*/
 
         public void ReleaseGrabbedObject()
         {
@@ -238,9 +245,11 @@ namespace Team_7.Scripts.AI.Drekavac
             return _drekavacStats;
         }
 
-        public GameObject GetGrabbedObject()
+        public bool TryGetGrabbedObject([NotNullWhen(true)] out GameObject grabbedObject)
         {
-            return _grabbedObject;
+            grabbedObject = _grabbedObject;
+            
+            return _grabbedObject is not null;
         }
 
         public Vector3 GetPlayerLocation()

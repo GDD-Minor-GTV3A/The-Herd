@@ -204,6 +204,8 @@ namespace Core.AI.Sheep
             {
                 _stateManager.Agent.isStopped = false;
             }
+            if (!_stateManager.Agent.enabled)
+                return;
             _stateManager.Agent.SetDestination(_currentTarget);
 
         }
