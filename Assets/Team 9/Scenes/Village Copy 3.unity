@@ -11850,9 +11850,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3d1b34f5f627264ba88794302dd7d32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  type: 0
   entryId: FromLevel2
   isDefault: 0
-  type: 0
   discovered: 1
 --- !u!1001 &397955769
 PrefabInstance:
@@ -16962,11 +16962,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: d1575d1c3ccb8fb49b3dd3bbd75470b5, type: 3}
   m_PrefabInstance: {fileID: 559931258}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &563711272 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 5225187035077598546, guid: de8c276fc2941a24e9412b756b76446e, type: 3}
-  m_PrefabInstance: {fileID: 1245864612}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &563748201
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -19320,6 +19315,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 602418655262605976, guid: 3afce97881ac9134da0620d0dc49eb06, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 274.30704
+      objectReference: {fileID: 0}
     - target: {fileID: 4520377452014377577, guid: 3afce97881ac9134da0620d0dc49eb06, type: 3}
       propertyPath: m_Name
       value: -------Player&Dog&Camera_DefaultSetUp-------
@@ -25545,9 +25544,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3d1b34f5f627264ba88794302dd7d32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  type: 0
   entryId: FromLevel3
   isDefault: 0
-  type: 0
   discovered: 1
 --- !u!1001 &900710192
 PrefabInstance:
@@ -35509,11 +35508,16 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 5225187035077598546, guid: de8c276fc2941a24e9412b756b76446e, type: 3}
+    - targetCorrespondingSourceObject: {fileID: 84673113832850427, guid: de8c276fc2941a24e9412b756b76446e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2068754619}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: de8c276fc2941a24e9412b756b76446e, type: 3}
+--- !u!4 &1245864613 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 84673113832850427, guid: de8c276fc2941a24e9412b756b76446e, type: 3}
+  m_PrefabInstance: {fileID: 1245864612}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1250286293
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -54885,9 +54889,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3d1b34f5f627264ba88794302dd7d32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  type: 0
   entryId: FromLevel1
   isDefault: 1
-  type: 0
   discovered: 1
 --- !u!1001 &1817708163
 PrefabInstance:
@@ -61574,7 +61578,7 @@ RectTransform:
   m_Children:
   - {fileID: 1581076489}
   - {fileID: 282291539}
-  m_Father: {fileID: 563711272}
+  m_Father: {fileID: 1245864613}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
