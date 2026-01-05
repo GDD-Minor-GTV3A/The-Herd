@@ -122,12 +122,15 @@ namespace Project.UI.Tutorials
 
             float _time = 0f;
             Color _color = fadeImage.color;
+            Color _textColor = storyMessage.color;
 
             while (_time < fadeDuration)
             {
                 _time += Time.deltaTime;
                 _color.a = Mathf.Lerp(1f, 0f, _time / fadeDuration);
+                _textColor.a = Mathf.Lerp(0.25f, 0f, _time / fadeDuration);
                 fadeImage.color = _color;
+                storyMessage.color = _textColor;
                 yield return null;
             }
 
