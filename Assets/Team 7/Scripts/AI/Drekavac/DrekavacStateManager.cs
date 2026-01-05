@@ -165,7 +165,7 @@ namespace Team_7.Scripts.AI.Drekavac
             _grabbedObject.transform.SetParent(_grabPoint, false);
             _grabbedObject.transform.localPosition = Vector3.zero;
             _grabbedObject.transform.localRotation = Quaternion.identity;
-
+            _grabbedObject.AddComponent<Grabbed>();
             SetState<DraggingState>();
         }
 
@@ -195,7 +195,7 @@ namespace Team_7.Scripts.AI.Drekavac
 
         public void Despawn()
         {
-            Destroy(_grabbedObject);
+            //Destroy(_grabbedObject);
             Destroy(gameObject);
         }
     
@@ -205,13 +205,20 @@ namespace Team_7.Scripts.AI.Drekavac
             NavMeshAgent SSM = _grabbedObject.GetComponent<NavMeshAgent>();
             SSM.enabled = true;
 
-            Rigidbody rb = _grabbedObject.GetComponent<Rigidbody>();
-            rb.isKinematic = true;
+            _grabbedObject.TryGetComponent<SheepStateManager>(out var sheepManager);
+            sheepManager.EnableBehavior();
+            
+            //Rigidbody rb = _grabbedObject.GetComponent<Rigidbody>();
+            //rb.isKinematic = true;
+            
             _grabbedObject.transform.SetParent(null, true);
 
-            if (_grabbedObjectRb is not null)
-                _grabbedObjectRb.isKinematic = _grabbedObjectOriginalKinematic;
+            //if (_grabbedObjectRb is not null)
+            //    _grabbedObjectRb.isKinematic = _grabbedObjectOriginalKinematic;
 
+            if (_grabbedObject.TryGetComponent<Grabbed>(out var grabbed))
+                Destroy(grabbed);
+            
             _grabbedObject = null;
             _grabbedObjectRb = null;
         }

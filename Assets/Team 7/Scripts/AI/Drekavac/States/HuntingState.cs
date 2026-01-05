@@ -28,6 +28,9 @@ namespace Team_7.Scripts.AI.Drekavac.States
 
             foreach (GameObject sheep in sheepObjects)
             {
+                if (sheep.TryGetComponent<Grabbed>(out _))
+                    continue;
+                
                 float dist = Vector3.Distance(_manager.transform.position, sheep.transform.position);
                 if (!(dist < closestDist))
                     continue;
