@@ -29,6 +29,9 @@ namespace Project.UI.Tutorials
         [Tooltip("Text shown to inform the player how to skip the intro.")]
         [SerializeField] private TextMeshProUGUI skipIntroText;
 
+        [Header("Story based message")]
+        [SerializeField] private TextMeshProUGUI storyMessage;
+
         private Coroutine fadeRoutine;
         private float skipHoldTimer;
         private bool isFading;
@@ -132,6 +135,11 @@ namespace Project.UI.Tutorials
             fadeImage.color = _color;
 
             fadeImage.gameObject.SetActive(false);
+
+            if (storyMessage != null)
+            {
+                storyMessage.gameObject.SetActive(false);
+            }
         }
     }
 }
