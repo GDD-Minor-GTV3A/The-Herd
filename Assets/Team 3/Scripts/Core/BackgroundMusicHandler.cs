@@ -25,8 +25,14 @@ namespace Project.Audio
         [Tooltip("Seconds used for fading volumes in/out.")]
         [SerializeField] private float fadeSeconds = 1.5f;
 
-        [Tooltip("Seconds to wait with wind ambience between music tracks.")]
-        [SerializeField] private float windPauseSeconds = 5f;
+        [Tooltip("Minimum seconds before the first music track can start.")]
+        [SerializeField] private float initialMusicDelaySeconds = 60f;
+
+        [Tooltip("Minimum seconds to wait with wind ambience between music tracks.")]
+        [SerializeField] private float minWindPauseSeconds = 70f;
+
+        [Tooltip("Maximum seconds to wait with wind ambience between music tracks.")]
+        [SerializeField] private float maxWindPauseSeconds = 100f;
 
         [Header("Volumes")]
         [Tooltip("Music volume while a track is playing.")]
@@ -77,6 +83,11 @@ namespace Project.Audio
         {
             yield return FadeVolume(windSource, windUnderMusicVolume, fadeSeconds);
 
+            if (initialMusicDelaySeconds > 0f)
+            {
+                yield return new WaitForSecondsRealtime(initialMusicDelaySeconds);
+            }
+
             while (true)
             {
                 var _clip = musicClips[currentIndex];
@@ -119,15 +130,32 @@ namespace Project.Audio
                 musicSource.Stop();
                 musicSource.volume = 0f;
 
-                if (windPauseSeconds > 0f)
+                float _pauseSeconds = GetRandomWindPauseSeconds();
+                if (_pauseSeconds > 0f)
                 {
-                    yield return new WaitForSecondsRealtime(windPauseSeconds);
+                    yield return new WaitForSecondsRealtime(_pauseSeconds);
                 }
 
                 yield return FadeVolume(windSource, windUnderMusicVolume, fadeSeconds);
 
                 currentIndex = (currentIndex + 1) % musicClips.Length;
             }
+        }
+
+        private float GetRandomWindPauseSeconds()
+        {
+            float _min = Mathf.Min(minWindPauseSeconds, maxWindPauseSeconds);
+            float _max = Mathf.Max(minWindPauseSeconds, maxWindPauseSeconds);
+
+            _min = Mathf.Max(0f, _min);
+            _max = Mathf.Max(_min, _max);
+
+            if (_max <= 0f)
+            {
+                return 0f;
+            }
+
+            return Random.Range(_min, _max);
         }
 
         private IEnumerator FadeVolume(AudioSource source, float targetVolume, float durationSeconds)
