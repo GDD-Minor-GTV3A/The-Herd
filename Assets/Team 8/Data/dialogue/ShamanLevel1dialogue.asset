@@ -1,0 +1,95 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd0f307230a28dd4cafaa0fd5e7e943c, type: 3}
+  m_Name: ShamanLevel1dialogue
+  m_EditorClassIdentifier: 
+  lines:
+  - speaker: Shaman
+    text: Greetings...
+    choices: []
+    nextAfterThis: -1
+  - speaker: Player
+    text: AHH! HOLY SH-
+    choices: []
+    nextAfterThis: -1
+  - speaker: Shaman
+    text: "Calm yourself\u2026 I think you wandered... too far."
+    choices:
+    - text: Wh-What?!?
+      nextLineIndex: 3
+    - text: Wa-Hu... WHO- WHAT ARE YOU!??!
+      nextLineIndex: 4
+    nextAfterThis: -1
+  - speaker: Shaman
+    text: This is not a place... for one like you.
+    choices: []
+    nextAfterThis: 5
+  - speaker: Shaman
+    text: My identity... is not of importance.
+    choices: []
+    nextAfterThis: 5
+  - speaker: Player
+    text: I-i-i--
+    choices: []
+    nextAfterThis: -1
+  - speaker: Shaman
+    text: Now that you are here... I need you to perform a task... for me. Gather
+      the sheep... that roam this land.
+    choices: []
+    nextAfterThis: -1
+  - speaker: Player
+    text: 'W-what? W-why? '
+    choices: []
+    nextAfterThis: -1
+  - speaker: Shaman
+    text: The sheep get scared by my... visage.
+    choices: []
+    nextAfterThis: -1
+  - speaker: Player
+    text: "B-but t-that still doesn\u2019t e-explain why I-I should do that? "
+    choices: []
+    nextAfterThis: -1
+  - speaker: Shaman
+    text: The village up ahead... is in grave danger. Getting the sheep all together...Will
+      allow us to save them all.
+    choices:
+    - text: U-us?
+      nextLineIndex: 11
+    - text: W-what v-village?
+      nextLineIndex: 12
+    nextAfterThis: -1
+  - speaker: Shaman
+    text: Yes... the two of us.
+    choices: []
+    nextAfterThis: 13
+  - speaker: Shaman
+    text: 'The one down this... harrowing road. Now... '
+    choices: []
+    nextAfterThis: 13
+  - speaker: Player
+    text: WH-WHAT DID YOU DO?!?
+    choices: []
+    nextAfterThis: -1
+  - speaker: Shaman
+    text: This is to ensure... your compliance. Leave the forest...Or stray too far...
+      and you will perish.
+    choices:
+    - text: WHY ME?!?
+      nextLineIndex: 15
+    - text: 'WHY SHEEP?!? '
+      nextLineIndex: 15
+    nextAfterThis: -1
+  - speaker: Shaman
+    text: You will get your answers...In due time. Now scurry...Off. I will wait
+      for you...at the end of the road.
+    choices: []
+    nextAfterThis: -1
