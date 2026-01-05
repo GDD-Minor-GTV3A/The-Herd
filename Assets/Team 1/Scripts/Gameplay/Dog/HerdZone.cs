@@ -103,9 +103,9 @@ namespace Gameplay.Dog
             if (freeSheep.Count == 0)
                 return;
 
-            foreach (SheepStateManager sheep in freeSheep)
+            for (int i = 0; i < freeSheep.Count; i++)
             {
-                HeardSheep(sheep);
+                HeardSheep(freeSheep[i]);
             }
         }
 
