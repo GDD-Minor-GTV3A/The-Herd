@@ -52,12 +52,12 @@ namespace Core.AI.Sheep
         {
             float speed = GetSpeed();
 
-            if (speed >= _runThreshold && Time.time >= nextJumpTime && !IsInJump())
+            /*if (speed >= _runThreshold && Time.time >= nextJumpTime && !IsInJump())
             {
                 //Debug.Log("Jump");
                 _animator.SetTrigger(_jumpHash);
                 ScheduleNextJump();
-            }
+            }*/
             if (speed <= _idleSpeed)
             {
                 if (Time.time >= _nextSwitchTime)
@@ -67,7 +67,7 @@ namespace Core.AI.Sheep
                     ScheduleIdle();
                 }
             }
-            if (speed < _runThreshold) ScheduleNextJump();
+            //if (speed < _runThreshold) ScheduleNextJump();
         }
 
         private void Reset()
