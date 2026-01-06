@@ -1322,7 +1322,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 3018951382313821739}
   m_Enabled: 1
   m_AgentTypeID: -334000983
-  m_Radius: 1.8
+  m_Radius: 0.6
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
@@ -1331,7 +1331,7 @@ NavMeshAgent:
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
-  m_Height: 2.3
+  m_Height: 0.77
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
@@ -1349,8 +1349,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerTransform: {fileID: 0}
   herdZone: {fileID: 7615872926369980527}
-  stepsSoundManager: {fileID: 0}
-  animator: {fileID: 3171391158692443822}
+  stepsSoundManager: {fileID: 7584023936537929165}
+  animator: {fileID: 3648023367269835576}
   config: {fileID: 11400000, guid: a9a53b25b4a842542b4086cfd00829cd, type: 2}
 --- !u!114 &3262632793578345549
 MonoBehaviour:
@@ -1434,10 +1434,10 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: UnityEngine.Animator, UnityEngine
-        m_MethodName: SetTrigger
-        m_Mode: 5
+      - m_Target: {fileID: 8274964810049798993}
+        m_TargetAssemblyTypeName: Gameplay.Audio.DogSoundManager, Team1
+        m_MethodName: PlayBarkSound
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -3458,7 +3458,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _player: {fileID: 0}
-  _halfExtents: {x: 12, y: 12}
+  _halfExtents: {x: 4, y: 4}
   _interval: 0.2
 --- !u!1 &6634447115382813582
 GameObject:
