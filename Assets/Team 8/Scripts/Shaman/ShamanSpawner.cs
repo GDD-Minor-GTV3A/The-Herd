@@ -10,6 +10,10 @@ public class ShamanSpawner : MonoBehaviour
     public ShamanAnimationHandler shamanAnimationHandler;
     public TextMeshProUGUI InterText;
 
+    [Header("VFX")]
+    public ParticleSystem spawnVFX;
+
+    private ParticleSystem activeVFX;
     private bool triggered = false;
     public bool Triggered => triggered;
 
@@ -33,6 +37,7 @@ public class ShamanSpawner : MonoBehaviour
             DespawnShaman();
             ResumeGlobalAudio();
             shamanDialogueManager.EndDialogue();
+
             if (shamanAnimationHandler != null && shamanAnimationHandler.shamanAudioSource != null)
             {
                 shamanAnimationHandler.shamanAudioSource.Stop();
@@ -53,13 +58,37 @@ public class ShamanSpawner : MonoBehaviour
     private void SpawnShaman()
     {
         if (npcShaman != null)
+        {
             npcShaman.SetActive(true);
+
+            if (spawnVFX != null)
+            {
+                activeVFX = Instantiate(
+                    spawnVFX,
+                    npcShaman.transform.position,
+                    spawnVFX.transform.rotation
+                );
+                activeVFX.Play();
+            }
+        }
     }
 
     private void DespawnShaman()
     {
         if (npcShaman != null)
+        {
+            if (spawnVFX != null)
+            {
+                ParticleSystem vfx = Instantiate(
+                    spawnVFX,
+                    npcShaman.transform.position,
+                    spawnVFX.transform.rotation
+                );
+                vfx.Play();
+            }
+
             npcShaman.SetActive(false);
+        }
     }
 
     // ---------------- GLOBAL AUDIO ----------------
