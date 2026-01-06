@@ -140,7 +140,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 602418655262605976, guid: 3afce97881ac9134da0620d0dc49eb06, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 21.352966
+      value: 21.352936
       objectReference: {fileID: 0}
     - target: {fileID: 3511701704155050573, guid: 3afce97881ac9134da0620d0dc49eb06, type: 3}
       propertyPath: m_Radius
@@ -1228,6 +1228,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1933720815}
   - component: {fileID: 1933720816}
+  - component: {fileID: 1933720817}
   m_Layer: 0
   m_Name: SanityTracker
   m_TagString: Untagged
@@ -1278,17 +1279,29 @@ MonoBehaviour:
     sanityRatePerSecond: 0
     zoneName: Warning
   - maxRadius: 15
-    sanityRatePerSecond: -2
+    sanityRatePerSecond: -1
     zoneName: Dangerous
   - maxRadius: 20
-    sanityRatePerSecond: -3
+    sanityRatePerSecond: -2
     zoneName: Death
   - maxRadius: 3.4028235e+38
-    sanityRatePerSecond: -3
+    sanityRatePerSecond: -2
     zoneName: Outside
   _escalationZoneIndex: 4
   _escalationRatePerSecond: -1
   _updateInterval: 0.1
+--- !u!114 &1933720817
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1933720813}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae753fc12c04e2e4c9d7c355d03d7e03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1952929439
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1651,7 +1664,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8345654652392638974, guid: 404449022f70f2244bc84f18383e9eeb, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.90000916
+      value: -0.9000244
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

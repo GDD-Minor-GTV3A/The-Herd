@@ -3,7 +3,11 @@ using TMPro;
 using Core.Events;
 using Core.AI.Sheep.Event;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+
+using UnityEngine.Analytics;
+using UnityEngine.Pool;
 
 using Random = UnityEngine.Random;
 
@@ -165,10 +169,15 @@ namespace Core.AI.Sheep
             // Get all active sheep
             SheepStateManager[] allSheep = FindObjectsByType<SheepStateManager>(FindObjectsSortMode.None);
 
+            HashSet<SheepStateManager> tamed = null;
+            
             foreach (var sheep in allSheep)
             {
                 if (sheep == null || !sheep.isActiveAndEnabled) continue;
-
+                
+                if (TamedSheep.Instance != null && !TamedSheep.Instance.WasEverTamed(sheep))
+                    continue;
+                
                 // Calculate distance to player
                 float distance = Vector3.Distance(sheep.transform.position, playerPos);
 
