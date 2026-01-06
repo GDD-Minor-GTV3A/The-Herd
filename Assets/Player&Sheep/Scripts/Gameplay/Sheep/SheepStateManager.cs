@@ -494,7 +494,7 @@ namespace Core.AI.Sheep
 
         public bool IsCurrentlyOutsideHerd()
         {
-            return FlockingUtility.IsOutSquare(transform.position, _playerCenter, _playerHalfExtents);
+            return !_isTamed;
         }
 
         public void SummonToHerd(float? graceSeconds = null, bool clearThreats = true)

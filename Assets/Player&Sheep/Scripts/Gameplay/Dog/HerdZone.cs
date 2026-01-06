@@ -43,10 +43,7 @@ namespace Gameplay.Dog
             if (_sheep == null)
                 return;
 
-            if (_sheep.IsCurrentlyOutsideHerd())
-            {
-                freeSheep.Add(_sheep);
-            }
+            freeSheep.Add(_sheep);
         }
 
 
@@ -56,8 +53,7 @@ namespace Gameplay.Dog
             if (_sheep == null)
                 return;
 
-            if (_sheep.IsCurrentlyOutsideHerd())
-                freeSheep.Remove(_sheep);
+            freeSheep.Remove(_sheep);
         }
 
 
