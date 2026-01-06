@@ -59,7 +59,6 @@ Go to the nearby ruins outside the village. It hasn’t been explored or set foo
 
 #speaker:Vesna
 I can show you the way. Follow me.
-
 ~ QUEST_001_accepted = true
 ~ QUEST_001_declined = false
 ~ StartQuest("QUEST_001")
