@@ -79,6 +79,7 @@ namespace Core.AI.Sheep
 
         [SerializeField] private bool _startAsStraggler;
         [SerializeField] private float _joinGrace = 3f;
+        [SerializeField] private bool _isTamed;
         private float _walkAwayReenableAt;
 
         /// <summary>
@@ -128,6 +129,11 @@ namespace Core.AI.Sheep
             _behaviorContext = new PersonalityBehaviorContext();
             _playerCenter = FindObjectOfType<SheepHerdController>().transform.position;
 
+            if (_startAsStraggler)
+            {
+                _isTamed = false;
+            }
+            
             InitializeStatesMap();
         }
 
@@ -487,6 +493,13 @@ namespace Core.AI.Sheep
         {
             Debug.Log("Event");
             _startAsStraggler = false;
+
+            if (!_isTamed)
+            {
+                _isTamed = true;
+                TamedSheep.Instance?.MarkTamed(this);
+                EventManager.Broadcast(new SheepJoinEvent(this));
+            }
 
             // apply grace so it doesn't immediately get lost again
             float grace = graceSeconds ?? _joinGrace;
