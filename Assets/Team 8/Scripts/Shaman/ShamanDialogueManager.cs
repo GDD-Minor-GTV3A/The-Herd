@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
@@ -17,9 +18,17 @@ public class ShamanDialogueManager : MonoBehaviour
     public Sprite shamanSprite;
     public Sprite playerSprite;
 
+    [Header("Typewriter")]
+    public float typingSpeed = 0.04f;
+
     private int index = 0;
     private bool inDialogue = false;
     private bool choicesActive = false;
+
+    // Typewriter state
+    private Coroutine typingCoroutine;
+    private bool isTyping = false;
+    private string currentFullLine = "";
 
     [System.Serializable]
     public class DialogueChoice
@@ -50,10 +59,11 @@ public class ShamanDialogueManager : MonoBehaviour
     void Update()
     {
         if (!inDialogue) return;
-
-        // Handle choice selection with number keys
+        
         if (choicesActive)
         {
+            if (isTyping) return;
+
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
                 ChooseChoiceByIndex(0);
@@ -65,9 +75,15 @@ public class ShamanDialogueManager : MonoBehaviour
             return;
         }
 
-        // Advance dialogue normally
+        // Advance dialogue or skip typing
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
         {
+            if (isTyping)
+            {
+                FinishTypingImmediately();
+                return;
+            }
+
             NextLine();
         }
     }
@@ -89,8 +105,8 @@ public class ShamanDialogueManager : MonoBehaviour
         }
 
         DialogueLine line = lines[index];
-        dialogueText.text = line.text;
 
+        // Speaker + portrait
         if (line.speaker == "Player")
         {
             speakerNameText.text = "Player";
@@ -101,6 +117,64 @@ public class ShamanDialogueManager : MonoBehaviour
             speakerNameText.text = "Shaman";
             portraitFrame.sprite = shamanSprite;
         }
+
+        // Stop any previous typing
+        if (typingCoroutine != null)
+        {
+            StopCoroutine(typingCoroutine);
+            typingCoroutine = null;
+        }
+
+        // Hide choices while typing
+        choiceButtons.SetActive(false);
+        choicesActive = false;
+
+        // Start typewriter
+        typingCoroutine = StartCoroutine(TypeLine(line.text));
+
+        // Show choices only after typing finishes (if this line has any)
+        StartCoroutine(ShowChoicesAfterTyping(line));
+    }
+
+    private IEnumerator TypeLine(string text)
+    {
+        isTyping = true;
+        currentFullLine = text;
+
+        dialogueText.text = text;
+        dialogueText.ForceMeshUpdate();
+
+        int totalChars = dialogueText.textInfo.characterCount;
+        dialogueText.maxVisibleCharacters = 0;
+
+        for (int i = 0; i <= totalChars; i++)
+        {
+            dialogueText.maxVisibleCharacters = i;
+            yield return new WaitForSeconds(typingSpeed);
+        }
+
+        isTyping = false;
+        typingCoroutine = null;
+    }
+
+    private void FinishTypingImmediately()
+    {
+        if (typingCoroutine != null)
+        {
+            StopCoroutine(typingCoroutine);
+            typingCoroutine = null;
+        }
+
+        dialogueText.text = currentFullLine;
+        dialogueText.ForceMeshUpdate();
+        dialogueText.maxVisibleCharacters = int.MaxValue;
+
+        isTyping = false;
+    }
+
+    private IEnumerator ShowChoicesAfterTyping(DialogueLine line)
+    {
+        while (isTyping) yield return null;
 
         if (line.choices != null && line.choices.Length > 0)
         {
@@ -148,6 +222,12 @@ public class ShamanDialogueManager : MonoBehaviour
 
     public void NextLine()
     {
+        if (index >= lines.Length)
+        {
+            EndDialogue();
+            return;
+        }
+
         DialogueLine line = lines[index];
 
         if (line.nextAfterThis >= 0)
@@ -170,6 +250,16 @@ public class ShamanDialogueManager : MonoBehaviour
 
     public void EndDialogue()
     {
+        // Stop typing if dialogue ends mid-line
+        if (typingCoroutine != null)
+        {
+            StopCoroutine(typingCoroutine);
+            typingCoroutine = null;
+        }
+
+        isTyping = false;
+        currentFullLine = "";
+
         dialoguePanel.SetActive(false);
         choiceButtons.SetActive(false);
         inDialogue = false;
