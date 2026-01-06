@@ -3,11 +3,12 @@ using UnityEngine;
 public class NEWInCameraDetector : MonoBehaviour
 {
     public Camera cam;
-
-    [SerializeField, ReadOnly] // You’ll define the ReadOnly attribute below
+    [SerializeField]
+    private float maxViewDistance = 12f;
+    [SerializeField, ReadOnly] 
     private bool _isVisible;
 
-    public bool IsVisible => _isVisible; // Public getter
+    public bool IsVisible => _isVisible; 
 
     private Plane[] camFrustum;
     private Collider[] colliders;
@@ -32,9 +33,18 @@ public class NEWInCameraDetector : MonoBehaviour
         camFrustum = GeometryUtility.CalculateFrustumPlanes(cam);
         bool currentlyVisible = false;
 
+        Vector3 camPos = cam.transform.position;
+        float maxDistSqr = maxViewDistance * maxViewDistance;
+
         foreach (var col in colliders)
         {
-            if (col != null && GeometryUtility.TestPlanesAABB(camFrustum, col.bounds))
+            if (col == null) continue;
+
+            
+            if ((col.bounds.center - camPos).sqrMagnitude > maxDistSqr)
+                continue;
+
+            if (GeometryUtility.TestPlanesAABB(camFrustum, col.bounds))
             {
                 currentlyVisible = true;
                 break;
@@ -45,7 +55,12 @@ public class NEWInCameraDetector : MonoBehaviour
         {
             foreach (var rend in renderers)
             {
-                if (rend != null && GeometryUtility.TestPlanesAABB(camFrustum, rend.bounds))
+                if (rend == null) continue;
+
+                if ((rend.bounds.center - camPos).sqrMagnitude > maxDistSqr)
+                    continue;
+
+                if (GeometryUtility.TestPlanesAABB(camFrustum, rend.bounds))
                 {
                     currentlyVisible = true;
                     break;

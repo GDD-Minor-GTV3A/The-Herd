@@ -42,7 +42,6 @@ namespace Gameplay.SanityEffects
             shadowsSpawner = gameObject.AddComponent<EnemyShadowsSpawner>();
             shadowsSpawner.Initialize(config, playerTransform);
 
-            EventManager.AddListener<SanityStageChangeEvent>(UpdateVisualEffects);
             EventManager.AddListener<SanityChangeEvent>(UpdateSpawner);
 
         }
@@ -61,6 +60,8 @@ namespace Gameplay.SanityEffects
                     shadowsSpawner.StartSpawner();
                 shadowsSpawner.UpdateCurrentChance(evt.Percentage);
             }
+
+            volume.weight = 1 - evt.Percentage / 100;
         }
 
 

@@ -84,9 +84,6 @@ PrefabInstance:
       addedObject: {fileID: 5339088807858897916}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: cc688abd024749141b4f7709fb922e81, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 6197805406145803232}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: cc688abd024749141b4f7709fb922e81, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 8955242974574131230}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: cc688abd024749141b4f7709fb922e81, type: 3}
       insertIndex: -1
@@ -140,41 +137,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetRenderer: {fileID: 0}
---- !u!114 &6197805406145803232
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2109449039902560593}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 74b7748a61bf2a940b3e29ded6113caa, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  currentState: 0
-  player: {fileID: 0}
-  detectionRange: 40
-  stalkCooldown: 2
-  timeToVanish: 3
-  playerTooFarDistance: 50
-  sheepDetector: {fileID: 0}
-  animator: {fileID: 0}
-  sheepAttackBoolName: Attack
-  attackStateName: Attack_Scarecrow
-  sheepLoseDelay: 0.5
-  _scareAmount: 1
-  vfx: {fileID: 0}
-  audioSource: {fileID: 0}
-  idleSound: {fileID: 0}
-  stalkingSound: {fileID: 0}
-  teleportSound: {fileID: 0}
-  reappearSound: {fileID: 0}
-  sfxVolume: 0.8
-  idleTeleportDelay: 10
-  requireOutOfPlayerView: 1
-  requireOutOfMonsterFOV: 0
-  teleportCooldown: 2
 --- !u!114 &8955242974574131230
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -242,6 +204,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 0}
+  maxViewDistance: 12
   _isVisible: 0
 --- !u!82 &640922352853643105
 AudioSource:

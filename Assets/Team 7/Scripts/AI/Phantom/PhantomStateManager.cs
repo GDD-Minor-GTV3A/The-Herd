@@ -5,7 +5,7 @@ using Core.Shared.Utilities;
 
 using Gameplay.Dog;
 using Gameplay.HealthSystem;
-using Gameplay.ToolsSystem.Tools.Rifle;
+//using Gameplay.ToolsSystem.Tools.Rifle;
 
 using Team_7.Scripts.AI.Phantom.States;
 
@@ -213,11 +213,11 @@ namespace Team_7.Scripts.AI.Phantom
         private void OnTriggerEnter(Collider other)
         {
             // TODO Make the bullet collide with the Phantom instead of having to do it like this
-            if (other.TryGetComponent<Bullet>(out var bullet))
+           /* if (other.TryGetComponent<Bullet>(out var bullet))
             {
                 TakeDamage(1);
                 return;
-            }
+            }*/
             
             if (stats.damage != 0)
                 return;

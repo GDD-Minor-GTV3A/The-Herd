@@ -83,11 +83,7 @@ namespace Gameplay.Dog
         }
 
 
-        /// <summary>
-        /// Adds sheep to herd.
-        /// </summary>
-        /// <param name="sheepToHeard">Sheep to add to herd.</param>
-        public void HeardSheep(SheepStateManager sheepToHeard)
+        private void HeardSheep(SheepStateManager sheepToHeard)
         {
             if (freeSheep.Contains(sheepToHeard))
             {
@@ -100,12 +96,17 @@ namespace Gameplay.Dog
 
 
         /// <summary>
-        /// Returns bool which says if there are any available free sheep.
+        /// Adds all newarby free sheep to herd.
         /// </summary>
-        /// <returns>Are there any available sheep.</returns>
-        public bool IsFreeSheepToHeard()
+        public void HerdAllSheep()
         {
-            return freeSheep.Count != 0;
+            if (freeSheep.Count == 0)
+                return;
+
+            foreach (SheepStateManager sheep in freeSheep)
+            {
+                HeardSheep(sheep);
+            }
         }
 
 

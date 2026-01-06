@@ -2,9 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Core.Events;
+
+using Gameplay.Player;
+
 using Ink.Runtime;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Audio; // Required for AudioMixerGroup if you use it in EnterDialogueMode
 
 /// <summary>
 /// A singleton class that manages the dialogue system,
@@ -29,11 +33,18 @@ public class DialogueManager : MonoBehaviour
     [Range(1, 3)]
     [SerializeField] private int _sanity = 2; // 1=low, 2=medium, 3=high
 
+    [Header("Sounds")]
+    [SerializeField] private AudioMixerGroup _whisperSoundMixerGroup; // The Mixer Group the whisper sound is routed through
+    
     // Private Fields
     private Story _story;
     private Animator _layoutAnimator;
     private string _pendingPortraitState;
     private System.Action _onDialogueFinished;
+    
+    // --- NEW FIELD FOR NPC AUDIO LINK ---
+    private NPCDialogueAudio _currentNPCAudio;
+    // --- END NEW FIELD ---
     
     // Variable persistence storage
     private Dictionary<string, object> _inkVariableState = new Dictionary<string, object>();
@@ -104,6 +115,15 @@ public class DialogueManager : MonoBehaviour
     private void OnEnable()
     {
         EventManager.AddListener<QuestCompletedEvent>(OnQuestCompleted);
+        // If you were using OnObjectiveCompleted, add listener here too:
+        // EventManager.AddListener<ObjectiveCompletedEvent>(OnObjectiveCompleted);
+    }
+
+    private void OnDisable()
+    {
+        EventManager.RemoveListener<QuestCompletedEvent>(OnQuestCompleted);
+        // If you were using OnObjectiveCompleted, remove listener here too:
+        // EventManager.RemoveListener<ObjectiveCompletedEvent>(OnObjectiveCompleted);
     }
 
 
@@ -152,15 +172,35 @@ public class DialogueManager : MonoBehaviour
     /// Enters dialogue mode by loading an Ink story and displaying the first line.
     /// </summary>
     /// <param name="inkJson">The Ink JSON file containing the dialogue script.</param>
+    /// <param name="speakerObject">The GameObject of the NPC currently speaking, used for audio and logic.</param>
     /// <param name="onDialogueFinished">Optional callback action when dialogue exits.</param>
-    public void EnterDialogueMode(TextAsset inkJson, System.Action onDialogueFinished = null)
+    public void EnterDialogueMode(TextAsset inkJson, GameObject speakerObject, System.Action onDialogueFinished = null)
     {
+        if (_whisperSoundMixerGroup != null)
+        {
+            _whisperSoundMixerGroup.audioMixer.SetFloat("WhisperVolume", -80); // -80 is effectively mute
+        }
+        
         if (IsDialoguePlaying)
         {
             return;
         }
 
+        //Set a different PlayerControlMap during dialogue 
+        if (PlayerInputHandler.Instance)
+        {
+            PlayerInputHandler.SwitchControlMap();
+        }
+        
         _story = new Story(inkJson.text);
+
+        // --- NEW: Set the current NPC Audio component reference ---
+        _currentNPCAudio = speakerObject?.GetComponent<NPCDialogueAudio>();
+        if (_currentNPCAudio == null && speakerObject != null)
+        {
+            _currentNPCAudio = speakerObject.GetComponentInParent<NPCDialogueAudio>();
+        }
+        // --- END NEW ---
         
         // Restore previously saved Ink variables
         RestoreInkVariables();
@@ -192,8 +232,16 @@ public class DialogueManager : MonoBehaviour
         _pendingPortraitState = null;
         _layoutAnimator?.Play(DEFAULT_LAYOUT_STATE); 
         
+        _currentNPCAudio = null; // Clear the NPC reference on exit
+        
         _onDialogueFinished?.Invoke(); 
         _onDialogueFinished = null;
+        
+        //Switch back PlayerControlMap after dialogue is finished
+        if (PlayerInputHandler.Instance)
+        {
+            PlayerInputHandler.SwitchControlMap();
+        }
     }
 
     /// <summary>
@@ -310,6 +358,16 @@ public class DialogueManager : MonoBehaviour
         {
             int visibleCount = counter % (totalVisibleCharacters + 1);
             _dialogueText.maxVisibleCharacters = visibleCount;
+            
+            // --- MODIFIED: Call the current NPC's audio component ---
+            if (_currentNPCAudio != null)
+            {
+                // Get the current character being displayed 
+                // We use TextMeshPro's textInfo to correctly handle rich text tags
+                char currentChar = _dialogueText.textInfo.characterInfo[counter].character;
+                _currentNPCAudio.PlayTypingSound(counter, currentChar);
+            }
+            // --- END MODIFIED ---
             
             counter++;
             yield return new WaitForSeconds(_typingSpeed);
