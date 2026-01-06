@@ -1,6 +1,8 @@
 using UnityEngine;
+using UnityEngine.Events;
 using TMPro;
 using UnityEngine.UI;
+using Gameplay.Player;
 
 public class ShamanDialogueManager : MonoBehaviour
 {
@@ -13,13 +15,20 @@ public class ShamanDialogueManager : MonoBehaviour
     public GameObject choiceButtons;
     public Image portraitFrame;
 
+    [Header("Game Over")]
+    [SerializeField] private GameObject gameOverPanel;
+
     [Header("Portraits")]
     public Sprite shamanSprite;
     public Sprite playerSprite;
 
+    [Header("Events")]
+    public UnityEvent onDialogueEnded;
+
     private int index = 0;
     private bool inDialogue = false;
     private bool choicesActive = false;
+    private bool isEnding = false;
 
     [System.Serializable]
     public class DialogueChoice
@@ -77,6 +86,10 @@ public class ShamanDialogueManager : MonoBehaviour
         index = 0;
         inDialogue = true;
         dialoguePanel.SetActive(true);
+
+        if (shamanSpawner != null)
+            shamanSpawner.InterText.enabled = false;
+
         ShowLine();
     }
 
@@ -175,9 +188,24 @@ public class ShamanDialogueManager : MonoBehaviour
         inDialogue = false;
         choicesActive = false;
 
+        onDialogueEnded?.Invoke();
+
+        if (isEnding && gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(true);
+            return;
+        }
+
+        PlayerInputHandler.EnableAllPlayerActions();
+
         if (shamanSpawner != null && shamanSpawner.Triggered)
         {
             shamanSpawner.InterText.enabled = true;
         }
+    }
+
+    public void SetIsEnding(bool value)
+    {
+        isEnding = value;
     }
 }
