@@ -128,13 +128,21 @@ namespace Core.AI.Sheep
             _personality = _archetype?.CreatePersonality(this);
             _behaviorContext = new PersonalityBehaviorContext();
             _playerCenter = FindObjectOfType<SheepHerdController>().transform.position;
+            
+            InitializeStatesMap();
+        }
 
-            if (_startAsStraggler)
+        private void Start()
+        {
+            if (!_startAsStraggler)
+            {
+                _isTamed = true;
+                TamedSheep.Instance?.MarkTamed(this);
+            }
+            else
             {
                 _isTamed = false;
             }
-            
-            InitializeStatesMap();
         }
 
         private void LateUpdate()
